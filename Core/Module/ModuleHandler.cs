@@ -7,6 +7,7 @@ using System.IO;
 using Lomztein.ModularDiscordBot.Core.Bot;
 using Lomztein.ModularDiscordBot.Core.Extensions;
 using System.Runtime.Loader;
+using Lomztein.ModularDiscordBot.Core.Configuration;
 
 namespace Lomztein.ModularDiscordBot.Core.Module
 {
@@ -23,10 +24,11 @@ namespace Lomztein.ModularDiscordBot.Core.Module
             LaunchLoad ();
         }
         
-        public void LaunchLoad() {
+        public async void LaunchLoad() {
 
             List<IModule> modules = LoadEntireDirectory (baseDirectory);
 
+            Log.Write (Log.Type.MODULE, "Pre-initializing modules.");
             foreach (IModule module in modules) {
                 try {
                     module.ParentModuleHandler = this;
@@ -37,6 +39,8 @@ namespace Lomztein.ModularDiscordBot.Core.Module
                 }
             }
 
+            await parentClient.AwaitFullBoot ();
+            Log.Write (Log.Type.MODULE, "Initializing modules.");
             foreach (IModule module in modules) {
                 try {
                     activeModules.Add (module);
@@ -46,6 +50,8 @@ namespace Lomztein.ModularDiscordBot.Core.Module
                 }
             }
 
+            ConfigureModules ();
+            Log.Write (Log.Type.MODULE, "Post-initializing modules.");
             foreach (IModule module in modules) {
                 try {
                     CheckModulePrerequisites (module);
@@ -117,7 +123,7 @@ namespace Lomztein.ModularDiscordBot.Core.Module
                 }
             }
 
-            foreach (string recommended in module.RecommnendedModules) {
+            foreach (string recommended in module.RecommendedModules) {
                 if (!HasModuleLoaded (recommended)) {
                     Log.Write (Log.Type.WARNING, $"Module {module.CompactizeName ()} is missing recommended module {recommended}.");
                 }
@@ -133,6 +139,11 @@ namespace Lomztein.ModularDiscordBot.Core.Module
         private void ShutdownModule (IModule module) {
             module.Shutdown ();
             activeModules.Remove (module);
+        }
+
+        private void ConfigureModules () {
+            foreach (IModule module in activeModules)
+                (module as IConfigurable)?.Configure ();
         }
     }
 }

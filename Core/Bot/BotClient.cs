@@ -1,13 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using Discord;
 using Discord.WebSocket;
 using System.Threading.Tasks;
 using Lomztein.ModularDiscordBot.Core.Module;
-using Lomztein.AdvDiscordCommands.Framework;
-using Lomztein.AdvDiscordCommands.ExampleCommands;
 using System.IO;
 using System.Threading;
+using System.Linq;
 
 namespace Lomztein.ModularDiscordBot.Core.Bot {
 
@@ -18,7 +16,6 @@ namespace Lomztein.ModularDiscordBot.Core.Bot {
 
         public DiscordSocketClient discordClient;
         private ModuleHandler moduleHandler;
-        private CommandRoot commandRoot;
 
         private CancellationToken shutdownToken = new CancellationToken ();
 
@@ -37,7 +34,6 @@ namespace Lomztein.ModularDiscordBot.Core.Bot {
             await discordClient.StartAsync ();
 
             InitializeListeners ();
-            InitializeCommandRoot ();
 
             moduleHandler = new ModuleHandler (this, baseDirectory + "/Modules/");
 
@@ -63,12 +59,12 @@ namespace Lomztein.ModularDiscordBot.Core.Bot {
             }
         }
 
-        private void InitializeCommandRoot () {
-            commandRoot = new CommandRoot ();
-        }
+        private bool IsBooted() => discordClient.Guilds.Count > 0 && discordClient.Guilds.ElementAtOrDefault (0) != null;
 
-        public CommandRoot GetCommandRoot () {
-            return commandRoot;
+        public async Task AwaitFullBoot () {
+            while (IsBooted () == false)
+                await Task.Delay (100);
+            return;
         }
     }
 }

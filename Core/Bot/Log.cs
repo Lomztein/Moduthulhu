@@ -18,5 +18,9 @@ namespace Lomztein.ModularDiscordBot.Core.Bot
         public static void Write (Exception exception) {
             Write (Type.EXCEPTION, exception.Message + " - " + exception.StackTrace);
         }
+
+        public static void Write(string text) {
+            Console.WriteLine (text);
+        }
     }
 }
