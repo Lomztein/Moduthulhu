@@ -5,6 +5,8 @@ using Lomztein.ModularDiscordBot.Core.Module.Framework;
 using System.Reflection;
 using System.IO;
 using Lomztein.ModularDiscordBot.Core.Bot;
+using Lomztein.ModularDiscordBot.Core.Extensions;
+using System.Runtime.Loader;
 
 namespace Lomztein.ModularDiscordBot.Core.Module
 {
@@ -20,8 +22,9 @@ namespace Lomztein.ModularDiscordBot.Core.Module
             baseDirectory = _baseDirectoy;
             LaunchLoad ();
         }
-
+        
         public void LaunchLoad() {
+
             List<IModule> modules = LoadEntireDirectory (baseDirectory);
 
             foreach (IModule module in modules) {
@@ -70,14 +73,16 @@ namespace Lomztein.ModularDiscordBot.Core.Module
 
             Log.Write (Log.Type.SYSTEM, "Loading assembly file " + Path.GetFileName (path));
             List<IModule> exportedModules = new List<IModule> ();
-            Assembly moduleAssembly = Assembly.LoadFile (path);
+
+            Assembly moduleAssembly = AssemblyLoadContext.Default.LoadFromAssemblyPath (path);
             Type [ ] exportedTypes = moduleAssembly.GetExportedTypes ();
 
             foreach (Type type in exportedTypes) {
 
                 if (type.GetInterface ("IModule") == typeof (IModule)) {
-                    exportedModules.Add (Activator.CreateInstance (type) as IModule);
-                    Log.Write (Log.Type.MODULE, "Module loaded: " + type.Name);
+                    IModule module = Activator.CreateInstance (type) as IModule;
+                    Log.Write (Log.Type.MODULE, "Module loaded: " + module.CompactizeName ());
+                    exportedModules.Add (module);
                 }
             }
 
@@ -107,14 +112,14 @@ namespace Lomztein.ModularDiscordBot.Core.Module
         private void CheckModulePrerequisites (IModule module) {
             foreach (string required in module.RequiredModules) {
                 if (HasModuleLoaded (required)) {
-                    Log.Write (Log.Type.EXCEPTION, $"Module {module.Name} cannot load due to missing module prerequisite {required}.");
+                    Log.Write (Log.Type.EXCEPTION, $"Module {module.CompactizeName ()} cannot load due to missing module prerequisite {required}.");
                     ShutdownModule (module);
                 }
             }
 
             foreach (string recommended in module.RecommnendedModules) {
                 if (!HasModuleLoaded (recommended)) {
-                    Log.Write (Log.Type.WARNING, $"Module {module.Name} is missing recommended module {recommended}.");
+                    Log.Write (Log.Type.WARNING, $"Module {module.CompactizeName ()} is missing recommended module {recommended}.");
                 }
             }
         }

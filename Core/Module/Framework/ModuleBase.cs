@@ -24,7 +24,5 @@ namespace Lomztein.ModularDiscordBot.Core.Module.Framework
 
         public abstract void Shutdown();
 
-        private string CompactizeName() => Author + "." + Name;
-
     }
 }
