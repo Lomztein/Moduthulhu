@@ -7,6 +7,9 @@ using Lomztein.ModularDiscordBot.Core.Bot;
 
 namespace Lomztein.ModularDiscordBot.Core.IO
 {
+    /// <summary>
+    /// Various JSON related serialization methods. Using the IO methods force the file extension to .json, for consistancy.
+    /// </summary>
     public static class JSONSerialization {
 
         private const string jsonExtension = ".json";

@@ -8,7 +8,7 @@ using Lomztein.ModularDiscordBot.Core.Configuration;
 using System.Collections.Generic;
 using Lomztein.ModularDiscordBot.Core.Bot;
 
-namespace ServerMessagesModule {
+namespace Lomztein.ModularDiscordBot.Modules.ServerMessages {
 
     public class ServerMessagesModule : ModuleBase, IConfigurable {
 
@@ -27,8 +27,6 @@ namespace ServerMessagesModule {
         private MultiEntry<string [ ]> onUserUnbannedFromGuild;
 
         public override void Initialize() {
-            Configuration = new MultiConfig (this.CompactizeName ());
-
             ParentBotClient.discordClient.JoinedGuild += OnJoinedNewGuild;
             ParentBotClient.discordClient.UserJoined += OnUserJoinedGuild;
             ParentBotClient.discordClient.UserLeft += OnUserLeftGuild;
@@ -37,7 +35,9 @@ namespace ServerMessagesModule {
         }
 
         public void Configure() {
+            Configuration = new MultiConfig (this.CompactizeName ());
             MultiConfig config = Configuration as MultiConfig;
+
             IEnumerable<SocketGuild> guilds = ParentBotClient.discordClient.Guilds;
             config.Load ();
 

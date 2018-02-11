@@ -8,6 +8,8 @@ using Lomztein.ModularDiscordBot.Core.Bot;
 using Lomztein.ModularDiscordBot.Core.Extensions;
 using System.Runtime.Loader;
 using Lomztein.ModularDiscordBot.Core.Configuration;
+using Lomztein.ModularDiscordBot.Core.IO;
+using System.Linq;
 
 namespace Lomztein.ModularDiscordBot.Core.Module
 {
@@ -15,6 +17,7 @@ namespace Lomztein.ModularDiscordBot.Core.Module
 
         public string baseDirectory = AppContext.BaseDirectory + "/Modules/";
         private List<IModule> activeModules = new List<IModule> ();
+        private Dictionary<string, bool> moduleEnableCache;
 
         private BotClient parentClient;
 
@@ -26,13 +29,17 @@ namespace Lomztein.ModularDiscordBot.Core.Module
         
         public async void LaunchLoad() {
 
+            LoadEnableCache ();
             List<IModule> modules = LoadEntireDirectory (baseDirectory);
+            activeModules = FilterEnabledModules (modules);
+            SaveEnableCache ();
 
             Log.Write (Log.Type.MODULE, "Pre-initializing modules.");
             foreach (IModule module in modules) {
                 try {
                     module.ParentModuleHandler = this;
                     module.ParentBotClient = parentClient;
+
                     module.PreInitialize ();
                 } catch (Exception exc) {
                     Log.Write (exc);
@@ -40,24 +47,21 @@ namespace Lomztein.ModularDiscordBot.Core.Module
             }
 
             await parentClient.AwaitFullBoot ();
+            ConfigureModules ();
+
             Log.Write (Log.Type.MODULE, "Initializing modules.");
             foreach (IModule module in modules) {
                 try {
-                    activeModules.Add (module);
                     module.Initialize ();
                 } catch (Exception exc) {
                     Log.Write (exc);
                 }
             }
 
-            ConfigureModules ();
             Log.Write (Log.Type.MODULE, "Post-initializing modules.");
             foreach (IModule module in modules) {
                 try {
-                    CheckModulePrerequisites (module);
-
-                    if (module != null)
-                        module.PostInitialize ();
+                     module.PostInitialize ();
                 } catch (Exception exc) {
                     Log.Write (exc);
                 }
@@ -65,7 +69,7 @@ namespace Lomztein.ModularDiscordBot.Core.Module
         }
 
         private List<IModule> LoadEntireDirectory(string path) {
-            string [ ] files = Directory.GetFiles (path);
+            string [ ] files = Directory.GetFiles (path, "*.dll");
             List<IModule> modules = new List<IModule> ();
 
             foreach (string file in files) {
@@ -95,39 +99,43 @@ namespace Lomztein.ModularDiscordBot.Core.Module
             return exportedModules;
         }
 
-        public (string name, string author) DecompressName (string compactName) {
-            string [ ] parts = compactName.Split ('.');
-            return (parts [ 0 ], parts[1]);
-        }
-
-        public bool HasModuleLoaded (string compactName) {
-            string name, author;
-            (name, author) = DecompressName (compactName);
-
-            return HasModuleLoaded (name, author);
-        }
-
-        public bool HasModuleLoaded(string moduleName, string moduleAuthor) {
-            return GetModule (moduleName, moduleAuthor) != null;
+        public bool IsModuleLoaded<T> () {
+            return GetModule<T>() != null;
         }
 
         public IModule GetModule (string moduleName, string moduleAuthor) {
             return activeModules.Find (x => x.Name == moduleName && x.Author == moduleAuthor);
         }
 
-        private void CheckModulePrerequisites (IModule module) {
-            foreach (string required in module.RequiredModules) {
-                if (HasModuleLoaded (required)) {
-                    Log.Write (Log.Type.EXCEPTION, $"Module {module.CompactizeName ()} cannot load due to missing module prerequisite {required}.");
-                    ShutdownModule (module);
-                }
-            }
+        public T GetModule<T>() {
+            IModule module = activeModules.Find (x => x.GetType () == typeof (T));
+            if (module == null)
+                return default (T);
+            else
+                return (T)module;
+        }
 
-            foreach (string recommended in module.RecommendedModules) {
-                if (!HasModuleLoaded (recommended)) {
-                    Log.Write (Log.Type.WARNING, $"Module {module.CompactizeName ()} is missing recommended module {recommended}.");
-                }
-            }
+        public void LoadEnableCache () {
+            moduleEnableCache = JSONSerialization.DeserializeFile<Dictionary<string, bool>> (baseDirectory + "cache");
+            if (moduleEnableCache == null)
+                moduleEnableCache = new Dictionary<string, bool> ();
+        }
+
+        public void SaveEnableCache () {
+            JSONSerialization.SerializeObject (moduleEnableCache, baseDirectory + "cache", true);
+        }
+
+        private bool IsModuleEnabled (string compactName) {
+            if (!moduleEnableCache.ContainsKey (compactName))
+                moduleEnableCache.Add (compactName, true);
+            return moduleEnableCache [ compactName ];
+        }
+
+        private List<IModule> FilterEnabledModules (IEnumerable<IModule> toCheck) {
+            toCheck = toCheck.Where (x => IsModuleEnabled (x.CompactizeName ())).ToList ();
+            toCheck = toCheck.Where (x => x.ContainsPrerequisites (toCheck)).ToList ();
+
+            return toCheck.ToList ();
         }
 
         private void InitializeModule (IModule module) {
