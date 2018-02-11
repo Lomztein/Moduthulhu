@@ -34,6 +34,7 @@ Well that's all there currently is for the core, but more is coming.
 
 * Server Messages, a module that sends various messages to chat on certain events!
 * Command Root, a module that implements my [Advanced Discord Commands](https://github.com/Lomztein/Advanced-Discord-Commands) library. It should act as a base for any other command-using module.
+* Standard Commands, a simple module that adds all standard commands from the arorementioned library.
 
 ## Creating new modules
 
@@ -118,9 +119,12 @@ Finally, you can implement IConfigurable on anything if to help you out a bit. T
 
 You're going to want to build your modules into .dll files for the core to load up and. The simple way to do this is just to build the project as with any other, and moving the primary output file into the build cores Modules folder. This should be fairly straightforward for anyone who've used Visual Studio in the past, albiet a bit of a trivial hassle after a few times.
 
-The slightly more advanced but easier once set up method is by using post-build commands. Right-click on your project in the solution explorer, click to "Properties", and go to the Build Events tab. To automatically copy the build module .dll, add this line to post-build event: `xcopy "$(TargetPath)" "$(SolutionDir)Core\bin\Debug\netcoreapp2.0\Modules\"`
+The slightly more advanced but easier once set up method is by using post-build commands. Right-click on your project in the solution explorer, click to "Properties", and go to the Build Events tab. To automatically copy the build module .dll, add this line to post-build event: `xcopy "$(TargetPath)" "$(SolutionDir)Core\bin\Debug\netcoreapp2.0\Modules\" /y`
 
 This will automatically copy the module into the given folder, which in this case is the default folder that VS builds to when you run the core project in the defualt Debug configuration. You can change the output path to whatever you want, but this should make it easier to test since you don't have to manually drag files around. Additionally, you can add more lines if you need it copied to different places or you perhaps need some additional files from the build, such as required assemblies or prerequisite modules.
+
+You can also add another xcopy line that copies the symbol files from compilation, which will make it much easier to debug your modules. They must be placed in the bots root folder, so a command line for this would look something like
+`xcopy "$(TargetDir)$(TargetFileName).pdb" "$(SolutionDir)Core\bin\Debug\netcoreapp2.0\" /y`
 
 ### Loading your modules
 
@@ -130,7 +134,7 @@ The module folder also contains i small JSON file that lists each module and whe
 
 ### Versions and compatability
 
-As long as the module implements the same IModule interface that the version of the bot you're running does, then it should work at the basic level no matter what. It's different if the module references parts of the core framework, which is more likely to change between versions. Same applies if the module refers to other modules.
+As long as the module implements the same IModule interface that the version of the bot you're running does, then it should work at the basic level no matter what. It's different if the module references parts of the core framework, which is more likely to change between versions. Same applies if the module refers to other modules. There is currently no version-checking system in place, and I'm not sure there will ever be one.
 
 ## Finally..
 
