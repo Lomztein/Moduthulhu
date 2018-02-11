@@ -138,12 +138,6 @@ namespace Lomztein.ModularDiscordBot.Core.Module
             return toCheck.ToList ();
         }
 
-        private void InitializeModule (IModule module) {
-            module.Initialize ();
-            activeModules.Add (module);
-            module.PostInitialize ();
-        }
-
         private void ShutdownModule (IModule module) {
             module.Shutdown ();
             activeModules.Remove (module);
