@@ -4,7 +4,7 @@ There is a story of a Discord Bot. A bot that became so bloated and so full of u
 
 *Ahem*, sorry.
 
-The point is that my previous Discord Bot, gloriously named Adminthulhu, became kind of a mess of code, and I was kinda sick of having issues with it. So here we are now. Welcome to the Modular Discord Bot repository!
+The point is that my previous Discord Bot, gloriously named Adminthulhu, became kind of a mess of code, and I became sick of having endless issues with it. So here we are now. Welcome to the Modular Discord Bot repository!
 
 So what is this all about, you might be wondering? As the name implies, it is a Discord bot build around the concept of a modular approach to features. Instead of having all features fighting for space in a single codebase, this bot splits features up into modules! Modules are dynamically loaded at runtime from .dll files, and can be written by anyone with a bit of C# experience and this codebase. The reason for the modular approach was a desire to have a single bot with many different features, so that you don't need to flood a server with like ten different bots, each doing a single thing.
 
@@ -32,9 +32,8 @@ Well that's all there currently is for the core, but more is coming.
 
 ### Standard modules
 
-* Server Messages, a module which sends various messages to chat on certain events!
-
-Well there isn't any more, but dude I've been working on this for like two days gimme a break.
+* Server Messages, a module that sends various messages to chat on certain events!
+* Command Root, a module that implements my [Advanced Discord Commands](https://github.com/Lomztein/Advanced-Discord-Commands) library. It should act as a base for any other command-using module.
 
 ## Creating new modules
 
@@ -46,12 +45,12 @@ Creating new modules is easy-ish once you've set up. Naturally you're going to h
 
 That should be the basics. Now to create an actual module.
 
-* Setting up shop:
-    * Open up this repositorys in your IDE, or create a new folder, doesn't really matter as long as you can refer to this in your code.
-    * Create a new project, something that compiles to a .dll file, like a library project.
-    * In references, add a reference to Core.dll, this will grant you access to the core framework.
-    * In references, add references to all modules you want to interact with. Am I repeating myself? :thinking:
-    * Create a new class, it must implement IModule in one way or another. Inheriting from ModuleBase is the recommended method.
+### Setting up shop
+* Open up this repositorys in your IDE, or create a new folder, doesn't really matter as long as you can refer to this in your code.
+* Create a new project, something that compiles to a .dll file, like a library project.
+* In references, add a reference to Core.dll, this will grant you access to the core framework.
+* In references, add references to all modules you want to interact with. Am I repeating myself? :thinking:
+* Create a new class, it must implement IModule in one way or another. Inheriting from ModuleBase is the recommended method.
 
 Next, to filling out the actual Module.
 
@@ -114,3 +113,27 @@ At the most basic level, configuration is based on saving objects with identifyi
 Usage of MultiConfig and MultiEntry can be seen in [Server Messages Module](ServerMessagesModule/ServerMessagesModule.cs), along with examples of creating a module in general.
 
 Finally, you can implement IConfigurable on anything if to help you out a bit. This interface contains a `Configure` method, which is supposed to contain the code which sets the variables from config. Implementing IConfigurable in a module tells the module manager to automatically configure the module just before Initialize is called, but after PreInitialize.
+
+### Building your modules
+
+You're going to want to build your modules into .dll files for the core to load up and. The simple way to do this is just to build the project as with any other, and moving the primary output file into the build cores Modules folder. This should be fairly straightforward for anyone who've used Visual Studio in the past, albiet a bit of a trivial hassle after a few times.
+
+The slightly more advanced but easier once set up method is by using post-build commands. Right-click on your project in the solution explorer, click to "Properties", and go to the Build Events tab. To automatically copy the build module .dll, add this line to post-build event: `xcopy "$(TargetPath)" "$(SolutionDir)Core\bin\Debug\netcoreapp2.0\Modules\"`
+
+This will automatically copy the module into the given folder, which in this case is the default folder that VS builds to when you run the core project in the defualt Debug configuration. You can change the output path to whatever you want, but this should make it easier to test since you don't have to manually drag files around. Additionally, you can add more lines if you need it copied to different places or you perhaps need some additional files from the build, such as required assemblies or prerequisite modules.
+
+### Loading your modules
+
+When the bot launches, it creates an instance of ModuleManager. This manager automatically loads up all .dll files in the Modules folder next to Core.dll, and loads all IModule objects from these .dll files into the ModuleManager. Non-module .dll files are also loaded into memory, which means you can add your own libraries to the folder, and it should work just fine. This also means having multiple modules per .dll file is perfectly viable, however it is recommended that you don't put multiple unrelated modules into a single .dll file, since it'd make it more difficult to manage.
+
+The module folder also contains i small JSON file that lists each module and whether or not they are enabled.
+
+### Versions and compatability
+
+As long as the module implements the same IModule interface that the version of the bot you're running does, then it should work at the basic level no matter what. It's different if the module references parts of the core framework, which is more likely to change between versions. Same applies if the module refers to other modules.
+
+## Finally..
+
+Want your module added to the list of standard modules? Just create a pull request, and I'll look into it.
+
+I have no idea what to name this bot. Currently it's just named "Modular Discord Bot", but that doesn't exactly roll of the tounge. I'd like a different, more radical name. Was considering Moduthulhu, but on the other hand I think my code already has enough eldritch horrors. The point is that new name suggestions are very welcome!
