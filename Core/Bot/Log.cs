@@ -20,7 +20,7 @@ namespace Lomztein.ModularDiscordBot.Core.Bot
         }
 
         public static void Write(string text) {
-            Console.WriteLine (text);
+            Write (Type.BOT, text);
         }
     }
 }

@@ -40,8 +40,8 @@ namespace Lomztein.ModularDiscordBot.Core.Module
 
             LoadCache ();
             List<IModule> modules = LoadEntireDirectory (baseDirectory);
+            await parentClient.AwaitFullBoot ();
             activeModules = FilterEnabledModules (modules);
-            SaveCache ();
 
             Log.Write (Log.Type.MODULE, "Pre-initializing modules.");
             foreach (IModule module in modules) {
@@ -55,7 +55,6 @@ namespace Lomztein.ModularDiscordBot.Core.Module
                 }
             }
 
-            await parentClient.AwaitFullBoot ();
             ConfigureModules ();
 
             Log.Write (Log.Type.MODULE, "Initializing modules.");
@@ -75,6 +74,8 @@ namespace Lomztein.ModularDiscordBot.Core.Module
                     Log.Write (exc);
                 }
             }
+
+            SaveCache ();
         }
 
         private List<IModule> LoadEntireDirectory(string path) {
@@ -108,7 +109,7 @@ namespace Lomztein.ModularDiscordBot.Core.Module
 
             foreach (Type type in exportedTypes) {
 
-                if (type is IModule) {
+                if (type.GetInterface ("IModule") == typeof (IModule)) {
                     IModule module = Activator.CreateInstance (type) as IModule;
                     Log.Write (Log.Type.MODULE, "Module loaded: " + module.CompactizeName ());
                     exportedModules.Add (module);
@@ -152,6 +153,10 @@ namespace Lomztein.ModularDiscordBot.Core.Module
 
         private List<IModule> FilterEnabledModules (IEnumerable<IModule> toCheck) {
             toCheck = toCheck.Where (x => IsModuleEnabled (x.CompactizeName ())).ToList ();
+            if (parentClient.IsMultiserver ()) {
+                toCheck = toCheck.Where (x => !x.Multiserver);
+            }
+
             toCheck = toCheck.Where (x => x.ContainsPrerequisites (toCheck)).ToList ();
 
             return toCheck.ToList ();

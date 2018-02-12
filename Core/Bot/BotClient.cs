@@ -66,5 +66,11 @@ namespace Lomztein.ModularDiscordBot.Core.Bot {
                 await Task.Delay (100);
             return;
         }
+
+        public bool IsMultiserver () {
+            if (!IsBooted ())
+                throw new Exception ("Cannot call IsMultiserver before bot is fully booted and connected.");
+            return discordClient.Guilds.Count != 1;
+        }
     }
 }
