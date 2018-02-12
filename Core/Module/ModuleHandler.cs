@@ -16,7 +16,11 @@ namespace Lomztein.ModularDiscordBot.Core.Module
     public class ModuleHandler {
 
         public string baseDirectory = AppContext.BaseDirectory + "/Modules/";
+
         private List<IModule> activeModules = new List<IModule> ();
+
+        private const string CACHE_ENABLE_NAME = "enabled";
+
         private Dictionary<string, bool> moduleEnableCache;
 
         private BotClient parentClient;
@@ -26,13 +30,18 @@ namespace Lomztein.ModularDiscordBot.Core.Module
             baseDirectory = _baseDirectoy;
             LaunchLoad ();
         }
-        
+
+        private Assembly OnAssemblyResolveFailed(object sender, ResolveEventArgs args) {
+            Log.Write (Log.Type.WARNING, "Assembly " + args.Name + " failed to resolve.");
+            return null;
+        }
+
         public async void LaunchLoad() {
 
-            LoadEnableCache ();
+            LoadCache ();
             List<IModule> modules = LoadEntireDirectory (baseDirectory);
             activeModules = FilterEnabledModules (modules);
-            SaveEnableCache ();
+            SaveCache ();
 
             Log.Write (Log.Type.MODULE, "Pre-initializing modules.");
             foreach (IModule module in modules) {
@@ -71,21 +80,31 @@ namespace Lomztein.ModularDiscordBot.Core.Module
         private List<IModule> LoadEntireDirectory(string path) {
             string [ ] files = Directory.GetFiles (path, "*.dll");
             List<IModule> modules = new List<IModule> ();
+            List<Assembly> assemblies = LoadAssemblies (files);
 
-            foreach (string file in files) {
-                modules.AddRange (LoadAssembly (file));
+            foreach (Assembly ass in assemblies) {
+                modules.AddRange (GetModulesFromAssembly (ass));
             }
 
             return modules;
         }
 
-        public List<IModule> LoadAssembly (string path) {
+        private List<Assembly> LoadAssemblies (params string[] paths) {
+            List<Assembly> result = new List<Assembly> ();
+            foreach (string path in paths) {
+                Log.Write (Log.Type.SYSTEM, "Loading assembly file " + Path.GetFileName (path));
+                Assembly ass = AssemblyLoadContext.Default.LoadFromAssemblyPath (path);
+                result.Add (ass);
+            }
 
-            Log.Write (Log.Type.SYSTEM, "Loading assembly file " + Path.GetFileName (path));
+            return result;
+        }
+
+        public List<IModule> GetModulesFromAssembly (Assembly ass) {
+
             List<IModule> exportedModules = new List<IModule> ();
 
-            Assembly moduleAssembly = AssemblyLoadContext.Default.LoadFromAssemblyPath (path);
-            Type [ ] exportedTypes = moduleAssembly.GetExportedTypes ();
+            Type[] exportedTypes = ass.GetExportedTypes (); // This is the shittiest line I've ever written.
 
             foreach (Type type in exportedTypes) {
 
@@ -108,21 +127,21 @@ namespace Lomztein.ModularDiscordBot.Core.Module
         }
 
         public T GetModule<T>() {
-            IModule module = activeModules.Find (x => x.GetType () == typeof (T));
+            IModule module = activeModules.Find (x => x is T);
             if (module == null)
                 return default (T);
             else
                 return (T)module;
         }
 
-        public void LoadEnableCache () {
-            moduleEnableCache = JSONSerialization.DeserializeFile<Dictionary<string, bool>> (baseDirectory + "cache");
+        public void LoadCache () {
+            moduleEnableCache = JSONSerialization.DeserializeFile<Dictionary<string, bool>> (baseDirectory + CACHE_ENABLE_NAME);
             if (moduleEnableCache == null)
                 moduleEnableCache = new Dictionary<string, bool> ();
         }
 
-        public void SaveEnableCache () {
-            JSONSerialization.SerializeObject (moduleEnableCache, baseDirectory + "cache", true);
+        public void SaveCache () {
+            JSONSerialization.SerializeObject (moduleEnableCache, baseDirectory + CACHE_ENABLE_NAME, true);
         }
 
         private bool IsModuleEnabled (string compactName) {

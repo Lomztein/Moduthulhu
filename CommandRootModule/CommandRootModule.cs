@@ -5,6 +5,7 @@ using Discord.WebSocket;
 using System.Threading.Tasks;
 using Discord;
 using Lomztein.ModularDiscordBot.Core.Bot;
+using Lomztein.ModularDiscordBot.Modules.ServerMessages;
 
 namespace Lomztein.ModularDiscordBot.Modules.CommandRoot
 {
