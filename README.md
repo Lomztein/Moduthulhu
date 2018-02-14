@@ -1,4 +1,4 @@
-# Modulthulhu - Modular Discord Bot
+# Moduthulhu - Modular Discord Bot
 
 There is a story of a Discord Bot. A bot that became so bloated and so full of useless, poorly planned or poorly executed features that it became little more than MOMS SPAGHETTI.
 
@@ -35,6 +35,7 @@ Well that's all there currently is for the core, but more is coming.
 * Server Messages, a module that sends various messages to chat on certain events!
 * Command Root, a module that implements my [Advanced Discord Commands](https://github.com/Lomztein/Advanced-Discord-Commands) library. It should act as a base for any other command-using module.
 * Standard Commands, a simple module that adds all standard commands from the arorementioned library.
+* User Activity Monitor, does exactly the same as the precurser variant, it's litteraly just a port to the modular architecture. This version works for multiserver bots however, and is more configurable.
 
 ## Creating new modules
 
