@@ -17,8 +17,6 @@ namespace Lomztein.ModularDiscordBot.Core.Bot {
         public DiscordSocketClient discordClient;
         private ModuleHandler moduleHandler;
 
-        private CancellationToken shutdownToken = new CancellationToken ();
-
         private string token;
 
         public string baseDirectory = AppContext.BaseDirectory;
@@ -37,7 +35,7 @@ namespace Lomztein.ModularDiscordBot.Core.Bot {
 
             moduleHandler = new ModuleHandler (this, baseDirectory + "/Modules/");
 
-            await Task.Delay (-1, shutdownToken);
+            await Task.Delay (-1);
             Log.Write (Log.Type.BOT, "Shutting down..");
         }
         
@@ -81,6 +79,26 @@ namespace Lomztein.ModularDiscordBot.Core.Bot {
 
         public SocketGuild GetGuild (ulong id) {
             return discordClient.GetGuild (id);
+        }
+
+        public SocketGuildUser GetUser (ulong id) {
+            if (!IsMultiserver ())
+                throw new InvalidOperationException ("You shouldn't request a user without guild ID from a multiserver bot.");
+            return GetGuild ().GetUser (id);
+        }
+
+        public SocketGuildUser GetUser(ulong guildID, ulong userID) {
+            return GetGuild (guildID).GetUser (userID);
+        }
+
+        public SocketRole GetRole (ulong id) {
+            if (!IsMultiserver ())
+                throw new InvalidOperationException ("You shouldn't request a role without guild ID from a multiserver bot.");
+            return GetGuild ().GetRole (id);
+        }
+
+        public SocketRole GetRole (ulong guildID, ulong roleID) {
+            return GetGuild (guildID).GetRole (roleID);
         }
 
         public SocketGuildChannel GetChannel (ulong id) {
