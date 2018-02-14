@@ -31,11 +31,6 @@ namespace Lomztein.ModularDiscordBot.Core.Module
             LaunchLoad ();
         }
 
-        private Assembly OnAssemblyResolveFailed(object sender, ResolveEventArgs args) {
-            Log.Write (Log.Type.WARNING, "Assembly " + args.Name + " failed to resolve.");
-            return null;
-        }
-
         public async void LaunchLoad() {
 
             LoadCache ();
@@ -162,7 +157,7 @@ namespace Lomztein.ModularDiscordBot.Core.Module
             return toCheck.ToList ();
         }
 
-        private void ShutdownModule (IModule module) {
+        public void ShutdownModule (IModule module) {
             module.Shutdown ();
             activeModules.Remove (module);
         }

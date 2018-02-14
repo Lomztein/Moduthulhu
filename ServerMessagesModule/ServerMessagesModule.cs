@@ -17,7 +17,7 @@ namespace Lomztein.ModularDiscordBot.Modules.ServerMessages {
         public override string Author => "Lomztein";
         public override bool Multiserver => true;
 
-        public Config Configuration { get; set; }
+        public MultiConfig config;
 
         private MultiEntry<ulong> channelIDs;
         private MultiEntry<string [ ]> onJoinedNewGuild;
@@ -25,6 +25,8 @@ namespace Lomztein.ModularDiscordBot.Modules.ServerMessages {
         private MultiEntry<string [ ]> onUserLeftGuild;
         private MultiEntry<string [ ]> onUserBannedFromGuild;
         private MultiEntry<string [ ]> onUserUnbannedFromGuild;
+
+        public Config GetConfiguration () => config;
 
         public override void Initialize() {
             ParentBotClient.discordClient.JoinedGuild += OnJoinedNewGuild;
@@ -35,11 +37,8 @@ namespace Lomztein.ModularDiscordBot.Modules.ServerMessages {
         }
 
         public void Configure() {
-            Configuration = new MultiConfig (this.CompactizeName ());
-            MultiConfig config = Configuration as MultiConfig;
-
+            config = new MultiConfig (this.CompactizeName ());
             IEnumerable<SocketGuild> guilds = ParentBotClient.discordClient.Guilds;
-            config.Load ();
 
             channelIDs = config.GetEntries<ulong> (guilds, "ChannelID", 0);
             onJoinedNewGuild = config.GetEntries (guilds, "OnJoinedNewGuild", new string [ ] { "Behold! it is I, [BOTNAME]!" });

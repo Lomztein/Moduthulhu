@@ -15,7 +15,7 @@ namespace Lomztein.ModularDiscordBot.Modules.CommandRoot
 
         public override bool Multiserver => true;
 
-        public override string [ ] RequiredModules { get => new string [ ] { "Lomztein.Command Root" }; }
+        public override string [ ] RequiredModules { get => new string [ ] { "Lomztein_Command Root" }; }
 
         private Command [ ] commands = new Command [ ] {
                 new HelpCommand (),

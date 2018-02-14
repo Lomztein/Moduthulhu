@@ -10,10 +10,10 @@ namespace Lomztein.ModularDiscordBot.Core.Extensions
 {
     public static class ModuleExtensions
     {
-        public static string CompactizeName (this IModule module) => (module.Author + "." + module.Name);
+        public static string CompactizeName (this IModule module) => (module.Author + "_" + module.Name);
 
         public static (string name, string author) DecompactizeModuleName(this string name) {
-            string [ ] split = name.Split ('.');
+            string [ ] split = name.Split ('_');
             return (split[1], split[0]);
         }
 

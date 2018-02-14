@@ -8,6 +8,6 @@ namespace Lomztein.ModularDiscordBot.Core.Configuration
     {
         void Configure();
 
-        Config Configuration { get; set; }
+        Config GetConfiguration();
     }
 }

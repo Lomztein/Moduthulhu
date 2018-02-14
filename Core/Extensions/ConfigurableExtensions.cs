@@ -8,7 +8,7 @@ namespace Lomztein.ModularDiscordBot.Core.Extensions
     public static class ConfigurableExtensions
     {
         public static void ReloadConfiguration (this IConfigurable configurable) {
-            configurable.Configuration.Load ();
+            configurable.GetConfiguration ()?.Load ();
             configurable.Configure ();
         }
     }

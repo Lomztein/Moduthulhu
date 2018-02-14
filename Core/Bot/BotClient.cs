@@ -59,7 +59,7 @@ namespace Lomztein.ModularDiscordBot.Core.Bot {
             }
         }
 
-        private bool IsBooted() => discordClient.Guilds.Count > 0 && discordClient.Guilds.ElementAtOrDefault (0) != null;
+        private bool IsBooted() => discordClient.Guilds.Count > 0 && discordClient.Guilds.ElementAtOrDefault (0) != null && discordClient.Guilds.ElementAt (0).Users.ElementAtOrDefault (0) != null;
 
         public async Task AwaitFullBoot () {
             while (IsBooted () == false)
