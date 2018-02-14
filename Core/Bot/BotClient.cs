@@ -69,8 +69,38 @@ namespace Lomztein.ModularDiscordBot.Core.Bot {
 
         public bool IsMultiserver () {
             if (!IsBooted ())
-                throw new Exception ("Cannot call IsMultiserver before bot is fully booted and connected.");
+                throw new InvalidOperationException ("Cannot call IsMultiserver before bot is fully booted and connected.");
             return discordClient.Guilds.Count != 1;
+        }
+
+        public SocketGuild GetGuild () {
+            if (!IsMultiserver ())
+                throw new InvalidOperationException ("You shouldn't request a guild without ID from a multiserver bot.");
+            return discordClient.Guilds.First ();
+        }
+
+        public SocketGuild GetGuild (ulong id) {
+            return discordClient.GetGuild (id);
+        }
+
+        public SocketGuildChannel GetChannel (ulong id) {
+            if (!IsMultiserver ())
+                throw new InvalidOperationException ("You shouldn't request a channel without guild ID from a multiserver bot.");
+            return GetGuild ().GetChannel (id);
+        }
+
+        public SocketGuildChannel GetChannel (ulong guildID, ulong channelID) {
+            return GetGuild (guildID)?.GetChannel (channelID);
+        }
+
+        public async Task<IMessage> GetMessage (ulong channelID, ulong messageID) {
+            if (!IsMultiserver ())
+                throw new InvalidOperationException ("You shouldn't request a message without guild ID from a multiserver bot.");
+            return await (GetGuild ().GetChannel (channelID) as SocketTextChannel)?.GetMessageAsync (messageID);
+        }
+
+        public async Task<IMessage> GetMessage(ulong guildID, ulong channelID, ulong messageID) {
+            return await (GetGuild (guildID).GetChannel (channelID) as SocketTextChannel)?.GetMessageAsync (messageID);
         }
     }
 }
