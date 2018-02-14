@@ -14,7 +14,7 @@ namespace Lomztein.ModularDiscordBot.Modules.Clock.ActivityMonitor
 {
     public class UserActivityMonitorModule : ModuleBase, ITickable, IConfigurable {
 
-        public override string Name => "User Activity Monitor";
+        public override string Name => "User Activity Module";
         public override string Description => "Catagorises people into configurable roles based on their last date of activity. Not recommended, but possible for multiserver.";
         public override string Author => "Lomztein";
 

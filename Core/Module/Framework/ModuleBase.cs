@@ -13,6 +13,9 @@ namespace Lomztein.ModularDiscordBot.Core.Module.Framework
         public abstract string Author { get; }
         public abstract bool Multiserver { get; }
 
+        public virtual string AuthorURL { get; } = "";
+        public virtual string PatchURL { get; } = "";
+
         public virtual string [ ] RequiredModules { get; } = new string [ 0 ];
         public virtual string [ ] RecommendedModules { get; } = new string [ 0 ];
         public virtual string [ ] ConflictingModules { get; } = new string [ 0 ];
