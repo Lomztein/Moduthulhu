@@ -1,4 +1,4 @@
-# Modular Discord Bot
+# Moduthulhu - Modular Discord Bot
 
 There is a story of a Discord Bot. A bot that became so bloated and so full of useless, poorly planned or poorly executed features that it became little more than MOMS SPAGHETTI.
 
@@ -35,6 +35,7 @@ Well that's all there currently is for the core, but more is coming.
 * Server Messages, a module that sends various messages to chat on certain events!
 * Command Root, a module that implements my [Advanced Discord Commands](https://github.com/Lomztein/Advanced-Discord-Commands) library. It should act as a base for any other command-using module.
 * Standard Commands, a simple module that adds all standard commands from the arorementioned library.
+* User Activity Monitor, does exactly the same as the precurser variant, it's litteraly just a port to the modular architecture. This version works for multiserver bots however, and is more configurable.
 
 ## Creating new modules
 
@@ -140,4 +141,4 @@ As long as the module implements the same IModule interface that the version of 
 
 Want your module added to the list of standard modules? Just create a pull request, and I'll look into it.
 
-I have no idea what to name this bot. Currently it's just named "Modular Discord Bot", but that doesn't exactly roll of the tounge. I'd like a different, more radical name. Was considering Moduthulhu, but on the other hand I think my code already has enough eldritch horrors. The point is that new name suggestions are very welcome!
+Yes, the name of this bot is incredibly cheesy, but considering it's a successor to my previous bot of a similar name, and the fact that we all should hail the eldritch beings, I decided to name it Moduthulhu. I could probably come up with a cool-sounding name for it, but I've never really been one for slick sounding names. If anything I prefer mythological and mystical namings, perhaps a result of musical taste. \m/
