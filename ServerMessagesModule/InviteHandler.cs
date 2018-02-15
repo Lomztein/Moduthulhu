@@ -14,7 +14,7 @@ namespace Lomztein.ModularDiscordBot.Modules.ServerMessages
         public static Dictionary<string, RestInviteMetadata> savedInvites;
         public BotClient parentBotClient;
 
-        public void Initialize(BotClient _parent) {
+        public InviteHandler (BotClient _parent) {
             parentBotClient = _parent;
 
             foreach (SocketGuild guild in parentBotClient.discordClient.Guilds) {

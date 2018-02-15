@@ -72,7 +72,7 @@ namespace Lomztein.ModularDiscordBot.Core.Bot {
         }
 
         public SocketGuild GetGuild () {
-            if (!IsMultiserver ())
+            if (IsMultiserver ())
                 throw new InvalidOperationException ("You shouldn't request a guild without ID from a multiserver bot.");
             return discordClient.Guilds.First ();
         }
@@ -82,7 +82,7 @@ namespace Lomztein.ModularDiscordBot.Core.Bot {
         }
 
         public SocketGuildUser GetUser (ulong id) {
-            if (!IsMultiserver ())
+            if (IsMultiserver ())
                 throw new InvalidOperationException ("You shouldn't request a user without guild ID from a multiserver bot.");
             return GetGuild ().GetUser (id);
         }
@@ -92,7 +92,7 @@ namespace Lomztein.ModularDiscordBot.Core.Bot {
         }
 
         public SocketRole GetRole (ulong id) {
-            if (!IsMultiserver ())
+            if (IsMultiserver ())
                 throw new InvalidOperationException ("You shouldn't request a role without guild ID from a multiserver bot.");
             return GetGuild ().GetRole (id);
         }
@@ -102,7 +102,7 @@ namespace Lomztein.ModularDiscordBot.Core.Bot {
         }
 
         public SocketGuildChannel GetChannel (ulong id) {
-            if (!IsMultiserver ())
+            if (IsMultiserver ())
                 throw new InvalidOperationException ("You shouldn't request a channel without guild ID from a multiserver bot.");
             return GetGuild ().GetChannel (id);
         }
@@ -112,7 +112,7 @@ namespace Lomztein.ModularDiscordBot.Core.Bot {
         }
 
         public async Task<IMessage> GetMessage (ulong channelID, ulong messageID) {
-            if (!IsMultiserver ())
+            if (IsMultiserver ())
                 throw new InvalidOperationException ("You shouldn't request a message without guild ID from a multiserver bot.");
             return await (GetGuild ().GetChannel (channelID) as SocketTextChannel)?.GetMessageAsync (messageID);
         }

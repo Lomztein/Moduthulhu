@@ -30,7 +30,7 @@ namespace Lomztein.ModularDiscordBot.Modules.ServerMessages {
 
         public Config GetConfiguration () => config;
 
-        private InviteHandler inviteHandler = new InviteHandler ();
+        private InviteHandler inviteHandler;
 
         public override void Initialize() {
             ParentBotClient.discordClient.JoinedGuild += OnJoinedNewGuild;
@@ -38,6 +38,8 @@ namespace Lomztein.ModularDiscordBot.Modules.ServerMessages {
             ParentBotClient.discordClient.UserLeft += OnUserLeftGuild;
             ParentBotClient.discordClient.UserBanned += OnUserBannedFromGuild;
             ParentBotClient.discordClient.UserUnbanned += OnUserUnbannedFromGuild;
+
+            inviteHandler = new InviteHandler (ParentBotClient);
         }
 
         public void Configure() {
@@ -45,12 +47,12 @@ namespace Lomztein.ModularDiscordBot.Modules.ServerMessages {
             IEnumerable<SocketGuild> guilds = ParentBotClient.discordClient.Guilds;
 
             channelIDs = config.GetEntries<ulong> (guilds, "ChannelID", 0);
-            onJoinedNewGuild = config.GetEntries (guilds, "OnJoinedNewGuild", new string [ ] { "Behold! it is I, [BOTNAME]!" });
-            onUserJoinedGuild = config.GetEntries (guilds, "OnUserJoinedGuild", new string [ ] { "[USERNAME] has joined this server!" });
-            onUserJoinedGuildByInvite = config.GetEntries (guilds, "OnUserJoinedGuildByInvite", new string [ ] { "[USERNAME] has joined this server by the help of [INVITERNAME]!" });
-            onUserLeftGuild = config.GetEntries (guilds, "OnUserLeftGuild", new string [ ] { "[USERNAME] has left this server. ;-;" });
-            onUserBannedFromGuild = config.GetEntries (guilds, "OnUserBannedFromGuild", new string [ ] { "[USERNAME] has been banned from this server." });
-            onUserUnbannedFromGuild = config.GetEntries (guilds, "OnUserUnbannedFromGuild", new string [ ] { "[USERNAME] has been unbanned from this server." });
+            onJoinedNewGuild = config.GetEntries (guilds, "OnJoinedNewGuild", new string [ ] { "Behold! it is I, **[BOTNAME]**!" });
+            onUserJoinedGuild = config.GetEntries (guilds, "OnUserJoinedGuild", new string [ ] { "**[USERNAME]** has joined this server!" });
+            onUserJoinedGuildByInvite = config.GetEntries (guilds, "OnUserJoinedGuildByInvite", new string [ ] { "**[USERNAME]** has joined this server by the help of **[INVITERNAME]**!" });
+            onUserLeftGuild = config.GetEntries (guilds, "OnUserLeftGuild", new string [ ] { "**[USERNAME]** has left this server. ;-;" });
+            onUserBannedFromGuild = config.GetEntries (guilds, "OnUserBannedFromGuild", new string [ ] { "**[USERNAME]** has been banned from this server." });
+            onUserUnbannedFromGuild = config.GetEntries (guilds, "OnUserUnbannedFromGuild", new string [ ] { "**[USERNAME]** has been unbanned from this server." });
 
             config.Save ();
         }
@@ -85,12 +87,12 @@ namespace Lomztein.ModularDiscordBot.Modules.ServerMessages {
 
         private async void SendMessage (SocketGuild guild, MultiEntry<string[]> messages, params string[] findAndReplace) {
 
-            SocketTextChannel channel = guild.GetTextChannel (channelIDs.GetEntry (guild));
+            SocketTextChannel channel = ParentBotClient.GetChannel (guild.Id, channelIDs.GetEntry (guild)) as SocketTextChannel;
             string [ ] guildMessages = messages.GetEntry (guild);
             string message = guildMessages [ new Random ().Next (0, guildMessages.Length) ];
 
             for (int i = 0; i < findAndReplace.Length; i += 2)
-                message.Replace (findAndReplace[i], findAndReplace[i+1]);
+                message = message.Replace (findAndReplace[i], findAndReplace[i+1]);
 
             await MessageControl.SendMessage (channel, message);
         }
