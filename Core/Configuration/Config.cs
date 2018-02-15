@@ -34,9 +34,11 @@ namespace Lomztein.ModularDiscordBot.Core.Configuration {
             return JSONSerialization.ConvertObject<T> (entries[id][key]);
         }
 
-        public void SetEntry(ulong id, string key, object obj) {
+        public void SetEntry(ulong id, string key, object obj, bool save) {
             SetEntryIfEmpty (id, key, obj);
             entries [ id ] [ key ] = obj;
+            if (save)
+                Save ();
         }
 
         private void SetEntryIfEmpty (ulong id, string key, object fallback) {

@@ -13,6 +13,10 @@ namespace Lomztein.ModularDiscordBot.Core.Configuration
             return GetEntry (0, key, fallback);
         }
 
+        public void SetEntry (string key, object value, bool save) {
+            SetEntry (0, key, value, save);
+        }
+
         public override void Load() {
             entries = JSONSerialization.DeserializeFile<Dictionary<ulong, Dictionary<string, object>>> (GetPath ());
             if (entries == null)
