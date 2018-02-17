@@ -1,4 +1,5 @@
 ﻿using Discord.WebSocket;
+using Lomztein.AdvDiscordCommands.Extensions;
 using Lomztein.AdvDiscordCommands.Framework;
 using Lomztein.ModularDiscordBot.Core.Configuration;
 using Lomztein.ModularDiscordBot.Core.Extensions;
@@ -31,6 +32,7 @@ namespace Lomztein.ModularDiscordBot.Modules.Voice
         private MultiConfig config;
 
         private VoiceLockingSet lockingCommandSet = new VoiceLockingSet ();
+        private VoiceLockingSet lockingCommandSet2 = new VoiceLockingSet ();
 
         public void Configure() {
             config = new MultiConfig (this.CompactizeName ());
@@ -59,6 +61,7 @@ namespace Lomztein.ModularDiscordBot.Modules.Voice
 
             lockingCommandSet.parentModule = this;
             root.AddCommands (lockingCommandSet);
+            root.AddCommands (lockingCommandSet2);
         }
 
         private async Task OnUserVoiceStateUpdated(SocketUser user, SocketVoiceState prevState, SocketVoiceState newState) {

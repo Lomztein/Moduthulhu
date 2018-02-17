@@ -18,13 +18,14 @@ namespace Lomztein.ModularDiscordBot.Core.Configuration
         }
 
         public override void Load() {
-            entries = JSONSerialization.DeserializeFile<Dictionary<ulong, Dictionary<string, object>>> (GetPath ());
-            if (entries == null)
-                entries = new Dictionary<ulong, Dictionary<string, object>> ();
+            entries = new Dictionary<ulong, Dictionary<string, object>> ();
+            Dictionary<string, object> singleEntries = JSONSerialization.DeserializeFile<Dictionary<string, object>> (GetPath ());
+            if (singleEntries != null)
+                entries.Add (0, singleEntries);
         }
 
         public override void Save() {
-            JSONSerialization.SerializeObject (entries, GetPath (), true);
+            JSONSerialization.SerializeObject (entries[0], GetPath (), true);
         }
     }
 }

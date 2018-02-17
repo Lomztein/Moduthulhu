@@ -8,10 +8,11 @@ using System.Threading.Tasks;
 
 namespace Lomztein.ModularDiscordBot.Modules.Voice.Commands {
     public class VoiceLockingSet : CommandSet {
+
         public VoiceLockingModule parentModule;
 
         public VoiceLockingSet() {
-            command = "vl"; // Name is temporary untill set merging is running.
+            command = "voice"; // Name is temporary untill set merging is running.
             shortHelp = "A command set for locking voice channels.";
             catagory = Category.Utility;
 
@@ -49,7 +50,7 @@ namespace Lomztein.ModularDiscordBot.Modules.Voice.Commands {
                     parentModule.LockChannel (author.VoiceChannel, author.VoiceChannel.Users);
                     return TaskResult (null, $"Voice channel **{author.VoiceChannel.Name}** succesfully locked!");
                 } else
-                    return TaskResult (null, $"You're gonna need to be in a channel to that.");
+                    return TaskResult (null, $"You're gonna need to be in a channel to do that.");
             }
         }
 
@@ -68,7 +69,7 @@ namespace Lomztein.ModularDiscordBot.Modules.Voice.Commands {
                     parentModule.UnlockChannel (author.VoiceChannel);
                     return TaskResult (null, $"Voice channel **{author.VoiceChannel.Name}** succesfully unlocked!");
                 } else
-                    return TaskResult (null, $"You're gonna need to be in a channel to that.");
+                    return TaskResult (null, $"You're gonna need to be in a channel to do that.");
             }
         }
 
@@ -86,7 +87,7 @@ namespace Lomztein.ModularDiscordBot.Modules.Voice.Commands {
                     parentModule.GetLock (author.VoiceChannel)?.AddMember (user);
                     return TaskResult (null, $"Succesfully invited **{user.GetShownName ()}** to **{author.VoiceChannel.Name}!**");
                 } else
-                    return TaskResult (null, $"You're gonna need to be in a locked channel to that.");
+                    return TaskResult (null, $"You're gonna need to be in a locked channel to do that.");
             }
         }
 
@@ -104,7 +105,7 @@ namespace Lomztein.ModularDiscordBot.Modules.Voice.Commands {
                     parentModule.GetLock (author.VoiceChannel)?.KickMember (user);
                     return TaskResult (null, $"Succesfully kicked **{user.GetShownName ()}** from **{author.VoiceChannel.Name}.**");
                 } else
-                    return TaskResult (null, $"You're gonna need to be in a locked channel to that.");
+                    return TaskResult (null, $"You're gonna need to be in a locked channel to do that.");
             }
         }
     }

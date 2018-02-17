@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using Lomztein.AdvDiscordCommands.Framework;
+using Lomztein.AdvDiscordCommands.Extensions;
 
 namespace Lomztein.ModularDiscordBot.Modules.CommandRoot
 {
