@@ -36,6 +36,10 @@ Well that's all there currently is for the core, but more is coming.
 * Command Root, a module that implements my [Advanced Discord Commands](https://github.com/Lomztein/Advanced-Discord-Commands) library. It should act as a base for any other command-using module.
 * Standard Commands, a simple module that adds all standard commands from the arorementioned library.
 * User Activity Monitor, does exactly the same as the precurser variant, it's litteraly just a port to the modular architecture. This version works for multiserver bots however, and is more configurable.
+* Auto Create Voicechannels, a module that automatically creates new voice channels when the needs arises.
+* Voice Locking, allows users to lock voice channels so only invited people can join.
+
+**These modules should all be considered in beta, since they have not been throughoutly tested.**
 
 ## Creating new modules
 
