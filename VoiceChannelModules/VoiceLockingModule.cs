@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace Lomztein.ModularDiscordBot.Modules.Voice
 {
-    public class VoiceLockingModule : ModuleBase, IConfigurable {
+    public class VoiceLockingModule : ModuleBase, IConfigurable<MultiConfig> {
 
         public override string Name => "Voice Locking";
         public override string Description => "Allows people to lock voice channels.";
@@ -29,27 +29,19 @@ namespace Lomztein.ModularDiscordBot.Modules.Voice
 
         private Dictionary<ulong, Lock> lockedChannels = new Dictionary<ulong, Lock> ();
 
-        private MultiConfig config;
+        public MultiConfig Configuration { get; set; } = new MultiConfig ();
 
         private VoiceLockingSet lockingCommandSet = new VoiceLockingSet ();
-        private VoiceLockingSet lockingCommandSet2 = new VoiceLockingSet ();
 
         public void Configure() {
-            config = new MultiConfig (this.CompactizeName ());
             List<SocketGuild> guilds = ParentBotClient.discordClient.Guilds.ToList ();
 
-            nonLockableChannels = config.GetEntries (guilds, "NonLockableChannels", new List<ulong> () { 0 });
-            moveToChannel = config.GetEntries (guilds, "MoveToChannel", guilds.Select (x => {
+            nonLockableChannels = Configuration.GetEntries (guilds, "NonLockableChannels", new List<ulong> () { 0 });
+            moveToChannel = Configuration.GetEntries (guilds, "MoveToChannel", guilds.Select (x => {
                 if (x.AFKChannel != null)
                     return x.AFKChannel.Id;
                 return (ulong)0;
             }));
-
-            config.Save ();
-        }
-
-        public Config GetConfiguration() {
-            throw new NotImplementedException ();
         }
 
         public override void Initialize() {
@@ -61,7 +53,6 @@ namespace Lomztein.ModularDiscordBot.Modules.Voice
 
             lockingCommandSet.parentModule = this;
             root.AddCommands (lockingCommandSet);
-            root.AddCommands (lockingCommandSet2);
         }
 
         private async Task OnUserVoiceStateUpdated(SocketUser user, SocketVoiceState prevState, SocketVoiceState newState) {

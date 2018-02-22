@@ -9,6 +9,8 @@ namespace Lomztein.ModularDiscordBot.Core.Configuration
 
         public SingleConfig(string _name) : base (_name) { }
 
+        public SingleConfig() : base () { }
+
         public T GetEntry<T> (string key, T fallback) {
             return GetEntry (0, key, fallback);
         }

@@ -11,7 +11,7 @@ using Discord.Rest;
 
 namespace Lomztein.ModularDiscordBot.Modules.Voice
 {
-    public class AutoVoiceCreatorModule : ModuleBase, IConfigurable {
+    public class AutoVoiceCreatorModule : ModuleBase, IConfigurable<MultiConfig> {
 
         public override string Name => "Auto Voice Creator";
         public override string Description => "Creates new voice channels when all others are full.";
@@ -19,7 +19,7 @@ namespace Lomztein.ModularDiscordBot.Modules.Voice
 
         public override bool Multiserver => true;
 
-        private MultiConfig config;
+        public MultiConfig Configuration { get; set; } = new MultiConfig ();
 
         private MultiEntry<List<ulong>> defaultChannels; // These are the channels that should never be deleted.
         private MultiEntry<List<string>> newVoiceNames; // Would be more fitting as a queue, but a list is easier to work with in this case.
@@ -30,14 +30,13 @@ namespace Lomztein.ModularDiscordBot.Modules.Voice
         private Dictionary<ulong, List<ulong>> temporaryChannels; // This isn't for config, but instead for keeping track of the active channels.
 
         public void Configure() {
-            config = new MultiConfig (this.CompactizeName ());
             List<SocketGuild> guilds = ParentBotClient.discordClient.Guilds.ToList ();
 
-            defaultChannels = config.GetEntries (guilds, "DefaultVoiceChannels", guilds.Select (x => x.VoiceChannels.Select (y => y.Id).ToList ()));
-            newVoiceNames = config.GetEntries (guilds, "NewVoiceNames", new List<string> () { "General 1", "General 2" });
-            desiredFreeChannels = config.GetEntries (guilds, "DesiredFreeChannels", 1);
+            defaultChannels = Configuration.GetEntries (guilds, "DefaultVoiceChannels", guilds.Select (x => x.VoiceChannels.Select (y => y.Id).ToList ()));
+            newVoiceNames = Configuration.GetEntries (guilds, "NewVoiceNames", new List<string> () { "General 1", "General 2" });
+            desiredFreeChannels = Configuration.GetEntries (guilds, "DesiredFreeChannels", 1);
 
-            ignoreChannels = config.GetEntries (guilds, "IgnoreChannels", guilds.Select (x => {
+            ignoreChannels = Configuration.GetEntries (guilds, "IgnoreChannels", guilds.Select (x => {
                 if (x.AFKChannel != null)
                     return x.AFKChannel.Id;
                 return (ulong)0;
@@ -50,11 +49,7 @@ namespace Lomztein.ModularDiscordBot.Modules.Voice
                 nameQueue.Add (value.Key, value.Value);
                 temporaryChannels.Add (value.Key, new List<ulong> ());
             }
-
-            config.Save ();
         }
-
-        public Config GetConfiguration() => config;
 
         public override void Initialize() {
             ParentBotClient.discordClient.UserVoiceStateUpdated += UserVoiceStateUpdated;
@@ -68,7 +63,7 @@ namespace Lomztein.ModularDiscordBot.Modules.Voice
 
                 if (!temporaryChannels[voiceChannel.Guild.Id].Contains (channel.Id)) {
                     defaultChannels.values [ voiceChannel.Guild.Id ].Add (channel.Id);
-                    config.SetEntry (voiceChannel.Guild.Id, "DefaultVoiceChannels", defaultChannels.GetEntry (voiceChannel.Guild), true);
+                    Configuration.SetEntry (voiceChannel.Guild.Id, "DefaultVoiceChannels", defaultChannels.GetEntry (voiceChannel.Guild), true);
                 }
             }
 
@@ -85,7 +80,7 @@ namespace Lomztein.ModularDiscordBot.Modules.Voice
 
                 if (!temporaryChannels [ voiceChannel.Guild.Id ].Contains (channel.Id)) {
                     defaultChannels.values [ voiceChannel.Guild.Id ].Remove (channel.Id);
-                    config.SetEntry (voiceChannel.Guild.Id, "DefaultVoiceChannels", defaultChannels.GetEntry (voiceChannel.Guild), true);
+                    Configuration.SetEntry (voiceChannel.Guild.Id, "DefaultVoiceChannels", defaultChannels.GetEntry (voiceChannel.Guild), true);
                 }
             }
 

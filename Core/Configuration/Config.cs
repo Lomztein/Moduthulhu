@@ -17,11 +17,14 @@ namespace Lomztein.ModularDiscordBot.Core.Configuration {
         public static string configRootDirectory = AppContext.BaseDirectory + "/Configuration/";
 
         protected Dictionary<ulong, Dictionary<string, object>> entries = new Dictionary<ulong, Dictionary<string, object>> ();
-        protected string name;
+        public string name;
 
         public Config(string _name) {
             name = _name;
-            Load ();
+        }
+
+        public Config() {
+            name = "Unnamed Config";
         }
 
         public abstract void Load();

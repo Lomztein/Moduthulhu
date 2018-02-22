@@ -163,8 +163,13 @@ namespace Lomztein.ModularDiscordBot.Core.Module
         }
 
         private void ConfigureModules () {
-            foreach (IModule module in activeModules)
-                (module as IConfigurable)?.Configure ();
+            foreach (IModule module in activeModules) {
+                if (module is IConfigurable configurable) {
+                    dynamic dynModule = module;
+                    dynModule.Configuration.name = module.CompactizeName ();
+                    configurable.ReloadConfiguration ();
+                }
+            }
         }
     }
 }

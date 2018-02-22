@@ -1,15 +1,18 @@
 ﻿using Lomztein.ModularDiscordBot.Core.Configuration;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace Lomztein.ModularDiscordBot.Core.Extensions
-{
-    public static class ConfigurableExtensions
-    {
-        public static void ReloadConfiguration (this IConfigurable configurable) {
-            configurable.GetConfiguration ()?.Load ();
-            configurable.Configure ();
+namespace Lomztein.ModularDiscordBot.Core.Extensions {
+
+    public static class ConfigurableExtensions {
+
+        internal static void ReloadConfiguration(this IConfigurable configurable) {
+            dynamic dynConfig = configurable;
+            dynConfig.Configuration.Load ();
+            dynConfig.Configure ();
+            dynConfig.Configuration.Save ();
+        }
+
+        public static void ReloadConfiguration<T>(this IConfigurable<T> configurable) where T : Config {
+            ReloadConfiguration (configurable as IConfigurable);
         }
     }
 }

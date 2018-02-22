@@ -17,6 +17,8 @@ namespace Lomztein.ModularDiscordBot.Core.Configuration
 
         public MultiConfig (string _name) : base (_name) { }
 
+        public MultiConfig () : base () { }
+
         public T GetEntry<T> (SocketGuild guild, string key, T fallback) {
             return GetEntry (guild.Id, key, fallback);
         }

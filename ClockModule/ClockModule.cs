@@ -7,7 +7,7 @@ using Lomztein.ModularDiscordBot.Core.Extensions;
 
 namespace Lomztein.ModularDiscordBot.Modules.Clock
 {
-    public class ClockModule : ModuleBase, IConfigurable
+    public class ClockModule : ModuleBase, IConfigurable<SingleConfig>
     {
         public override string Name => "Clock Module";
         public override string Description => "Base module for handling objects that need to update automatically.";
@@ -19,7 +19,7 @@ namespace Lomztein.ModularDiscordBot.Modules.Clock
         private int tickFrequency = 1;
         private bool running;
 
-        private SingleConfig config;
+        public SingleConfig Configuration { get; set; } = new SingleConfig ();
         private Thread clockThread;
 
         private DateTime lastTick;
@@ -30,12 +30,8 @@ namespace Lomztein.ModularDiscordBot.Modules.Clock
         }
 
         public void Configure() {
-            config = new SingleConfig (this.CompactizeName ());
-            tickFrequency = config.GetEntry ("TickFrequency", tickFrequency);
-            config.Save ();
+            tickFrequency = Configuration.GetEntry ("TickFrequency", tickFrequency);
         }
-
-        public Config GetConfiguration() => config;
 
         public override void Shutdown() {
             Stop ();

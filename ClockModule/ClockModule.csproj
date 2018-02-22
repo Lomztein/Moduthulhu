@@ -8,6 +8,12 @@
     <ProjectReference Include="..\Core\Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Reference Include="Advanced-Discord-Commands">
+      <HintPath>..\..\Advanced-Discord-Commands\Advanced-Discord-Commands\bin\Debug\netcoreapp2.0\Advanced-Discord-Commands.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Exec Command="xcopy &quot;$(TargetPath)&quot; &quot;$(SolutionDir)CompiledModules\&quot; /y&#xD;&#xA;xcopy &quot;$(TargetPath)&quot; &quot;$(SolutionDir)Core\bin\Debug\netcoreapp2.0\Modules\&quot; /y" />
   </Target>

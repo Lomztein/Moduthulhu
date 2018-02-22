@@ -11,14 +11,14 @@ using Discord.Rest;
 
 namespace Lomztein.ModularDiscordBot.Modules.ServerMessages {
 
-    public class ServerMessagesModule : ModuleBase, IConfigurable {
+    public class ServerMessagesModule : ModuleBase, IConfigurable<MultiConfig> {
 
         public override string Name => "Server Messages";
         public override string Description => "Sends a variety of messages on certain events.";
         public override string Author => "Lomztein";
         public override bool Multiserver => true;
 
-        public MultiConfig config;
+        public MultiConfig Configuration { get; set; } = new MultiConfig ();
 
         private MultiEntry<ulong> channelIDs;
         private MultiEntry<string [ ]> onJoinedNewGuild;
@@ -27,8 +27,6 @@ namespace Lomztein.ModularDiscordBot.Modules.ServerMessages {
         private MultiEntry<string [ ]> onUserLeftGuild;
         private MultiEntry<string [ ]> onUserBannedFromGuild;
         private MultiEntry<string [ ]> onUserUnbannedFromGuild;
-
-        public Config GetConfiguration () => config;
 
         private InviteHandler inviteHandler;
 
@@ -43,18 +41,15 @@ namespace Lomztein.ModularDiscordBot.Modules.ServerMessages {
         }
 
         public void Configure() {
-            config = new MultiConfig (this.CompactizeName ());
             IEnumerable<SocketGuild> guilds = ParentBotClient.discordClient.Guilds;
 
-            channelIDs = config.GetEntries<ulong> (guilds, "ChannelID", 0);
-            onJoinedNewGuild = config.GetEntries (guilds, "OnJoinedNewGuild", new string [ ] { "Behold! it is I, **[BOTNAME]**!" });
-            onUserJoinedGuild = config.GetEntries (guilds, "OnUserJoinedGuild", new string [ ] { "**[USERNAME]** has joined this server!" });
-            onUserJoinedGuildByInvite = config.GetEntries (guilds, "OnUserJoinedGuildByInvite", new string [ ] { "**[USERNAME]** has joined this server by the help of **[INVITERNAME]**!" });
-            onUserLeftGuild = config.GetEntries (guilds, "OnUserLeftGuild", new string [ ] { "**[USERNAME]** has left this server. ;-;" });
-            onUserBannedFromGuild = config.GetEntries (guilds, "OnUserBannedFromGuild", new string [ ] { "**[USERNAME]** has been banned from this server." });
-            onUserUnbannedFromGuild = config.GetEntries (guilds, "OnUserUnbannedFromGuild", new string [ ] { "**[USERNAME]** has been unbanned from this server." });
-
-            config.Save ();
+            channelIDs = Configuration.GetEntries<ulong> (guilds, "ChannelID", 0);
+            onJoinedNewGuild = Configuration.GetEntries (guilds, "OnJoinedNewGuild", new string [ ] { "Behold! it is I, **[BOTNAME]**!" });
+            onUserJoinedGuild = Configuration.GetEntries (guilds, "OnUserJoinedGuild", new string [ ] { "**[USERNAME]** has joined this server!" });
+            onUserJoinedGuildByInvite = Configuration.GetEntries (guilds, "OnUserJoinedGuildByInvite", new string [ ] { "**[USERNAME]** has joined this server by the help of **[INVITERNAME]**!" });
+            onUserLeftGuild = Configuration.GetEntries (guilds, "OnUserLeftGuild", new string [ ] { "**[USERNAME]** has left this server. ;-;" });
+            onUserBannedFromGuild = Configuration.GetEntries (guilds, "OnUserBannedFromGuild", new string [ ] { "**[USERNAME]** has been banned from this server." });
+            onUserUnbannedFromGuild = Configuration.GetEntries (guilds, "OnUserUnbannedFromGuild", new string [ ] { "**[USERNAME]** has been unbanned from this server." });
         }
 
         private Task OnUserUnbannedFromGuild(SocketUser user, SocketGuild guild) {

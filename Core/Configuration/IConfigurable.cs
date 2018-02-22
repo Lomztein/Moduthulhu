@@ -4,10 +4,15 @@ using System.Text;
 
 namespace Lomztein.ModularDiscordBot.Core.Configuration
 {
-    public interface IConfigurable
-    {
+    public interface IConfigurable {
+
         void Configure();
 
-        Config GetConfiguration();
+    }
+
+    public interface IConfigurable<T> : IConfigurable where T : Config {
+
+        T Configuration { get; set; }
+
     }
 }
