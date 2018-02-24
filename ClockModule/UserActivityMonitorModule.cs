@@ -53,7 +53,7 @@ namespace Lomztein.ModularDiscordBot.Modules.Clock.ActivityMonitor
 
             ParentBotClient.discordClient.UserVoiceStateUpdated += (user, before, after) => {
                 SocketGuildUser afterUser = user as SocketGuildUser;
-                if (afterUser.VoiceChannel != null) {
+                if (afterUser?.VoiceChannel != null) {
                     RecordActivity (afterUser, DateTime.Now, true);
                 }
 

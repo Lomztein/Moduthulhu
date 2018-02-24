@@ -49,13 +49,14 @@ namespace Lomztein.ModularDiscordBot.Modules.Voice {
         private async void UpdateChannel (SocketVoiceChannel channel) {
             string highestGame = "";
 
-            if (channel != null) {
+            if (channel != null && ParentBotClient.GetChannel (channel.Guild.Id, channel.Id) != null) {
 
-                string name = channelNames.GetEntry (channel.Guild)[channel.Id];
-                List<SocketGuildUser> users = channel.Users.ToList ();
+                string name = channelNames.GetEntry (channel.Guild).GetValueOrDefault (channel.Id);
 
                 if (toIgnore.GetEntry (channel.Guild).Contains (channel.Id))
                     return;
+
+                List<SocketGuildUser> users = channel.Users.ToList ();
 
                 Dictionary<string, int> numPlayers = new Dictionary<string, int> ();
                 foreach (SocketGuildUser user in users) {
@@ -112,6 +113,7 @@ namespace Lomztein.ModularDiscordBot.Modules.Voice {
             if (channel is SocketVoiceChannel voice) {
                 channelNames.values [ voice.Guild.Id ].Add (voice.Id, voice.Name);
                 Configuration.SetEntry (voice.Guild.Id, "ChannelNames", channelNames.GetEntry (voice.Guild), true);
+                UpdateChannel (voice);
             }
             return Task.CompletedTask;
         }

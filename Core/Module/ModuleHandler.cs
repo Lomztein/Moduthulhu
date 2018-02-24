@@ -39,7 +39,7 @@ namespace Lomztein.ModularDiscordBot.Core.Module
             activeModules = FilterEnabledModules (modules);
 
             Log.Write (Log.Type.MODULE, "Pre-initializing modules.");
-            foreach (IModule module in modules) {
+            foreach (IModule module in activeModules) {
                 try {
                     module.ParentModuleHandler = this;
                     module.ParentBotClient = parentClient;
@@ -53,7 +53,7 @@ namespace Lomztein.ModularDiscordBot.Core.Module
             ConfigureModules ();
 
             Log.Write (Log.Type.MODULE, "Initializing modules.");
-            foreach (IModule module in modules) {
+            foreach (IModule module in activeModules) {
                 try {
                     module.Initialize ();
                 } catch (Exception exc) {
@@ -62,7 +62,7 @@ namespace Lomztein.ModularDiscordBot.Core.Module
             }
 
             Log.Write (Log.Type.MODULE, "Post-initializing modules.");
-            foreach (IModule module in modules) {
+            foreach (IModule module in activeModules) {
                 try {
                      module.PostInitialize ();
                 } catch (Exception exc) {

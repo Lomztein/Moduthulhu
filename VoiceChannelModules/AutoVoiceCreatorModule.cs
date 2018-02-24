@@ -49,6 +49,11 @@ namespace Lomztein.ModularDiscordBot.Modules.Voice
                 nameQueue.Add (value.Key, value.Value);
                 temporaryChannels.Add (value.Key, new List<ulong> ());
             }
+
+            foreach (SocketGuild guild in guilds) {
+                var nonCachedChannels = guild.VoiceChannels.Where (x => !defaultChannels.GetEntry (guild).Contains (x.Id));
+                temporaryChannels [ guild.Id ] = nonCachedChannels.Select (x => x.Id).ToList ();
+            }
         }
 
         public override void Initialize() {
@@ -87,18 +92,25 @@ namespace Lomztein.ModularDiscordBot.Modules.Voice
             return Task.CompletedTask;
         }
 
-        private async Task UserVoiceStateUpdated (SocketUser user, SocketVoiceState prevState, SocketVoiceState curState) {
+        private Task UserVoiceStateUpdated (SocketUser user, SocketVoiceState prevState, SocketVoiceState curState) {
             SocketGuildUser guildUser = user as SocketGuildUser;
             if (guildUser == null)
-                return; // Break off instantly if this is in a private DM. Can you even call bots directly?
+                return Task.CompletedTask; // Break off instantly if this is in a private DM. Can you even call bots directly?
 
-            List<SocketVoiceChannel> voiceChannels = guildUser.Guild.VoiceChannels.ToList ();
+            CheckAndModifyChannelCount (guildUser);
+            return Task.CompletedTask;
+        }
+
+        // Have to put it in a seperate async void function, so it doesn't block the event. Async root?
+        private async void CheckAndModifyChannelCount (SocketGuildUser user) {
+
+            List<SocketVoiceChannel> voiceChannels = user.Guild.VoiceChannels.ToList ();
 
             int freeChannels = 0;
-            int desiredFree = desiredFreeChannels.GetEntry (guildUser.Guild);
-            List<ulong> toIgnore = ignoreChannels.GetEntry (guildUser.Guild);
+            int desiredFree = desiredFreeChannels.GetEntry (user.Guild);
+            List<ulong> toIgnore = ignoreChannels.GetEntry (user.Guild);
 
-            List<string> names = nameQueue [ guildUser.Guild.Id ];
+            List<string> names = nameQueue [ user.Guild.Id ];
 
             foreach (SocketVoiceChannel channel in voiceChannels) {
                 if (!toIgnore.Contains (channel.Id) && channel.Users.Count == 0)
@@ -108,13 +120,18 @@ namespace Lomztein.ModularDiscordBot.Modules.Voice
             if (freeChannels < desiredFree) {
                 string selectedName = names.First ();
                 names.Remove (selectedName); // Shuffle dat shiznat.
-                names.Add (selectedName);
+                names.Add (selectedName); // I don't know why this is here and I'm too afraid to remove it.
 
-                await CreateNewChannel (guildUser.Guild, selectedName);
-            } else {
-                SocketVoiceChannel toDelete = ParentBotClient.GetChannel (guildUser.Guild.Id, temporaryChannels [ guildUser.Guild.Id ].Last ()) as SocketVoiceChannel;
-                await DeleteChannel (toDelete);
+                await CreateNewChannel (user.Guild, selectedName);
+            } else if (freeChannels > desiredFree) {
+                if (FindEmptyTemporaryChannel (user.Guild) is SocketVoiceChannel toDelete)
+                    await DeleteChannel (toDelete); // Man, pattern matching seems to be able to do anything.
             }
+        }
+
+        private SocketVoiceChannel FindEmptyTemporaryChannel (SocketGuild guild) {
+            var temps = temporaryChannels[guild.Id].Select (x => ParentBotClient.GetChannel (guild.Id, x) as SocketVoiceChannel);
+            return temps.LastOrDefault (x => x.Users.Count == 0);
         }
 
         private async Task<RestVoiceChannel> CreateNewChannel (SocketGuild guild, string channelName) {

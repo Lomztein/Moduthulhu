@@ -42,10 +42,18 @@ namespace Lomztein.ModularDiscordBot.Core.Bot {
         private void InitializeListeners () {
             discordClient.Disconnected += OnDisconnected;
             discordClient.Connected += OnConnected;
+            discordClient.Ready += OnReady;
+            discordClient.Log += OnLog;
+        }
+
+        private Task OnLog(LogMessage log) {
+            Log.Write (Log.Type.BOT, log.Severity + " - " + log.Message);
+            if (log.Exception != null)
+                Log.Write (log.Exception);
+            return Task.CompletedTask;
         }
 
         private Task OnConnected() {
-            Log.Write (Log.Type.BOT, "Connected to Discord!");
             return Task.CompletedTask;
         }
 
@@ -57,16 +65,21 @@ namespace Lomztein.ModularDiscordBot.Core.Bot {
             }
         }
 
-        private bool IsBooted() => discordClient.Guilds.Count > 0 && discordClient.Guilds.ElementAtOrDefault (0) != null && discordClient.Guilds.ElementAt (0).Users.ElementAtOrDefault (0) != null;
+        private Task OnReady () {
+            isReady = true;
+            return Task.CompletedTask;
+        }
+
+        private bool isReady = false;
 
         public async Task AwaitFullBoot () {
-            while (IsBooted () == false)
+            while (isReady == false)
                 await Task.Delay (100);
             return;
         }
 
         public bool IsMultiserver () {
-            if (!IsBooted ())
+            if (!isReady)
                 throw new InvalidOperationException ("Cannot call IsMultiserver before bot is fully booted and connected.");
             return discordClient.Guilds.Count != 1;
         }
