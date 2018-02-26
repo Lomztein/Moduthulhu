@@ -21,15 +21,26 @@ namespace Lomztein.ModularDiscordBot.Modules.Voice {
         private MultiEntry<Dictionary<ulong, string>> channelNames;
         private MultiEntry<List<ulong>> toIgnore;
 
+        // Tag specific configuration
+        private MultiEntry<ulong> musicBotID;
+
         public MultiConfig Configuration { get; set; } = new MultiConfig ();
 
         private Dictionary<ulong, string> customNames = new Dictionary<ulong, string> ();
+        private Dictionary<string, Tag> tags = new Dictionary<string, Tag> (); // This is a dictionary purely for easier identification of tags.
 
         public override void Initialize() {
             ParentBotClient.discordClient.ChannelCreated += OnChannelCreated;
             ParentBotClient.discordClient.ChannelDestroyed += OnChannelDestroyed;
             ParentBotClient.discordClient.UserVoiceStateUpdated += OnVoiceStateUpdated;
             ParentBotClient.discordClient.GuildMemberUpdated += OnGuildMemberUpdated;
+            InitDefaultTags ();
+        }
+
+        void InitDefaultTags () {
+            AddTag (new Tag ("🎵", x => x.Users.Any (y => y.Id == musicBotID.GetEntry (x.Guild))));
+            AddTag (new Tag ("🔥", x => x.Users.Count (y => y.GuildPermissions.Administrator) >= 3)); // Three is the magic number. *snickers*
+            AddTag (new Tag ("📹", x => x.Users.Any (y => y.Activity?.Type == ActivityType.Streaming)));
         }
 
         private Task OnGuildMemberUpdated(SocketGuildUser prev, SocketGuildUser cur) {
@@ -46,15 +57,20 @@ namespace Lomztein.ModularDiscordBot.Modules.Voice {
             return Task.CompletedTask;
         }
 
-        private async void UpdateChannel (SocketVoiceChannel channel) {
+        public async void UpdateChannel(SocketVoiceChannel channel) {
             string highestGame = "";
 
-            if (channel != null && ParentBotClient.GetChannel (channel.Guild.Id, channel.Id) != null) {
+            if (channel != null) {
 
                 string name = channelNames.GetEntry (channel.Guild).GetValueOrDefault (channel.Id);
 
                 if (toIgnore.GetEntry (channel.Guild).Contains (channel.Id))
                     return;
+
+                if (string.IsNullOrEmpty (name)) { // If the channel is unknown, then add it and retry through OnChannelCreated.
+                    await OnChannelCreated (channel);
+                    return;
+                }
 
                 List<SocketGuildUser> users = channel.Users.ToList ();
 
@@ -88,11 +104,12 @@ namespace Lomztein.ModularDiscordBot.Modules.Voice {
                 string [ ] splitVoice = name.Split (';');
                 string possibleShorten = splitVoice.Length > 1 ? splitVoice [ 1 ] : splitVoice [ 0 ];
 
-                string gameName = highestGame;
-                string newName = gameName != "" ?  possibleShorten + " - " + gameName : splitVoice [ 0 ];
+                string tags = GetTags (channel);
+                string newName = highestGame != "" ? possibleShorten + " - " + highestGame : splitVoice [ 0 ];
+                newName = tags + " " + newName;
 
                 if (customNames.ContainsKey (channel.Id))
-                    newName = possibleShorten + " - " + customNames[channel.Id];
+                    newName = possibleShorten + " - " + customNames [ channel.Id ];
 
                 // Trying to optimize API calls here, just to spare those poor souls at the Discord API HQ stuff
                 if (channel.Name != newName) {
@@ -129,6 +146,44 @@ namespace Lomztein.ModularDiscordBot.Modules.Voice {
             List<SocketGuild> guilds = ParentBotClient.discordClient.Guilds.ToList ();
             channelNames = Configuration.GetEntries (guilds, "ChannelNames", guilds.Select (x => x.VoiceChannels.ToDictionary (y => y.Id, z => z.Name)));
             toIgnore = Configuration.GetEntries (guilds, "ToIgnore", new List<ulong> ());
+            musicBotID = Configuration.GetEntries (guilds, "MusicBotID", (ulong)0);
+        }
+
+        public void AddTag (Tag newTag) {
+            tags.Add (newTag.emoji, newTag);
+        }
+
+        public void RemoveTag (Tag tag) {
+            if (tag == null)
+                return;
+            tags.Remove (tag.emoji);
+        }
+
+        public void RemoveTag (string emoji) {
+            RemoveTag (tags.GetValueOrDefault (emoji));
+        }
+
+        public string GetTags (SocketVoiceChannel channel) {
+            string tagString = "";
+            foreach (var tag in tags) {
+                if (tag.Value.isActive (channel)) {
+                    tagString += tag.Value.emoji;
+                }
+            }
+
+            return tagString;
+        }
+
+        public class Tag {
+
+            public string emoji = ""; // The "graphical" representation of the tag.
+            public Func<SocketVoiceChannel, bool> isActive; // Should return true if the tag is active.
+
+            public Tag (string _emoji, Func<SocketVoiceChannel, bool> _isActive) {
+                emoji = _emoji;
+                isActive = _isActive;
+            }
+
         }
     }
 }

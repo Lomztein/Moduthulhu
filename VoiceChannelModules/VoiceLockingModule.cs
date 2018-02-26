@@ -23,6 +23,7 @@ namespace Lomztein.ModularDiscordBot.Modules.Voice
         public override bool Multiserver => true;
 
         public override string [ ] RequiredModules => new string [ ] { "Lomztein_Command Root" };
+        public override string [ ] RecommendedModules => new string [ ] { "Lomztein_Auto Voice Names" };
 
         private MultiEntry<List<ulong>> nonLockableChannels;
         private MultiEntry<ulong> moveToChannel;
@@ -53,21 +54,26 @@ namespace Lomztein.ModularDiscordBot.Modules.Voice
 
             lockingCommandSet.parentModule = this;
             root.AddCommands (lockingCommandSet);
+
+            if (ParentModuleHandler.GetModule<AutoVoiceNameModule>() is AutoVoiceNameModule autoVoiceModule) { // You can do this?
+                autoVoiceModule.AddTag (new AutoVoiceNameModule.Tag ("🔒", x => IsChannelLocked (x)));
+            }
         }
 
-        private async Task OnUserVoiceStateUpdated(SocketUser user, SocketVoiceState prevState, SocketVoiceState newState) {
+        private Task OnUserVoiceStateUpdated(SocketUser user, SocketVoiceState prevState, SocketVoiceState newState) {
             SocketGuildUser guildUser = user as SocketGuildUser;
-            if (guildUser == null || newState.VoiceChannel == null)
-                return; // Return instantly if not in a channel, or not in a guild.
+            if (guildUser == null)
+                return Task.CompletedTask; // Return instantly if not in a guild.
 
-            if (!IsUserAllowed (guildUser, newState.VoiceChannel)) {
-                await KickUserToPrison (guildUser);
+            if (newState.VoiceChannel != null && !IsUserAllowed (guildUser, newState.VoiceChannel)) {
+                KickUserToPrison (guildUser);
             }
 
             if (prevState.VoiceChannel != null) {
-                if (prevState.VoiceChannel.Users.Count () == 0)
-                    UnlockChannel (prevState.VoiceChannel);
+                CheckLock (prevState.VoiceChannel);
             }
+
+            return Task.CompletedTask;
         }
 
         private async Task KickUserToPrison (SocketGuildUser user) {
@@ -94,10 +100,13 @@ namespace Lomztein.ModularDiscordBot.Modules.Voice
         public void LockChannel (SocketVoiceChannel channel, IEnumerable<SocketGuildUser> initialMembers) {
             if (!lockedChannels.ContainsKey (channel.Id))
                 lockedChannels.Add (channel.Id, new Lock (channel.Id, initialMembers.Select (x => x.Id).ToList ()));
+
+            UpdateChannelName (channel);
         }
 
         public void UnlockChannel (SocketVoiceChannel channel) {
             lockedChannels.Remove (channel.Id);
+            UpdateChannelName (channel);
         }
 
         public List<SocketGuildUser> GetAllowedMembers (SocketVoiceChannel channel) {
@@ -107,10 +116,21 @@ namespace Lomztein.ModularDiscordBot.Modules.Voice
             return null;
         }
 
+        private void UpdateChannelName (SocketVoiceChannel channel) {
+            if (ParentModuleHandler.GetModule<AutoVoiceNameModule> () is AutoVoiceNameModule autoVoiceModule) {
+                autoVoiceModule.UpdateChannel (channel);
+            }
+        }
+
         public Lock GetLock (SocketVoiceChannel channel) {
             if (IsChannelLocked (channel))
                 return lockedChannels [ channel.Id ];
             return null;
+        }
+
+        private void CheckLock (SocketVoiceChannel channel) {
+            if (channel.Users.Count == 0)
+                UnlockChannel (channel);
         }
 
         public class Lock {

@@ -15,6 +15,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClockModule", "ClockModule\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VoiceChannelModules", "VoiceChannelModules\VoiceChannelModules.csproj", "{5243464D-AF78-4A23-AA25-64232D827167}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MiscModules", "MiscModules\MiscModules.csproj", "{3F037FE6-7410-40D2-975F-173D82E058F2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,6 +47,10 @@ Global
 		{5243464D-AF78-4A23-AA25-64232D827167}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5243464D-AF78-4A23-AA25-64232D827167}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5243464D-AF78-4A23-AA25-64232D827167}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3F037FE6-7410-40D2-975F-173D82E058F2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3F037FE6-7410-40D2-975F-173D82E058F2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3F037FE6-7410-40D2-975F-173D82E058F2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3F037FE6-7410-40D2-975F-173D82E058F2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

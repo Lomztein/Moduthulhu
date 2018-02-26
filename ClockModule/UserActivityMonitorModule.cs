@@ -47,21 +47,21 @@ namespace Lomztein.ModularDiscordBot.Modules.Clock.ActivityMonitor
             LoadData ();
 
             ParentBotClient.discordClient.MessageReceived += (e) => {
-                RecordActivity (e.Author as SocketGuildUser, DateTime.Now, true);
+                RecordActivity (e.Author as SocketGuildUser, DateTime.Now);
                 return Task.CompletedTask;
             };
 
             ParentBotClient.discordClient.UserVoiceStateUpdated += (user, before, after) => {
                 SocketGuildUser afterUser = user as SocketGuildUser;
                 if (afterUser?.VoiceChannel != null) {
-                    RecordActivity (afterUser, DateTime.Now, true);
+                    RecordActivity (afterUser, DateTime.Now);
                 }
 
                 return Task.CompletedTask;
             };
 
             ParentBotClient.discordClient.UserJoined += (user) => {
-                RecordActivity (user, DateTime.Now, true);
+                RecordActivity (user, DateTime.Now);
                 return Task.CompletedTask;
             };
         }
@@ -70,7 +70,7 @@ namespace Lomztein.ModularDiscordBot.Modules.Clock.ActivityMonitor
             ParentModuleHandler.GetModule<ClockModule> ().AddTickable (this);
         }
 
-        public async void RecordActivity(SocketGuildUser user, DateTime time, bool single) {
+        public async void RecordActivity(SocketGuildUser user, DateTime time) {
             SocketGuild guild = user.Guild;
 
             if (!userActivity.ContainsKey (guild.Id))
@@ -85,10 +85,6 @@ namespace Lomztein.ModularDiscordBot.Modules.Clock.ActivityMonitor
                 await UpdateUser (user);
             } catch (Exception exc) {
                 Log.Write (exc);
-            }
-
-            if (single) {
-                SaveData ();
             }
         }
 
@@ -140,7 +136,7 @@ namespace Lomztein.ModularDiscordBot.Modules.Clock.ActivityMonitor
 
             foreach (SocketGuildUser u in users) {
                 if (!userActivity.ContainsKey (u.Id)) {
-                    RecordActivity (u, DateTime.Now.AddMonths (-6), false);
+                    RecordActivity (u, DateTime.Now.AddMonths (-6));
                 }
 
                 await UpdateUser (u);

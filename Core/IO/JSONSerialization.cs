@@ -16,7 +16,6 @@ namespace Lomztein.ModularDiscordBot.Core.IO
 
         public static T DeserializeFile<T>(string path) {
             path = Path.ChangeExtension (path, jsonExtension);
-            Log.Write (Log.Type.SYSTEM, "Loading JSON file at " + path);
 
             if (File.Exists (path)) {
                 try {
