@@ -5,6 +5,7 @@ using Lomztein.ModularDiscordBot.Core.IO;
 using Lomztein.ModularDiscordBot.Core.Module.Framework;
 using Lomztein.ModularDiscordBot.Modules.CommandRoot;
 using Lomztein.ModularDiscordBot.Modules.Misc.Karma.Commands;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,7 +28,7 @@ namespace Lomztein.ModularDiscordBot.Modules.Misc.Karma
         private MultiEntry<ulong> upvoteEmoteId;
         private MultiEntry<ulong> downvoteEmoteId;
 
-        private Dictionary<ulong, int> karma;
+        private Dictionary<ulong, Selfworth> karma;
 
         private KarmaCommand karmaCommand = new KarmaCommand ();
 
@@ -86,27 +87,53 @@ namespace Lomztein.ModularDiscordBot.Modules.Misc.Karma
         }
 
         private void LoadKarma () {
-            karma = DataSerialization.DeserializeData<Dictionary<ulong, int>> ("Karma");
+            karma = DataSerialization.DeserializeData<Dictionary<ulong, Selfworth>> ("Karma");
             if (karma == null)
-                karma = new Dictionary<ulong, int> ();
+                karma = new Dictionary<ulong, Selfworth> ();
         }
 
         private void SaveKarma () {
             DataSerialization.SerializeData (karma, "Karma");
         }
 
-        private void ChangeKarma (IUser giver, IUser reciever, int change) {
+        private void ChangeKarma (IUser giver, IUser reciever, int direction) {
             if (giver.Id == reciever.Id)
                 return; // Can't go around giving yourself karma, ye twat.
             if (!karma.ContainsKey (reciever.Id))
-                karma.Add (reciever.Id, 0);
+                karma.Add (reciever.Id, new Selfworth ());
 
-            karma [ reciever.Id ] += change;
+            if (direction > 0)
+                karma [ reciever.Id ].Upvote ();
+            else if (direction < 0)
+                karma [ reciever.Id ].Downvote ();
+
             SaveKarma ();
         }
 
-        public int GetKarma (ulong userID) {
-            return karma.GetValueOrDefault (userID);
+        public Dictionary<ulong, Selfworth> GetKarma () {
+            return karma;
+        }
+
+        public Selfworth GetKarma (ulong userID) {
+            Selfworth result = karma.GetValueOrDefault (userID);
+            if (result == null)
+                result = new Selfworth ();
+            return result;
+        }
+
+        public class Selfworth {
+
+            public int upvotes;
+            public int downvotes;
+
+            [JsonIgnore]
+            public int Total { get =>  upvotes - downvotes; }
+
+            public void Upvote() => upvotes++;
+            public void Downvote() => downvotes++;
+
+            public override string ToString() => $"{Total} (+{upvotes} / -{downvotes})";
+
         }
     }
 }
