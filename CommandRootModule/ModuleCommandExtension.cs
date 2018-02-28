@@ -16,5 +16,12 @@ namespace Lomztein.ModularDiscordBot.Modules.CommandRoot
 
         public T parentModule;
 
+        public override void Initialize() {
+            foreach (Command cmd in commandsInSet) {
+                (cmd as ModuleCommand<T>).parentModule = parentModule;
+            }
+            base.Initialize ();
+        }
+
     }
 }

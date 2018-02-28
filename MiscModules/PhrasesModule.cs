@@ -62,13 +62,13 @@ namespace Lomztein.ModularDiscordBot.Modules.Misc.Phrases
 
         public class Phrase {
 
-            public string triggerPhrase;
-            public ulong userID;
-            public ulong channelID;
-            public double chance;
+            public string triggerPhrase = "";
+            public ulong userID = 0;
+            public ulong channelID = 0;
+            public double chance = 100d;
 
-            public string response;
-            public string emoji;
+            public string response = "";
+            public string emoji = "";
 
             public (string res, Emoji emo) CheckAndReturnResponse (SocketUserMessage message) {
                 if (string.IsNullOrEmpty (triggerPhrase) || message.Content.StartsWith (triggerPhrase)) { // Check if the message content fits the trigger, or if there is no trigger.

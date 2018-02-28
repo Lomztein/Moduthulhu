@@ -1,15 +1,14 @@
 ﻿using Discord.WebSocket;
 using Lomztein.AdvDiscordCommands.Extensions;
 using Lomztein.AdvDiscordCommands.Framework;
+using Lomztein.ModularDiscordBot.Modules.CommandRoot;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Lomztein.ModularDiscordBot.Modules.Voice.Commands {
-    public class VoiceLockingSet : CommandSet {
-
-        public VoiceLockingModule parentModule;
+    public class VoiceLockingSet : ModuleCommandSet<VoiceLockingModule> {
 
         public VoiceLockingSet() {
             command = "voice"; // Name is temporary untill set merging is running.
@@ -24,18 +23,7 @@ namespace Lomztein.ModularDiscordBot.Modules.Voice.Commands {
             };
         }
 
-        public override void Initialize() {
-            base.Initialize ();
-            foreach (Command cmd in commandsInSet) {
-                (cmd as LockCommandBase).parentModule = parentModule;
-            }
-        }
-
-        public abstract class LockCommandBase : Command {
-            public VoiceLockingModule parentModule;
-        }
-
-        public class Lock : LockCommandBase {
+        public class Lock : ModuleCommand<VoiceLockingModule> {
 
             public Lock() {
                 command = "lock";
@@ -54,7 +42,7 @@ namespace Lomztein.ModularDiscordBot.Modules.Voice.Commands {
             }
         }
 
-        public class Unlock : LockCommandBase {
+        public class Unlock : ModuleCommand<VoiceLockingModule> {
 
             public Unlock() {
                 command = "unlock";
@@ -73,7 +61,7 @@ namespace Lomztein.ModularDiscordBot.Modules.Voice.Commands {
             }
         }
 
-        public class Invite : LockCommandBase {
+        public class Invite : ModuleCommand<VoiceLockingModule> {
 
             public Invite() {
                 command = "invite";
@@ -91,7 +79,7 @@ namespace Lomztein.ModularDiscordBot.Modules.Voice.Commands {
             }
         }
 
-        public class Kick : LockCommandBase {
+        public class Kick : ModuleCommand<VoiceLockingModule> {
 
             public Kick() {
                 command = "kick";

@@ -13,6 +13,9 @@ namespace Lomztein.ModularDiscordBot.Core.Bot
         public static async Task<IUserMessage> SendMessage(ITextChannel channel, string text, bool isTTS = false, Embed embed = null) {
             if (text == null)
                 text = "";
+            if (string.IsNullOrWhiteSpace (text) && embed == null)
+                return null;
+
             return await channel.SendMessageAsync (text, isTTS, embed);
         }
 

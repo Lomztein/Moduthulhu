@@ -29,9 +29,7 @@ namespace Lomztein.ModularDiscordBot.Modules.CommandRoot
                 new PrintCommand (),
         };
 
-        public override void Initialize() { }
-
-        public override void PostInitialize() {
+        public override void Initialize() {
             var root = ParentModuleHandler.GetCommandRoot ();
             root.AddCommands (commands);
         }

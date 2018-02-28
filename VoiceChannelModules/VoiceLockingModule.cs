@@ -47,14 +47,10 @@ namespace Lomztein.ModularDiscordBot.Modules.Voice
 
         public override void Initialize() {
             ParentBotClient.discordClient.UserVoiceStateUpdated += OnUserVoiceStateUpdated;
+            ParentModuleHandler.GetModule<CommandRootModule> ().commandRoot.AddCommands (lockingCommandSet);
         }
 
         public override void PostInitialize() {
-            var root = ParentModuleHandler.GetModule<CommandRootModule> ().commandRoot;
-
-            lockingCommandSet.parentModule = this;
-            root.AddCommands (lockingCommandSet);
-
             if (ParentModuleHandler.GetModule<AutoVoiceNameModule>() is AutoVoiceNameModule autoVoiceModule) { // You can do this?
                 autoVoiceModule.AddTag (new AutoVoiceNameModule.Tag ("🔒", x => IsChannelLocked (x)));
             }

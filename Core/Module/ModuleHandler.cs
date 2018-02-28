@@ -122,6 +122,8 @@ namespace Lomztein.ModularDiscordBot.Core.Module
             return activeModules.Find (x => x.Name == moduleName && x.Author == moduleAuthor);
         }
 
+        public List<IModule> GetActiveModules() => activeModules;
+
         public T GetModule<T>() {
             IModule module = activeModules.Find (x => x is T);
             if (module == null)

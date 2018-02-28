@@ -5,7 +5,6 @@ using Discord.WebSocket;
 using System.Threading.Tasks;
 using Discord;
 using Lomztein.ModularDiscordBot.Core.Bot;
-using Lomztein.ModularDiscordBot.Modules.ServerMessages;
 
 namespace Lomztein.ModularDiscordBot.Modules.CommandRoot
 {
@@ -27,6 +26,10 @@ namespace Lomztein.ModularDiscordBot.Modules.CommandRoot
             ParentBotClient.discordClient.MessageReceived += OnMessageRecieved;
         }
 
+        public override void PostInitialize() {
+            commandRoot.InitializeCommands ();
+        }
+
         private Task OnMessageRecieved(SocketMessage arg) {
             AwaitAndSend (arg);
             return Task.CompletedTask;
@@ -34,11 +37,9 @@ namespace Lomztein.ModularDiscordBot.Modules.CommandRoot
 
         // This is neccesary since awaiting the result in the event would halt the rest of the bot, and we don't really want that.
         private async void AwaitAndSend(SocketMessage arg) {
-            if (arg.Content.Length > 0) { // TODO, implement these checks directly into library.
-                var result = await commandRoot.EnterCommand (arg as SocketUserMessage);
-                if (result != null)
-                    await MessageControl.SendMessage (arg.Channel as ITextChannel, result?.message, false, result?.value as Embed);
-            }
+            var result = await commandRoot.EnterCommand (arg as SocketUserMessage);
+            if (result != null)
+                await MessageControl.SendMessage (arg.Channel as ITextChannel, result?.message, false, result?.value as Embed);
         }
 
         public override void Shutdown() {
