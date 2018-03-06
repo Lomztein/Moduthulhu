@@ -1,13 +1,13 @@
 ﻿using Discord.WebSocket;
 using Lomztein.AdvDiscordCommands.Extensions;
 using Lomztein.AdvDiscordCommands.Framework;
-using Lomztein.ModularDiscordBot.Modules.CommandRoot;
+using Lomztein.Moduthulhu.Modules.CommandRoot;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Lomztein.ModularDiscordBot.Modules.Voice.Commands {
+namespace Lomztein.Moduthulhu.Modules.Voice.Commands {
     public class VoiceLockingSet : ModuleCommandSet<VoiceLockingModule> {
 
         public VoiceLockingSet() {

@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 using Discord.Rest;
 using Discord;
 using Discord.WebSocket;
-using Lomztein.ModularDiscordBot.Core.Bot;
+using Lomztein.Moduthulhu.Core.Bot;
 
-namespace Lomztein.ModularDiscordBot.Modules.ServerMessages
+namespace Lomztein.Moduthulhu.Modules.ServerMessages
 {
     public class InviteHandler
     {

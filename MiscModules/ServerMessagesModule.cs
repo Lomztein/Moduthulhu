@@ -1,15 +1,15 @@
 ﻿using Discord.WebSocket;
-using Lomztein.ModularDiscordBot.Core.Module.Framework;
+using Lomztein.Moduthulhu.Core.Module.Framework;
 using Lomztein.AdvDiscordCommands.Extensions;
-using Lomztein.ModularDiscordBot.Core.Extensions;
+using Lomztein.Moduthulhu.Core.Extensions;
 using System;
 using System.Threading.Tasks;
-using Lomztein.ModularDiscordBot.Core.Configuration;
+using Lomztein.Moduthulhu.Core.Configuration;
 using System.Collections.Generic;
-using Lomztein.ModularDiscordBot.Core.Bot;
+using Lomztein.Moduthulhu.Core.Bot;
 using Discord.Rest;
 
-namespace Lomztein.ModularDiscordBot.Modules.ServerMessages {
+namespace Lomztein.Moduthulhu.Modules.ServerMessages {
 
     public class ServerMessagesModule : ModuleBase, IConfigurable<MultiConfig> {
 

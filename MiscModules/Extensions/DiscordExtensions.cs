@@ -2,10 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Lomztein.Moduthulhu.Core.Module
+namespace MiscModules.Extensions
 {
-    public class ModulePatcher
+    public static class DiscordExtensions
     {
-
     }
 }

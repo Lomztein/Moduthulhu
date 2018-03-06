@@ -1,17 +1,17 @@
 ﻿using Discord;
 using Discord.WebSocket;
-using Lomztein.ModularDiscordBot.Core.Configuration;
-using Lomztein.ModularDiscordBot.Core.IO;
-using Lomztein.ModularDiscordBot.Core.Module.Framework;
-using Lomztein.ModularDiscordBot.Modules.CommandRoot;
-using Lomztein.ModularDiscordBot.Modules.Misc.Karma.Commands;
+using Lomztein.Moduthulhu.Core.Configuration;
+using Lomztein.Moduthulhu.Core.IO;
+using Lomztein.Moduthulhu.Core.Module.Framework;
+using Lomztein.Moduthulhu.Modules.CommandRoot;
+using Lomztein.Moduthulhu.Modules.Misc.Karma.Commands;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Lomztein.ModularDiscordBot.Modules.Misc.Karma
+namespace Lomztein.Moduthulhu.Modules.Misc.Karma
 {
     public class KarmaModule : ModuleBase, IConfigurable<MultiConfig> {
 

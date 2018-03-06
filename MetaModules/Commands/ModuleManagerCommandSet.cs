@@ -1,15 +1,15 @@
 ﻿using Discord;
 using Lomztein.AdvDiscordCommands.Framework;
-using Lomztein.ModularDiscordBot.Core.Extensions;
-using Lomztein.ModularDiscordBot.Core.Module.Framework;
-using Lomztein.ModularDiscordBot.Modules.CommandRoot;
-using Lomztein.ModularDiscordBot.Modules.Meta.Extensions;
+using Lomztein.Moduthulhu.Core.Extensions;
+using Lomztein.Moduthulhu.Core.Module.Framework;
+using Lomztein.Moduthulhu.Modules.CommandRoot;
+using Lomztein.Moduthulhu.Modules.Meta.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Lomztein.ModularDiscordBot.Modules.Meta.Commands
+namespace Lomztein.Moduthulhu.Modules.Meta.Commands
 {
     public class ModuleManagerCommandSet : ModuleCommandSet<ModuleManagerModule>
     {

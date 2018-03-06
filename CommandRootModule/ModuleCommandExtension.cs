@@ -1,10 +1,10 @@
 ﻿using Lomztein.AdvDiscordCommands.Framework;
-using Lomztein.ModularDiscordBot.Core.Module.Framework;
+using Lomztein.Moduthulhu.Core.Module.Framework;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Lomztein.ModularDiscordBot.Modules.CommandRoot
+namespace Lomztein.Moduthulhu.Modules.CommandRoot
 {
     public class ModuleCommand<T> : Command where T : IModule {
 

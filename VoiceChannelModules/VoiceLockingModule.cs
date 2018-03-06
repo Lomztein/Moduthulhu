@@ -1,18 +1,18 @@
 ﻿using Discord.WebSocket;
 using Lomztein.AdvDiscordCommands.Extensions;
 using Lomztein.AdvDiscordCommands.Framework;
-using Lomztein.ModularDiscordBot.Core.Configuration;
-using Lomztein.ModularDiscordBot.Core.Extensions;
-using Lomztein.ModularDiscordBot.Core.Module.Framework;
-using Lomztein.ModularDiscordBot.Modules.CommandRoot;
-using Lomztein.ModularDiscordBot.Modules.Voice.Commands;
+using Lomztein.Moduthulhu.Core.Configuration;
+using Lomztein.Moduthulhu.Core.Extensions;
+using Lomztein.Moduthulhu.Core.Module.Framework;
+using Lomztein.Moduthulhu.Modules.CommandRoot;
+using Lomztein.Moduthulhu.Modules.Voice.Commands;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Lomztein.ModularDiscordBot.Modules.Voice
+namespace Lomztein.Moduthulhu.Modules.Voice
 {
     public class VoiceLockingModule : ModuleBase, IConfigurable<MultiConfig> {
 

@@ -1,15 +1,15 @@
 ﻿using Discord;
 using Discord.WebSocket;
-using Lomztein.ModularDiscordBot.Core.Bot;
-using Lomztein.ModularDiscordBot.Core.Configuration;
-using Lomztein.ModularDiscordBot.Core.Extensions;
-using Lomztein.ModularDiscordBot.Core.Module.Framework;
+using Lomztein.Moduthulhu.Core.Bot;
+using Lomztein.Moduthulhu.Core.Configuration;
+using Lomztein.Moduthulhu.Core.Extensions;
+using Lomztein.Moduthulhu.Core.Module.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Lomztein.ModularDiscordBot.Modules.Voice {
+namespace Lomztein.Moduthulhu.Modules.Voice {
     public class AutoVoiceNameModule : ModuleBase, IConfigurable<MultiConfig> {
 
         public override string Name => "Auto Voice Names";

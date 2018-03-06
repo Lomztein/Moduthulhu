@@ -1,6 +1,6 @@
-﻿using Lomztein.ModularDiscordBot.Core.Configuration;
+﻿using Lomztein.Moduthulhu.Core.Configuration;
 
-namespace Lomztein.ModularDiscordBot.Core.Extensions {
+namespace Lomztein.Moduthulhu.Core.Extensions {
 
     public static class ConfigurableExtensions {
 

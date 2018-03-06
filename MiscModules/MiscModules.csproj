@@ -5,13 +5,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Extensions\DiscordExtensions.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\CommandRootModule\CommandRootModule.csproj" />
     <ProjectReference Include="..\Core\Core.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <Reference Include="Advanced-Discord-Commands">
-      <HintPath>..\..\Advanced-Discord-Commands\Advanced-Discord-Commands\bin\Debug\netcoreapp2.0\Advanced-Discord-Commands.dll</HintPath>
+      <HintPath>..\Core\bin\Debug\netcoreapp2.0\Advanced-Discord-Commands.dll</HintPath>
     </Reference>
   </ItemGroup>
 

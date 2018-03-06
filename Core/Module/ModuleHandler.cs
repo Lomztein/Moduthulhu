@@ -1,17 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Lomztein.ModularDiscordBot.Core.Module.Framework;
+using Lomztein.Moduthulhu.Core.Module.Framework;
 using System.Reflection;
 using System.IO;
-using Lomztein.ModularDiscordBot.Core.Bot;
-using Lomztein.ModularDiscordBot.Core.Extensions;
+using Lomztein.Moduthulhu.Core.Bot;
+using Lomztein.Moduthulhu.Core.Extensions;
 using System.Runtime.Loader;
-using Lomztein.ModularDiscordBot.Core.Configuration;
-using Lomztein.ModularDiscordBot.Core.IO;
+using Lomztein.Moduthulhu.Core.Configuration;
+using Lomztein.Moduthulhu.Core.IO;
 using System.Linq;
 
-namespace Lomztein.ModularDiscordBot.Core.Module
+namespace Lomztein.Moduthulhu.Core.Module
 {
     public class ModuleHandler {
 

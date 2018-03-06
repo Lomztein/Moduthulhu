@@ -1,12 +1,12 @@
-﻿using Lomztein.ModularDiscordBot.Core.Module.Framework;
+﻿using Lomztein.Moduthulhu.Core.Module.Framework;
 using Lomztein.AdvDiscordCommands.Framework;
 using System;
 using Discord.WebSocket;
 using System.Threading.Tasks;
 using Discord;
-using Lomztein.ModularDiscordBot.Core.Bot;
+using Lomztein.Moduthulhu.Core.Bot;
 
-namespace Lomztein.ModularDiscordBot.Modules.CommandRoot
+namespace Lomztein.Moduthulhu.Modules.CommandRoot
 {
     public class CommandRootModule : ModuleBase {
 

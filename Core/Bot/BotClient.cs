@@ -2,12 +2,12 @@
 using Discord;
 using Discord.WebSocket;
 using System.Threading.Tasks;
-using Lomztein.ModularDiscordBot.Core.Module;
+using Lomztein.Moduthulhu.Core.Module;
 using System.IO;
 using System.Threading;
 using System.Linq;
 
-namespace Lomztein.ModularDiscordBot.Core.Bot {
+namespace Lomztein.Moduthulhu.Core.Bot {
 
     /// <summary>
     /// A wrapper for the Discord.NET DiscordClient.

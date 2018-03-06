@@ -1,15 +1,15 @@
-﻿using Lomztein.ModularDiscordBot.Core.Module.Framework;
+﻿using Lomztein.Moduthulhu.Core.Module.Framework;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using Discord.WebSocket;
 using Discord;
 using System.Threading.Tasks;
-using Lomztein.ModularDiscordBot.Core.Configuration;
+using Lomztein.Moduthulhu.Core.Configuration;
 using Lomztein.AdvDiscordCommands.Extensions;
-using Lomztein.ModularDiscordBot.Core.Bot;
+using Lomztein.Moduthulhu.Core.Bot;
 
-namespace Lomztein.ModularDiscordBot.Modules.Misc.Phrases
+namespace Lomztein.Moduthulhu.Modules.Misc.Phrases
 {
     public class PhrasesModule : ModuleBase, IConfigurable<MultiConfig> {
 

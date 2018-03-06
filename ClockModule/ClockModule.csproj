@@ -10,7 +10,7 @@
 
   <ItemGroup>
     <Reference Include="Advanced-Discord-Commands">
-      <HintPath>..\..\Advanced-Discord-Commands\Advanced-Discord-Commands\bin\Debug\netcoreapp2.0\Advanced-Discord-Commands.dll</HintPath>
+      <HintPath>..\Core\bin\Debug\netcoreapp2.0\Advanced-Discord-Commands.dll</HintPath>
     </Reference>
   </ItemGroup>
 

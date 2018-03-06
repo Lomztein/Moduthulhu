@@ -1,7 +1,7 @@
-﻿using Lomztein.ModularDiscordBot.Core.Bot;
+﻿using Lomztein.Moduthulhu.Core.Bot;
 using System;
 
-namespace Lomztein.ModularDiscordBot.Core
+namespace Lomztein.Moduthulhu.Core
 {
     class Program
     {

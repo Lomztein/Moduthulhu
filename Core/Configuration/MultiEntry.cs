@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Lomztein.ModularDiscordBot.Core.Configuration {
+namespace Lomztein.Moduthulhu.Core.Configuration {
     public struct MultiEntry<T> {
 
         public Dictionary<ulong, T> values;

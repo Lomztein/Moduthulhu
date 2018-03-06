@@ -1,5 +1,5 @@
-﻿using Lomztein.ModularDiscordBot.Core.Bot;
-using Lomztein.ModularDiscordBot.Core.IO;
+﻿using Lomztein.Moduthulhu.Core.Bot;
+using Lomztein.Moduthulhu.Core.IO;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -7,7 +7,7 @@ using System.IO;
 using System.Runtime.Serialization;
 using System.Text;
 
-namespace Lomztein.ModularDiscordBot.Core.Configuration {
+namespace Lomztein.Moduthulhu.Core.Configuration {
 
     /// <summary>
     /// This class might be overengineered, and is subject to change.

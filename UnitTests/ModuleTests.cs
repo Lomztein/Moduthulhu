@@ -1,6 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Lomztein.ModularDiscordBot.UnitTests.Modules {
+namespace Lomztein.Moduthulhu.UnitTests.Modules {
 
     [TestClass]
     public class ModuleTests {

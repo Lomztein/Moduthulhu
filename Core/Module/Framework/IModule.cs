@@ -1,10 +1,10 @@
-﻿using Lomztein.ModularDiscordBot.Core.Bot;
-using Lomztein.ModularDiscordBot.Core.Configuration;
+﻿using Lomztein.Moduthulhu.Core.Bot;
+using Lomztein.Moduthulhu.Core.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Lomztein.ModularDiscordBot.Core.Module.Framework
+namespace Lomztein.Moduthulhu.Core.Module.Framework
 {
     public interface IModule {
 

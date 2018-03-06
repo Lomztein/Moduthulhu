@@ -1,10 +1,10 @@
 ﻿using Discord.WebSocket;
-using Lomztein.ModularDiscordBot.Modules.Misc.Karma;
+using Lomztein.Moduthulhu.Modules.Misc.Karma;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Lomztein.ModularDiscordBot.Modules.Misc.Karma.Extensions
+namespace Lomztein.Moduthulhu.Modules.Misc.Karma.Extensions
 {
     public class KarmaComparator : IComparer<SocketUser> {
 

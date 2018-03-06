@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Lomztein.ModularDiscordBot.Core.Bot
+namespace Lomztein.Moduthulhu.Core.Bot
 {
     public static class Log
     {

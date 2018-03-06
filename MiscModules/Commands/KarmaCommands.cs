@@ -1,15 +1,15 @@
 ﻿using Discord.WebSocket;
 using Lomztein.AdvDiscordCommands.Extensions;
 using Lomztein.AdvDiscordCommands.Framework;
-using Lomztein.ModularDiscordBot.Modules.CommandRoot;
+using Lomztein.Moduthulhu.Modules.CommandRoot;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
-using Lomztein.ModularDiscordBot.Modules.Misc.Karma;
-using Lomztein.ModularDiscordBot.Modules.Misc.Karma.Extensions;
+using Lomztein.Moduthulhu.Modules.Misc.Karma;
+using Lomztein.Moduthulhu.Modules.Misc.Karma.Extensions;
 
-namespace Lomztein.ModularDiscordBot.Modules.Misc.Karma.Commands
+namespace Lomztein.Moduthulhu.Modules.Misc.Karma.Commands
 {
     public class KarmaCommand : ModuleCommand<KarmaModule> {
 

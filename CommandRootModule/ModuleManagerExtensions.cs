@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Lomztein.ModularDiscordBot.Core.Module;
+using Lomztein.Moduthulhu.Core.Module;
 
-namespace Lomztein.ModularDiscordBot.Modules.CommandRoot
+namespace Lomztein.Moduthulhu.Modules.CommandRoot
 {
     public static class ModuleManagerExtensions
     {
