@@ -57,6 +57,8 @@ namespace Lomztein.Moduthulhu.Modules.Clock
                 tickables.ForEach (x => x.Tick (lastTick, DateTime.Now));
                 lastTick = DateTime.Now;
             }
+
+            clockThread.Abort ();
         }
     }
 }

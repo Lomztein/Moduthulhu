@@ -24,7 +24,6 @@ namespace Lomztein.Moduthulhu.Modules.CommandRoot
                 new FlowCommandSet (),
                 new MathCommandSet (),
                 new VariableCommandSet (),
-                new MiscCommandSet (),
                 new CallstackCommand (),
                 new PrintCommand (),
         };

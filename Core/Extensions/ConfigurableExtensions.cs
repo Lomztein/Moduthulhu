@@ -4,7 +4,11 @@ namespace Lomztein.Moduthulhu.Core.Extensions {
 
     public static class ConfigurableExtensions {
 
-        internal static void ReloadConfiguration(this IConfigurable configurable) {
+        /// <summary>
+        /// Use with caution. Whatever this is given must contain a Config object named Configuration.
+        /// </summary>
+        /// <param name="configurable"></param>
+        public static void ReloadConfiguration(this IConfigurable configurable) {
             dynamic dynConfig = configurable;
             dynConfig.Configuration.Load ();
             dynConfig.Configure ();

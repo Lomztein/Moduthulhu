@@ -161,7 +161,7 @@ namespace Lomztein.Moduthulhu.Modules.Misc.Logging
         }
 
         private Task OnMessageUpdated(Cacheable<IMessage, ulong> arg1, SocketMessage arg2, ISocketMessageChannel arg3) {
-            Log.Write (Log.Type.CHAT, "Message " + arg1.Id + " in " + arg3.GetPath () + " has been updated to " + arg2.Content.ToStringOrNull () + ".");
+            Log.Write (Log.Type.CHAT, "Message " + arg1.Id + " in " + arg3.GetPath () + " has been updated to " + arg2?.Content.ToStringOrNull () + ".");
             return Task.CompletedTask;
         }
 

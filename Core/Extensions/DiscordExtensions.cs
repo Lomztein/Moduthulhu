@@ -52,5 +52,11 @@ namespace Lomztein.Moduthulhu.Core.Extensions
             return role.Guild + " / " + role.Name;
 
         }
+
+        public static ulong ZeroIfNull (this IEntity<ulong> entity) {
+            if (entity == null)
+                return 0;
+            return entity.Id;
+        }
     }
 }

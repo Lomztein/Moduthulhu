@@ -8,6 +8,7 @@ using Lomztein.Moduthulhu.Core.Configuration;
 using System.Collections.Generic;
 using Lomztein.Moduthulhu.Core.Bot;
 using Discord.Rest;
+using System.Linq;
 
 namespace Lomztein.Moduthulhu.Modules.ServerMessages {
 
@@ -27,6 +28,7 @@ namespace Lomztein.Moduthulhu.Modules.ServerMessages {
         private MultiEntry<string [ ]> onUserLeftGuild;
         private MultiEntry<string [ ]> onUserBannedFromGuild;
         private MultiEntry<string [ ]> onUserUnbannedFromGuild;
+        private MultiEntry<string [ ]> onUserNameChanged;
 
         private InviteHandler inviteHandler;
 
@@ -36,8 +38,24 @@ namespace Lomztein.Moduthulhu.Modules.ServerMessages {
             ParentBotClient.discordClient.UserLeft += OnUserLeftGuild;
             ParentBotClient.discordClient.UserBanned += OnUserBannedFromGuild;
             ParentBotClient.discordClient.UserUnbanned += OnUserUnbannedFromGuild;
+            ParentBotClient.discordClient.GuildMemberUpdated += OnGuildMemberUpdated;
 
             inviteHandler = new InviteHandler (ParentBotClient);
+        }
+
+        private Task OnGuildMemberUpdated(SocketGuildUser arg1, SocketGuildUser arg2) {
+            CheckAndAnnounceNameChange (arg1, arg2);
+            return Task.CompletedTask;
+        }
+
+        private void CheckAndAnnounceNameChange(SocketGuildUser before, SocketGuildUser after) {
+
+            if (before == null || after == null)
+                return;
+
+            if (before.GetShownName () != after.GetShownName ()) {
+                SendMessage (after.Guild, onUserNameChanged, "[USERNAME]", before.GetShownName (), "[NEWNAME]", after.GetShownName ());
+            }
         }
 
         public void Configure() {
@@ -50,6 +68,7 @@ namespace Lomztein.Moduthulhu.Modules.ServerMessages {
             onUserLeftGuild = Configuration.GetEntries (guilds, "OnUserLeftGuild", new string [ ] { "**[USERNAME]** has left this server. ;-;" });
             onUserBannedFromGuild = Configuration.GetEntries (guilds, "OnUserBannedFromGuild", new string [ ] { "**[USERNAME]** has been banned from this server." });
             onUserUnbannedFromGuild = Configuration.GetEntries (guilds, "OnUserUnbannedFromGuild", new string [ ] { "**[USERNAME]** has been unbanned from this server." });
+            onUserNameChanged = Configuration.GetEntries (guilds, "OnUserNameChanged", new string [ ] { "**[USERNAME]** changed name to **[NEWNAME]**" });
         }
 
         private Task OnUserUnbannedFromGuild(SocketUser user, SocketGuild guild) {
@@ -77,6 +96,7 @@ namespace Lomztein.Moduthulhu.Modules.ServerMessages {
 
         private Task OnJoinedNewGuild(SocketGuild guild) {
             SendMessage (guild, onJoinedNewGuild, "[BOTNAME]", ParentBotClient.discordClient.CurrentUser.GetShownName ());
+            inviteHandler.UpdateData (null, guild);
             return Task.CompletedTask;
         }
 
@@ -98,6 +118,7 @@ namespace Lomztein.Moduthulhu.Modules.ServerMessages {
             ParentBotClient.discordClient.UserLeft -= OnUserLeftGuild;
             ParentBotClient.discordClient.UserBanned -= OnUserBannedFromGuild;
             ParentBotClient.discordClient.UserUnbanned -= OnUserUnbannedFromGuild;
+            ParentBotClient.discordClient.GuildMemberUpdated -= OnGuildMemberUpdated;
         }
     }
 }

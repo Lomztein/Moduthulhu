@@ -71,6 +71,9 @@ namespace Lomztein.Moduthulhu.Modules.Clock.ActivityMonitor
         }
 
         public async void RecordActivity(SocketGuildUser user, DateTime time) {
+            if (user == null)
+                return;
+
             SocketGuild guild = user.Guild;
 
             if (!userActivity.ContainsKey (guild.Id))

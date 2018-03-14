@@ -33,7 +33,7 @@ namespace Lomztein.Moduthulhu.Modules.Misc.Phrases
         }
 
         private async void CheckAndRespond (SocketMessage message) {
-            if (message is SocketUserMessage userMessage) {
+            if (message is SocketUserMessage userMessage && userMessage.GetGuild () != null) {
 
                 string response = null;
                 Emoji emoji = null;

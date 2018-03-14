@@ -59,6 +59,7 @@ namespace Lomztein.Moduthulhu.Modules.Misc.Color
             public SetColour () {
                 command = "setcolour";
                 shortHelp = "Set your personal color to something funky.";
+                catagory = Category.Utility;
             }
 
             [Overload (typeof (void), "Set your colour to something cool!")]

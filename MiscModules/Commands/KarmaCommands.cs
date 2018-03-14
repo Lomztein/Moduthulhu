@@ -16,6 +16,7 @@ namespace Lomztein.Moduthulhu.Modules.Misc.Karma.Commands
         public KarmaCommand() {
             command = "karma";
             shortHelp = "Shows karma.";
+            catagory = Category.Fun;
         }
 
         [Overload (typeof (int), "Returns your own karma.")]

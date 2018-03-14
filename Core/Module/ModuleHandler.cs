@@ -15,6 +15,8 @@ namespace Lomztein.Moduthulhu.Core.Module
 {
     public class ModuleHandler {
 
+        // This class could use a refactoring, it's gotten a bit messy.
+
         public string baseDirectory = AppContext.BaseDirectory + "/Modules/";
 
         private List<IModule> activeModules = new List<IModule> ();
@@ -28,10 +30,15 @@ namespace Lomztein.Moduthulhu.Core.Module
         public ModuleHandler (BotClient _client, string _baseDirectoy) {
             parentClient = _client;
             baseDirectory = _baseDirectoy;
-            LaunchLoad ();
+            LoadModuleFolder ();
         }
 
-        public async void LaunchLoad() {
+        public void ReloadModules () {
+            ShutdownAllModules ();
+            LoadModuleFolder ();
+        }
+
+        private async void LoadModuleFolder() {
 
             LoadCache ();
             List<IModule> modules = LoadEntireDirectory (baseDirectory);
@@ -160,11 +167,20 @@ namespace Lomztein.Moduthulhu.Core.Module
         }
 
         public void ShutdownModule (IModule module) {
+            Log.Write (Log.Type.MODULE, "Shutting down module: " + module.CompactizeName ());
             module.Shutdown ();
-            activeModules.Remove (module);
         }
 
-        private void ConfigureModules () {
+        public void ClearModuleCache () => activeModules = new List<IModule> ();
+
+        public void ShutdownAllModules () {
+            Log.Write (Log.Type.MODULE, "Shutting down all modules..");
+            foreach (IModule module in activeModules)
+                ShutdownModule (module);
+            ClearModuleCache ();
+        }
+
+        public void ConfigureModules () {
             foreach (IModule module in activeModules) {
                 if (module is IConfigurable configurable) {
                     dynamic dynModule = module;
