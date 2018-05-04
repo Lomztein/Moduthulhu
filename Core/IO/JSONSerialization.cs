@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Text;
 using Newtonsoft.Json;
 using System.IO;
-using Lomztein.ModularDiscordBot.Core.Bot;
+using Lomztein.Moduthulhu.Core.Bot;
 
-namespace Lomztein.ModularDiscordBot.Core.IO
+namespace Lomztein.Moduthulhu.Core.IO
 {
     /// <summary>
     /// Various JSON related serialization methods. Using the IO methods force the file extension to .json, for consistancy.

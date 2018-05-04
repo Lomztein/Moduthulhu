@@ -1,4 +1,4 @@
-﻿using Lomztein.ModularDiscordBot.Core.Module.Framework;
+﻿using Lomztein.Moduthulhu.Core.Module.Framework;
 using Lomztein.AdvDiscordCommands.ExampleCommands;
 using System;
 using System.Collections.Generic;
@@ -6,7 +6,7 @@ using System.Text;
 using Lomztein.AdvDiscordCommands.Framework;
 using Lomztein.AdvDiscordCommands.Extensions;
 
-namespace Lomztein.ModularDiscordBot.Modules.CommandRoot
+namespace Lomztein.Moduthulhu.Modules.CommandRoot
 {
     public class StandardCommandsModule : ModuleBase {
 
@@ -24,7 +24,6 @@ namespace Lomztein.ModularDiscordBot.Modules.CommandRoot
                 new FlowCommandSet (),
                 new MathCommandSet (),
                 new VariableCommandSet (),
-                new MiscCommandSet (),
                 new CallstackCommand (),
                 new PrintCommand (),
         };

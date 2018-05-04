@@ -6,7 +6,7 @@ using Discord.WebSocket;
 using Discord;
 using System.Threading.Tasks;
 
-namespace Lomztein.ModularDiscordBot.Core.Bot
+namespace Lomztein.Moduthulhu.Core.Bot
 {
     public static class MessageControl
     {

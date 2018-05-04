@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Lomztein.ModularDiscordBot.Modules.Clock
+namespace Lomztein.Moduthulhu.Modules.Clock
 {
     public interface ITickable
     {

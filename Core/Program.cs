@@ -1,10 +1,10 @@
-﻿using Lomztein.ModularDiscordBot.Core.Bot;
+﻿using Lomztein.Moduthulhu.Core.Bot;
 using System;
 
-namespace Lomztein.ModularDiscordBot.Core
+namespace Lomztein.Moduthulhu.Core
 {
     class Program
     {
-        static void Main(string [ ] args) => new BotClient ().Initialize ().GetAwaiter ().GetResult ();
+        static void Main(string [ ] args) => new BotClient ().Run ().GetAwaiter ().GetResult ();
     }
 }

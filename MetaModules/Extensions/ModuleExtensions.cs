@@ -1,11 +1,11 @@
 ﻿using Discord;
-using Lomztein.ModularDiscordBot.Core.Module;
-using Lomztein.ModularDiscordBot.Core.Module.Framework;
+using Lomztein.Moduthulhu.Core.Module;
+using Lomztein.Moduthulhu.Core.Module.Framework;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Lomztein.ModularDiscordBot.Modules.Meta.Extensions
+namespace Lomztein.Moduthulhu.Modules.Meta.Extensions
 {
     public static class ModuleExtensions
     {

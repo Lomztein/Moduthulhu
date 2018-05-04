@@ -1,12 +1,12 @@
-﻿using Lomztein.ModularDiscordBot.Core.Bot;
-using Lomztein.ModularDiscordBot.Core.Configuration;
-using Lomztein.ModularDiscordBot.Core.Module.Framework;
+﻿using Lomztein.Moduthulhu.Core.Bot;
+using Lomztein.Moduthulhu.Core.Configuration;
+using Lomztein.Moduthulhu.Core.Module.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Lomztein.ModularDiscordBot.Core.Extensions
+namespace Lomztein.Moduthulhu.Core.Extensions
 {
     public static class ModuleExtensions
     {

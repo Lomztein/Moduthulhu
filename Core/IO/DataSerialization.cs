@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Lomztein.ModularDiscordBot.Core.IO
+namespace Lomztein.Moduthulhu.Core.IO
 {
     /// <summary>
     /// In many ways just an extension of JSON serialization, however this consistantly saves in a specific folder.

@@ -1,8 +1,8 @@
-﻿using Lomztein.ModularDiscordBot.Core.Module.Framework;
-using Lomztein.ModularDiscordBot.Modules.Meta.Commands;
+﻿using Lomztein.Moduthulhu.Core.Module.Framework;
+using Lomztein.Moduthulhu.Modules.Meta.Commands;
 using System;
 
-namespace Lomztein.ModularDiscordBot.Modules.Meta
+namespace Lomztein.Moduthulhu.Modules.Meta
 {
     public class ModuleManagerModule : ModuleBase {
 

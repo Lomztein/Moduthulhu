@@ -1,14 +1,16 @@
-﻿using Lomztein.ModularDiscordBot.Core.Module.Framework;
+﻿using Lomztein.Moduthulhu.Core.Module.Framework;
 using Lomztein.AdvDiscordCommands.Framework;
 using System;
 using Discord.WebSocket;
 using System.Threading.Tasks;
 using Discord;
-using Lomztein.ModularDiscordBot.Core.Bot;
+using Lomztein.Moduthulhu.Core.Bot;
+using Lomztein.AdvDiscordCommands.Framework.Interfaces;
+using System.Collections.Generic;
 
-namespace Lomztein.ModularDiscordBot.Modules.CommandRoot
+namespace Lomztein.Moduthulhu.Modules.CommandRoot
 {
-    public class CommandRootModule : ModuleBase {
+    public class CommandRootModule : ModuleBase, ICommandSet {
 
         public override string Name => "Command Root";
         public override string Description => "A base module for implementing the Advanced Discord Commands framework.";
@@ -37,13 +39,29 @@ namespace Lomztein.ModularDiscordBot.Modules.CommandRoot
 
         // This is neccesary since awaiting the result in the event would halt the rest of the bot, and we don't really want that.
         private async void AwaitAndSend(SocketMessage arg) {
-            var result = await commandRoot.EnterCommand (arg as SocketUserMessage);
-            if (result != null)
-                await MessageControl.SendMessage (arg.Channel as ITextChannel, result?.message, false, result?.value as Embed);
+            try {
+                var result = await commandRoot.EnterCommand (arg as SocketUserMessage);
+                if (result != null)
+                    await MessageControl.SendMessage (arg.Channel as ITextChannel, result?.message, false, result?.value as Embed);
+            } catch (Exception e) {
+                Log.Write (e);
+            }
         }
 
         public override void Shutdown() {
             ParentBotClient.discordClient.MessageReceived -= OnMessageRecieved;
+        }
+
+        public List<Command> GetCommands() {
+            return ((ICommandSet)commandRoot).GetCommands ();
+        }
+
+        public void AddCommands(params Command [ ] newCommands) {
+            ((ICommandSet)commandRoot).AddCommands (newCommands);
+        }
+
+        public void RemoveCommands(params Command [ ] commands) {
+            ((ICommandSet)commandRoot).RemoveCommands (commands);
         }
     }
 }

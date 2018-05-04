@@ -5,6 +5,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Extensions\DiscordExtensions.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\CommandRootModule\CommandRootModule.csproj" />
     <ProjectReference Include="..\Core\Core.csproj" />
   </ItemGroup>

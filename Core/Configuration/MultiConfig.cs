@@ -1,14 +1,14 @@
 ﻿using Discord;
 using Discord.WebSocket;
-using Lomztein.ModularDiscordBot.Core.Bot;
-using Lomztein.ModularDiscordBot.Core.IO;
+using Lomztein.Moduthulhu.Core.Bot;
+using Lomztein.Moduthulhu.Core.IO;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 
-namespace Lomztein.ModularDiscordBot.Core.Configuration
+namespace Lomztein.Moduthulhu.Core.Configuration
 {
     /// <summary>
     /// This is designed to be easy to use for multiserver modules.

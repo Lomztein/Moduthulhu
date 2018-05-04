@@ -1,17 +1,17 @@
-﻿using Lomztein.ModularDiscordBot.Core.Module.Framework;
+﻿using Lomztein.Moduthulhu.Core.Module.Framework;
 using Discord.WebSocket;
 using Discord;
 using System;
-using Lomztein.ModularDiscordBot.Core.Configuration;
-using Lomztein.ModularDiscordBot.Core.Extensions;
+using Lomztein.Moduthulhu.Core.Configuration;
+using Lomztein.Moduthulhu.Core.Extensions;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Lomztein.ModularDiscordBot.Core.IO;
+using Lomztein.Moduthulhu.Core.IO;
 using Lomztein.AdvDiscordCommands.Extensions;
-using Lomztein.ModularDiscordBot.Core.Bot;
+using Lomztein.Moduthulhu.Core.Bot;
 
-namespace Lomztein.ModularDiscordBot.Modules.Clock.ActivityMonitor
+namespace Lomztein.Moduthulhu.Modules.Clock.ActivityMonitor
 {
     public class UserActivityMonitorModule : ModuleBase, ITickable, IConfigurable<MultiConfig> {
 
@@ -71,6 +71,9 @@ namespace Lomztein.ModularDiscordBot.Modules.Clock.ActivityMonitor
         }
 
         public async void RecordActivity(SocketGuildUser user, DateTime time) {
+            if (user == null)
+                return;
+
             SocketGuild guild = user.Guild;
 
             if (!userActivity.ContainsKey (guild.Id))

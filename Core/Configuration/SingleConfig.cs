@@ -1,9 +1,9 @@
-﻿using Lomztein.ModularDiscordBot.Core.IO;
+﻿using Lomztein.Moduthulhu.Core.IO;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Lomztein.ModularDiscordBot.Core.Configuration
+namespace Lomztein.Moduthulhu.Core.Configuration
 {
     public class SingleConfig : Config {
 

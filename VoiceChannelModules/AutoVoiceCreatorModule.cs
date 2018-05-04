@@ -1,7 +1,7 @@
 ﻿using Discord.WebSocket;
-using Lomztein.ModularDiscordBot.Core.Configuration;
-using Lomztein.ModularDiscordBot.Core.Extensions;
-using Lomztein.ModularDiscordBot.Core.Module.Framework;
+using Lomztein.Moduthulhu.Core.Configuration;
+using Lomztein.Moduthulhu.Core.Extensions;
+using Lomztein.Moduthulhu.Core.Module.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Discord.Rest;
 
-namespace Lomztein.ModularDiscordBot.Modules.Voice
+namespace Lomztein.Moduthulhu.Modules.Voice
 {
     public class AutoVoiceCreatorModule : ModuleBase, IConfigurable<MultiConfig> {
 
@@ -25,6 +25,7 @@ namespace Lomztein.ModularDiscordBot.Modules.Voice
         private MultiEntry<List<string>> newVoiceNames; // Would be more fitting as a queue, but a list is easier to work with in this case.
         private MultiEntry<int> desiredFreeChannels; // However many channels you'd want free at any given time.
         private MultiEntry<List<ulong>> ignoreChannels; // Whichever channels you want this module to completely ignore, such as AFK channels.
+        private MultiEntry<ulong> newChannelCategoryID; // The catagory that new channels are placed in, 0 if no catagory.
 
         private Dictionary<ulong, List<string>> nameQueue; // This isn't for config, but instead for keeping track of which names have been used.
         private Dictionary<ulong, List<ulong>> temporaryChannels; // This isn't for config, but instead for keeping track of the active channels.
@@ -36,11 +37,14 @@ namespace Lomztein.ModularDiscordBot.Modules.Voice
             newVoiceNames = Configuration.GetEntries (guilds, "NewVoiceNames", new List<string> () { "General 1", "General 2" });
             desiredFreeChannels = Configuration.GetEntries (guilds, "DesiredFreeChannels", 1);
 
-            ignoreChannels = Configuration.GetEntries (guilds, "IgnoreChannels", guilds.Select (x => {
-                if (x.AFKChannel != null)
-                    return x.AFKChannel.Id;
-                return (ulong)0;
-                }).ToList ());
+            ignoreChannels = Configuration.GetEntries (guilds, "IgnoreChannels", guilds.Select (x => x.AFKChannel.ZeroIfNull ()).ToList ());
+            newChannelCategoryID = Configuration.GetEntries (guilds, "NewChannelCategory", defaultChannels.values.Select (x => {
+                if (x.Value.Count > 0) {
+                    return (ulong)ParentBotClient.GetChannel (x.Value.FirstOrDefault ()).Category.ZeroIfNull ();
+                } else {
+                    return (ulong)0;
+                }
+            }));
 
             nameQueue = new Dictionary<ulong, List<string>> ();
             temporaryChannels = new Dictionary<ulong, List<ulong>> ();
@@ -137,6 +141,12 @@ namespace Lomztein.ModularDiscordBot.Modules.Voice
         private async Task<RestVoiceChannel> CreateNewChannel (SocketGuild guild, string channelName) {
             var channel = await guild.CreateVoiceChannelAsync (channelName);
             temporaryChannels [ guild.Id ].Add (channel.Id);
+
+            ulong catagory = newChannelCategoryID.GetEntry (guild);
+            if (catagory != 0) {
+                await channel.ModifyAsync (x => x.CategoryId = catagory);
+            }
+
             return channel;
         }
 

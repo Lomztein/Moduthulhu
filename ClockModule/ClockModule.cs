@@ -1,11 +1,11 @@
 ﻿using System;
-using Lomztein.ModularDiscordBot.Core.Module.Framework;
+using Lomztein.Moduthulhu.Core.Module.Framework;
 using System.Collections.Generic;
-using Lomztein.ModularDiscordBot.Core.Configuration;
+using Lomztein.Moduthulhu.Core.Configuration;
 using System.Threading;
-using Lomztein.ModularDiscordBot.Core.Extensions;
+using Lomztein.Moduthulhu.Core.Extensions;
 
-namespace Lomztein.ModularDiscordBot.Modules.Clock
+namespace Lomztein.Moduthulhu.Modules.Clock
 {
     public class ClockModule : ModuleBase, IConfigurable<SingleConfig>
     {
@@ -57,6 +57,8 @@ namespace Lomztein.ModularDiscordBot.Modules.Clock
                 tickables.ForEach (x => x.Tick (lastTick, DateTime.Now));
                 lastTick = DateTime.Now;
             }
+
+            clockThread.Abort ();
         }
     }
 }

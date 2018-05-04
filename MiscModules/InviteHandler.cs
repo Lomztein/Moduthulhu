@@ -5,13 +5,13 @@ using System.Threading.Tasks;
 using Discord.Rest;
 using Discord;
 using Discord.WebSocket;
-using Lomztein.ModularDiscordBot.Core.Bot;
+using Lomztein.Moduthulhu.Core.Bot;
 
-namespace Lomztein.ModularDiscordBot.Modules.ServerMessages
+namespace Lomztein.Moduthulhu.Modules.ServerMessages
 {
     public class InviteHandler
     {
-        public static Dictionary<string, RestInviteMetadata> savedInvites;
+        public static Dictionary<ulong, Dictionary<string, RestInviteMetadata>> savedInvites = new Dictionary<ulong, Dictionary<string, RestInviteMetadata>> ();
         public BotClient parentBotClient;
 
         public InviteHandler (BotClient _parent) {
@@ -24,11 +24,13 @@ namespace Lomztein.ModularDiscordBot.Modules.ServerMessages
 
         public async void UpdateData(IReadOnlyCollection<RestInviteMetadata> readOnly, SocketGuild guild) {
             try {
-                await parentBotClient.AwaitFullBoot ();
                 if (readOnly == null)
                     readOnly = await guild.GetInvitesAsync ();
 
-                savedInvites = readOnly.ToDictionary (x => x.Code);
+                if (!savedInvites.ContainsKey (guild.Id))
+                    savedInvites.Add (guild.Id, new Dictionary<string, RestInviteMetadata> ());
+
+                savedInvites[guild.Id] = readOnly.ToDictionary (x => x.Code);
             } catch (Exception e) {
                 Log.Write (e);
             }
@@ -40,9 +42,12 @@ namespace Lomztein.ModularDiscordBot.Modules.ServerMessages
                 Dictionary<string, RestInviteMetadata> dict = newInvites.ToDictionary (x => x.Code);
                 RestInviteMetadata result = null;
 
+                if (!savedInvites.ContainsKey (guild.Id))
+                    UpdateData (null, guild); // Shouldn't happen, but just in case it does happen.
+
                 foreach (var key in dict) {
-                    if (savedInvites.ContainsKey (key.Key)) {
-                        if (savedInvites [ key.Key ].Uses + 1 == key.Value.Uses) {
+                    if (savedInvites[guild.Id].ContainsKey (key.Key)) {
+                        if (savedInvites [ guild.Id ] [ key.Key ].Uses + 1 == key.Value.Uses) {
                             result = key.Value;
                         }
                     } else {

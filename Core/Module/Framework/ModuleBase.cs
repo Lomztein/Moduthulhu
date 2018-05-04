@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Lomztein.ModularDiscordBot.Core.Bot;
-using Lomztein.ModularDiscordBot.Core.Configuration;
+using Lomztein.Moduthulhu.Core.Bot;
+using Lomztein.Moduthulhu.Core.Configuration;
 
-namespace Lomztein.ModularDiscordBot.Core.Module.Framework
+namespace Lomztein.Moduthulhu.Core.Module.Framework
 {
     public abstract class ModuleBase : IModule {
 

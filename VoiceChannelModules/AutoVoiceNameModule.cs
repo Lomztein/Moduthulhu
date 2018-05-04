@@ -1,15 +1,17 @@
 ﻿using Discord;
 using Discord.WebSocket;
-using Lomztein.ModularDiscordBot.Core.Bot;
-using Lomztein.ModularDiscordBot.Core.Configuration;
-using Lomztein.ModularDiscordBot.Core.Extensions;
-using Lomztein.ModularDiscordBot.Core.Module.Framework;
+using Lomztein.Moduthulhu.Core.Bot;
+using Lomztein.Moduthulhu.Core.Configuration;
+using Lomztein.Moduthulhu.Core.Extensions;
+using Lomztein.Moduthulhu.Core.Module.Framework;
+using Lomztein.Moduthulhu.Modules.CommandRoot;
+using Lomztein.Moduthulhu.Modules.Voice.Commands;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Lomztein.ModularDiscordBot.Modules.Voice {
+namespace Lomztein.Moduthulhu.Modules.Voice {
     public class AutoVoiceNameModule : ModuleBase, IConfigurable<MultiConfig> {
 
         public override string Name => "Auto Voice Names";
@@ -21,15 +23,22 @@ namespace Lomztein.ModularDiscordBot.Modules.Voice {
         private MultiEntry<Dictionary<ulong, string>> channelNames;
         private MultiEntry<List<ulong>> toIgnore;
 
+        public override string [ ] RequiredModules => new string [ ] { "Lomztein_Command Root" };
+
         // Tag specific configuration
         private MultiEntry<ulong> musicBotID;
+        private MultiEntry<ulong> internationalRoleID;
 
         public MultiConfig Configuration { get; set; } = new MultiConfig ();
 
         private Dictionary<ulong, string> customNames = new Dictionary<ulong, string> ();
         private Dictionary<string, Tag> tags = new Dictionary<string, Tag> (); // This is a dictionary purely for easier identification of tags.
 
+        private VoiceNameSet commandSet;
+
         public override void Initialize() {
+            commandSet = new VoiceNameSet () { parentModule = this };
+            ParentModuleHandler.GetModule<CommandRootModule> ().commandRoot.AddCommands (commandSet);
             ParentBotClient.discordClient.ChannelCreated += OnChannelCreated;
             ParentBotClient.discordClient.ChannelDestroyed += OnChannelDestroyed;
             ParentBotClient.discordClient.UserVoiceStateUpdated += OnVoiceStateUpdated;
@@ -41,6 +50,7 @@ namespace Lomztein.ModularDiscordBot.Modules.Voice {
             AddTag (new Tag ("🎵", x => x.Users.Any (y => y.Id == musicBotID.GetEntry (x.Guild))));
             AddTag (new Tag ("🔥", x => x.Users.Count (y => y.GuildPermissions.Administrator) >= 3)); // Three is the magic number. *snickers*
             AddTag (new Tag ("📹", x => x.Users.Any (y => y.Activity?.Type == ActivityType.Streaming)));
+            AddTag (new Tag ("🌎", x => x.Users.Any (y => y.Roles.Any (z => z.Id == internationalRoleID.GetEntry (x.Guild)))));
         }
 
         private Task OnGuildMemberUpdated(SocketGuildUser prev, SocketGuildUser cur) {
@@ -108,6 +118,8 @@ namespace Lomztein.ModularDiscordBot.Modules.Voice {
                 string newName = highestGame != "" ? possibleShorten + " - " + highestGame : splitVoice [ 0 ];
                 newName = tags + " " + newName;
 
+                if (channel.Users.Count == 0)
+                    customNames.Remove (channel.Id);
                 if (customNames.ContainsKey (channel.Id))
                     newName = possibleShorten + " - " + customNames [ channel.Id ];
 
@@ -136,6 +148,7 @@ namespace Lomztein.ModularDiscordBot.Modules.Voice {
         }
 
         public override void Shutdown() {
+            ParentModuleHandler.GetModule<CommandRootModule> ().commandRoot.RemoveCommands (commandSet);
             ParentBotClient.discordClient.ChannelCreated -= OnChannelCreated;
             ParentBotClient.discordClient.ChannelDestroyed -= OnChannelDestroyed;
             ParentBotClient.discordClient.UserVoiceStateUpdated -= OnVoiceStateUpdated;
@@ -145,6 +158,7 @@ namespace Lomztein.ModularDiscordBot.Modules.Voice {
         public void Configure() {
             List<SocketGuild> guilds = ParentBotClient.discordClient.Guilds.ToList ();
             channelNames = Configuration.GetEntries (guilds, "ChannelNames", guilds.Select (x => x.VoiceChannels.ToDictionary (y => y.Id, z => z.Name)));
+            internationalRoleID = Configuration.GetEntries (guilds, "InternationalRoleID", (ulong)0);
             toIgnore = Configuration.GetEntries (guilds, "ToIgnore", new List<ulong> ());
             musicBotID = Configuration.GetEntries (guilds, "MusicBotID", (ulong)0);
         }
@@ -172,6 +186,19 @@ namespace Lomztein.ModularDiscordBot.Modules.Voice {
             }
 
             return tagString;
+        }
+
+        public void SetCustomName (SocketVoiceChannel channel, string name) {
+            if (!customNames.ContainsKey (channel.Id))
+                customNames.Add (channel.Id, name);
+            else
+                customNames [ channel.Id ] = name;
+            UpdateChannel (channel);
+        }
+
+        public void ResetCustomName (SocketVoiceChannel channel) {
+            customNames.Remove (channel.Id);
+            UpdateChannel (channel);
         }
 
         public class Tag {

@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace MiscModules
+namespace MiscModules.Extensions
 {
-    class BirthdayModule
+    public static class DiscordExtensions
     {
     }
 }
