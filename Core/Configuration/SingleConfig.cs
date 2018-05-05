@@ -27,7 +27,7 @@ namespace Lomztein.Moduthulhu.Core.Configuration
         }
 
         public override void Save() {
-            JSONSerialization.SerializeObject (entries[0], GetPath (), true);
+            JSONSerialization.SerializeObject (entries [ 0 ], GetPath (), true);
         }
     }
 }

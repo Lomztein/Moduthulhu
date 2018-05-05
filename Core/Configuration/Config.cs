@@ -17,6 +17,7 @@ namespace Lomztein.Moduthulhu.Core.Configuration {
         public static string configRootDirectory = AppContext.BaseDirectory + "/Configuration/";
 
         protected Dictionary<ulong, Dictionary<string, object>> entries = new Dictionary<ulong, Dictionary<string, object>> ();
+
         public string name;
 
         public Config(string _name) {
@@ -38,17 +39,22 @@ namespace Lomztein.Moduthulhu.Core.Configuration {
         }
 
         public void SetEntry(ulong id, string key, object obj, bool save) {
+
             SetEntryIfEmpty (id, key, obj);
             entries [ id ] [ key ] = obj;
+
             if (save)
                 Save ();
         }
 
         private void SetEntryIfEmpty (ulong id, string key, object fallback) {
-            if (!entries.ContainsKey (id))
-                entries.Add (id, new Dictionary<string, object> () { { key, fallback } });
-            if (!entries [ id ].ContainsKey (key))
+            if (!entries.ContainsKey (id)) {
+                entries.Add (id, new Dictionary<string, object> ());
+            }
+
+            if (!entries [ id ].ContainsKey (key)) {
                 entries [ id ].Add (key, fallback);
+            }
         }
 
         public string GetPath() {

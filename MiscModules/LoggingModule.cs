@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Lomztein.Moduthulhu.Core.Extensions;
 using Lomztein.Moduthulhu.Modules.Misc.Logging.Extensions;
+using System.Linq;
 
 namespace Lomztein.Moduthulhu.Modules.Misc.Logging
 {
@@ -78,18 +79,18 @@ namespace Lomztein.Moduthulhu.Modules.Misc.Logging
 
         private Task OnUserVoiceStateUpdated(SocketUser user, SocketVoiceState before, SocketVoiceState after) {
             if (before.VoiceChannel != after.VoiceChannel) {
-                Log.Write (Log.Type.BOT, $"{user.GetShownName ()} moved from voice channel {before.VoiceChannel.GetPath ()} to {after.VoiceChannel.GetPath ()}");
+                Log.Write (Log.Type.USER, $"{user.GetShownName ()} moved from voice channel {before.VoiceChannel.GetPath ()} to {after.VoiceChannel.GetPath ()}");
             } else {
                 if (before.IsDeafened != after.IsDeafened)
-                    Log.Write (Log.Type.BOT, $"{user.GetShownName ()} had deafened toggled: {after.IsDeafened}.");
+                    Log.Write (Log.Type.USER, $"{user.GetShownName ()} had deafened toggled: {after.IsDeafened}.");
                 if (before.IsMuted != after.IsMuted)
-                    Log.Write (Log.Type.BOT, $"{user.GetShownName ()} had muted toggled: {after.IsMuted}.");
+                    Log.Write (Log.Type.USER, $"{user.GetShownName ()} had muted toggled: {after.IsMuted}.");
                 if (before.IsSelfDeafened != after.IsSelfDeafened)
-                    Log.Write (Log.Type.BOT, $"{user.GetShownName ()} had self-deafened toggled: {after.IsSelfDeafened}.");
+                    Log.Write (Log.Type.USER, $"{user.GetShownName ()} had self-deafened toggled: {after.IsSelfDeafened}.");
                 if (before.IsSelfMuted != after.IsSelfMuted)
-                    Log.Write (Log.Type.BOT, $"{user.GetShownName ()} had self-muted toggled: {after.IsSelfMuted}.");
+                    Log.Write (Log.Type.USER, $"{user.GetShownName ()} had self-muted toggled: {after.IsSelfMuted}.");
                 if (before.IsSuppressed != after.IsSuppressed)
-                    Log.Write (Log.Type.BOT, $"{user.GetShownName ()} had supressed toggled: {after.IsSuppressed}.");
+                    Log.Write (Log.Type.USER, $"{user.GetShownName ()} had supressed toggled: {after.IsSuppressed}.");
 
             }
             return Task.CompletedTask;
@@ -97,51 +98,51 @@ namespace Lomztein.Moduthulhu.Modules.Misc.Logging
 
         private Task OnUserUpdated(SocketUser arg1, SocketUser arg2) {
             if (arg1.Username != arg2.Username)
-                Log.Write (Log.Type.BOT, $"{arg1.Username} changed username to {arg2.Username}");
+                Log.Write (Log.Type.USER, $"{arg1.Username} changed username to {arg2.Username}");
             if (arg1.AvatarId != arg2.AvatarId)
-                Log.Write (Log.Type.BOT, $"{arg1.Username} changed avatar.");
+                Log.Write (Log.Type.USER, $"{arg1.Username} changed avatar.");
             return Task.CompletedTask;
         }
 
         private Task OnUserUnbanned(SocketUser arg1, SocketGuild arg2) {
-            Log.Write (Log.Type.BOT, arg1.GetShownName () + " has been unbanned from " + arg2.Name);
+            Log.Write (Log.Type.USER, arg1.GetShownName () + " has been unbanned from " + arg2.Name);
             return Task.CompletedTask;
         }
 
         private Task OnUserLeft(SocketGuildUser arg) {
-            Log.Write (Log.Type.BOT, arg.GetShownName () + " has left " + arg.Guild.Name);
+            Log.Write (Log.Type.USER, arg.GetShownName () + " has left " + arg.Guild.Name);
             return Task.CompletedTask;
         }
 
         private Task OnUserJoined(SocketGuildUser arg) {
-            Log.Write (Log.Type.BOT, arg.GetShownName () + " has joined " + arg.Guild.Name);
+            Log.Write (Log.Type.USER, arg.GetShownName () + " has joined " + arg.Guild.Name);
             return Task.CompletedTask;
         }
 
         private Task OnUserBanned(SocketUser arg1, SocketGuild arg2) {
-            Log.Write (Log.Type.BOT, arg1.GetShownName () + " has been banned from " + arg2.Name);
+            Log.Write (Log.Type.USER, arg1.GetShownName () + " has been banned from " + arg2.Name);
             return Task.CompletedTask;
         }
 
         private Task OnRoleUpdated(SocketRole arg1, SocketRole arg2) {
             if (arg1.Color.RawValue != arg2.Color.RawValue)
-                Log.Write (Log.Type.BOT, "Role " + arg1.GetPath () + " changed colour.");
+                Log.Write (Log.Type.SERVER, "Role " + arg1.GetPath () + " changed colour.");
             if (arg1.Name != arg2.Name)
-                Log.Write (Log.Type.BOT, $"Role {arg1.GetPath ()} changed name to {arg2.Name}");
+                Log.Write (Log.Type.SERVER, $"Role {arg1.GetPath ()} changed name to {arg2.Name}");
             if (arg1.Permissions.RawValue != arg2.Permissions.RawValue)
-                Log.Write (Log.Type.BOT, "Role " + arg1.GetPath () + " had permissions changed.");
+                Log.Write (Log.Type.SERVER, "Role " + arg1.GetPath () + " had permissions changed.");
             if (arg1.IsMentionable != arg2.IsMentionable)
-                Log.Write (Log.Type.BOT, "Role " + arg1.GetPath () + " toggled mentionable: " + arg2.IsMentionable);
+                Log.Write (Log.Type.SERVER, "Role " + arg1.GetPath () + " toggled mentionable: " + arg2.IsMentionable);
             return Task.CompletedTask;
         }
 
         private Task OnRoleDeleted(SocketRole arg) {
-            Log.Write (Log.Type.BOT, "Role " + arg.GetPath () + " has been deleted.");
+            Log.Write (Log.Type.SERVER, "Role " + arg.GetPath () + " has been deleted.");
             return Task.CompletedTask;
         }
 
         private Task OnRoleCreated(SocketRole arg) {
-            Log.Write (Log.Type.BOT, "Role " + arg.GetPath () + " has been created.");
+            Log.Write (Log.Type.SERVER, "Role " + arg.GetPath () + " has been created.");
             return Task.CompletedTask;
         }
 
@@ -187,48 +188,93 @@ namespace Lomztein.Moduthulhu.Modules.Misc.Logging
 
         private Task OnGuildUpdated(SocketGuild arg1, SocketGuild arg2) {
             if (arg1.Name != arg2.Name)
-                Log.Write (Log.Type.BOT, $"Guild {arg1.Name} has changed name to {arg2.Name}.");
+                Log.Write (Log.Type.SERVER, $"Guild {arg1.Name} has changed name to {arg2.Name}.");
             if (arg1.OwnerId != arg2.OwnerId)
-                Log.Write (Log.Type.BOT, $"Guid {arg1.Name} has changed owner from {arg1.Owner.GetShownName ()} to {arg2.Owner.GetShownName ()}.");
+                Log.Write (Log.Type.SERVER, $"Guild {arg1.Name} has changed owner from {arg1.Owner.GetShownName ()} to {arg2.Owner.GetShownName ()}.");
             if (arg1.IconUrl != arg2.IconUrl)
-                Log.Write (Log.Type.BOT, $"Guild {arg1.Name} has changed icon.");
+                Log.Write (Log.Type.SERVER, $"Guild {arg1.Name} has changed icon.");
             return Task.CompletedTask;
         }
 
         private Task OnGuildUnavailable(SocketGuild arg) {
-            Log.Write (Log.Type.BOT, "Guild " + arg.Name + " became unavailable.");
+            Log.Write (Log.Type.SERVER, "Guild " + arg.Name + " became unavailable.");
             return Task.CompletedTask;
         }
 
         private Task OnGuildMemberUpdated(SocketGuildUser arg1, SocketGuildUser arg2) {
             if (arg1.Nickname != arg2.Nickname)
-                Log.Write (arg1.GetPath () + " changed nickname to " + arg2.GetShownName ());
+                Log.Write (Log.Type.USER, arg1.GetPath () + " changed nickname to " + arg2.GetShownName ());
+            if (arg1.GuildPermissions.RawValue != arg2.GuildPermissions.RawValue)
+                Log.Write (Log.Type.USER, arg1.GetPath () + " had guild permissions changed.");
+
+            SocketRole added = GetAddedRole (arg1, arg2);
+
+            if (added != null)
+                Log.Write (Log.Type.USER, arg1.GetPath () + " had role " + added.GetPath () + " added.");
+            else {
+                SocketRole removed = GetRemovedRole (arg1, arg2);
+                if (removed != null)
+                    Log.Write (Log.Type.USER, arg1.GetPath () + " had role " + removed.GetPath () + " removed.");
+            }
+
             return Task.CompletedTask;
         }
 
         private Task OnGuildMembersDownloaded(SocketGuild arg) {
-            Log.Write (Log.Type.BOT, "Guild " + arg.Name + "'s members downloaded.");
+            Log.Write (Log.Type.SERVER, "Guild " + arg.Name + "'s members downloaded.");
             return Task.CompletedTask;
         }
 
         private Task OnGuildAvailable(SocketGuild arg) {
-            Log.Write (Log.Type.BOT, "Guild " + arg.Name + " became available.");
+            Log.Write (Log.Type.SERVER, "Guild " + arg.Name + " became available.");
             return Task.CompletedTask;
         }
 
-        private Task OnChannelUpdated(SocketChannel arg1, SocketChannel arg2) {
-            Log.Write ("Channel " + arg1.GetPath () + " has changed.");
+        private Task OnChannelUpdated(SocketChannel before, SocketChannel after) {
+            if (before is SocketGuildChannel guildBefore && after is SocketGuildChannel guildAfter) {
+                if (guildBefore.CategoryId != guildAfter.CategoryId)
+                    Log.Write (Log.Type.CHANNEL, $"{guildBefore.GetPath ()} was moved to catagory {guildAfter.Category.GetPath ()}.");
+                if (guildBefore.Name != guildAfter.Name)
+                    Log.Write (Log.Type.CHANNEL, $"{guildBefore.GetPath ()} changed name to {guildAfter.Name}.");
+                if (guildBefore.Position != guildAfter.Position)
+                    Log.Write (Log.Type.CHANNEL, $"{guildBefore.GetPath ()} changed position from {guildBefore.Position} to {guildAfter.Position}.");
+            }
+            
+            if (before.Users.Count != after.Users.Count) {
+                int difference = before.Users.Count - after.Users.Count;
+                if (difference < 0) {
+                    Log.Write (Log.Type.CHANNEL, "Channel " + before.GetPath () + " gained " + difference + " new users.");
+                } else {
+                    Log.Write (Log.Type.CHANNEL, "Channel " + before.GetPath () + " lost " + -difference + " users.");
+                }
+
+            } else
+                Log.Write (Log.Type.CHANNEL, "Channel " + before.GetPath () + " has changed.");
             return Task.CompletedTask;
         }
 
         private Task OnChannelDestroyed(SocketChannel arg) {
-            Log.Write (Log.Type.BOT, $"{arg.GetPath ()} has been deleted.");
+            Log.Write (Log.Type.CHANNEL, $"{arg.GetPath ()} has been deleted.");
             return Task.CompletedTask;
         }
 
         private Task OnChannelCreated(SocketChannel arg) {
-            Log.Write (Log.Type.BOT, $"{arg.GetPath ()} has been created.");
+            Log.Write (Log.Type.CHANNEL, $"{arg.GetPath ()} has been created.");
             return Task.CompletedTask;
+        }
+
+        private SocketRole GetAddedRole (SocketGuildUser before, SocketGuildUser after) {
+            foreach (SocketRole role in after.Roles)
+                if (!before.Roles.Contains (role))
+                    return role;
+            return null;
+        }
+
+        private SocketRole GetRemovedRole (SocketGuildUser before, SocketGuildUser after) {
+            foreach (SocketRole role in before.Roles)
+                if (!after.Roles.Contains (role))
+                    return role;
+            return null;
         }
     }
 }

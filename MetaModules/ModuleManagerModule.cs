@@ -17,7 +17,7 @@ namespace Lomztein.Moduthulhu.Modules.Meta
         private ModuleManagerCommandSet moduleCommands = new ModuleManagerCommandSet ();
 
         public override void Initialize() {
-            moduleCommands.parentModule = this;
+            moduleCommands.ParentModule = this;
             ParentModuleHandler.GetModule<CommandRoot.CommandRootModule> ().commandRoot.AddCommands (moduleCommands);
         }
 

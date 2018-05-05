@@ -25,8 +25,8 @@ namespace Lomztein.Moduthulhu.Modules.Clock
         private DateTime lastTick;
 
         public override void Initialize() {
-            ThreadStart start = new ThreadStart (Run);
-            clockThread = new Thread (start);
+            clockThread = new Thread (Run);
+            clockThread.Start ();
         }
 
         public void Configure() {
@@ -36,10 +36,10 @@ namespace Lomztein.Moduthulhu.Modules.Clock
         public override void Shutdown() {
             Stop ();
             foreach (ITickable tickable in tickables) {
-                IModule module = tickable as IModule;
-                if (module != null)
+                if (tickable is IModule module)
                     ParentModuleHandler.ShutdownModule (module);
             }
+            clockThread.Abort (); // In case it doesn't stop on completion for whatever reason.
         }
 
         public void AddTickable (ITickable tickable) {
@@ -57,8 +57,13 @@ namespace Lomztein.Moduthulhu.Modules.Clock
                 tickables.ForEach (x => x.Tick (lastTick, DateTime.Now));
                 lastTick = DateTime.Now;
             }
-
-            clockThread.Abort ();
         }
+
+        // Just for good measure.
+        public static bool YearPassed(DateTime lastTick, DateTime currentTick) => lastTick.Year != currentTick.Year;
+        public static bool MonthPassed(DateTime lastTick, DateTime currentTick) => lastTick.Month != currentTick.Month;
+        public static bool DayPassed(DateTime lastTick, DateTime currentTick) => lastTick.Day != currentTick.Day;
+        public static bool HourPassed(DateTime lastTick, DateTime currentTick) => lastTick.Hour != currentTick.Hour;
+        public static bool MinutePassed(DateTime lastTick, DateTime currentTick) => lastTick.Minute != currentTick.Minute;
     }
 }

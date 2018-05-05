@@ -14,13 +14,15 @@ namespace Lomztein.Moduthulhu.Core.IO
 
         private const string jsonExtension = ".json";
 
-        public static T DeserializeFile<T>(string path) {
+        public static T DeserializeFile<T>(string path) => DeserializeFile<T> (path, null);
+
+        public static T DeserializeFile<T>(string path, JsonSerializerSettings serializerSettings) {
             path = Path.ChangeExtension (path, jsonExtension);
 
             if (File.Exists (path)) {
                 try {
                     string content = File.ReadAllText (path);
-                    return JsonConvert.DeserializeObject<T> (content);
+                    return JsonConvert.DeserializeObject<T> (content, serializerSettings);
                 } catch (Exception exc) {
                     Log.Write (exc);
                 }

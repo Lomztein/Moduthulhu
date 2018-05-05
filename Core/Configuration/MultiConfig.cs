@@ -58,14 +58,15 @@ namespace Lomztein.Moduthulhu.Core.Configuration
         public override void Load() {
             try {
                 string [ ] files = Directory.GetFiles (GetPath ());
-                var loadedEntries = new Dictionary<ulong, Dictionary<string, object>> ();
+                entries = new Dictionary<ulong, Dictionary<string, object>> ();
 
                 foreach (string file in files) {
-                    Dictionary<string, object> entry = JSONSerialization.DeserializeFile<Dictionary<string, object>> (file);
-                    loadedEntries.Add (ulong.Parse (Path.GetFileNameWithoutExtension (file)), entry);
+                    ulong id = ulong.Parse (Path.GetFileNameWithoutExtension (file));
+
+                    Dictionary < string, object> entry = JSONSerialization.DeserializeFile<Dictionary<string, object>> (file);
+                    entries.Add (id, entry);
                 }
 
-                entries = loadedEntries;
             } catch (Exception exc) {
                 Log.Write (exc);
             }

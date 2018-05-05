@@ -86,7 +86,12 @@ namespace Lomztein.Moduthulhu.Modules.ServerMessages {
             return Task.CompletedTask;
         }
 
-        private async Task OnUserJoinedGuild(SocketGuildUser user) {
+        private Task OnUserJoinedGuild(SocketGuildUser user) {
+            OnUserJoinedGuildAsync (user);
+            return Task.CompletedTask;
+        }
+
+        private async void OnUserJoinedGuildAsync (SocketGuildUser user) {
             RestInviteMetadata invite = await inviteHandler.FindInviter (user.Guild);
             if (invite == null)
                 SendMessage (user.Guild, onUserJoinedGuild, "[USERNAME]", user.GetShownName ());
@@ -101,7 +106,6 @@ namespace Lomztein.Moduthulhu.Modules.ServerMessages {
         }
 
         private async void SendMessage (SocketGuild guild, MultiEntry<string[]> messages, params string[] findAndReplace) {
-
             SocketTextChannel channel = ParentBotClient.GetChannel (guild.Id, channelIDs.GetEntry (guild)) as SocketTextChannel;
             string [ ] guildMessages = messages.GetEntry (guild);
             string message = guildMessages [ new Random ().Next (0, guildMessages.Length) ];
