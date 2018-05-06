@@ -35,8 +35,8 @@ namespace Lomztein.Moduthulhu.Modules.Voice.Commands {
             [Overload (typeof (void), "Lock the voicechannel you're currently in.")]
             public Task<Result> Execute(CommandMetadata data) {
                 if (data.message.Author.IsInVoiceChannel (out Task<Result> result, out SocketGuildUser guildUser)) {
-                    if (!parentModule.IsChannelLocked (guildUser.VoiceChannel)) {
-                        parentModule.LockChannel (guildUser.VoiceChannel, guildUser.VoiceChannel.Users);
+                    if (!ParentModule.IsChannelLocked (guildUser.VoiceChannel)) {
+                        ParentModule.LockChannel (guildUser.VoiceChannel, guildUser.VoiceChannel.Users);
                         return TaskResult (null, $"Channel **{guildUser.VoiceChannel.Name}** succesfully locked!");
                     } else {
                         return TaskResult (null, $"Error - Channel **{guildUser.VoiceChannel.Name}** is already locked.");
@@ -57,8 +57,8 @@ namespace Lomztein.Moduthulhu.Modules.Voice.Commands {
             [Overload (typeof (void), "Unlock the voicechannel you're currently in.")]
             public Task<Result> Execute(CommandMetadata data) {
                 if (data.message.Author.IsInVoiceChannel (out Task<Result> result, out SocketGuildUser guildUser)) {
-                    if (!parentModule.IsChannelLocked (guildUser.VoiceChannel)) {
-                        parentModule.UnlockChannel (guildUser.VoiceChannel);
+                    if (!ParentModule.IsChannelLocked (guildUser.VoiceChannel)) {
+                        ParentModule.UnlockChannel (guildUser.VoiceChannel);
                         return TaskResult (null, $"Channel **{guildUser.VoiceChannel.Name}** succesfully unlocked!");
                     } else {
                         return TaskResult (null, $"Error - Channel **{guildUser.VoiceChannel.Name}** isn't locked.");
@@ -80,8 +80,8 @@ namespace Lomztein.Moduthulhu.Modules.Voice.Commands {
             [Overload (typeof (void), "Invite someone to your currently locked voice channel.")]
             public Task<Result> Execute(CommandMetadata data, SocketGuildUser user) {
                 if (data.message.Author.IsInVoiceChannel (out Task<Result> result, out SocketGuildUser guildUser)) {
-                    if (parentModule.IsChannelLocked (guildUser.VoiceChannel)) {
-                        parentModule.GetLock (guildUser.VoiceChannel).AddMember (user);
+                    if (ParentModule.IsChannelLocked (guildUser.VoiceChannel)) {
+                        ParentModule.GetLock (guildUser.VoiceChannel).AddMember (user);
                         return TaskResult (null, $"Channel **{user.GetShownName ()}** succesfully invited!");
                     } else {
                         return TaskResult (null, $"Error - Channel **{guildUser.VoiceChannel.Name}** isn't locked.");
@@ -102,8 +102,8 @@ namespace Lomztein.Moduthulhu.Modules.Voice.Commands {
             [Overload (typeof (void), "Kick someone from your currently locked voice channel.")]
             public Task<Result> Execute(CommandMetadata data, SocketGuildUser user) {
                 if (data.message.Author.IsInVoiceChannel (out Task<Result> result, out SocketGuildUser guildUser)) {
-                    if (parentModule.IsChannelLocked (guildUser.VoiceChannel)) {
-                        parentModule.GetLock (guildUser.VoiceChannel).KickMember (user);
+                    if (ParentModule.IsChannelLocked (guildUser.VoiceChannel)) {
+                        ParentModule.GetLock (guildUser.VoiceChannel).KickMember (user);
                         return TaskResult (null, $"Channel **{user.GetShownName ()}** succesfully kicked!");
                     } else {
                         return TaskResult (null, $"Error - Channel **{guildUser.VoiceChannel.Name}** isn't locked.");

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -16,7 +17,11 @@ namespace Lomztein.Moduthulhu.Core.IO
         }
 
         public static T DeserializeData<T> (string relativePath) {
-            return JSONSerialization.DeserializeFile<T> (dataDirPath + relativePath);
+            return DeserializeData<T> (relativePath, null);
+        }
+
+        public static T DeserializeData<T>(string relativePath, JsonSerializerSettings settings) {
+            return JSONSerialization.DeserializeFile<T> (dataDirPath + relativePath, settings);
         }
     }
 }

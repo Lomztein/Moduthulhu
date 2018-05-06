@@ -48,7 +48,7 @@ namespace Lomztein.Moduthulhu.Modules.Misc.Karma
         public override void Initialize() {
             ParentBotClient.discordClient.ReactionAdded += OnReactionAdded;
             ParentBotClient.discordClient.ReactionRemoved += OnReactionRemoved;
-            karmaCommand.parentModule = this;
+            karmaCommand.ParentModule = this;
             ParentModuleHandler.GetModule<CommandRootModule> ().commandRoot.AddCommands (karmaCommand);
             LoadKarma ();
         }

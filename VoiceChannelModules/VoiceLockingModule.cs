@@ -46,7 +46,7 @@ namespace Lomztein.Moduthulhu.Modules.Voice
         }
 
         public override void Initialize() {
-            lockingCommandSet.parentModule = this;
+            lockingCommandSet.ParentModule = this;
             ParentBotClient.discordClient.UserVoiceStateUpdated += OnUserVoiceStateUpdated;
             ParentModuleHandler.GetModule<CommandRootModule> ().commandRoot.AddCommands (lockingCommandSet);
         }

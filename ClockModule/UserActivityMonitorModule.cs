@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using Lomztein.Moduthulhu.Core.IO;
 using Lomztein.AdvDiscordCommands.Extensions;
 using Lomztein.Moduthulhu.Core.Bot;
+using Discord.Rest;
 
 namespace Lomztein.Moduthulhu.Modules.Clock.ActivityMonitor
 {
@@ -28,8 +29,6 @@ namespace Lomztein.Moduthulhu.Modules.Clock.ActivityMonitor
         private Dictionary<ulong, Dictionary<ulong, DateTime>> userActivity;
         private MultiEntry<ActivityRole[]> activityRoles;
 
-        public override void Shutdown() { }
-
         public void Configure() {
             IEnumerable<SocketGuild> guilds = ParentBotClient.discordClient.Guilds;
             activityRoles = Configuration.GetEntries (guilds, "ActivityRoles", new ActivityRole [ ] { new ActivityRole (0, 7) });
@@ -46,24 +45,34 @@ namespace Lomztein.Moduthulhu.Modules.Clock.ActivityMonitor
 
             LoadData ();
 
-            ParentBotClient.discordClient.MessageReceived += (e) => {
-                RecordActivity (e.Author as SocketGuildUser, DateTime.Now);
-                return Task.CompletedTask;
-            };
+            ParentBotClient.discordClient.MessageReceived += DiscordClient_MessageReceived;
+            ParentBotClient.discordClient.UserVoiceStateUpdated += DiscordClient_UserVoiceStateUpdated;
+            ParentBotClient.discordClient.UserJoined += DiscordClient_UserJoined;
+        }
 
-            ParentBotClient.discordClient.UserVoiceStateUpdated += (user, before, after) => {
-                SocketGuildUser afterUser = user as SocketGuildUser;
-                if (afterUser?.VoiceChannel != null) {
-                    RecordActivity (afterUser, DateTime.Now);
-                }
+        public override void Shutdown() {
+            ParentBotClient.discordClient.MessageReceived += DiscordClient_MessageReceived;
+            ParentBotClient.discordClient.UserVoiceStateUpdated += DiscordClient_UserVoiceStateUpdated;
+            ParentBotClient.discordClient.UserJoined += DiscordClient_UserJoined;
+        }
 
-                return Task.CompletedTask;
-            };
+        private Task DiscordClient_UserJoined(SocketGuildUser arg) {
+            RecordActivity (arg, DateTime.Now);
+            return Task.CompletedTask;
+        }
 
-            ParentBotClient.discordClient.UserJoined += (user) => {
-                RecordActivity (user, DateTime.Now);
-                return Task.CompletedTask;
-            };
+        private Task DiscordClient_UserVoiceStateUpdated(SocketUser arg1, SocketVoiceState arg2, SocketVoiceState arg3) {
+            SocketGuildUser afterUser = arg1 as SocketGuildUser;
+            if (afterUser?.VoiceChannel != null) {
+                RecordActivity (afterUser, DateTime.Now);
+            }
+
+            return Task.CompletedTask;
+        }
+
+        private Task DiscordClient_MessageReceived(SocketMessage arg) {
+            RecordActivity (arg.Author as SocketGuildUser, DateTime.Now);
+            return Task.CompletedTask;
         }
 
         public override void PostInitialize () {
@@ -80,9 +89,9 @@ namespace Lomztein.Moduthulhu.Modules.Clock.ActivityMonitor
                 userActivity.Add (guild.Id, new Dictionary<ulong, DateTime> ());
 
             if (!userActivity [ guild.Id ].ContainsKey (user.Id))
-                userActivity [ guild.Id ].Add (user.Id, DateTime.Now.AddYears (-1));
+                userActivity [ guild.Id ].Add (user.Id, time);
             else
-                userActivity [ guild.Id ] [ user.Id ] = DateTime.Now;
+                userActivity [ guild.Id ] [ user.Id ] = time;
 
             try {
                 await UpdateUser (user);
@@ -96,37 +105,44 @@ namespace Lomztein.Moduthulhu.Modules.Clock.ActivityMonitor
         }
 
         private async Task UpdateUser(SocketGuildUser user) {
-            DateTime activity = GetLastActivity (user);
-            DateTime now = DateTime.Now;
 
-            ActivityRole [ ] activityStates = activityRoles.GetEntry (user.Guild);
-            SocketRole [ ] roles = activityStates.Select (x => user.Guild.GetRole (x.id)).ToArray ();
+            try {
+                DateTime activity = GetLastActivity (user);
+                DateTime now = DateTime.Now;
 
-            SocketRole finalRole = roles [ 0 ];
+                ActivityRole [ ] activityStates = activityRoles.GetEntry (user.Guild);
+                SocketRole [ ] roles = activityStates.Select (x => user.Guild.GetRole (x.id)).ToArray ();
 
-            DateTime lastDate = now.AddDays (1);
+                SocketRole finalRole = roles [ 0 ];
 
-            for (int i = 0; i < activityStates.Length; i++) {
-                DateTime thisDate = now.AddDays (-activityStates [ i ].threshold);
+                DateTime lastDate = now.AddDays (1);
 
-                if (activity < lastDate && activity > thisDate) {
-                    finalRole = roles [ i ];
-                    lastDate = thisDate;
+                for (int i = 0; i < activityStates.Length; i++) {
+                    DateTime thisDate = now.AddDays (-activityStates [ i ].threshold);
+
+                    if (activity < lastDate && activity > thisDate) {
+                        finalRole = roles [ i ];
+                        lastDate = thisDate;
+                    }
                 }
+
+                if (activity < now.AddDays (-activityStates.Last ().threshold))
+                    finalRole = roles.Last ();
+
+                List<SocketRole> toRemove = roles.ToList ();
+                toRemove.Remove (finalRole);
+
+                await user.AsyncSecureAddRole (finalRole);
+                toRemove.ForEach (x => user.AsyncSecureRemoveRole (x));
+
+            } catch (Exception e) {
+                Log.Write (e);
             }
 
-            if (activity < now.AddDays (-activityStates.Last ().threshold))
-                finalRole = roles.Last ();
-
-            List<SocketRole> toRemove = roles.ToList ();
-            toRemove.Remove (finalRole);
-
-            await user.AsyncSecureAddRole (finalRole);
-            toRemove.ForEach (x => user.AsyncSecureRemoveRole (x));
         }
 
         public async void Tick(DateTime lastTick, DateTime now) {
-            if (lastTick.Day != now.Day) {
+            if (ClockModule.DayPassed (lastTick, now)) {
 
                 await UpdateAll ();
                 SaveData ();
@@ -138,8 +154,13 @@ namespace Lomztein.Moduthulhu.Modules.Clock.ActivityMonitor
             ParentBotClient.discordClient.Guilds.ToList ().ForEach (x => users.AddRange (x.Users));
 
             foreach (SocketGuildUser u in users) {
-                if (!userActivity.ContainsKey (u.Id)) {
-                    RecordActivity (u, DateTime.Now.AddMonths (-6));
+
+                if (!userActivity.ContainsKey (u.Guild.Id)) {
+                    RecordActivity (u, DateTime.Now);
+                }
+
+                if (!userActivity[u.Guild.Id].ContainsKey (u.Id)) {
+                    RecordActivity (u, DateTime.Now);
                 }
 
                 await UpdateUser (u);

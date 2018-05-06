@@ -38,12 +38,17 @@ namespace Lomztein.Moduthulhu.Modules.Misc.Color
         }
 
         public override void Initialize() {
-            colorCommand.parentModule = this;
+            colorCommand.ParentModule = this;
             ParentModuleHandler.GetModule<CommandRootModule> ().commandRoot.AddCommands (colorCommand);
             ParentBotClient.discordClient.UserJoined += OnUserJoined;
         }
 
-        private async Task OnUserJoined(SocketGuildUser guildUser) {
+        private Task OnUserJoined(SocketGuildUser guildUser) {
+            GiveRandomColourAsync (guildUser);
+            return Task.CompletedTask;
+        }
+
+        private async void GiveRandomColourAsync (SocketGuildUser guildUser) {
             Dictionary<ulong, string> localColours = colourIdentification.GetEntry (guildUser.Guild);
             SocketRole randomRole = ParentBotClient.GetRole (guildUser.Guild.Id, localColours.ElementAt (new Random ().Next (localColours.Count)).Key);
             await guildUser.AsyncSecureAddRole (randomRole);
@@ -67,14 +72,14 @@ namespace Lomztein.Moduthulhu.Modules.Misc.Color
 
                 if (data.message.Author is SocketGuildUser guildUser) {
 
-                    IEnumerable<SocketRole> currentRoles = guildUser.Roles.Where (x => parentModule.colourIdentification.GetEntry (guildUser.Guild).ContainsKey (x.Id));
+                    IEnumerable<SocketRole> currentRoles = guildUser.Roles.Where (x => ParentModule.colourIdentification.GetEntry (guildUser.Guild).ContainsKey (x.Id));
 
                     SocketRole role = null;
                     string name = "";
 
-                    foreach (var entry in parentModule.colourIdentification.GetEntry (data.message.GetGuild ())) {
+                    foreach (var entry in ParentModule.colourIdentification.GetEntry (data.message.GetGuild ())) {
                         if (entry.Value.ToUpper () == colorName.ToUpper ()) {
-                            role = parentModule.ParentBotClient.GetRole (data.message.GetGuild ().Id, entry.Key);
+                            role = ParentModule.ParentBotClient.GetRole (data.message.GetGuild ().Id, entry.Key);
                             name = entry.Value;
                             break;
                         }

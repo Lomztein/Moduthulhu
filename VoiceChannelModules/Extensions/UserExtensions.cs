@@ -1,4 +1,5 @@
-﻿using Discord.WebSocket;
+﻿using Discord;
+using Discord.WebSocket;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -9,7 +10,7 @@ namespace Lomztein.Moduthulhu.Modules.Voice.Extensions
 {
     public static class UserExtensions {
 
-        public static bool IsInVoiceChannel(this SocketUser user, out Task<Result> result, out SocketGuildUser gUser) {
+        public static bool IsInVoiceChannel(this IUser user, out Task<Result> result, out SocketGuildUser gUser) {
             if (user is SocketGuildUser guildUser) {
                 gUser = guildUser;
 

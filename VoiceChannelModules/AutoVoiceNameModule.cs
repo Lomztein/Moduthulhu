@@ -37,7 +37,7 @@ namespace Lomztein.Moduthulhu.Modules.Voice {
         private VoiceNameSet commandSet;
 
         public override void Initialize() {
-            commandSet = new VoiceNameSet () { parentModule = this };
+            commandSet = new VoiceNameSet () { ParentModule = this };
             ParentModuleHandler.GetModule<CommandRootModule> ().commandRoot.AddCommands (commandSet);
             ParentBotClient.discordClient.ChannelCreated += OnChannelCreated;
             ParentBotClient.discordClient.ChannelDestroyed += OnChannelDestroyed;
@@ -73,6 +73,9 @@ namespace Lomztein.Moduthulhu.Modules.Voice {
             if (channel != null) {
 
                 string name = channelNames.GetEntry (channel.Guild).GetValueOrDefault (channel.Id);
+
+                if (ParentBotClient.GetChannel (channel.Guild.Id, channel.Id) == null)
+                    return;
 
                 if (toIgnore.GetEntry (channel.Guild).Contains (channel.Id))
                     return;
@@ -125,7 +128,11 @@ namespace Lomztein.Moduthulhu.Modules.Voice {
 
                 // Trying to optimize API calls here, just to spare those poor souls at the Discord API HQ stuff
                 if (channel.Name != newName) {
-                    await channel.ModifyAsync (x => x.Name = newName);
+                    try {
+                        await channel.ModifyAsync (x => x.Name = newName);
+                    }catch (Exception e) {
+                        Log.Write (e);
+                    }
                 }
             }
         }

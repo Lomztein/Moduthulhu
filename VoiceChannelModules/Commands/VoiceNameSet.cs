@@ -32,7 +32,7 @@ namespace Lomztein.Moduthulhu.Modules.Voice.Commands
             [Overload (typeof (void), "Reset a custom channel name.")]
             public Task<Result> Execute (CommandMetadata data) {
                 if (data.message.Author.IsInVoiceChannel (out Task<Result> errorResult, out SocketGuildUser guildUser)) {
-                    parentModule.ResetCustomName (guildUser.VoiceChannel);
+                    ParentModule.ResetCustomName (guildUser.VoiceChannel);
                     return TaskResult (null, "Succesfully reset custom voice channel name.");
                 }
                 return errorResult;
@@ -41,7 +41,7 @@ namespace Lomztein.Moduthulhu.Modules.Voice.Commands
             [Overload (typeof (void), "Reset a custom channel name.")]
             public Task<Result> Execute(CommandMetadata data, string name) {
                 if (data.message.Author.IsInVoiceChannel (out Task<Result> errorResult, out SocketGuildUser guildUser)) {
-                    parentModule.SetCustomName (guildUser.VoiceChannel, name);
+                    ParentModule.SetCustomName (guildUser.VoiceChannel, name);
                     return TaskResult (null, $"Succesfully set custom voice channel name to {name}.");
                 }
                 return errorResult;
