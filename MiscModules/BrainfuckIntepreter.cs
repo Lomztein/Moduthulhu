@@ -20,8 +20,9 @@ namespace Lomztein.ModularDiscordBot.Modules.Misc.Brainfuck
         private Byte [ ] memory = new byte [ 30000 ];
         public Func<Task<byte>> getInput;
 
-        public async Task<string> Interpret(string program) {
+        public async Task<string> Interpret(string _program) {
 
+            program = _program;
             string printout = string.Empty;
 
             try {

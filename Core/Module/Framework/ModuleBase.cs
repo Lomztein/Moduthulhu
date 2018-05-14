@@ -17,8 +17,6 @@ namespace Lomztein.Moduthulhu.Core.Module.Framework
         public virtual string PatchURL { get; } = "";
 
         public virtual string [ ] RequiredModules { get; } = new string [ 0 ];
-        public virtual string [ ] RecommendedModules { get; } = new string [ 0 ];
-        public virtual string [ ] ConflictingModules { get; } = new string [ 0 ];
 
         public ModuleHandler ParentModuleHandler { get; set; }
         public BotClient ParentBotClient { get; set; }

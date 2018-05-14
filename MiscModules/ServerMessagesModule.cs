@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using Lomztein.Moduthulhu.Core.Bot;
 using Discord.Rest;
 using System.Linq;
+using Lomztein.Moduthulhu.Modules.Misc.Shipping;
 
 namespace Lomztein.Moduthulhu.Modules.ServerMessages {
 
@@ -96,7 +97,7 @@ namespace Lomztein.Moduthulhu.Modules.ServerMessages {
             if (invite == null)
                 SendMessage (user.Guild, onUserJoinedGuild, "[USERNAME]", user.GetShownName ());
             else
-                SendMessage (user.Guild, onUserJoinedGuild, "[USERNAME]", user.GetShownName (), "[INVITERNAME]", invite.Inviter.GetShownName ());
+                SendMessage (user.Guild, onUserJoinedGuildByInvite, "[USERNAME]", user.GetShownName (), "[INVITERNAME]", invite.Inviter.GetShownName ());
         }
 
         private Task OnJoinedNewGuild(SocketGuild guild) {

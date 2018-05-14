@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Discord.Rest;
+using Lomztein.Moduthulhu.Modules.Misc.Shipping;
 
 namespace Lomztein.Moduthulhu.Modules.Voice
 {
@@ -38,13 +39,7 @@ namespace Lomztein.Moduthulhu.Modules.Voice
             desiredFreeChannels = Configuration.GetEntries (guilds, "DesiredFreeChannels", 1);
 
             ignoreChannels = Configuration.GetEntries (guilds, "IgnoreChannels", guilds.Select (x => x.AFKChannel.ZeroIfNull ()).ToList ());
-            newChannelCategoryID = Configuration.GetEntries (guilds, "NewChannelCategory", defaultChannels.values.Select (x => {
-                if (x.Value.Count > 0) {
-                    return (ulong)ParentBotClient.GetChannel (x.Value.FirstOrDefault ()).Category.ZeroIfNull ();
-                } else {
-                    return (ulong)0;
-                }
-            }));
+            newChannelCategoryID = Configuration.GetEntries (guilds, "NewChannelCategory", (ulong)0);
 
             nameQueue = new Dictionary<ulong, List<string>> ();
             temporaryChannels = new Dictionary<ulong, List<ulong>> ();

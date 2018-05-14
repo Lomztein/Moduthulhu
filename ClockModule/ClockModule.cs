@@ -39,7 +39,6 @@ namespace Lomztein.Moduthulhu.Modules.Clock
                 if (tickable is IModule module)
                     ParentModuleHandler.ShutdownModule (module);
             }
-            clockThread.Abort (); // In case it doesn't stop on completion for whatever reason.
         }
 
         public void AddTickable (ITickable tickable) {

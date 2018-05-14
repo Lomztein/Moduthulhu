@@ -110,7 +110,7 @@ namespace Lomztein.Moduthulhu.Modules.Misc.Karma
             SaveKarma ();
         }
 
-        public Dictionary<ulong, Selfworth> GetKarma () {
+        public Dictionary<ulong, Selfworth> GetKarmaDictionary () {
             return karma;
         }
 

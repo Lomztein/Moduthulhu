@@ -5,6 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="BirthdayModule.cs" />
     <Compile Remove="Extensions\DiscordExtensions.cs" />
   </ItemGroup>
 

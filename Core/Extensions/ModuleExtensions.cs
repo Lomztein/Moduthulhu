@@ -18,6 +18,7 @@ namespace Lomztein.Moduthulhu.Core.Extensions
         }
 
         public static bool ContainsPrerequisites (this IModule module, IEnumerable<IModule> list) {
+
             foreach (string required in module.RequiredModules) {
 
                 string name = required.DecompactizeModuleName ().name;
@@ -29,13 +30,8 @@ namespace Lomztein.Moduthulhu.Core.Extensions
                 if (!enabled) {
                     Log.Write (Log.Type.CRITICAL, $"Module {module.CompactizeName ()} can't load due to missing module prerequisite {required}.");
                     return false;
-                }
-            }
-
-            foreach (string recommended in module.RecommendedModules) {
-                if (list.Where (x => x.CompactizeName () == recommended).Count () == 0) {
-                    Log.Write (Log.Type.WARNING, $"Module {module.CompactizeName ()} is missing recommended module {recommended}.");
-                }
+                } else
+                    return true;
             }
 
             return true;

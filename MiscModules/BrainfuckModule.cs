@@ -1,6 +1,6 @@
 ﻿using Lomztein.AdvDiscordCommands.Framework;
-using Lomztein.ModularDiscordBot.Core.Module.Framework;
-using Lomztein.ModularDiscordBot.Modules.CommandRoot;
+using Lomztein.Moduthulhu.Core.Module.Framework;
+using Lomztein.Moduthulhu.Modules.CommandRoot;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -16,16 +16,17 @@ namespace Lomztein.ModularDiscordBot.Modules.Misc.Brainfuck
 
         public override bool Multiserver => true;
 
-        private BrainfuckCommand command = new BrainfuckCommand ();
+        private BrainfuckCommand command;
 
         private Dictionary<ulong, char?> input = new Dictionary<ulong, char?> ();
 
         public override void Initialize() {
-            throw new NotImplementedException ();
+            command = new BrainfuckCommand () { ParentModule = this };
+            ParentModuleHandler.GetModule<CommandRootModule> ().AddCommands (command);
         }
 
         public override void Shutdown() {
-            throw new NotImplementedException ();
+            ParentModuleHandler.GetModule<CommandRootModule> ().RemoveCommands (command);
         }
 
         private async Task<string> Run (string program, ulong channelID) {
@@ -34,7 +35,8 @@ namespace Lomztein.ModularDiscordBot.Modules.Misc.Brainfuck
 
             input.Add (channelID, null);
             BrainfuckIntepreter intepreter = new BrainfuckIntepreter (new Func<Task<byte>> (async () => await AwaitInputAsync (channelID)));
-            return await intepreter.Interpret (program);
+            var result = await intepreter.Interpret (program);
+            return result;
         }
 
         private async Task<byte> AwaitInputAsync(ulong channelID) {
@@ -56,8 +58,9 @@ namespace Lomztein.ModularDiscordBot.Modules.Misc.Brainfuck
                 catagory = Category.Fun;
             }
 
+            [Overload (typeof (string), "Brainfuck.")]
             public async Task<Result> Execute (CommandMetadata metadata, string program) {
-                string result = await parentModule.Run (program, metadata.message.Channel.Id);
+                string result = await ParentModule.Run (program, metadata.message.Channel.Id);
                 return new Result (result, result);
             }
 

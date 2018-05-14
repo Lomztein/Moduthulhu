@@ -44,16 +44,6 @@ namespace Lomztein.Moduthulhu.Core.Module.Framework
         string [ ] RequiredModules { get; }
 
         /// <summary>
-        /// Can your module use functionality from another one, but isn't strictly neccesary? Add them here in format [MODULEAUTHOR]_[MODULENAME]
-        /// </summary>
-        string [ ] RecommendedModules { get; }
-
-        /// <summary>
-        /// Do you know of any modules that your module just cannot be used with? Add them here in format [MODULEAUTHOR]_[MODULENAME]
-        /// </summary>
-        string [ ] ConflictingModules { get; }
-
-        /// <summary>
         /// The module handler that loaded and contains this module. Is set by the module handler.
         /// </summary>
         ModuleHandler ParentModuleHandler { get; set; }

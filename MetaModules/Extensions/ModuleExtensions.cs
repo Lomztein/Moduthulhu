@@ -19,8 +19,6 @@ namespace Lomztein.Moduthulhu.Modules.Meta.Extensions
                 .AddField ("Autopatching", Uri.IsWellFormedUriString (module.PatchURL, UriKind.Absolute), true);
 
             AddDependanciesInline ("Prerequisite Modules", module.RequiredModules);
-            AddDependanciesInline ("Recommended Modules", module.RecommendedModules);
-            AddDependanciesInline ("Known Conflicting Modules", module.ConflictingModules);
 
             void AddDependanciesInline (string header, string[] dependancies) { // Never did I ever say I knew how to spell.
 

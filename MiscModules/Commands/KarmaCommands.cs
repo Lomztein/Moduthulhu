@@ -33,7 +33,7 @@ namespace Lomztein.Moduthulhu.Modules.Misc.Karma.Commands
 
         [Overload (typeof (SocketGuildUser[]), "Returns karma of a given user.")]
         public Task<Result> Execute (CommandMetadata data, int amount) {
-            var allKarma = ParentModule.GetKarma ();
+            var allKarma = ParentModule.GetKarmaDictionary ();
             List<SocketGuildUser> inGuild = new List<SocketGuildUser> ();
 
             foreach (var entry in allKarma) { // Man I'm getting lazy with dictionary type naming. All those generic parameters yo.

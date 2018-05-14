@@ -41,10 +41,10 @@ namespace Lomztein.Moduthulhu.Core.Module
         private async void LoadModuleFolder() {
 
             LoadCache ();
-            List<IModule> modules = LoadEntireDirectory (baseDirectory);
+            List<IModule> modules = LoadEntireDirectory(baseDirectory);
             await parentClient.AwaitFullBoot ();
             activeModules = FilterEnabledModules (modules);
-
+            
             Log.Write (Log.Type.MODULE, "Pre-initializing modules.");
             foreach (IModule module in activeModules) {
                 try {
@@ -158,10 +158,11 @@ namespace Lomztein.Moduthulhu.Core.Module
         private List<IModule> FilterEnabledModules (IEnumerable<IModule> toCheck) {
             toCheck = toCheck.Where (x => IsModuleEnabled (x.CompactizeName ())).ToList ();
             if (parentClient.IsMultiserver ()) {
-                toCheck = toCheck.Where (x => !x.Multiserver);
+                toCheck = toCheck.Where (x => x.Multiserver);
             }
 
-            toCheck = toCheck.Where (x => x.ContainsPrerequisites (toCheck)).ToList ();
+            var clone = toCheck.ToList ();
+            toCheck = toCheck.Where (x => x.ContainsPrerequisites (clone)).ToList ();
 
             return toCheck.ToList ();
         }

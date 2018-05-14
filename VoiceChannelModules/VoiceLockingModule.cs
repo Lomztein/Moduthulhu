@@ -23,7 +23,6 @@ namespace Lomztein.Moduthulhu.Modules.Voice
         public override bool Multiserver => true;
 
         public override string [ ] RequiredModules => new string [ ] { "Lomztein_Command Root" };
-        public override string [ ] RecommendedModules => new string [ ] { "Lomztein_Auto Voice Names" };
 
         private MultiEntry<List<ulong>> nonLockableChannels;
         private MultiEntry<ulong> moveToChannel;

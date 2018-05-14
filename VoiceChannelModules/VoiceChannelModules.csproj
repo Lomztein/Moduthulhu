@@ -7,6 +7,7 @@
   <ItemGroup>
     <ProjectReference Include="..\CommandRootModule\CommandRootModule.csproj" />
     <ProjectReference Include="..\Core\Core.csproj" />
+    <ProjectReference Include="..\MiscModules\MiscModules.csproj" />
   </ItemGroup>
 
   <ItemGroup>
