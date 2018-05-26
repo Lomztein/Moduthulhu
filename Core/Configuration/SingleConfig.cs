@@ -20,14 +20,15 @@ namespace Lomztein.Moduthulhu.Core.Configuration
         }
 
         public override void Load() {
-            entries = new Dictionary<ulong, Dictionary<string, object>> ();
-            Dictionary<string, object> singleEntries = JSONSerialization.DeserializeFile<Dictionary<string, object>> (GetPath ());
+            entries = new Dictionary<ulong, Dictionary<string, Entry>> ();
+            Dictionary<string, Entry> singleEntries = JSONSerialization.DeserializeFile<Dictionary<string, Entry>> (GetPath ());
             if (singleEntries != null)
                 entries.Add (0, singleEntries);
         }
 
         public override void Save() {
             JSONSerialization.SerializeObject (entries [ 0 ], GetPath (), true);
+            CallOnSaved ();
         }
     }
 }

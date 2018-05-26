@@ -83,6 +83,10 @@ namespace Lomztein.Moduthulhu.Modules.Misc.Phrases
 
                 return (null, null);
             }
+
+            public override string ToString() {
+                return $"TRIGGER: {triggerPhrase}, USERID: {userID}, CHANNELID: {channelID}, CHANCE: {chance}, RESPONSE: {response}, EMOJI: {emoji}";
+            }
         }
     }
 }

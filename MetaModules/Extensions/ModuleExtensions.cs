@@ -37,13 +37,13 @@ namespace Lomztein.Moduthulhu.Modules.Meta.Extensions
         }
 
         public static Embed GetModuleListEmbed (this ModuleHandler handler) {
-            List<IModule> allModules = handler.GetActiveModules ();
+            IModule[] allModules = handler.GetActiveModules ();
 
             EmbedBuilder builder = new EmbedBuilder ()
                 .WithAuthor ("Module Information")
                 .WithTitle ("All Active Modules")
                 .WithDescription ("All currently installed, enabled and active modules.")
-                .WithFooter (allModules.Count + " modules active.");
+                .WithFooter (allModules.Length + " modules active.");
 
             foreach (IModule module in allModules) {
                 builder.AddField (module.Name, module.Description);

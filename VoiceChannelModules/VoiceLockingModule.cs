@@ -72,7 +72,7 @@ namespace Lomztein.Moduthulhu.Modules.Voice
             return Task.CompletedTask;
         }
 
-        private async Task KickUserToPrison (SocketGuildUser user) {
+        private async void KickUserToPrison (SocketGuildUser user) {
             SocketVoiceChannel prison = ParentBotClient.GetChannel (moveToChannel.GetEntry (user.Guild)) as SocketVoiceChannel;
             await user.ModifyAsync (x => x.Channel = prison);
         }

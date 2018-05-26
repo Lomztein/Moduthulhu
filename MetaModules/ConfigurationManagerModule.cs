@@ -1,7 +1,14 @@
-﻿using Lomztein.Moduthulhu.Core.Module.Framework;
+﻿using Lomztein.Moduthulhu.Core.Configuration;
+using Lomztein.Moduthulhu.Core.Extensions;
+using Lomztein.Moduthulhu.Core.Module.Framework;
+using Lomztein.Moduthulhu.Modules.CommandRoot;
+using Lomztein.Moduthulhu.Modules.Meta.Commands;
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
+using static Lomztein.Moduthulhu.Core.Configuration.Config;
 
 namespace Lomztein.Moduthulhu.Modules.Meta
 {
@@ -13,10 +20,60 @@ namespace Lomztein.Moduthulhu.Modules.Meta
 
         public override bool Multiserver => true;
 
+        private ConfigurationManagerCommandSet commandSet;
+
         public override void Initialize() {
+            commandSet = new ConfigurationManagerCommandSet () { ParentModule = this };
+            ParentModuleHandler.GetModule<CommandRootModule> ().AddCommands (commandSet);
         }
 
         public override void Shutdown() {
+            ParentModuleHandler.GetModule<CommandRootModule> ().RemoveCommands (commandSet);
+        }
+
+        public List<IConfigurable> GetModulesWithEntry(ulong id, string key) {
+
+            IModule[] allModules = ParentModuleHandler.GetActiveModules ();
+            List<IConfigurable> withKey = new List<IConfigurable> ();
+
+            foreach (IModule module in allModules) {
+
+                if (module is IConfigurable configurableModule) {
+                    Config config = configurableModule.GetConfig ();
+                    if (config.HasEntry (id, key))
+                        withKey.Add (configurableModule);
+                }
+
+            }
+
+            return withKey;
+        }
+
+
+        public string ListEntriesInModules(IEnumerable<IModule> modules, ulong id, Predicate<Entry> predicate) {
+
+            string list = "";
+            foreach (IModule module in modules) {
+
+                if (module is IConfigurable configurable) {
+
+                    var entries = configurable.GetConfig ().GetEntryDictionary (id, predicate);
+
+                    if (entries == null)
+                        continue;
+                    list += module.CompactizeName () + "\n";
+
+                    foreach (var entry in entries) {
+                        bool isEnumerable = entry.Value.Object is IEnumerable;
+                        string objectString = isEnumerable ? "Enumerable type, use \"!config list\" to see values." : entry.Value.Object.ToString ();
+
+                        list += "\t" + entry.Key.ToString () + " - " + objectString + "\n";
+                    }
+                    list += "\n";
+                }
+
+            }
+            return "```" + list + "```";
         }
     }
 }

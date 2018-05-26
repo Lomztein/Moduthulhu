@@ -17,9 +17,9 @@ namespace Lomztein.Moduthulhu.Core.Module
 
         // This class could use a refactoring, it's gotten a bit messy.
 
-        public string baseDirectory = AppContext.BaseDirectory + "/Modules/";
+        public readonly string baseDirectory = AppContext.BaseDirectory + "/Modules/";
 
-        private List<IModule> activeModules = new List<IModule> ();
+        public List<IModule> activeModules = new List<IModule> ();
 
         private const string CACHE_ENABLE_NAME = "enabled";
 
@@ -129,7 +129,11 @@ namespace Lomztein.Moduthulhu.Core.Module
             return activeModules.Find (x => x.Name == moduleName && x.Author == moduleAuthor);
         }
 
-        public List<IModule> GetActiveModules() => activeModules;
+        /// <summary>
+        /// Returns a copy of the internal list of active modules as an array, so that it cannot be modified from the outside.
+        /// </summary>
+        /// <returns></returns>
+        public IModule[] GetActiveModules() => activeModules.ToArray ();
 
         public T GetModule<T>() {
             IModule module = activeModules.Find (x => x is T);
@@ -181,11 +185,27 @@ namespace Lomztein.Moduthulhu.Core.Module
             ClearModuleCache ();
         }
 
+        /// <summary>
+        /// Returns the first module that matches the given string even remotely.
+        /// </summary>
+        /// <param name="searchString"></param>
+        /// <returns></returns>
+        public IModule FuzzySearchModule (string searchString) {
+            foreach (IModule module in activeModules) {
+                string upperedName = module.Name.ToUpper ();
+                string upperedInput = searchString.ToUpper ();
+
+                if (upperedName.Contains (upperedInput))
+                    return module;
+            }
+            return null;
+        }
+
         public void ConfigureModules () {
             foreach (IModule module in activeModules) {
                 if (module is IConfigurable configurable) {
                     dynamic dynModule = module;
-                    dynModule.Configuration.name = module.CompactizeName ();
+                    dynModule.Configuration.Name = module.CompactizeName ();
                     configurable.ReloadConfiguration ();
                 }
             }

@@ -1,4 +1,6 @@
 ﻿using Lomztein.Moduthulhu.Core.Configuration;
+using System;
+using System.Collections.Generic;
 
 namespace Lomztein.Moduthulhu.Core.Extensions {
 
@@ -18,5 +20,18 @@ namespace Lomztein.Moduthulhu.Core.Extensions {
         public static void ReloadConfiguration<T>(this IConfigurable<T> configurable) where T : Config {
             ReloadConfiguration (configurable as IConfigurable);
         }
+
+        public static Config GetConfig(this IConfigurable config) {
+            dynamic dynConfig = config;
+            return dynConfig.Configuration;
+        }
+
+        public static Type GetEntryType (this IConfigurable configurable, ulong id, string key) {
+            Config config = configurable.GetConfig ();
+            object currentEntry = config.GetEntry (id, key);
+            Type type = currentEntry.GetType ();
+            return type;
+        }
+
     }
 }

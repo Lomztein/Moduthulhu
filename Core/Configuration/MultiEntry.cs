@@ -15,5 +15,6 @@ namespace Lomztein.Moduthulhu.Core.Configuration {
         public T GetEntry (IEntity<ulong> entity) {
             return values [ entity.Id ];
         }
+
     }
 }

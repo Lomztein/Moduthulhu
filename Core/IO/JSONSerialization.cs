@@ -4,6 +4,7 @@ using System.Text;
 using Newtonsoft.Json;
 using System.IO;
 using Lomztein.Moduthulhu.Core.Bot;
+using System.Reflection;
 
 namespace Lomztein.Moduthulhu.Core.IO
 {
@@ -59,6 +60,12 @@ namespace Lomztein.Moduthulhu.Core.IO
             }
 
             return (T)obj;
+        }
+
+        public static object ConvertObject (object input, Type toType) {
+            MethodInfo info = typeof (JSONSerialization).GetMethod ("ConvertObject", BindingFlags.Static); // Should return the first one in the class, I hope.
+            info.MakeGenericMethod (toType);
+            return info.Invoke (null, new object[] { input });
         }
     }
 }

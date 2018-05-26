@@ -5,6 +5,7 @@ using Lomztein.Moduthulhu.Core.Extensions;
 using Lomztein.Moduthulhu.Core.Module.Framework;
 using Lomztein.Moduthulhu.Modules.CommandRoot;
 using Lomztein.Moduthulhu.Modules.Meta.Extensions;
+using System.Linq;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -41,7 +42,7 @@ namespace Lomztein.Moduthulhu.Modules.Meta.Commands
 
             [Overload (typeof (IModule), "Get a module from the parent manager by seach string.")]
             public Task<Result> Execute(CommandMetadata data, string search) {
-                IModule result = ParentModule.ParentModuleHandler.GetActiveModules ().Find (x => x.CompactizeName ().Contains (search));
+                IModule result = ParentModule.ParentModuleHandler.FuzzySearchModule (search);
                 return TaskResult (result, result.CompactizeName ());
             }
 
@@ -77,7 +78,7 @@ namespace Lomztein.Moduthulhu.Modules.Meta.Commands
 
             [Overload (typeof (Embed), "Display information about a specific module found by name.")]
             public Task<Result> Execute(CommandMetadata data, string search) {
-                IModule module = ParentModule.ParentModuleHandler.GetActiveModules ().Find (x => x.CompactizeName ().Contains (search));
+                IModule module = ParentModule.ParentModuleHandler.FuzzySearchModule (search);
                 return TaskResult (module?.GetModuleEmbed (), "");
             }
         }

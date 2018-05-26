@@ -19,8 +19,8 @@ namespace Lomztein.Moduthulhu.Core.Configuration
 
         public MultiConfig () : base () { }
 
-        public T GetEntry<T> (SocketGuild guild, string key, T fallback) {
-            return GetEntry (guild.Id, key, fallback);
+        public T GetEntry<T> (IEntity<ulong> entity, string key, T fallback) {
+            return GetEntry (entity.Id, key, fallback);
         }
 
         public MultiEntry<T> GetEntries<T> (IEnumerable<IEntity<ulong>> entities, string key, T fallback) {
@@ -58,12 +58,12 @@ namespace Lomztein.Moduthulhu.Core.Configuration
         public override void Load() {
             try {
                 string [ ] files = Directory.GetFiles (GetPath ());
-                entries = new Dictionary<ulong, Dictionary<string, object>> ();
+                entries = new Dictionary<ulong, Dictionary<string, Entry>> ();
 
                 foreach (string file in files) {
                     ulong id = ulong.Parse (Path.GetFileNameWithoutExtension (file));
 
-                    Dictionary < string, object> entry = JSONSerialization.DeserializeFile<Dictionary<string, object>> (file);
+                    Dictionary < string, Entry> entry = JSONSerialization.DeserializeFile<Dictionary<string, Entry>> (file);
                     entries.Add (id, entry);
                 }
 
@@ -76,10 +76,11 @@ namespace Lomztein.Moduthulhu.Core.Configuration
             foreach (var value in entries) {
                 JSONSerialization.SerializeObject (value.Value, GetPath (value.Key), true);
             }
+            CallOnSaved ();
         }
 
         public string GetPath (ulong id) {
-            return configRootDirectory + name + "/" + id.ToString ();
+            return configRootDirectory + Name + "/" + id.ToString ();
         }
     }
 }
