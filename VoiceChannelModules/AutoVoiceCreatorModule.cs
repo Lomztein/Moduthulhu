@@ -22,38 +22,14 @@ namespace Lomztein.Moduthulhu.Modules.Voice
 
         public MultiConfig Configuration { get; set; } = new MultiConfig ();
 
-        private MultiEntry<List<ulong>> defaultChannels; // These are the channels that should never be deleted.
-        private MultiEntry<List<string>> newVoiceNames; // Would be more fitting as a queue, but a list is easier to work with in this case.
-        private MultiEntry<int> desiredFreeChannels; // However many channels you'd want free at any given time.
-        private MultiEntry<List<ulong>> ignoreChannels; // Whichever channels you want this module to completely ignore, such as AFK channels.
-        private MultiEntry<ulong> newChannelCategoryID; // The catagory that new channels are placed in, 0 if no catagory.
+        [AutoConfig] private MultiEntry<List<ulong>, SocketGuild> defaultChannels = new MultiEntry<List<ulong>, SocketGuild> (x => x.VoiceChannels.Select (y => y.Id).ToList (), "DefaultVoiceChannels", false);
+        [AutoConfig] private MultiEntry<List<string>, SocketGuild> newVoiceNames = new MultiEntry<List<string>, SocketGuild> (x => new List<string> () { "General 1", "General 2" }, "NewVoiceNames", false);
+        [AutoConfig] private MultiEntry<int, SocketGuild> desiredFreeChannels = new MultiEntry<int, SocketGuild> (x => 1, "DesiredFreeChannels", false);
+        [AutoConfig] private MultiEntry<List<ulong>, SocketGuild> ignoreChannels = new MultiEntry<List<ulong>, SocketGuild> (x => new List<ulong> () { x.AFKChannel.ZeroIfNull () }, "IgnoreChannels", false);
+        [AutoConfig] private MultiEntry<ulong, SocketGuild> newChannelCategoryID = new MultiEntry<ulong, SocketGuild> (x => (ulong)x.VoiceChannels.FirstOrDefault ()?.CategoryId.GetValueOrDefault (), "NewChannelsCategory", false);
 
         private Dictionary<ulong, List<string>> nameQueue; // This isn't for config, but instead for keeping track of which names have been used.
         private Dictionary<ulong, List<ulong>> temporaryChannels; // This isn't for config, but instead for keeping track of the active channels.
-
-        public void Configure() {
-            List<SocketGuild> guilds = ParentBotClient.discordClient.Guilds.ToList ();
-
-            defaultChannels = Configuration.GetEntries (guilds, "DefaultVoiceChannels", guilds.Select (x => x.VoiceChannels.Select (y => y.Id).ToList ()));
-            newVoiceNames = Configuration.GetEntries (guilds, "NewVoiceNames", new List<string> () { "General 1", "General 2" });
-            desiredFreeChannels = Configuration.GetEntries (guilds, "DesiredFreeChannels", 1);
-
-            ignoreChannels = Configuration.GetEntries (guilds, "IgnoreChannels", guilds.Select (x => x.AFKChannel.ZeroIfNull ()).ToList ());
-            newChannelCategoryID = Configuration.GetEntries (guilds, "NewChannelCategory", (ulong)0);
-
-            nameQueue = new Dictionary<ulong, List<string>> ();
-            temporaryChannels = new Dictionary<ulong, List<ulong>> ();
-
-            foreach (var value in newVoiceNames.values) {
-                nameQueue.Add (value.Key, value.Value);
-                temporaryChannels.Add (value.Key, new List<ulong> ());
-            }
-
-            foreach (SocketGuild guild in guilds) {
-                var nonCachedChannels = guild.VoiceChannels.Where (x => !defaultChannels.GetEntry (guild).Contains (x.Id));
-                temporaryChannels [ guild.Id ] = nonCachedChannels.Select (x => x.Id).ToList ();
-            }
-        }
 
         public override void Initialize() {
             ParentBotClient.discordClient.UserVoiceStateUpdated += UserVoiceStateUpdated;
@@ -61,12 +37,28 @@ namespace Lomztein.Moduthulhu.Modules.Voice
             ParentBotClient.discordClient.ChannelDestroyed += OnChannelDeleted;
         }
 
+        public override void PostInitialize() {
+            nameQueue = new Dictionary<ulong, List<string>> ();
+            temporaryChannels = new Dictionary<ulong, List<ulong>> ();
+
+            foreach (var value in newVoiceNames.Values) {
+                nameQueue.Add (value.Key, value.Value);
+                temporaryChannels.Add (value.Key, new List<ulong> ());
+            }
+
+            var guilds = ParentBotClient.discordClient.Guilds;
+            foreach (SocketGuild guild in guilds) {
+                var nonCachedChannels = guild.VoiceChannels.Where (x => !defaultChannels.GetEntry (guild).Contains (x.Id));
+                temporaryChannels[guild.Id] = nonCachedChannels.Select (x => x.Id).ToList ();
+            }
+        }
+
         private Task OnChannelCreated(SocketChannel channel) {
             if (channel is SocketVoiceChannel) {
                 SocketVoiceChannel voiceChannel = channel as SocketVoiceChannel;
 
                 if (!temporaryChannels[voiceChannel.Guild.Id].Contains (channel.Id)) {
-                    defaultChannels.values [ voiceChannel.Guild.Id ].Add (channel.Id);
+                    defaultChannels.Values [ voiceChannel.Guild.Id ].Add (channel.Id);
                     Configuration.SetEntry (voiceChannel.Guild.Id, "DefaultVoiceChannels", defaultChannels.GetEntry (voiceChannel.Guild), true);
                 }
             }
@@ -83,7 +75,7 @@ namespace Lomztein.Moduthulhu.Modules.Voice
                 }
 
                 if (!temporaryChannels [ voiceChannel.Guild.Id ].Contains (channel.Id)) {
-                    defaultChannels.values [ voiceChannel.Guild.Id ].Remove (channel.Id);
+                    defaultChannels.Values [ voiceChannel.Guild.Id ].Remove (channel.Id);
                     Configuration.SetEntry (voiceChannel.Guild.Id, "DefaultVoiceChannels", defaultChannels.GetEntry (voiceChannel.Guild), true);
                 }
             }

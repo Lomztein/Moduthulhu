@@ -9,8 +9,6 @@ namespace Lomztein.Moduthulhu.Core.Configuration
     /// </summary>
     public interface IConfigurable {
 
-        void Configure();
-
     }
 
     public interface IConfigurable<T> : IConfigurable where T : Config {

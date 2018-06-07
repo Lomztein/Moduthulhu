@@ -27,12 +27,7 @@ namespace Lomztein.Moduthulhu.Modules.Clock.ActivityMonitor
         public MultiConfig Configuration { get; set; } = new MultiConfig ();
 
         private Dictionary<ulong, Dictionary<ulong, DateTime>> userActivity;
-        private MultiEntry<ActivityRole[]> activityRoles;
-
-        public void Configure() {
-            IEnumerable<SocketGuild> guilds = ParentBotClient.discordClient.Guilds;
-            activityRoles = Configuration.GetEntries (guilds, "ActivityRoles", new ActivityRole [ ] { new ActivityRole (0, 7) });
-        }
+        [AutoConfig] private MultiEntry<ActivityRole[], SocketGuild> activityRoles = new MultiEntry<ActivityRole[], SocketGuild> (x => new ActivityRole[] { new ActivityRole (0, 7), new ActivityRole (0, 30) }, "ActivityRoles", true);
 
         private void SaveData () => DataSerialization.SerializeData (userActivity, "UserActivity");
         private void LoadData() {
@@ -81,6 +76,9 @@ namespace Lomztein.Moduthulhu.Modules.Clock.ActivityMonitor
 
         public async void RecordActivity(SocketGuildUser user, DateTime time) {
             if (user == null)
+                return;
+
+            if (this.IsConfigured (user.Guild.Id))
                 return;
 
             SocketGuild guild = user.Guild;

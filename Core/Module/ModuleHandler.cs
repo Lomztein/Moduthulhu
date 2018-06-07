@@ -10,6 +10,7 @@ using System.Runtime.Loader;
 using Lomztein.Moduthulhu.Core.Configuration;
 using Lomztein.Moduthulhu.Core.IO;
 using System.Linq;
+using Discord.WebSocket;
 
 namespace Lomztein.Moduthulhu.Core.Module
 {
@@ -57,7 +58,7 @@ namespace Lomztein.Moduthulhu.Core.Module
                 }
             }
 
-            ConfigureModules ();
+            AutoConfigureModules ();
 
             Log.Write (Log.Type.MODULE, "Initializing modules.");
             foreach (IModule module in activeModules) {
@@ -201,12 +202,16 @@ namespace Lomztein.Moduthulhu.Core.Module
             return null;
         }
 
-        public void ConfigureModules () {
+        public void AutoConfigureModules () {
+            List<SocketGuild> allGuilds = parentClient.discordClient.Guilds.ToList ();
+
             foreach (IModule module in activeModules) {
                 if (module is IConfigurable configurable) {
                     dynamic dynModule = module;
                     dynModule.Configuration.Name = module.CompactizeName ();
-                    configurable.ReloadConfiguration ();
+                    dynModule.Configuration.Load ();
+                    configurable.AutoConfigure (allGuilds);
+                    dynModule.Configuration.Save ();
                 }
             }
         }

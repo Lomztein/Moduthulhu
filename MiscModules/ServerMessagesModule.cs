@@ -22,14 +22,14 @@ namespace Lomztein.Moduthulhu.Modules.ServerMessages {
 
         public MultiConfig Configuration { get; set; } = new MultiConfig ();
 
-        private MultiEntry<ulong> channelIDs;
-        private MultiEntry<string [ ]> onJoinedNewGuild;
-        private MultiEntry<string [ ]> onUserJoinedGuild;
-        private MultiEntry<string [ ]> onUserJoinedGuildByInvite;
-        private MultiEntry<string [ ]> onUserLeftGuild;
-        private MultiEntry<string [ ]> onUserBannedFromGuild;
-        private MultiEntry<string [ ]> onUserUnbannedFromGuild;
-        private MultiEntry<string [ ]> onUserNameChanged;
+        [AutoConfig] private MultiEntry<ulong, SocketGuild> channelIDs = new MultiEntry<ulong, SocketGuild> (x => x.TextChannels.FirstOrDefault ().ZeroIfNull (), "AnnounceChannelID", true);
+        [AutoConfig] private MultiEntry<string [ ], SocketGuild> onJoinedNewGuild = new MultiEntry<string[], SocketGuild> (x => new string[] { "**[BOTNAME]** here, I've arrived to haunt you all with crashes and bugs!" }, "OnJoinedNewGuild", false);
+        [AutoConfig] private MultiEntry<string [ ], SocketGuild> onUserJoinedGuild = new MultiEntry<string[], SocketGuild> (x => new string[] { "**[USERNAME]** has joined this server!" }, "OnUserJoinedGuild", false);
+        [AutoConfig] private MultiEntry<string [ ], SocketGuild> onUserJoinedGuildByInvite = new MultiEntry<string[], SocketGuild> (x => new string[] { "**[USERNAME]** has joined this server through the help of **[INVITERNAME]**!" }, "OnUserJoinedGuildByInvite", false);
+        [AutoConfig] private MultiEntry<string [ ], SocketGuild> onUserLeftGuild = new MultiEntry<string[], SocketGuild> (x => new string[] { "**[USERNAME]** has left this server. :C" }, "OnUserLeftGuild", false);
+        [AutoConfig] private MultiEntry<string [ ], SocketGuild> onUserBannedFromGuild = new MultiEntry<string[], SocketGuild> (x => new string[] { "**[USERNAME]** has been banned from this server." }, "OnUserBannedFromGuild", false);
+        [AutoConfig] private MultiEntry<string [ ], SocketGuild> onUserUnbannedFromGuild = new MultiEntry<string[], SocketGuild> (x => new string[] { "**[USERNAME]** has been unbanned from this server!" }, "OnUserUnbannedFromGuild", false);
+        [AutoConfig] private MultiEntry<string [ ], SocketGuild> onUserNameChanged = new MultiEntry<string[], SocketGuild>(x => new string[] { "**[USERNAME] changed their name to **[NEWNAME]**!" }, "OnUserChangedName", false);
 
         private InviteHandler inviteHandler;
 
@@ -57,19 +57,6 @@ namespace Lomztein.Moduthulhu.Modules.ServerMessages {
             if (before.GetShownName () != after.GetShownName ()) {
                 SendMessage (after.Guild, onUserNameChanged, "[USERNAME]", before.GetShownName (), "[NEWNAME]", after.GetShownName ());
             }
-        }
-
-        public void Configure() {
-            IEnumerable<SocketGuild> guilds = ParentBotClient.discordClient.Guilds;
-
-            channelIDs = Configuration.GetEntries<ulong> (guilds, "ChannelID", 0);
-            onJoinedNewGuild = Configuration.GetEntries (guilds, "OnJoinedNewGuild", new string [ ] { "Behold! it is I, **[BOTNAME]**!" });
-            onUserJoinedGuild = Configuration.GetEntries (guilds, "OnUserJoinedGuild", new string [ ] { "**[USERNAME]** has joined this server!" });
-            onUserJoinedGuildByInvite = Configuration.GetEntries (guilds, "OnUserJoinedGuildByInvite", new string [ ] { "**[USERNAME]** has joined this server by the help of **[INVITERNAME]**!" });
-            onUserLeftGuild = Configuration.GetEntries (guilds, "OnUserLeftGuild", new string [ ] { "**[USERNAME]** has left this server. ;-;" });
-            onUserBannedFromGuild = Configuration.GetEntries (guilds, "OnUserBannedFromGuild", new string [ ] { "**[USERNAME]** has been banned from this server." });
-            onUserUnbannedFromGuild = Configuration.GetEntries (guilds, "OnUserUnbannedFromGuild", new string [ ] { "**[USERNAME]** has been unbanned from this server." });
-            onUserNameChanged = Configuration.GetEntries (guilds, "OnUserNameChanged", new string [ ] { "**[USERNAME]** changed name to **[NEWNAME]**" });
         }
 
         private Task OnUserUnbannedFromGuild(SocketUser user, SocketGuild guild) {
@@ -106,7 +93,10 @@ namespace Lomztein.Moduthulhu.Modules.ServerMessages {
             return Task.CompletedTask;
         }
 
-        private async void SendMessage (SocketGuild guild, MultiEntry<string[]> messages, params string[] findAndReplace) {
+        private async void SendMessage (SocketGuild guild, MultiEntry<string[], SocketGuild> messages, params string[] findAndReplace) {
+            if (!this.IsConfigured (guild.Id))
+                return;
+
             SocketTextChannel channel = ParentBotClient.GetChannel (guild.Id, channelIDs.GetEntry (guild)) as SocketTextChannel;
             string [ ] guildMessages = messages.GetEntry (guild);
             string message = guildMessages [ new Random ().Next (0, guildMessages.Length) ];

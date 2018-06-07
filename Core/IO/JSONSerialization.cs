@@ -63,8 +63,8 @@ namespace Lomztein.Moduthulhu.Core.IO
         }
 
         public static object ConvertObject (object input, Type toType) {
-            MethodInfo info = typeof (JSONSerialization).GetMethod ("ConvertObject", BindingFlags.Static); // Should return the first one in the class, I hope.
-            info.MakeGenericMethod (toType);
+            MethodInfo info = typeof (JSONSerialization).GetMethod ("ConvertObject", new Type[] { typeof (object) }); // Should return the first one in the class, I hope.
+            info = info.MakeGenericMethod (toType);
             return info.Invoke (null, new object[] { input });
         }
     }

@@ -23,14 +23,6 @@ namespace Lomztein.Moduthulhu.Core.Configuration
             return GetEntry (entity.Id, key, fallback);
         }
 
-        public MultiEntry<T> GetEntries<T> (IEnumerable<IEntity<ulong>> entities, string key, T fallback) {
-            Dictionary<ulong, T> entries = new Dictionary<ulong, T> ();
-            foreach (SocketGuild entity in entities) {
-                entries.Add (entity.Id, GetEntry (entity, key, fallback));
-            }
-            return new MultiEntry<T> (entries);
-        }
-
         public void SetEntries (IEnumerable<IEntity<ulong>> entities, string key, object value, bool save) {
             Dictionary<ulong, object> entries = new Dictionary<ulong, object> ();
             foreach (SocketGuild entity in entities) {
@@ -38,22 +30,22 @@ namespace Lomztein.Moduthulhu.Core.Configuration
             }
         }
 
-        public MultiEntry<T> GetEntries<T>(IEnumerable<IEntity<ulong>> entities, string key, IEnumerable<T> fallback) {
-            Dictionary<ulong, T> entries = new Dictionary<ulong, T> ();
+        public Dictionary<ulong, TValue> GetEntries<TValue>(IEnumerable<IEntity<ulong>> entities, string key, IEnumerable<TValue> fallback) {
+            Dictionary<ulong, TValue> entries = new Dictionary<ulong, TValue> ();
 
             for (int i = 0; i < entities.Count (); i++) {
                 entries.Add (entities.ElementAt (i).Id, GetEntry (entities.ElementAt (i).Id, key, fallback.ElementAt (i)));
             }
 
-            return new MultiEntry<T> (entries);
+            return entries;
         }
 
-        public void SetEntries<T>(IEnumerable<IEntity<ulong>> entities, string key, MultiEntry<T> entry, bool save) {
-            Dictionary<ulong, object> entries = new Dictionary<ulong, object> ();
-            for (int i = 0; i < entities.Count (); i++) {
-                SetEntry (entry.values.ElementAt (i).Key, key, entry.values.ElementAt (i).Value, save);
-            }
-        }
+        //public void SetEntries<T>(IEnumerable<IEntity<ulong>> entities, string key, MultiEntry<T> entry, bool save) {
+        //    Dictionary<ulong, object> entries = new Dictionary<ulong, object> ();
+        //    for (int i = 0; i < entities.Count (); i++) {
+        //        SetEntry (entry.Values.ElementAt (i).Key, key, entry.Values.ElementAt (i).Value, save);
+        //    }
+        //}
 
         public override void Load() {
             try {

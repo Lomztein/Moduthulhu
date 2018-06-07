@@ -1,6 +1,7 @@
 ﻿using Discord;
 using Discord.WebSocket;
 using Lomztein.Moduthulhu.Core.Configuration;
+using Lomztein.Moduthulhu.Core.Extensions;
 using Lomztein.Moduthulhu.Core.IO;
 using Lomztein.Moduthulhu.Core.Module.Framework;
 using Lomztein.Moduthulhu.Modules.CommandRoot;
@@ -25,25 +26,12 @@ namespace Lomztein.Moduthulhu.Modules.Misc.Karma
 
         public override string [ ] RequiredModules => new string [ ] { "Lomztein_Command Root" };
 
-        private MultiEntry<ulong> upvoteEmoteId;
-        private MultiEntry<ulong> downvoteEmoteId;
+        [AutoConfig] private MultiEntry<ulong, SocketGuild> upvoteEmoteId = new MultiEntry<ulong, SocketGuild> (x => x.Emotes.FirstOrDefault (y => y.Name == "upvote").ZeroIfNull (), "UpvoteEmoteID", true);
+        [AutoConfig] private MultiEntry<ulong, SocketGuild> downvoteEmoteId = new MultiEntry<ulong, SocketGuild> (x => x.Emotes.FirstOrDefault (y => y.Name == "downvote").ZeroIfNull (), "DownvoteEmoteID", true);
 
         private Dictionary<ulong, Selfworth> karma;
 
         private KarmaCommand karmaCommand = new KarmaCommand ();
-
-        public void Configure() {
-            List<SocketGuild> guilds = ParentBotClient.discordClient.Guilds.ToList ();
-            upvoteEmoteId = Configuration.GetEntries (guilds, "UpvoteEmoteID", guilds.Select (x => {
-                Emote emote = x.Emotes.FirstOrDefault (y => y.Name == "upvote");
-                return emote != null ? emote.Id : 0;
-            }));
-
-            downvoteEmoteId = Configuration.GetEntries (guilds, "DownvoteEmoteID", guilds.Select (x => {
-                Emote emote = x.Emotes.FirstOrDefault (y => y.Name == "downvote");
-                return emote != null ? emote.Id : 0;
-            }));
-        }
 
         public override void Initialize() {
             ParentBotClient.discordClient.ReactionAdded += OnReactionAdded;
@@ -70,6 +58,10 @@ namespace Lomztein.Moduthulhu.Modules.Misc.Karma
                 return;
 
             if (reaction.Channel is SocketGuildChannel guildChannel && reaction.Emote is Emote emote) {
+
+                if (!this.IsConfigured (guildChannel.Id))
+                    return;
+
                 if (emote.Id == upvoteEmoteId.GetEntry (guildChannel.Guild)) {
                     ChangeKarma (reaction.User.Value, message.Author, direction * 1);
                 }

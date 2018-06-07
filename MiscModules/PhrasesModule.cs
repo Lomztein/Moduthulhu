@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Lomztein.Moduthulhu.Core.Configuration;
 using Lomztein.AdvDiscordCommands.Extensions;
 using Lomztein.Moduthulhu.Core.Bot;
+using Lomztein.Moduthulhu.Core.Extensions;
 
 namespace Lomztein.Moduthulhu.Modules.Misc.Phrases
 {
@@ -21,7 +22,7 @@ namespace Lomztein.Moduthulhu.Modules.Misc.Phrases
 
         public MultiConfig Configuration { get; set; } = new MultiConfig ();
 
-        private MultiEntry<List<Phrase>> phrases;
+        [AutoConfig] private MultiEntry<List<Phrase>, SocketGuild> phrases = new MultiEntry<List<Phrase>, SocketGuild> (x => new List<Phrase> () { new Phrase (), new Phrase () }, "Phrases", true);
 
         public override void Initialize() {
             ParentBotClient.discordClient.MessageReceived += OnMessageRecieved;
@@ -33,7 +34,11 @@ namespace Lomztein.Moduthulhu.Modules.Misc.Phrases
         }
 
         private async void CheckAndRespond (SocketMessage message) {
+
             if (message is SocketUserMessage userMessage && userMessage.GetGuild () != null) {
+
+                if (!this.IsConfigured (userMessage.GetGuild ().Id))
+                    return;
 
                 string response = null;
                 Emoji emoji = null;
@@ -53,11 +58,6 @@ namespace Lomztein.Moduthulhu.Modules.Misc.Phrases
 
         public override void Shutdown() {
             ParentBotClient.discordClient.MessageReceived -= OnMessageRecieved;
-        }
-
-        public void Configure() {
-            IEnumerable<SocketGuild> guilds = ParentBotClient.discordClient.Guilds;
-            phrases = Configuration.GetEntries (guilds, "Phrases", new List<Phrase> { new Phrase (), new Phrase () });
         }
 
         public class Phrase {

@@ -24,25 +24,14 @@ namespace Lomztein.Moduthulhu.Modules.Voice
 
         public override string [ ] RequiredModules => new string [ ] { "Lomztein_Command Root" };
 
-        private MultiEntry<List<ulong>> nonLockableChannels;
-        private MultiEntry<ulong> moveToChannel;
+        [AutoConfig] private MultiEntry<List<ulong>, SocketGuild> nonLockableChannels = new MultiEntry<List<ulong>, SocketGuild> (x => new List<ulong> (), "NonLockableChannels");
+        [AutoConfig] private MultiEntry<ulong, SocketGuild> moveToChannel = new MultiEntry<ulong, SocketGuild> (x => x.AFKChannel.ZeroIfNull (), "PrisonChannel");
 
         private Dictionary<ulong, Lock> lockedChannels = new Dictionary<ulong, Lock> ();
 
         public MultiConfig Configuration { get; set; } = new MultiConfig ();
 
         private VoiceLockingSet lockingCommandSet = new VoiceLockingSet ();
-
-        public void Configure() {
-            List<SocketGuild> guilds = ParentBotClient.discordClient.Guilds.ToList ();
-
-            nonLockableChannels = Configuration.GetEntries (guilds, "NonLockableChannels", new List<ulong> () { 0 });
-            moveToChannel = Configuration.GetEntries (guilds, "MoveToChannel", guilds.Select (x => {
-                if (x.AFKChannel != null)
-                    return x.AFKChannel.Id;
-                return (ulong)0;
-            }));
-        }
 
         public override void Initialize() {
             lockingCommandSet.ParentModule = this;
@@ -94,6 +83,9 @@ namespace Lomztein.Moduthulhu.Modules.Voice
         }
 
         public void LockChannel (SocketVoiceChannel channel, IEnumerable<SocketGuildUser> initialMembers) {
+            if (channel == channel.Guild.AFKChannel)
+                throw new ArgumentException ("You cannot lock the AFK channel, that would be mean.");
+
             if (!lockedChannels.ContainsKey (channel.Id))
                 lockedChannels.Add (channel.Id, new Lock (channel.Id, initialMembers.Select (x => x.Id).ToList ()));
 

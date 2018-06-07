@@ -61,7 +61,7 @@ namespace Lomztein.Moduthulhu.Core.Bot {
         }
 
         private Task OnJoinedGuild(SocketGuild arg) {
-            moduleHandler.ConfigureModules (); // Reload configuration when joined a new server.
+            moduleHandler.AutoConfigureModules (); // Reload configuration when joined a new server.
             return Task.CompletedTask;
         }
 

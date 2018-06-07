@@ -83,6 +83,22 @@ namespace Lomztein.Moduthulhu.Core.Configuration {
             throw new InvalidOperationException ("Object at \"" + key + "\" has not yet been converted from JSON format.");
         }
 
+        public object GetEntry(ulong id, string key, object fallback) {
+            SetEntryIfEmpty (id, key, fallback);
+            object obj = entries[id][key].Object;
+            Type convertTo = fallback.GetType ();
+
+            obj = JSONSerialization.ConvertObject (obj, convertTo);
+
+            entries[id][key].Converted = true;
+            entries[id][key].Object = obj;
+            return entries[id][key].Object;
+        }
+
+        public Entry GetRawEntry (ulong id, string key) {
+            return entries[id][key];
+        }
+
         public void SetEntry(ulong id, string key, object obj, bool save, bool manual = false) {
 
             SetEntryIfEmpty (id, key, obj);

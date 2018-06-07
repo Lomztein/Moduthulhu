@@ -20,14 +20,14 @@ namespace Lomztein.Moduthulhu.Modules.Voice {
 
         public override bool Multiserver => true;
 
-        private MultiEntry<Dictionary<ulong, string>> channelNames;
-        private MultiEntry<List<ulong>> toIgnore;
+        [AutoConfig] private MultiEntry<Dictionary<ulong, string>, SocketGuild> channelNames = new MultiEntry<Dictionary<ulong, string>, SocketGuild> (x => x.VoiceChannels.ToDictionary (y => y.Id, z => z.Name), "ChannelNames");
+        [AutoConfig] private MultiEntry<List<ulong>, SocketGuild> toIgnore = new MultiEntry<List<ulong>, SocketGuild> (x => new List<ulong> (), "ToIgnore");
 
         public override string [ ] RequiredModules => new string [ ] { "Lomztein_Command Root" };
 
         // Tag specific configuration
-        private MultiEntry<ulong> musicBotID;
-        private MultiEntry<ulong> internationalRoleID;
+        [AutoConfig] private MultiEntry<ulong, SocketGuild> musicBotID = new MultiEntry<ulong, SocketGuild> (x => 0, "MusicBotID");
+        [AutoConfig] private MultiEntry<ulong, SocketGuild> internationalRoleID = new MultiEntry<ulong, SocketGuild> (x => 0, "InternationalRoleID");
 
         public MultiConfig Configuration { get; set; } = new MultiConfig ();
 
@@ -139,7 +139,7 @@ namespace Lomztein.Moduthulhu.Modules.Voice {
 
         private Task OnChannelDestroyed(SocketChannel channel) {
             if (channel is SocketVoiceChannel voice) {
-                channelNames.values [ voice.Guild.Id ].Remove (voice.Id);
+                channelNames.Values [ voice.Guild.Id ].Remove (voice.Id);
                 Configuration.SetEntry (voice.Guild.Id, "ChannelNames", channelNames.GetEntry (voice.Guild), true);
             }
             return Task.CompletedTask;
@@ -147,7 +147,7 @@ namespace Lomztein.Moduthulhu.Modules.Voice {
 
         private Task OnChannelCreated(SocketChannel channel) {
             if (channel is SocketVoiceChannel voice) {
-                channelNames.values [ voice.Guild.Id ].Add (voice.Id, voice.Name);
+                channelNames.Values [ voice.Guild.Id ].Add (voice.Id, voice.Name);
                 Configuration.SetEntry (voice.Guild.Id, "ChannelNames", channelNames.GetEntry (voice.Guild), true);
                 UpdateChannel (voice);
             }
@@ -160,14 +160,6 @@ namespace Lomztein.Moduthulhu.Modules.Voice {
             ParentBotClient.discordClient.ChannelDestroyed -= OnChannelDestroyed;
             ParentBotClient.discordClient.UserVoiceStateUpdated -= OnVoiceStateUpdated;
             ParentBotClient.discordClient.GuildMemberUpdated -= OnGuildMemberUpdated;
-        }
-
-        public void Configure() {
-            List<SocketGuild> guilds = ParentBotClient.discordClient.Guilds.ToList ();
-            channelNames = Configuration.GetEntries (guilds, "ChannelNames", guilds.Select (x => x.VoiceChannels.ToDictionary (y => y.Id, z => z.Name)));
-            internationalRoleID = Configuration.GetEntries (guilds, "InternationalRoleID", (ulong)0);
-            toIgnore = Configuration.GetEntries (guilds, "ToIgnore", new List<ulong> ());
-            musicBotID = Configuration.GetEntries (guilds, "MusicBotID", (ulong)0);
         }
 
         public void AddTag (Tag newTag) {

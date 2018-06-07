@@ -28,18 +28,12 @@ namespace Lomztein.Moduthulhu.Modules.Clock.Birthday
 
         public MultiConfig Configuration { get; set; } = new MultiConfig ();
 
-        private MultiEntry<string> announcementMessage;
-        private MultiEntry<ulong> announcementChannel;
+        [AutoConfig] private MultiEntry<string, SocketGuild> announcementMessage = new MultiEntry<string, SocketGuild> (x => "Congratulations to **[USERNAME]**, as today they celebrate their [AGE] birthday!", "AnnouncementMessage");
+        [AutoConfig] private MultiEntry<ulong, SocketGuild> announcementChannel = new MultiEntry<ulong, SocketGuild> (x => x.TextChannels.FirstOrDefault (y => y.Name == "general" || y.Name == "main" || y.Name == "chat").ZeroIfNull (), "AnnouncementChannel");
 
         private Dictionary<ulong, Dictionary<ulong, BirthdayDate>> allBirthdays;
 
         private BirthdayCommand command;
-
-        public void Configure() {
-            var guilds = ParentBotClient.discordClient.Guilds;
-            announcementMessage = Configuration.GetEntries (guilds, "AnnouncementMessage", "Congratulations to **[USERNAME]**, as today they celebrate their [AGE] birthday!");
-            announcementChannel = Configuration.GetEntries (guilds, "AnnouncementChannel", guilds.Select (x => x.TextChannels.FirstOrDefault (y => y.Name == "general" || y.Name == "main" || y.Name == "chat").ZeroIfNull ()));
-        }
 
         private void LoadData() {
             allBirthdays = DataSerialization.DeserializeData<Dictionary<ulong, Dictionary<ulong, BirthdayDate>>> (dataFilePath);

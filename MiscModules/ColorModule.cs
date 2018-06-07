@@ -26,16 +26,10 @@ namespace Lomztein.Moduthulhu.Modules.Misc.Color
 
         public MultiConfig Configuration { get; set; } = new MultiConfig ();
 
-        private MultiEntry<bool> autocolourNewJoins;
-        protected MultiEntry<Dictionary<ulong, string>> colourIdentification;
+        [AutoConfig] private MultiEntry<bool, SocketGuild> autocolourNewJoins = new MultiEntry<bool, SocketGuild> (x => false, "AutoColourNewMembers");
+        [AutoConfig] private MultiEntry<Dictionary<ulong, string>, SocketGuild> colourIdentification = new MultiEntry<Dictionary<ulong, string>, SocketGuild> (x => x.Roles.Where (y => y.Name.StartsWith (PREFIX)).ToDictionary (z => z.Id, z => z.Name.Substring (PREFIX.Length)), "ColourRoleIDs");
 
         private SetColour colorCommand = new SetColour ();
-
-        public void Configure() {
-            List<SocketGuild> guilds = ParentBotClient.discordClient.Guilds.ToList ();
-            colourIdentification = Configuration.GetEntries (guilds, "Colours", guilds.Select (x => x.Roles.Where (y => y.Name.StartsWith (PREFIX)).ToDictionary (z => z.Id, z => z.Name.Substring (PREFIX.Length))));
-            autocolourNewJoins = Configuration.GetEntries (guilds, "AutoColour", true);
-        }
 
         public override void Initialize() {
             colorCommand.ParentModule = this;

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Lomztein.Moduthulhu.Core.Configuration;
 using System.Threading;
 using Lomztein.Moduthulhu.Core.Extensions;
+using Discord.WebSocket;
 
 namespace Lomztein.Moduthulhu.Modules.Clock
 {
@@ -16,7 +17,7 @@ namespace Lomztein.Moduthulhu.Modules.Clock
         public override bool Multiserver => true;
 
         private List<ITickable> tickables = new List<ITickable> ();
-        private int tickFrequency = 1;
+        [AutoConfig] private SingleEntry<int, SocketGuild> tickFrequency = new SingleEntry<int, SocketGuild> (x => 1, "TickFrequency", false);
         private bool running;
 
         public SingleConfig Configuration { get; set; } = new SingleConfig ();
@@ -24,13 +25,17 @@ namespace Lomztein.Moduthulhu.Modules.Clock
 
         private DateTime lastTick;
 
+        public delegate void TickEvent(DateTime currentTick, DateTime lastTick);
+
+        public event TickEvent OnMinutePassed;
+        public event TickEvent OnHourPassed;
+        public event TickEvent OnDayPassed;
+        public event TickEvent OnMonthPassed;
+        public event TickEvent OnYearPassed;
+
         public override void Initialize() {
             clockThread = new Thread (Run);
             clockThread.Start ();
-        }
-
-        public void Configure() {
-            tickFrequency = Configuration.GetEntry ("TickFrequency", tickFrequency);
         }
 
         public override void Shutdown() {
@@ -48,14 +53,29 @@ namespace Lomztein.Moduthulhu.Modules.Clock
         public void Stop() => running = false;
 
         private void Run () {
-            int milliseconds = (int)Math.Round (1f / tickFrequency) * 1000;
+            int milliseconds = (int)Math.Round (1f / tickFrequency.GetValue ()) * 1000;
             running = true;
 
             while (running) {
                 Thread.Sleep (milliseconds);
-                tickables.ForEach (x => x.Tick (lastTick, DateTime.Now));
+                Tick (DateTime.Now, lastTick);
                 lastTick = DateTime.Now;
             }
+        }
+
+        private void Tick (DateTime curTick, DateTime lTick) {
+            tickables.ForEach (x => x.Tick (lastTick, DateTime.Now));
+
+            if (MinutePassed (curTick, lTick))
+                OnMinutePassed?.Invoke (curTick, lTick);
+            if (HourPassed (curTick, lTick))
+                OnHourPassed?.Invoke (curTick, lTick);
+            if (DayPassed (curTick, lTick))
+                OnDayPassed?.Invoke (curTick, lTick);
+            if (MonthPassed (curTick, lTick))
+                OnMonthPassed?.Invoke (curTick, lTick);
+            if (YearPassed (curTick, lTick))
+                OnYearPassed?.Invoke (curTick, lTick);
         }
 
         // Just for good measure.

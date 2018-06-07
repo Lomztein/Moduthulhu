@@ -48,7 +48,7 @@ namespace Lomztein.Moduthulhu.Core.Configuration.Management {
             Type type = configurable.GetEntryType (id, key);
             object newValue = ConvertTo (type, input);
             configurable.GetConfig ().SetEntry (id, key, newValue, save, true);
-            configurable.Configure ();
+            configurable.GetConfigEntry (key).UpdateEntry (id);
         }
 
         public static string ListToString(this IConfigurable configurable, ulong id, string key) {
@@ -89,7 +89,7 @@ namespace Lomztein.Moduthulhu.Core.Configuration.Management {
                     currentEnumerable = currentEnumerable.ToArray ();
 
                 configurable.GetConfig ().SetEntry (id, key, currentEnumerable, save, manual);
-                configurable.Configure ();
+                configurable.GetConfigEntry (key).UpdateEntry (id);
                 return;
             }
 
@@ -113,7 +113,7 @@ namespace Lomztein.Moduthulhu.Core.Configuration.Management {
                     currentEnumerable = currentEnumerable.ToArray ();
 
                 configurable.GetConfig ().SetEntry (id, key, currentEnumerable, save, manual);
-                configurable.Configure ();
+                configurable.GetConfigEntry (key).UpdateEntry (id);
 
                 return element;
             }
