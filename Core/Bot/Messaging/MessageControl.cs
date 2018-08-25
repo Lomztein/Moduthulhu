@@ -5,8 +5,9 @@ using System.Text;
 using Discord.WebSocket;
 using Discord;
 using System.Threading.Tasks;
+using Lomztein.Moduthulhu.Core.Bot.Messaging.Advanced;
 
-namespace Lomztein.Moduthulhu.Core.Bot
+namespace Lomztein.Moduthulhu.Core.Bot.Messaging
 {
     public static class MessageControl
     {
@@ -19,5 +20,11 @@ namespace Lomztein.Moduthulhu.Core.Bot
             return await channel.SendMessageAsync (text, isTTS, embed);
         }
 
+        public static async Task<IMessage[]> SendLargeEmbed (ITextChannel channel, EmbedBuilder sourceBuilder) {
+            LargeEmbed largeEmbed = new LargeEmbed ();
+            largeEmbed.CreateFrom (sourceBuilder);
+            await largeEmbed.SendAsync (channel);
+            return largeEmbed.Message;
+        }
     }
 }

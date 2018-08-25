@@ -3,15 +3,13 @@ using Lomztein.Moduthulhu.Core.IO;
 using Lomztein.Moduthulhu.Core.Module.Framework;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Linq;
 using Newtonsoft.Json;
-using Lomztein.AdvDiscordCommands.Extensions;
 using Lomztein.Moduthulhu.Modules.Misc.Shipping.Commands;
 using Lomztein.Moduthulhu.Modules.CommandRoot;
+using Lomztein.AdvDiscordCommands.Extensions;
 
-namespace Lomztein.Moduthulhu.Modules.Misc.Shipping
-{
+namespace Lomztein.Moduthulhu.Modules.Misc.Shipping {
     // There is arguably a bit of spaghetti in this file, as Ships contain and use references to this parent module quite often.
     // However, it is entirely restricted to this file and the commands file.
     public class ShippingModule : ModuleBase {
@@ -31,18 +29,22 @@ namespace Lomztein.Moduthulhu.Modules.Misc.Shipping
         private ShippingCommands commands;
 
         private void LoadData() {
+
             ships = DataSerialization.DeserializeData<Dictionary<ulong, List<Ship>>> (shipFileName);
             if (ships == null)
                 ships = new Dictionary<ulong, List<Ship>> ();
+
             foreach (var guild in ships) {
                 foreach (Ship ship in guild.Value) {
                     ship.parentModule = this;
                     ship.GuildId = guild.Key;
                 }
             }
+
             shipNames = DataSerialization.DeserializeData<List<ShipName>> (nameFileName);
             if (shipNames == null)
                 shipNames = new List<ShipName> ();
+
         }
 
         private void SaveData() {
@@ -185,19 +187,16 @@ namespace Lomztein.Moduthulhu.Modules.Misc.Shipping
 
     public class Ship
     {
-
-        private readonly static char[] consonants = new char[] { 'B', 'C', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'B', 'W', 'X' };
-
         [JsonIgnore]
         public ShippingModule parentModule;
 
         [JsonIgnore]
         public ulong GuildId { get; internal set; }
 
-        public ulong Shipper { get; }
+        public ulong Shipper { get; set; }
 
-        public ulong ShippieOne { get; }
-        public ulong ShippieTwo { get; }
+        public ulong ShippieOne { get; set; }
+        public ulong ShippieTwo { get; set; }
 
         public Ship(ShippingModule _parentModule, ulong _guildId, ulong _shipper, ulong _shippieOne, ulong _shippieTwo)
         {

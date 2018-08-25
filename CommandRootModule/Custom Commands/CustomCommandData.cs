@@ -1,4 +1,5 @@
 ﻿using Lomztein.AdvDiscordCommands.Framework;
+using Lomztein.AdvDiscordCommands.Framework.Categories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,22 +9,19 @@ namespace Lomztein.Moduthulhu.Modules.CustomCommands.Data
 {
     public class CustomCommandData
     {
-
         public string name;
         public string description;
 
         public ulong ownerID;
         public CommandAccessability accessability;
-        public Command.Category catagory;
 
         public void ApplyTo (ICustomCommand command) {
             command.OwnerID = ownerID;
             command.Accessability = accessability;
 
             if (command is Command cmd) {
-                cmd.command = name;
-                cmd.shortHelp = description;
-                cmd.catagory = catagory;
+                cmd.Name = name;
+                cmd.Description = description;
             }
         }
 

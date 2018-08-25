@@ -1,10 +1,13 @@
-﻿using Lomztein.AdvDiscordCommands.Extensions;
+﻿using Discord;
+using Lomztein.AdvDiscordCommands.Extensions;
 using Lomztein.AdvDiscordCommands.Framework;
+using Lomztein.AdvDiscordCommands.Framework.Interfaces;
 using Lomztein.Moduthulhu.Core.Configuration;
 using Lomztein.Moduthulhu.Core.Configuration.Management;
 using Lomztein.Moduthulhu.Core.Extensions;
 using Lomztein.Moduthulhu.Core.Module.Framework;
 using Lomztein.Moduthulhu.Modules.CommandRoot;
+using Lomztein.Moduthulhu.Modules.CustomCommands.Categories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,12 +19,12 @@ namespace Lomztein.Moduthulhu.Modules.Meta.Commands {
     class ConfigurationManagerCommandSet : ModuleCommandSet<ConfigurationManagerModule> {
 
         public ConfigurationManagerCommandSet() {
-            command = "config";
-            shortHelp = "Commands for configuring the bot.";
-            catagory = Category.Admin;
-            requiredPermissions.Add (Discord.GuildPermission.ManageGuild);
+            Name = "config";
+            Description = "Commands for configuring the bot.";
+            RequiredPermissions.Add (GuildPermission.ManageGuild);
+            Category = AdditionalCategories.Management;
 
-            commandsInSet = new List<Command> () {
+            commandsInSet = new List<ICommand> () {
                 new Change (), new Add (), new Remove (),
                 new List (), new All (), new Unset (),
             };
@@ -41,15 +44,15 @@ namespace Lomztein.Moduthulhu.Modules.Meta.Commands {
         public class Change : ModuleCommand<ConfigurationManagerModule> {
 
             public Change() {
-                command = "change";
-                shortHelp = "Change a specific key.";
-                catagory = Category.Admin;
-                requiredPermissions.Add (Discord.GuildPermission.ManageGuild);
+                Name = "change";
+                Description = "Change a specific key.";
+                Category = AdditionalCategories.Management;
+                RequiredPermissions.Add (GuildPermission.ManageGuild);
             }
 
             [Overload (typeof (void), "Change a specific key in the given IConfigurable.")]
             public Task<Result> Execute(CommandMetadata data, IConfigurable configurable, string key, params string[] inputValues) {
-                configurable.ChangeEntry (data.message.GetGuild ().Id, key, true, true, inputValues);
+                configurable.ChangeEntry (data.Message.GetGuild ().Id, key, true, true, inputValues);
                 return TaskResult (null, $"Succesfully set \"{key}\" to {inputValues.Singlify ()}");
             }
 
@@ -62,7 +65,7 @@ namespace Lomztein.Moduthulhu.Modules.Meta.Commands {
 
             [Overload (typeof (void), "Change a specified configuration key.")]
             public Task<Result> Execute(CommandMetadata data, string key, params string[] inputValues) {
-                var configurables = ParentModule.GetModulesWithEntry (data.message.GetGuild ().Id, key);
+                var configurables = ParentModule.GetModulesWithEntry (data.Message.GetGuild ().Id, key);
                 if (ReturnErrorIfMulitple (configurables, key, out var result))
                     return result;
                 return Execute (data, configurables.Single (), key, inputValues);
@@ -72,15 +75,15 @@ namespace Lomztein.Moduthulhu.Modules.Meta.Commands {
             public class Add : ModuleCommand<ConfigurationManagerModule> {
 
             public Add () {
-                command = "add";
-                shortHelp = "Add a value to a list-type entry.";
-                catagory = Category.Admin;
-                requiredPermissions.Add (Discord.GuildPermission.ManageGuild);
+                Name = "add";
+                Description = "Add a value to a list-type entry.";
+                Category = AdditionalCategories.Management;
+                RequiredPermissions.Add (GuildPermission.ManageGuild);
             }
 
             [Overload (typeof (void), "Add a value to a list/enumerable type configuration entry in the given IConfigurable.")]
             public Task<Result> Execute (CommandMetadata data, IConfigurable configurable, string key, params string[] inputValues) {
-                configurable.AddToEntry ( data.message.GetGuild ().Id, key, true, true, inputValues);
+                configurable.AddToEntry ( data.Message.GetGuild ().Id, key, true, true, inputValues);
                 return TaskResult (null, $"Succesfully added \"{inputValues.Singlify ()}\" to \"{key}\"");
             }
 
@@ -93,7 +96,7 @@ namespace Lomztein.Moduthulhu.Modules.Meta.Commands {
 
             [Overload (typeof (void), "Add to a specified configuration key.")]
             public Task<Result> Execute(CommandMetadata data, string key, params string[] inputValues) {
-                var configurables = ParentModule.GetModulesWithEntry (data.message.GetGuild ().Id, key);
+                var configurables = ParentModule.GetModulesWithEntry (data.Message.GetGuild ().Id, key);
                 if (ReturnErrorIfMulitple (configurables, key, out var result))
                     return result;
                 return Execute (data, configurables.Single (), key, inputValues);
@@ -103,15 +106,15 @@ namespace Lomztein.Moduthulhu.Modules.Meta.Commands {
         public class Remove : ModuleCommand<ConfigurationManagerModule> {
 
             public Remove() {
-                command = "remove";
-                shortHelp = "Remove a value from a list-type entry.";
-                catagory = Category.Admin;
-                requiredPermissions.Add (Discord.GuildPermission.ManageGuild);
+                Name = "remove";
+                Description = "Remove a value from a list-type entry.";
+                Category = AdditionalCategories.Management;
+                RequiredPermissions.Add (GuildPermission.ManageGuild);
             }
 
             [Overload (typeof (void), "Remove a value from a list/enumerable type configuration entry in the given IConfigurable.")]
             public Task<Result> Execute(CommandMetadata data, IConfigurable configurable, string key, int index) {
-                object obj = configurable.RemoveFromEntry (data.message.GetGuild ().Id, key, true, true, index);
+                object obj = configurable.RemoveFromEntry (data.Message.GetGuild ().Id, key, true, true, index);
                 return TaskResult (null, $"Succesfully removed \"{obj}\" from \"{key}\"");
             }
 
@@ -124,7 +127,7 @@ namespace Lomztein.Moduthulhu.Modules.Meta.Commands {
 
             [Overload (typeof (void), "Remove a value from a specified configuration key.")]
             public Task<Result> Execute(CommandMetadata data, string key, int index) {
-                var configurables = ParentModule.GetModulesWithEntry (data.message.GetGuild ().Id, key);
+                var configurables = ParentModule.GetModulesWithEntry (data.Message.GetGuild ().Id, key);
                 if (ReturnErrorIfMulitple (configurables, key, out var result))
                     return result;
                 return Execute (data, configurables.Single (), key, index);
@@ -134,15 +137,15 @@ namespace Lomztein.Moduthulhu.Modules.Meta.Commands {
         public class List : ModuleCommand<ConfigurationManagerModule> {
 
             public List () {
-                command = "list";
-                shortHelp = "List all values in a list-type entry.";
-                catagory = Category.Admin;
-                requiredPermissions.Add (Discord.GuildPermission.ManageGuild);
+                Name = "list";
+                Description = "List all values in a list-type entry.";
+                Category = AdditionalCategories.Management;
+                RequiredPermissions.Add (GuildPermission.ManageGuild);
             }
 
             [Overload (typeof (string), "List every value in a list/enumerable type configuration entry in the given IConfigurable.")]
             public Task<Result> Execute (CommandMetadata data, IConfigurable configurable, string key) {
-                string list = "```" + configurable.ListToString (data.message.GetGuild ().Id, key) + "```";
+                string list = "```" + configurable.ListToString (data.Message.GetGuild ().Id, key) + "```";
                 return TaskResult (list, list);
             }
 
@@ -156,7 +159,7 @@ namespace Lomztein.Moduthulhu.Modules.Meta.Commands {
 
             [Overload (typeof (string), "List every value in a list/enumerable type configuration entry.")]
             public Task<Result> Execute(CommandMetadata data, string key) {
-                var configurables = ParentModule.GetModulesWithEntry (data.message.GetGuild ().Id, key);
+                var configurables = ParentModule.GetModulesWithEntry (data.Message.GetGuild ().Id, key);
                 if (ReturnErrorIfMulitple (configurables, key, out var result))
                     return result;
                 return Execute (data, configurables.Single (), key);
@@ -167,22 +170,22 @@ namespace Lomztein.Moduthulhu.Modules.Meta.Commands {
         public class All : ModuleCommand<ConfigurationManagerModule> {
 
             public All() {
-                command = "all";
-                shortHelp = "Show every single configuration entry.";
-                catagory = Category.Admin;
-                requiredPermissions.Add (Discord.GuildPermission.ManageGuild);
+                Name = "all";
+                Description = "Show every single configuration entry.";
+                Category = AdditionalCategories.Management;
+                RequiredPermissions.Add (Discord.GuildPermission.ManageGuild);
             }
 
             [Overload (typeof (string), "List every single configuration entry in all modules.")]
             public Task<Result> Execute (CommandMetadata data) {
-                string all = ParentModule.ListEntriesInModules (ParentModule.ParentModuleHandler.GetActiveModules (), data.message.GetGuild ().Id, x => true);
+                string all = ParentModule.ListEntriesInModules (ParentModule.ParentModuleHandler.GetActiveModules (), data.Message.GetGuild ().Id, x => true);
                 return TaskResult (all, all);
             }
 
             [Overload (typeof (string), "List every value in a list/enumerable type configuration entry in the search module.")]
             public Task<Result> Execute(CommandMetadata data, string moduleSearch) {
                 if (ParentModule.ParentModuleHandler.FuzzySearchModule (moduleSearch) is IConfigurable configurable) {
-                    string all = ParentModule.ListEntriesInModules (new IModule[] { configurable as IModule }, data.message.GetGuild ().Id, x => true);
+                    string all = ParentModule.ListEntriesInModules (new IModule[] { configurable as IModule }, data.Message.GetGuild ().Id, x => true);
                     return TaskResult (all, all);
                 }
                 return TaskResult (null, $"Error - No configurable module was found when \"" + moduleSearch + "\" was searched.");
@@ -192,22 +195,22 @@ namespace Lomztein.Moduthulhu.Modules.Meta.Commands {
         public class Unset : ModuleCommand<ConfigurationManagerModule> {
 
             public Unset() {
-                command = "unset";
-                shortHelp = "Show every configuration entry that hasn't been set.";
-                catagory = Category.Admin;
-                requiredPermissions.Add (Discord.GuildPermission.ManageGuild);
+                Name = "unset";
+                Description = "Show every configuration entry that hasn't been set.";
+                Category = AdditionalCategories.Management;
+                RequiredPermissions.Add (Discord.GuildPermission.ManageGuild);
             }
 
             [Overload (typeof (string), "List every single configuration entry in all modules that hasn't been manually set.")]
             public Task<Result> Execute(CommandMetadata data) {
-                string all = ParentModule.ListEntriesInModules (ParentModule.ParentModuleHandler.GetActiveModules (), data.message.GetGuild ().Id, x => !x.ManuallySet);
+                string all = ParentModule.ListEntriesInModules (ParentModule.ParentModuleHandler.GetActiveModules (), data.Message.GetGuild ().Id, x => !x.ManuallySet);
                 return TaskResult (all, all);
             }
 
             [Overload (typeof (string), "List every value in a list/enumerable type configuration entry in the search module.")]
             public Task<Result> Execute(CommandMetadata data, string moduleSearch) {
                 if (ParentModule.ParentModuleHandler.FuzzySearchModule (moduleSearch) is IConfigurable configurable) {
-                    string all = ParentModule.ListEntriesInModules (new IModule[] { configurable as IModule }, data.message.GetGuild ().Id, x => true);
+                    string all = ParentModule.ListEntriesInModules (new IModule[] { configurable as IModule }, data.Message.GetGuild ().Id, x => true);
                     return TaskResult (all, all);
                 }
                 return TaskResult (null, $"Error - No configurable module was found when \"" + moduleSearch + "\" was searched.");

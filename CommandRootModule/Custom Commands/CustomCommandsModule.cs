@@ -61,29 +61,27 @@ namespace Lomztein.Moduthulhu.Modules.CustomCommands
             DataSerialization.SerializeData (customCommandData, customCommandFileName);
         }
 
-        public static CustomCommand CreateCommand (string name, string description, IUser author, CommandAccessability accessability, Command.Category category, string commandChain) {
+        public static CustomCommand CreateCommand (string name, string description, IUser author, CommandAccessability accessability, string commandChain) {
             CustomCommand command = new CustomCommand {
                 commandChain = commandChain
             };
 
-            SetCommandData (command, name, description, author, accessability, category);
+            SetCommandData (command, name, description, author, accessability);
             return command;
         }
 
-        public static CustomCommandSet CreateSet (string name, string description, IUser author, CommandAccessability accessability, Command.Category category) {
+        public static CustomCommandSet CreateSet (string name, string description, IUser author, CommandAccessability accessability) {
             CustomCommandSet commandSet = new CustomCommandSet ();
-            SetCommandData (commandSet, name, description, author, accessability, category);
+            SetCommandData (commandSet, name, description, author, accessability);
             return commandSet;
         }
 
         public void AddSetToList(CustomCommandSet set) => customSets.Add (set);
 
-        private static void SetCommandData (Command command, string name, string description, IUser author, CommandAccessability accessability, Command.Category category) {
+        private static void SetCommandData (Command command, string name, string description, IUser author, CommandAccessability accessability) {
 
-            command.catagory = Command.Category.Advanced;
-            command.shortHelp = description;
-            command.command = name;
-            command.catagory = category;
+            command.Description = description;
+            command.Name = name;
 
             ICustomCommand custom = command as ICustomCommand;
 
@@ -106,14 +104,13 @@ namespace Lomztein.Moduthulhu.Modules.CustomCommands
         public void RemoveCustomCommand (ICommandSet fromSet, string commandName) {
 
             var commands = fromSet.GetCommands ();
-            Command toRemove = null;
+            ICommand toRemove = null;
 
             foreach (var cmd in commands) {
                 if (cmd is ICustomCommand customCommand) {
 
-                    if (cmd.command == commandName)
+                    if (cmd.Name == commandName)
                         toRemove = cmd;
-
                 }
             }
 

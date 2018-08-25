@@ -1,4 +1,6 @@
-﻿using Lomztein.AdvDiscordCommands.Framework;
+﻿using Discord;
+using Lomztein.AdvDiscordCommands.Framework;
+using Lomztein.AdvDiscordCommands.Framework.Categories;
 using Lomztein.AdvDiscordCommands.Framework.Interfaces;
 using Lomztein.Moduthulhu.Modules.CommandRoot;
 using System;
@@ -11,13 +13,13 @@ namespace Lomztein.Moduthulhu.Modules.CustomCommands.Commands
     public class CustomCommandCommands : ModuleCommandSet<CustomCommandsModule>
     {
         public CustomCommandCommands () {
-            command = "custom";
-            catagory = Category.Advanced;
-            shortHelp = "Custom command management.";
+            Name = "custom";
+            Category = StandardCategories.Advanced;
+            Description = "Custom command management.";
 
-            requiredPermissions.Add (Discord.GuildPermission.ManageGuild);
+            RequiredPermissions.Add (GuildPermission.ManageGuild);
 
-            commandsInSet = new List<Command> {
+            commandsInSet = new List<ICommand> {
                 new Create (),
                 new CreateSet (),
                 new Remove (),
@@ -27,30 +29,26 @@ namespace Lomztein.Moduthulhu.Modules.CustomCommands.Commands
         public class Create : ModuleCommand<CustomCommandsModule> {
 
             public Create() {
-                command = "create";
-                catagory = Category.Advanced;
-                shortHelp = "Create a new custom command.";
+                Name = "create";
+                Description = "Create a new custom command.";
+                Category = StandardCategories.Advanced;
             }
 
-            [Overload (typeof (CustomCommand), "Create a new custom commands set.")]
-            public Task<Result> Execute(CommandMetadata metadata, string name, string description, CustomCommandSet commandSet, string commandChain) => Execute (metadata, name, description, "Private", "Miscilaneous", commandSet, commandChain);
+            [Overload (typeof (CustomCommand), "Create a new custom commands.")]
+            public Task<Result> Execute(CommandMetadata metadata, string name, string description, CustomCommandSet commandSet, string commandChain) => Execute (metadata, name, description, "Private", commandSet, commandChain);
 
-            [Overload (typeof (CustomCommand), "Create a new custom commands set with a specfic accessability.")]
-            public Task<Result> Execute(CommandMetadata metadata, string name, string description, string accessability, CustomCommandSet commandSet, string commandChain) => Execute (metadata, name, description, accessability, "Miscilaneous", commandSet, commandChain);
-
-            [Overload (typeof (CustomCommand), "Create a new custom command.")]
-            public Task<Result> Execute(CommandMetadata metadata, string name, string description, string accessability, string category, CustomCommandSet commandSet, string commandChain) {
+            [Overload (typeof (CustomCommand), "Create a new custom command with a specific accesability.")]
+            public Task<Result> Execute(CommandMetadata metadata, string name, string description, string accessability, CustomCommandSet commandSet, string commandChain) {
 
                 if (!commandSet.ContainsCommandByName (name)) {
                     CommandAccessability commandAccessability = (CommandAccessability)Enum.Parse (typeof (CommandAccessability), accessability, true);
-                    Category commandCategory = (Category)Enum.Parse (typeof (Category), category, true);
-                    CustomCommand command = CustomCommandsModule.CreateCommand (name, description, metadata.message.Author, commandAccessability, commandCategory, commandChain);
+                    CustomCommand command = CustomCommandsModule.CreateCommand (name, description, metadata.Message.Author, commandAccessability, commandChain);
                     commandSet.AddCommands (command);
 
                     ParentModule.SaveData ();
                     return TaskResult (command, "Succesfully created new command.");
                 } else {
-                    return TaskResult (command, $"Failed to create command - A command by name **{name}** already exists in the {commandSet.ToString ()} set.");
+                    return TaskResult (null, $"Failed to create command - A command by name **{name}** already exists in the {commandSet.ToString ()} set.");
                 }
 
             }
@@ -59,24 +57,20 @@ namespace Lomztein.Moduthulhu.Modules.CustomCommands.Commands
         public class CreateSet : ModuleCommand<CustomCommandsModule> {
 
             public CreateSet() {
-                command = "createset";
-                catagory = Category.Advanced;
-                shortHelp = "Create a new custom command set.";
+                Name = "createset";
+                Description = "Create a new custom command set.";
+                Category = StandardCategories.Advanced;
             }
 
             [Overload (typeof (CustomCommandSet), "Create a new custom commands set.")]
-            public Task<Result> Execute(CommandMetadata metadata, string name, string description) => Execute (metadata, name, description, "Private", "Miscilaneous");
+            public Task<Result> Execute(CommandMetadata metadata, string name, string description) => Execute (metadata, name, description, "Private");
 
-            [Overload (typeof (CustomCommandSet), "Create a new custom commands set with a specfic accessability.")]
-            public Task<Result> Execute(CommandMetadata metadata, string name, string description, string accessability) => Execute (metadata, name, description, accessability, "Miscilaneous");
-
-            [Overload (typeof (CustomCommandSet), "Create a new custom command set with a specific accessability and catagory.")]
-            public Task<Result> Execute(CommandMetadata metadata, string name, string description, string accessability, string category) {
+            [Overload (typeof (CustomCommandSet), "Create a new custom command set with a specific accessability.")]
+            public Task<Result> Execute(CommandMetadata metadata, string name, string description, string accessability) {
                 CommandAccessability commandAccessability = (CommandAccessability)Enum.Parse (typeof (CommandAccessability), accessability, true);
-                Category commandCategory = (Category)Enum.Parse (typeof (Category), category, true);
 
-                CustomCommandSet newCommandSet = CustomCommandsModule.CreateSet (name, description, metadata.message.Author, commandAccessability, commandCategory);
-                metadata.root.AddCommands (newCommandSet);
+                CustomCommandSet newCommandSet = CustomCommandsModule.CreateSet (name, description, metadata.Message.Author, commandAccessability);
+                metadata.Root.AddCommands (newCommandSet);
                 ParentModule.AddSetToList (newCommandSet);
 
                 ParentModule.SaveData ();
@@ -88,9 +82,9 @@ namespace Lomztein.Moduthulhu.Modules.CustomCommands.Commands
         public class Remove : ModuleCommand<CustomCommandsModule> {
 
             public Remove() {
-                command = "remove";
-                catagory = Category.Advanced;
-                shortHelp = "Remove a custom command.";
+                Name = "remove";
+                Description = "Remove a custom command.";
+                Category = StandardCategories.Advanced;
             }
 
             [Overload (typeof (void), "Remove the first found command in the given set that matches the given name.")]
@@ -99,7 +93,7 @@ namespace Lomztein.Moduthulhu.Modules.CustomCommands.Commands
                     ParentModule.RemoveCustomCommand (commandSet, name);
 
                     if (commandSet.GetCommands ().Count == 0)
-                        metadata.root.RemoveCommands (commandSet as Command);
+                        metadata.Root.RemoveCommands (commandSet as Command);
 
                     return TaskResult (true, $"Succesfully removed command **{name}** from **{commandSet.ToString ()}**");
                 } else {

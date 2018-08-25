@@ -1,6 +1,7 @@
 ﻿using Discord.WebSocket;
 using Lomztein.AdvDiscordCommands.Extensions;
 using Lomztein.AdvDiscordCommands.Framework;
+using Lomztein.AdvDiscordCommands.Framework.Categories;
 using Lomztein.Moduthulhu.Core.Configuration;
 using Lomztein.Moduthulhu.Core.Module.Framework;
 using Lomztein.Moduthulhu.Modules.CommandRoot;
@@ -9,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Lomztein.Moduthulhu.Core.Extensions;
 
 namespace Lomztein.Moduthulhu.Modules.Misc.Color
 {
@@ -38,7 +40,8 @@ namespace Lomztein.Moduthulhu.Modules.Misc.Color
         }
 
         private Task OnUserJoined(SocketGuildUser guildUser) {
-            GiveRandomColourAsync (guildUser);
+            if (this.IsConfigured (guildUser.Guild.Id))
+                GiveRandomColourAsync (guildUser);
             return Task.CompletedTask;
         }
 
@@ -56,24 +59,25 @@ namespace Lomztein.Moduthulhu.Modules.Misc.Color
         public class SetColour : ModuleCommand<ColourModule> {
 
             public SetColour () {
-                command = "setcolour";
-                shortHelp = "Set your personal color to something funky.";
-                catagory = Category.Utility;
+                Name = "setcolour";
+                Description = "Set your personal color to something funky.";
+                Category = StandardCategories.Utility;
             }
 
             [Overload (typeof (void), "Set your colour to something cool!")]
             public async Task<Result> Execute(CommandMetadata data, string colorName) {
 
-                if (data.message.Author is SocketGuildUser guildUser) {
+                if (ParentModule.IsConfigured (data.Message.GetGuild ().Id)) {
 
+                    SocketGuildUser guildUser = data.Message.Author as SocketGuildUser;
                     IEnumerable<SocketRole> currentRoles = guildUser.Roles.Where (x => ParentModule.colourIdentification.GetEntry (guildUser.Guild).ContainsKey (x.Id));
 
                     SocketRole role = null;
                     string name = "";
 
-                    foreach (var entry in ParentModule.colourIdentification.GetEntry (data.message.GetGuild ())) {
+                    foreach (var entry in ParentModule.colourIdentification.GetEntry (data.Message.GetGuild ())) {
                         if (entry.Value.ToUpper () == colorName.ToUpper ()) {
-                            role = ParentModule.ParentBotClient.GetRole (data.message.GetGuild ().Id, entry.Key);
+                            role = ParentModule.ParentBotClient.GetRole (data.Message.GetGuild ().Id, entry.Key);
                             name = entry.Value;
                             break;
                         }

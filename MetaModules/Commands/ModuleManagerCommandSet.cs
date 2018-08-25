@@ -10,17 +10,19 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using Lomztein.Moduthulhu.Modules.CustomCommands.Categories;
+using Lomztein.AdvDiscordCommands.Framework.Interfaces;
 
 namespace Lomztein.Moduthulhu.Modules.Meta.Commands
 {
     public class ModuleManagerCommandSet : ModuleCommandSet<ModuleManagerModule>
     {
         public ModuleManagerCommandSet () {
-            command = "modules";
-            shortHelp = "Get information about modules.";
-            catagory = Category.Advanced;
+            Name = "modules";
+            Description = "Get information about modules.";
+            Category = AdditionalCategories.Management;
 
-            commandsInSet = new List<Command> () {
+            commandsInSet = new List<ICommand> () {
                 new List (), new Get (), new Info (), new Reload (),
             };
         }
@@ -28,10 +30,9 @@ namespace Lomztein.Moduthulhu.Modules.Meta.Commands
         public class Get : ModuleCommand<ModuleManagerModule> {
 
             public Get () {
-                command = "get";
-                shortHelp = "Get a module object.";
-                catagory = Category.Advanced;
-
+                Name = "get";
+                Description = "Get a module object.";
+                Category = AdditionalCategories.Management;
             }
 
             [Overload (typeof (IModule), "Get a module from the parent manager by name and author.")]
@@ -51,9 +52,9 @@ namespace Lomztein.Moduthulhu.Modules.Meta.Commands
         public class List : ModuleCommand<ModuleManagerModule> {
 
             public List () {
-                command = "list";
-                shortHelp = "Display a list of modules.";
-                catagory = Category.Advanced;
+                Name = "list";
+                Description = "Display a list of modules.";
+                Category = AdditionalCategories.Management;
             }
 
             [Overload (typeof (Embed), "Display a list of all currently active modules.")]
@@ -66,9 +67,9 @@ namespace Lomztein.Moduthulhu.Modules.Meta.Commands
         public class Info : ModuleCommand<ModuleManagerModule> {
 
             public Info () {
-                command = "info";
-                shortHelp = "Display information about a module.";
-                catagory = Category.Advanced;
+                Name = "info";
+                Description = "Display information about a module.";
+                Category = AdditionalCategories.Management;
             }
 
             [Overload (typeof (Embed), "Display information about a specific module.")]
@@ -86,11 +87,11 @@ namespace Lomztein.Moduthulhu.Modules.Meta.Commands
         public class Reload : ModuleCommand<ModuleManagerModule> {
 
             public Reload () {
-                command = "reload";
-                shortHelp = "Reload modules.";
-                catagory = Category.Admin;
+                Name = "reload";
+                Description = "Reload modules.";
+                Category = AdditionalCategories.Management;
 
-                requiredPermissions.Add (GuildPermission.Administrator);
+                RequiredPermissions.Add (GuildPermission.Administrator);
             }
 
             [Overload (typeof (void), "Reload modules from the module folder.")]
