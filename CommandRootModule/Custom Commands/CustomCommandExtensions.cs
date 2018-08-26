@@ -37,14 +37,10 @@ namespace Lomztein.Moduthulhu.Modules.CustomCommands
             commandData.accessability = command.Accessability;
             commandData.ownerID = command.OwnerID;
             commandData.name = command.Name;
-
-            if (command is Command cmd) {
-                commandData.catagory = cmd.catagory;
-            }
         }
 
         public static bool ContainsCommandByName (this ICommandSet commandSet, string name) {
-            return commandSet.GetCommands ().Exists (x => x.command == name);
+            return commandSet.GetCommands ().Exists (x => x.Name == name);
         }
     }
 }

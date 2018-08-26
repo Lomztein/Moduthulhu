@@ -7,8 +7,10 @@ using Discord;
 using System.Threading.Tasks;
 using Lomztein.Moduthulhu.Core.Configuration;
 using Lomztein.AdvDiscordCommands.Extensions;
-using Lomztein.Moduthulhu.Core.Bot;
+using Lomztein.Moduthulhu.Core.Bot.Messaging;
 using Lomztein.Moduthulhu.Core.Extensions;
+using Lomztein.Moduthulhu.Core.Configuration.Management.Converters;
+using Lomztein.Moduthulhu.Core.Configuration.Management;
 
 namespace Lomztein.Moduthulhu.Modules.Misc.Phrases
 {
@@ -26,6 +28,7 @@ namespace Lomztein.Moduthulhu.Modules.Misc.Phrases
 
         public override void Initialize() {
             ParentBotClient.discordClient.MessageReceived += OnMessageRecieved;
+            ConfigurationManager.AddConverter (new PhraseConfigConverter ());
         }
 
         private Task OnMessageRecieved(SocketMessage message) {
@@ -86,6 +89,23 @@ namespace Lomztein.Moduthulhu.Modules.Misc.Phrases
 
             public override string ToString() {
                 return $"TRIGGER: {triggerPhrase}, USERID: {userID}, CHANNELID: {channelID}, CHANCE: {chance}, RESPONSE: {response}, EMOJI: {emoji}";
+            }
+        }
+
+        public class PhraseConfigConverter : IConfigConverter {
+
+            public Type TargetType => typeof (Phrase);
+
+            public object Convert(Type targetType, params string[] input) {
+                Phrase phrase = new Phrase () {
+                    triggerPhrase = input[0],
+                    userID = ulong.Parse (input[1]),
+                    channelID = ulong.Parse (input[2]),
+                    chance = double.Parse (input[3]),
+                    response = input[4],
+                    emoji = input[5]
+                };
+                return phrase;
             }
         }
     }

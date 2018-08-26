@@ -9,20 +9,21 @@ using System.Threading.Tasks;
 using Lomztein.Moduthulhu.Modules.Misc.Karma;
 using Lomztein.Moduthulhu.Modules.Misc.Karma.Extensions;
 using Discord;
+using Lomztein.AdvDiscordCommands.Framework.Categories;
 
 namespace Lomztein.Moduthulhu.Modules.Misc.Karma.Commands
 {
     public class KarmaCommand : ModuleCommand<KarmaModule> {
 
         public KarmaCommand() {
-            command = "karma";
-            shortHelp = "Shows karma.";
-            catagory = Category.Fun;
+            Name = "karma";
+            Description = "Shows karma.";
+            Category = StandardCategories.Fun;
         }
 
         [Overload (typeof (int), "Returns your own karma.")]
         public Task<Result> Execute (CommandMetadata data) {
-            return Execute (data, data.message.Author);
+            return Execute (data, data.Message.Author);
         }
 
         [Overload (typeof (int), "Returns karma of a given user.")]
@@ -37,7 +38,7 @@ namespace Lomztein.Moduthulhu.Modules.Misc.Karma.Commands
             List<SocketGuildUser> inGuild = new List<SocketGuildUser> ();
 
             foreach (var entry in allKarma) { // Man I'm getting lazy with dictionary type naming. All those generic parameters yo.
-                SocketGuildUser user = data.message.GetGuild ()?.GetUser (entry.Key);
+                SocketGuildUser user = data.Message.GetGuild ()?.GetUser (entry.Key);
                 if (user == null)
                     continue;
                 inGuild.Add (user);

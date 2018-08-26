@@ -1,10 +1,10 @@
 ﻿using Discord;
 using Discord.WebSocket;
+using Lomztein.AdvDiscordCommands.Framework;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
-using static Lomztein.AdvDiscordCommands.Framework.Command;
 
 namespace Lomztein.Moduthulhu.Modules.Voice.Extensions
 {

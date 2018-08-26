@@ -13,6 +13,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Lomztein.Moduthulhu.Modules.CommandRoot;
 using Lomztein.AdvDiscordCommands.Framework;
+using Lomztein.AdvDiscordCommands.Framework.Categories;
 
 namespace Lomztein.Moduthulhu.Modules.Clock.Birthday
 {
@@ -69,14 +70,20 @@ namespace Lomztein.Moduthulhu.Modules.Clock.Birthday
         }
 
         private void TestBirthdays(DateTime now) {
+
             foreach (var guild in allBirthdays) {
                 foreach (var user in guild.Value) {
 
                     if (user.Value.IsNow ()) {
+
                         SocketGuildUser guildUser = ParentBotClient.GetUser (guild.Key, user.Key);
+                        if (guildUser == null)
+                            return; // User doesn't exist anymore, may have left the server.
+
                         SocketTextChannel guildChannel = ParentBotClient.GetChannel (guild.Key, announcementChannel.GetEntry (guildUser.Guild)) as SocketTextChannel;
                         AnnounceBirthday (guildChannel, guildUser, user.Value);
                         user.Value.SetLastPassedToNow ();
+                        SaveData ();
                     }
 
                 }
@@ -156,15 +163,15 @@ namespace Lomztein.Moduthulhu.Modules.Clock.Birthday
         public class BirthdayCommand : ModuleCommand<BirthdayModule> {
 
             public BirthdayCommand () {
-                command = "birthday";
-                shortHelp = "Set your birthday date.";
-                catagory = Category.Utility;
+                Name = "birthday";
+                Description = "Set your birthday date.";
+                Category = StandardCategories.Utility;
             }
 
             [Overload (typeof (void), "Set your birthday to a specific date.")]
             public Task<Result> Execute (CommandMetadata data, int day, int month, int year) {
                 DateTime date = new DateTime (year, month, day, 12, 0, 0);
-                ParentModule.SetBirthday (data.message.GetGuild ().Id, data.message.Author.Id, date);
+                ParentModule.SetBirthday (data.Message.GetGuild ().Id, data.Message.Author.Id, date);
                 return TaskResult (null, $"Succesfully set birthday date to **{date.ToShortDateString ()}**.");
             }
 

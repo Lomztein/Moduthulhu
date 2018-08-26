@@ -5,23 +5,23 @@ using System.Text;
 using Discord.WebSocket;
 using Discord;
 using Lomztein.Moduthulhu.Modules.CustomCommands.Data;
+using Lomztein.AdvDiscordCommands.Framework;
 
 namespace Lomztein.Moduthulhu.Modules.CustomCommands
 {
     public class CustomCommandSet : ModuleCommandSet<CustomCommandsModule>, ICustomCommand {
 
         public CustomCommandSet () {
-            availableOnServer = true;
-            availableInDM = true;
-            commandEnabled = true;
+            AvailableOnServer = true;
+            AvailableInDM = true;
+            CommandEnabled = true;
         }
 
         public CommandAccessability Accessability { get; set; }
         public ulong OwnerID { get; set; }
-        public string Name { get => command; }
 
-        public override string AllowExecution(IMessage e) {
-            return this.CheckAccessability (base.AllowExecution (e), e as SocketMessage);
+        public override string AllowExecution(CommandMetadata data) {
+            return this.CheckAccessability (base.AllowExecution (data), data.Message as SocketMessage);
         }
 
         public CustomCommandData SaveToData() {

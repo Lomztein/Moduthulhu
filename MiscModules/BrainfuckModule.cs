@@ -1,4 +1,5 @@
 ﻿using Lomztein.AdvDiscordCommands.Framework;
+using Lomztein.AdvDiscordCommands.Framework.Categories;
 using Lomztein.Moduthulhu.Core.Module.Framework;
 using Lomztein.Moduthulhu.Modules.CommandRoot;
 using System;
@@ -36,6 +37,7 @@ namespace Lomztein.ModularDiscordBot.Modules.Misc.Brainfuck
             input.Add (channelID, null);
             BrainfuckIntepreter intepreter = new BrainfuckIntepreter (new Func<Task<byte>> (async () => await AwaitInputAsync (channelID)));
             var result = await intepreter.Interpret (program);
+            input.Remove (channelID);
             return result;
         }
 
@@ -53,14 +55,14 @@ namespace Lomztein.ModularDiscordBot.Modules.Misc.Brainfuck
         public class BrainfuckCommand : ModuleCommand<BrainfuckModule> {
 
             public BrainfuckCommand () {
-                command = "brainfuck";
-                shortHelp = "Brainfuck.";
-                catagory = Category.Fun;
+                Name = "brainfuck";
+                Description = "Brainfuck.";
+                Category = StandardCategories.Fun;
             }
 
             [Overload (typeof (string), "Brainfuck.")]
             public async Task<Result> Execute (CommandMetadata metadata, string program) {
-                string result = await ParentModule.Run (program, metadata.message.Channel.Id);
+                string result = await ParentModule.Run (program, metadata.Message.Channel.Id);
                 return new Result (result, result);
             }
 

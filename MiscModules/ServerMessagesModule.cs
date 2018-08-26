@@ -6,7 +6,7 @@ using System;
 using System.Threading.Tasks;
 using Lomztein.Moduthulhu.Core.Configuration;
 using System.Collections.Generic;
-using Lomztein.Moduthulhu.Core.Bot;
+using Lomztein.Moduthulhu.Core.Bot.Messaging;
 using Discord.Rest;
 using System.Linq;
 using Lomztein.Moduthulhu.Modules.Misc.Shipping;

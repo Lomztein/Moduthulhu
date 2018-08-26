@@ -8,34 +8,37 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Linq;
 using Discord;
+using Lomztein.AdvDiscordCommands.Framework.Categories;
+using Lomztein.AdvDiscordCommands.Framework.Interfaces;
+using Lomztein.Moduthulhu.Core.Bot.Messaging;
+using Lomztein.Moduthulhu.Core.Bot.Messaging.Advanced;
 
-namespace Lomztein.Moduthulhu.Modules.Misc.Shipping.Commands
-{
+namespace Lomztein.Moduthulhu.Modules.Misc.Shipping.Commands {
     public class ShippingCommands : ModuleCommandSet<ShippingModule> {
 
-        public ShippingCommands () {
-            command = "shipping";
-            shortHelp = "The most important commands.";
-            catagory = Category.Fun;
+        public ShippingCommands() {
+            Name = "shipping";
+            Description = "The most important commands.";
+            Category = StandardCategories.Fun;
 
-            commandsInSet = new List<Command> () {
+            commandsInSet = new List<ICommand> () {
                 new Ship (), new Sink (),
-                new Name (), new List (),
+                new Shipname (), new List (),
                 new OTPs (), new ATPs (),
             };
         }
 
         public class Ship : ModuleCommand<ShippingModule> {
 
-            public Ship () {
-                command = "ship";
-                shortHelp = "Ship two people.";
-                catagory = Category.Fun;
+            public Ship() {
+                Name = "ship";
+                Description = "Ship two people.";
+                Category = StandardCategories.Fun;
             }
 
             [Overload (typeof (Ship), "Ship two people so that they'll be together forever, at least in your headcanon.")]
-            public Task<Result> Execute (CommandMetadata data, SocketGuildUser shippieOne, SocketGuildUser shippieTwo) {
-                Shipping.Ship ship = ParentModule.Ship (data.message.Author as SocketGuildUser, shippieOne, shippieTwo, out bool succesful);
+            public Task<Result> Execute(CommandMetadata data, SocketGuildUser shippieOne, SocketGuildUser shippieTwo) {
+                Shipping.Ship ship = ParentModule.Ship (data.Message.Author as SocketGuildUser, shippieOne, shippieTwo, out bool succesful);
                 if (succesful) {
                     return TaskResult (ship, "Succesfully shipped " + shippieOne.GetShownName () + " and " + shippieTwo.GetShownName () + ", now known as " + ship.GetShipName () + ".");
                 }
@@ -53,14 +56,14 @@ namespace Lomztein.Moduthulhu.Modules.Misc.Shipping.Commands
         public class Sink : ModuleCommand<ShippingModule> {
 
             public Sink() {
-                command = "sink";
-                shortHelp = "Sink one of your ships.";
-                catagory = Category.Fun;
+                Name = "sink";
+                Description = "Sink one of your ships.";
+                Category = StandardCategories.Fun;
             }
 
             [Overload (typeof (void), "Sink one of your ships, in case the imaginative spark is gone.")]
             public Task<Result> Execute(CommandMetadata data, SocketGuildUser shippieOne, SocketGuildUser shippieTwo) {
-                Shipping.Ship ship = ParentModule.Sink (data.message.Author as SocketGuildUser, shippieOne, shippieTwo, out bool succesful);
+                Shipping.Ship ship = ParentModule.Sink (data.Message.Author as SocketGuildUser, shippieOne, shippieTwo, out bool succesful);
                 if (succesful) {
                     return TaskResult (null, "Succesfully sunk " + ship.GetShipName () + ", at least for you.");
                 }
@@ -68,18 +71,18 @@ namespace Lomztein.Moduthulhu.Modules.Misc.Shipping.Commands
             }
         }
 
-        public class Name : ModuleCommand<ShippingModule> {
+        public class Shipname : ModuleCommand<ShippingModule> {
 
-            public Name () {
-                command = "name";
-                shortHelp = "Name a ship something special.";
-                catagory = Category.Utility;
+            public Shipname() {
+                Name = "name";
+                Description = "Name a ship something special.";
+                Category = StandardCategories.Fun;
             }
 
             [Overload (typeof (void), "Name a ship something better than the shitty automatic name generator did.")]
-            public Task<Result> Execute (CommandMetadata data, SocketGuildUser shippieOne, SocketGuildUser shippieTwo, string name) {
+            public Task<Result> Execute(CommandMetadata data, SocketGuildUser shippieOne, SocketGuildUser shippieTwo, string name) {
                 ParentModule.NameShip (shippieOne, shippieTwo, name);
-                return TaskResult (null, $"{shippieOne.GetShownName ()} x {shippieTwo.GetShownName()} has now been named {name}");
+                return TaskResult (null, $"{shippieOne.GetShownName ()} x {shippieTwo.GetShownName ()} has now been named {name}");
             }
 
             [Overload (typeof (void), "Reset a ship name back to the automatically generated one.")]
@@ -93,15 +96,15 @@ namespace Lomztein.Moduthulhu.Modules.Misc.Shipping.Commands
 
         public class List : ModuleCommand<ShippingModule> {
 
-            public List () {
-                command = "list";
-                shortHelp = "List all ships containing a person.";
-                catagory = Category.Utility;
+            public List() {
+                Name = "list";
+                Description = "List all ships containing a person.";
+                Category = StandardCategories.Fun;
             }
 
             [Overload (typeof (Embed), "List every single ship that you yourself is a part of.")]
             public Task<Result> Execute(CommandMetadata data) {
-                return Execute (data, data.message.Author as SocketGuildUser);
+                return Execute (data, data.Message.Author as SocketGuildUser);
             }
 
             [Overload (typeof (Embed), "List every single ship that the given person is a part of.")]
@@ -114,17 +117,19 @@ namespace Lomztein.Moduthulhu.Modules.Misc.Shipping.Commands
                     WithTitle ("Ships containing " + user.GetShownName () + ".");
 
                 foreach (var ship in catagorized) {
-                    var shippers = ship.Select (x => ParentModule.ParentBotClient.GetUser (data.message.GetGuild ().Id, x.Shipper));
+                    var shippers = ship.Select (x => ParentModule.ParentBotClient.GetUser (data.Message.GetGuild ().Id, x.Shipper));
                     string shipperNames = "";
                     foreach (var shipper in shippers) {
                         shipperNames += shipper.GetShownName () + "\n";
                     }
 
-                    SocketGuildUser companion = ParentModule.ParentBotClient.GetUser (data.message.GetGuild ().Id, ship.Key);
+                    SocketGuildUser companion = ParentModule.ParentBotClient.GetUser (data.Message.GetGuild ().Id, ship.Key);
                     builder.AddField ("Shipped with " + companion.GetShownName () + " as " + ship.FirstOrDefault ().GetShipName () + ", " + ship.Count () + " times by:", shipperNames);
                 }
 
-                return TaskResult (builder.Build (), null);
+                LargeEmbed largeEmbed = new LargeEmbed ();
+                largeEmbed.CreateFrom (builder);
+                return TaskResult(largeEmbed, null);
             }
 
         }
@@ -132,16 +137,16 @@ namespace Lomztein.Moduthulhu.Modules.Misc.Shipping.Commands
         public class OTPs : ModuleCommand<ShippingModule> {
 
             public OTPs() {
-                command = "otps";
-                shortHelp = "Show your true pairs.";
-                catagory = Category.Utility;
+                Name = "otps";
+                Description = "Show your true pairs.";
+                Category = StandardCategories.Fun;
             }
 
             [Overload (typeof (string), "Show every single ship that you yourself has shipped.")]
-            public Task<Result> Execute(CommandMetadata data) => Execute (data, data.message.Author as SocketGuildUser);
+            public Task<Result> Execute(CommandMetadata data) => Execute (data, data.Message.Author as SocketGuildUser);
 
             [Overload (typeof (string), "Show every single ship the given person has shipped.")]
-            public Task<Result> Execute (CommandMetadata data, SocketGuildUser user) {
+            public Task<Result> Execute(CommandMetadata data, SocketGuildUser user) {
                 var allShips = ParentModule.GetAllShipperShips (user);
                 string result = $"{user.GetShownName ()} has shipped the following ships:```\n";
                 foreach (Shipping.Ship ship in allShips) {
@@ -155,21 +160,21 @@ namespace Lomztein.Moduthulhu.Modules.Misc.Shipping.Commands
         public class ATPs : ModuleCommand<ShippingModule> {
 
             public ATPs() {
-                command = "atps";
-                shortHelp = "Show a leaderboard of all true pairs.";
-                catagory = Category.Utility;
+                Name = "atps";
+                Description = "Show a leaderboard of all true pairs.";
+                Category = StandardCategories.Fun;
             }
 
             [Overload (typeof (Embed), "Show a leaderboard of most shipped ships, sorted by most shipped.")]
-            public Task<Result> Execute (CommandMetadata data) {
-                var leaderboard = ParentModule.GetShipLeaderboard (data.message.GetGuild ());
+            public Task<Result> Execute(CommandMetadata data) {
+                var leaderboard = ParentModule.GetShipLeaderboard (data.Message.GetGuild ());
 
                 EmbedBuilder builder = new EmbedBuilder ().
                     WithAuthor (ParentModule.ParentBotClient.discordClient.CurrentUser).
-                    WithTitle ("All ships on " + data.message.GetGuild ().Name + ".");
+                    WithTitle ("All ships on " + data.Message.GetGuild ().Name + ".");
 
                 foreach (var pair in leaderboard) {
-                    SocketGuildUser shippie = ParentModule.ParentBotClient.GetUser (data.message.GetGuild ().Id, pair.Key);
+                    SocketGuildUser shippie = ParentModule.ParentBotClient.GetUser (data.Message.GetGuild ().Id, pair.Key);
                     string ships = "";
 
                     foreach (Shipping.Ship ship in pair.Value) {
@@ -179,7 +184,9 @@ namespace Lomztein.Moduthulhu.Modules.Misc.Shipping.Commands
                     builder.AddField ($"{shippie.GetShownName ()} has been shipped {pair.Value.Count} times in the following ships:", ships);
                 }
 
-                return TaskResult (builder.Build (), null);
+                LargeEmbed largeEmbed = new LargeEmbed ();
+                largeEmbed.CreateFrom (builder);
+                return TaskResult(largeEmbed, null);
             }
         }
 
