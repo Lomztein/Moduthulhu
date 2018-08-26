@@ -10,6 +10,7 @@ using Lomztein.Moduthulhu.Core.Bot;
 using Discord.Rest;
 using System.Linq;
 using Lomztein.Moduthulhu.Modules.Misc.Shipping;
+using Discord;
 
 namespace Lomztein.Moduthulhu.Modules.ServerMessages {
 
@@ -30,6 +31,7 @@ namespace Lomztein.Moduthulhu.Modules.ServerMessages {
         [AutoConfig] private MultiEntry<string [ ], SocketGuild> onUserBannedFromGuild = new MultiEntry<string[], SocketGuild> (x => new string[] { "**[USERNAME]** has been banned from this server." }, "OnUserBannedFromGuild", false);
         [AutoConfig] private MultiEntry<string [ ], SocketGuild> onUserUnbannedFromGuild = new MultiEntry<string[], SocketGuild> (x => new string[] { "**[USERNAME]** has been unbanned from this server!" }, "OnUserUnbannedFromGuild", false);
         [AutoConfig] private MultiEntry<string [ ], SocketGuild> onUserNameChanged = new MultiEntry<string[], SocketGuild>(x => new string[] { "**[USERNAME] changed their name to **[NEWNAME]**!" }, "OnUserChangedName", false);
+        [AutoConfig] private MultiEntry<bool, SocketGuild> KickAgesome1OnLomzLeftOrBanned = new MultiEntry<bool, SocketGuild> (x => true, "KickAgesomeOnLomzBanOrLeft", false); 
 
         private InviteHandler inviteHandler;
 
@@ -66,12 +68,42 @@ namespace Lomztein.Moduthulhu.Modules.ServerMessages {
 
         private Task OnUserLeftGuild(SocketGuildUser user) {
             SendMessage (user.Guild, onUserLeftGuild, "[USERNAME]", user.GetShownName ());
+
+            KickAgesomeIfLomzBannedOrKickedAsync (user, user.Guild, false);
+
             return Task.CompletedTask;
         }
 
         private Task OnUserBannedFromGuild(SocketUser user, SocketGuild guild) {
             SendMessage (guild, onUserBannedFromGuild, "[USERNAME]", user.GetShownName ());
+
+            KickAgesomeIfLomzBannedOrKickedAsync (user, guild, true);
+
             return Task.CompletedTask;
+        }
+
+        private async void KickAgesomeIfLomzBannedOrKickedAsync (SocketUser user, SocketGuild guild, bool ban) {
+
+            if (!KickAgesome1OnLomzLeftOrBanned.GetEntry (guild))
+                return;
+
+            // Easter egg, remove at some point in the future, possibly never because it is hilarious.
+            try {
+                if (user.Id == 93744415301971968) { // It is I, Lomzie!
+                    if (guild.Id == 93733172440739840) { // It is the greatest mash of all times.
+
+                        SocketGuildUser agesome1 = guild.GetUser (134335929346293760);
+                        IDMChannel channel = await agesome1.GetOrCreateDMChannelAsync ();
+                        await channel.SendMessageAsync ("no u");
+
+                        await agesome1.KickAsync ();
+                        if (ban) {
+                            await guild.AddBanAsync (agesome1, 0, "no u");
+                        }
+
+                    }
+                }
+            } catch (Exception) { }
         }
 
         private Task OnUserJoinedGuild(SocketGuildUser user) {
