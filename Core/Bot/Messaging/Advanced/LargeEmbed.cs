@@ -8,17 +8,44 @@ namespace Lomztein.Moduthulhu.Core.Bot.Messaging.Advanced {
 
     public class LargeEmbed : ICustomMessage<EmbedBuilder, EmbedBuilder[], IMessage[]> {
 
-        public const int fieldsPerEmbed = 25;
+        public const int FieldsPerEmbed = 25;
 
         public IMessage[] Message { get; set; }
         public EmbedBuilder[] Intermediate { get; set; }
 
         public void CreateFrom(EmbedBuilder source) {
 
-            EmbedBuilder header = new EmbedBuilder ();
-            EmbedBuilder footer = new EmbedBuilder ();
+            EmbedBuilder header = null;
+            EmbedBuilder footer = null;
 
             List<EmbedBuilder> fields = new List<EmbedBuilder> ();
+
+            List<List<EmbedFieldBuilder>> embedFields = new List<List<EmbedFieldBuilder>> ();
+            for (int i = 0; i < source.Fields.Count; i++) {
+
+                if (i > FieldsPerEmbed) { // This goes a bit against the typical for-loop conventions, but it should work rather simply. Please don't scream at me.
+                    embedFields.Add (new List<EmbedFieldBuilder> (source.Fields.GetRange (0, FieldsPerEmbed)));
+                    source.Fields.RemoveRange (0, FieldsPerEmbed);
+                    i = 0;
+                }
+            }
+
+            embedFields.Add (new List<EmbedFieldBuilder> (source.Fields));
+
+            for (int i = 0; i < embedFields.Count; i++) {
+                EmbedBuilder field = new EmbedBuilder ();
+
+                for (int j = 0; j < embedFields[i].Count; j++) {
+                    field.AddField (embedFields[i][j]);
+                }
+
+                if (i == 0)
+                    header = field;
+                if (i == embedFields.Count - 1)
+                    footer = field;
+
+                fields.Add (field);
+            }
 
             header.Author = source.Author;
             header.Color = source.Color;
@@ -31,32 +58,8 @@ namespace Lomztein.Moduthulhu.Core.Bot.Messaging.Advanced {
             footer.Footer = source.Footer;
             footer.Timestamp = source.Timestamp;
 
-            List<List<EmbedFieldBuilder>> embedFields = new List<List<EmbedFieldBuilder>> ();
-            for (int i = 0; i < source.Fields.Count; i++) {
-
-                if (i > fieldsPerEmbed) { // This goes a bit against the typical for-loop conventions, but it should work rather simply. Please don't scream at me.
-                    embedFields.Add (new List<EmbedFieldBuilder> (source.Fields.GetRange (0, fieldsPerEmbed)));
-                    source.Fields.RemoveRange (0, fieldsPerEmbed);
-                    i = 0;
-                }
-            }
-
-            embedFields.Add (new List<EmbedFieldBuilder> (source.Fields));
-
-            for (int i = 0; i < embedFields.Count; i++) {
-                EmbedBuilder field = new EmbedBuilder ();
-
-                for (int j = 0; j < embedFields[j].Count; j++) {
-                    field.AddField (embedFields[i][j]);
-                }
-
-                fields.Add (field);
-            }
-
             List<EmbedBuilder> result = new List<EmbedBuilder> ();
-            result.Add (header);
             result.AddRange (fields);
-            result.Add (footer);
 
             Intermediate = result.ToArray ();
         }

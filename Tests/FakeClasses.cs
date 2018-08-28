@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Lomztein.Moduthulhu.Modules.Clock.Birthday;
+﻿using Lomztein.Moduthulhu.Modules.Clock.Birthday;
+using System;
 
-namespace Lomztein.Moduthulhu.UnitTests.FakeClasses
-{
-        public class FakeBirthdayDate : BirthdayModule.BirthdayDate {
+namespace Lomztein.Moduthulhu.UnitTests.FakeClasses {
+
+    public class FakeBirthdayDate : BirthdayModule.BirthdayDate {
 
             public DateTime fakeNow;
 

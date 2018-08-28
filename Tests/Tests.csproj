@@ -2,12 +2,19 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
+
+    <IsPackable>false</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CommandRootModule\CommandRootModule.csproj" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0-preview-20170628-02" />
+    <PackageReference Include="xunit" Version="2.2.0" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Core\Core.csproj" />
-    <ProjectReference Include="..\MiscModules\MiscModules.csproj" />
+    <ProjectReference Include="..\Modules\Modules.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -16,8 +23,8 @@
     </Reference>
   </ItemGroup>
 
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="xcopy &quot;$(TargetPath)&quot; &quot;$(SolutionDir)CompiledModules\&quot; /y&#xD;&#xA;xcopy &quot;$(TargetPath)&quot; &quot;$(SolutionDir)Core\bin\Debug\netcoreapp2.0\Modules\&quot; /y" />
-  </Target>
+  <ItemGroup>
+    <Folder Include="Properties\" />
+  </ItemGroup>
 
 </Project>

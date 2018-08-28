@@ -112,7 +112,7 @@ namespace Lomztein.Moduthulhu.Core.Module
 
             foreach (Type type in exportedTypes) {
 
-                if (type.GetInterface ("IModule") == typeof (IModule)) {
+                if (type.GetInterfaces().Contains (typeof (IModule))) {
                     IModule module = Activator.CreateInstance (type) as IModule;
                     Log.Write (Log.Type.MODULE, "Module loaded: " + module.CompactizeName ());
                     exportedModules.Add (module);

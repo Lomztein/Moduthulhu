@@ -15,6 +15,9 @@ namespace Lomztein.Moduthulhu.Core.Bot {
     /// </summary>
     public class BotClient : IDiscordClient {
 
+        public TimeSpan Uptime { get => DateTime.Now - BootDate; }
+        public DateTime BootDate { get; private set; }
+
         public DiscordSocketClient discordClient;
         private ModuleHandler moduleHandler;
 
@@ -27,6 +30,7 @@ namespace Lomztein.Moduthulhu.Core.Bot {
         };
 
         public async Task Run() {
+            BootDate = DateTime.Now;
             await ConnectAndInitialize ();
             await Task.Delay (-1);
             Log.Write (Log.Type.BOT, "Shutting down..");
@@ -76,10 +80,15 @@ namespace Lomztein.Moduthulhu.Core.Bot {
             return Task.CompletedTask;
         }
 
-        private async Task OnDisconnected(Exception arg) {
+        private Task OnDisconnected(Exception arg) {
             Log.Write (arg);
-            await discordClient.SetActivityAsync (new Game ("Last Disconnect: " + DateTime.Now.ToString (), ActivityType.Playing));
+            UpdateUptimeDisplay ();
             //TryReconnect ();
+            return Task.CompletedTask;
+        }
+
+        public void UpdateUptimeDisplay () {
+            discordClient.SetGameAsync ("Current uptime: " + Math.Floor (Uptime.TotalDays) + " days.");
         }
 
         private async Task Disconnect () {
@@ -89,14 +98,9 @@ namespace Lomztein.Moduthulhu.Core.Bot {
             isReady = false;
         }
 
-        private async void TryReconnect () {
-            await Disconnect ();
-            await ConnectAndInitialize ();
-            await discordClient.SetActivityAsync (new Game ("Last Disconnect: " + DateTime.Now.ToString (), ActivityType.Playing));
-        }
-
         private Task OnReady () {
             isReady = true;
+            UpdateUptimeDisplay ();
             return Task.CompletedTask;
         }
 

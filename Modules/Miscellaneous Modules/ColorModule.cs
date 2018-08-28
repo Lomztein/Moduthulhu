@@ -1,7 +1,6 @@
 ﻿using Discord.WebSocket;
 using Lomztein.AdvDiscordCommands.Extensions;
 using Lomztein.AdvDiscordCommands.Framework;
-using Lomztein.AdvDiscordCommands.Framework.Categories;
 using Lomztein.Moduthulhu.Core.Configuration;
 using Lomztein.Moduthulhu.Core.Module.Framework;
 using Lomztein.Moduthulhu.Modules.CommandRoot;
@@ -11,6 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Lomztein.Moduthulhu.Core.Extensions;
+using Lomztein.AdvDiscordCommands.Framework.Categories;
 
 namespace Lomztein.Moduthulhu.Modules.Misc.Color
 {
