@@ -1,4 +1,4 @@
-﻿using Lomztein.Moduthulhu.Modules.CommandRoot;
+﻿using Lomztein.Moduthulhu.Modules.Command;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -27,12 +27,6 @@ namespace Lomztein.Moduthulhu.Modules.CustomCommands
         public CustomCommandData SaveToData() {
             CustomSetData data = new CustomSetData ();
             data.SetBaseValues (this);
-
-            foreach (var cmd in commandsInSet) {
-                ICustomCommand customCmd = cmd as ICustomCommand;
-                data.nestedCommands.Add (customCmd.SaveToData () as CustomChainData);
-            }
-
             return data;
         }
 

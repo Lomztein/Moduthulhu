@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using Newtonsoft.Json;
 using System.IO;
-using Lomztein.Moduthulhu.Core.Bot;
 using System.Reflection;
+using Newtonsoft.Json.Linq;
 
-namespace Lomztein.Moduthulhu.Core.IO
+namespace Lomztein.Moduthulhu.Cross
 {
     /// <summary>
     /// Various JSON related serialization methods. Using the IO methods force the file extension to .json, for consistancy.
@@ -30,6 +28,19 @@ namespace Lomztein.Moduthulhu.Core.IO
             }
 
             return default (T);
+        }
+
+        public static JObject LoadAsJObject (string path) {
+            path = Path.ChangeExtension (path, jsonExtension);
+            if (File.Exists (path)) {
+                return JObject.Parse (File.ReadAllText (path));
+            }
+            return null;
+        }
+
+        public static void SaveJObject (JObject obj, string path) {
+            path = Path.ChangeExtension (path, jsonExtension);
+            File.WriteAllText (path, obj.ToString ());
         }
 
         public static void SerializeObject (object obj, string path, bool format = false) {

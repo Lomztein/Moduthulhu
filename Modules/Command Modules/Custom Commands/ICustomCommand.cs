@@ -1,4 +1,5 @@
-﻿using Lomztein.Moduthulhu.Modules.CustomCommands.Data;
+﻿using Lomztein.AdvDiscordCommands.Framework.Interfaces;
+using Lomztein.Moduthulhu.Modules.CustomCommands.Data;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -11,16 +12,13 @@ namespace Lomztein.Moduthulhu.Modules.CustomCommands
         Global // Litteraly global for the entire bot.
     }
 
-    public interface ICustomCommand
+    // Implementing ICommand into ICustomCommand shouldn't change anything in practice, but might avoid issues later down the line.
+    public interface ICustomCommand : ICommand
     {
-
         CommandAccessability Accessability { get; set; }
 
         ulong OwnerID { get; set; }
 
-        string Name { get; }
-
         CustomCommandData SaveToData();
-
     }
 }

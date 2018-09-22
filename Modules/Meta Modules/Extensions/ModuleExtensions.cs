@@ -4,6 +4,7 @@ using Lomztein.Moduthulhu.Core.Module.Framework;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Lomztein.Moduthulhu.Core.Bot;
 
 namespace Lomztein.Moduthulhu.Modules.Meta.Extensions
 {
@@ -36,7 +37,7 @@ namespace Lomztein.Moduthulhu.Modules.Meta.Extensions
             return builder.Build ();
         }
 
-        public static Embed GetModuleListEmbed (this ModuleHandler handler) {
+        public static Embed GetModuleListEmbed (this ModuleLoader handler) {
             IModule[] allModules = handler.GetActiveModules ();
 
             EmbedBuilder builder = new EmbedBuilder ()

@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using Lomztein.Moduthulhu.Core.Extensions;
 using Lomztein.Moduthulhu.Modules.Misc.Logging.Extensions;
 using System.Linq;
+using Lomztein.Moduthulhu.Cross;
 
 namespace Lomztein.Moduthulhu.Modules.Misc.Logging
 {

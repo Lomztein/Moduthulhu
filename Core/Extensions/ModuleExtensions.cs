@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Lomztein.Moduthulhu.Cross;
 
 namespace Lomztein.Moduthulhu.Core.Extensions
 {
@@ -15,6 +16,14 @@ namespace Lomztein.Moduthulhu.Core.Extensions
         public static (string name, string author) DecompactizeModuleName(this string name) {
             string [ ] split = name.Split ('_');
             return (split[1], split[0]);
+        }
+
+        public static void ModuleLog(IModule module, string text) {
+            Cross.Log.Write (Cross.Log.GetColor (Cross.Log.Type.MODULE), module.CompactizeName (), text);
+        }
+
+        public static void Log(this IModule module, string text) {
+            ModuleLog (module, text);
         }
 
         public static bool ContainsPrerequisites (this IModule module, IEnumerable<IModule> list) {
@@ -28,7 +37,7 @@ namespace Lomztein.Moduthulhu.Core.Extensions
                 bool enabled = prerequisite == null ? false : prerequisite.ContainsPrerequisites (list);
 
                 if (!enabled) {
-                    Log.Write (Log.Type.CRITICAL, $"Module {module.CompactizeName ()} can't load due to missing module prerequisite {required}.");
+                    Cross.Log.Write (Cross.Log.Type.CRITICAL, $"Module {module.CompactizeName ()} can't load due to missing module prerequisite {required}.");
                     return false;
                 } else
                     return true;

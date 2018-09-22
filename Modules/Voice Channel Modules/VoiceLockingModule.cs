@@ -4,7 +4,7 @@ using Lomztein.AdvDiscordCommands.Framework;
 using Lomztein.Moduthulhu.Core.Configuration;
 using Lomztein.Moduthulhu.Core.Extensions;
 using Lomztein.Moduthulhu.Core.Module.Framework;
-using Lomztein.Moduthulhu.Modules.CommandRoot;
+using Lomztein.Moduthulhu.Modules.Command;
 using Lomztein.Moduthulhu.Modules.Voice.Commands;
 using System;
 using System.Collections.Generic;

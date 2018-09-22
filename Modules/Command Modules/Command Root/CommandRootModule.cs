@@ -11,8 +11,14 @@ using Lomztein.Moduthulhu.Core.Bot.Misc;
 using Lomztein.Moduthulhu.Core.Bot.Messaging.Advanced;
 using Lomztein.AdvDiscordCommands.Framework.Interfaces;
 using Lomztein.AdvDiscordCommands.Framework;
+using System.Linq;
+using Lomztein.Moduthulhu.Modules.Meta.Extensions;
+using Lomztein.Moduthulhu.Core.Extensions;
+using Lomztein.AdvDiscordCommands.Framework.Execution;
+using Lomztein.Moduthulhu.Cross;
+using Lomztein.AdvDiscordCommands.Extensions;
 
-namespace Lomztein.Moduthulhu.Modules.CommandRoot {
+namespace Lomztein.Moduthulhu.Modules.Command {
     public class CommandRootModule : ModuleBase, ICommandSet, IConfigurable<MultiConfig> {
 
         public override string Name => "Command Root";
@@ -29,12 +35,15 @@ namespace Lomztein.Moduthulhu.Modules.CommandRoot {
 
         public MultiConfig Configuration { get; set; } = new MultiConfig ();
 
-        public AdvDiscordCommands.Framework.CommandRoot commandRoot;
+        public CommandRoot commandRoot;
 
         public override void PreInitialize() {
-            commandRoot = new AdvDiscordCommands.Framework.CommandRoot (new List<ICommand> (), new Executor ());
-            commandRoot.CommandExecutor.Trigger = new Func<ulong, char> (x => trigger.GetEntry (new FakeEntity<ulong> (x)));
-            commandRoot.CommandExecutor.HiddenTrigger = new Func<ulong, char> (x => hiddenTrigger.GetEntry (new FakeEntity<ulong> (x)));
+
+            commandRoot = new CommandRoot (new List<ICommand> (),
+                x => trigger.GetEntry (new FakeEntity<ulong> (x)),
+                x => hiddenTrigger.GetEntry (new FakeEntity<ulong> (x))
+                );
+
         }
 
         public override void Initialize() {
@@ -54,7 +63,7 @@ namespace Lomztein.Moduthulhu.Modules.CommandRoot {
         private async void AwaitAndSend(SocketMessage arg) {
 
             try {
-                var result = await commandRoot.EnterCommand (arg.Content, arg as SocketUserMessage);
+                var result = await commandRoot.EnterCommand (arg.Content, arg as SocketUserMessage, arg.GetGuild ().Id);
                 if (result != null) {
 
                     if (result.Exception != null)
@@ -79,10 +88,12 @@ namespace Lomztein.Moduthulhu.Modules.CommandRoot {
         }
 
         public void AddCommands(params ICommand [ ] newCommands) {
+            this.Log ($"Adding commands: {newCommands.Select (x => x.Name).ToArray ().Singlify ()}");
             ((ICommandSet)commandRoot).AddCommands (newCommands);
         }
 
         public void RemoveCommands(params ICommand [ ] commands) {
+            this.Log ($"Removing commands: {commands.Select (x => x.Name).ToArray ().Singlify ()}");
             ((ICommandSet)commandRoot).RemoveCommands (commands);
         }
     }

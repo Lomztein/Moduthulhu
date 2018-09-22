@@ -1,7 +1,7 @@
 ﻿using Discord.WebSocket;
 using Lomztein.AdvDiscordCommands.Framework;
 using Lomztein.AdvDiscordCommands.Framework.Interfaces;
-using Lomztein.Moduthulhu.Modules.CommandRoot;
+using Lomztein.Moduthulhu.Modules.Command;
 using Lomztein.Moduthulhu.Modules.CustomCommands.Categories;
 using Lomztein.Moduthulhu.Modules.Voice.Extensions;
 using System;

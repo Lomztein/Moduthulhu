@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Lomztein.Moduthulhu.Cross;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -10,10 +11,10 @@ namespace Lomztein.Moduthulhu.Core.IO
     /// </summary>
     public static class DataSerialization
     {
-        public static string dataDirPath = AppContext.BaseDirectory + "Data/";
+        public static string DataPath => AppContext.BaseDirectory + "Data/";
 
         public static void SerializeData (object obj, string relativePath) {
-            JSONSerialization.SerializeObject (obj, dataDirPath + relativePath);
+            JSONSerialization.SerializeObject (obj, DataPath + relativePath);
         }
 
         public static T DeserializeData<T> (string relativePath) {
@@ -21,7 +22,7 @@ namespace Lomztein.Moduthulhu.Core.IO
         }
 
         public static T DeserializeData<T>(string relativePath, JsonSerializerSettings settings) {
-            return JSONSerialization.DeserializeFile<T> (dataDirPath + relativePath, settings);
+            return JSONSerialization.DeserializeFile<T> (DataPath + relativePath, settings);
         }
     }
 }

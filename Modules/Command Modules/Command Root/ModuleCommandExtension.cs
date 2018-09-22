@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Lomztein.Moduthulhu.Modules.CommandRoot
+namespace Lomztein.Moduthulhu.Modules.Command
 {
     public interface IModuleCommand<T> {
 
@@ -12,7 +12,7 @@ namespace Lomztein.Moduthulhu.Modules.CommandRoot
 
     }
 
-    public class ModuleCommand<T> : Command, IModuleCommand<T> where T : IModule {
+    public class ModuleCommand<T> : AdvDiscordCommands.Framework.Command, IModuleCommand<T> where T : IModule {
 
         public T ParentModule { get; set; }
 
@@ -23,7 +23,7 @@ namespace Lomztein.Moduthulhu.Modules.CommandRoot
         public T ParentModule { get; set; }
 
         public override void Initialize() {
-            foreach (Command cmd in commandsInSet) {
+            foreach (AdvDiscordCommands.Framework.Command cmd in commandsInSet) {
                 (cmd as ModuleCommand<T>).ParentModule = ParentModule;
             }
             base.Initialize ();

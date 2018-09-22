@@ -1,10 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 
-namespace Core.IO
+namespace Cross
 {
-    class Encryption
+    public static class CrossUtility
     {
+        
+
+
     }
 }

@@ -18,11 +18,11 @@ namespace Lomztein.Moduthulhu.Modules.Meta
 
         public override void Initialize() {
             moduleCommands.ParentModule = this;
-            ParentModuleHandler.GetModule<CommandRoot.CommandRootModule> ().commandRoot.AddCommands (moduleCommands);
+            ParentModuleHandler.GetModule<Command.CommandRootModule> ().commandRoot.AddCommands (moduleCommands);
         }
 
         public override void Shutdown() {
-            ParentModuleHandler.GetModule<CommandRoot.CommandRootModule> ().commandRoot.RemoveCommands (moduleCommands);
+            ParentModuleHandler.GetModule<Command.CommandRootModule> ().commandRoot.RemoveCommands (moduleCommands);
         }
 
     }

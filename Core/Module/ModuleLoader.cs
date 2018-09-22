@@ -11,12 +11,16 @@ using Lomztein.Moduthulhu.Core.Configuration;
 using Lomztein.Moduthulhu.Core.IO;
 using System.Linq;
 using Discord.WebSocket;
+using Lomztein.Moduthulhu.Cross;
 
 namespace Lomztein.Moduthulhu.Core.Module
 {
-    public class ModuleHandler {
+    public class ModuleLoader {
 
         // This class could use a refactoring, it's gotten a bit messy.
+        // TODO: Create a proper dependancy tree and order initialization based on that, as well as allowing for better on-the-fly swapping.
+        // TODO: Figure out much more robust error handling for modules.
+        // TODO: Rework the flow of this class in order to be much cleaner.
 
         public readonly string baseDirectory = AppContext.BaseDirectory + "/Modules/";
 
@@ -26,11 +30,12 @@ namespace Lomztein.Moduthulhu.Core.Module
 
         private Dictionary<string, bool> moduleEnableCache;
 
-        private BotClient parentClient;
+        private Bot.Core parentClient;
 
-        public ModuleHandler (BotClient _client, string _baseDirectoy) {
+        public ModuleLoader (Bot.Core _client, string _baseDirectoy) {
             parentClient = _client;
             baseDirectory = _baseDirectoy;
+            Status.Set ("ModulesPath", baseDirectory);
             LoadModuleFolder ();
         }
 
@@ -203,7 +208,7 @@ namespace Lomztein.Moduthulhu.Core.Module
         }
 
         public void AutoConfigureModules () {
-            List<SocketGuild> allGuilds = parentClient.discordClient.Guilds.ToList ();
+            List<SocketGuild> allGuilds = parentClient.DiscordClient.Guilds.ToList ();
 
             foreach (IModule module in activeModules) {
                 if (module is IConfigurable configurable) {

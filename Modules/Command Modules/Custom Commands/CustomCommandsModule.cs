@@ -4,9 +4,10 @@ using Lomztein.AdvDiscordCommands.Framework;
 using Lomztein.AdvDiscordCommands.Framework.Interfaces;
 using Lomztein.Moduthulhu.Core.IO;
 using Lomztein.Moduthulhu.Core.Module.Framework;
-using Lomztein.Moduthulhu.Modules.CommandRoot;
+using Lomztein.Moduthulhu.Modules.Command;
 using Lomztein.Moduthulhu.Modules.CustomCommands.Commands;
 using Lomztein.Moduthulhu.Modules.CustomCommands.Data;
+using Lomztein.Moduthulhu.Modules.CustomCommands.IO;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -25,8 +26,7 @@ namespace Lomztein.Moduthulhu.Modules.CustomCommands
 
         public override bool Multiserver => true;
 
-        public List<CustomSetData> customCommandData = new List<CustomSetData> ();
-        public List<CustomCommandSet> customSets = new List<CustomCommandSet> ();
+        public List<ICustomCommand> customCommands = new List<ICustomCommand> ();
 
         private CustomCommandCommands customCommandCommands;
         private CommandRootModule commandRootModule;
@@ -40,25 +40,15 @@ namespace Lomztein.Moduthulhu.Modules.CustomCommands
 
         public override void Shutdown() {
             ParentModuleHandler.GetModule<CommandRootModule> ().RemoveCommands (customCommandCommands);
-            commandRootModule.RemoveCommands (customSets.ToArray ());
+            commandRootModule.RemoveCommands (customCommands.ToArray ());
         }
 
         public void LoadData() {
-            commandRootModule.RemoveCommands (customSets.ToArray ()); // Just in case we need to reload data at some point.
-            customCommandData = DataSerialization.DeserializeData<List<CustomSetData>> (customCommandFileName);
-            foreach (var set in customCommandData) {
-                customSets.Add (set.CreateFrom () as CustomCommandSet);
-            }
-            commandRootModule.AddCommands (customSets.ToArray ());
+            AddCommands (CustomCommandIO.LoadAll (CustomCommandIO.DataPath));
         }
 
         public void SaveData () {
-            customCommandData = new List<CustomSetData> ();
-            foreach (var cmd in customSets) {
-                CustomSetData data = cmd.SaveToData () as CustomSetData;
-                customCommandData.Add (data);
-            }
-            DataSerialization.SerializeData (customCommandData, customCommandFileName);
+            CustomCommandIO.SaveAll (customCommands.ToArray (), CustomCommandIO.DataPath);
         }
 
         public static CustomCommand CreateCommand (string name, string description, IUser author, CommandAccessability accessability, string commandChain) {
@@ -76,9 +66,13 @@ namespace Lomztein.Moduthulhu.Modules.CustomCommands
             return commandSet;
         }
 
-        public void AddSetToList(CustomCommandSet set) => customSets.Add (set);
+        public void AddCommands(params ICustomCommand[] commands) {
+            customCommands.AddRange (commands);
+            ParentModuleHandler.GetModule<CommandRootModule> ().AddCommands (commands);
+            SaveData ();
+        }
 
-        private static void SetCommandData (Command command, string name, string description, IUser author, CommandAccessability accessability) {
+        private static void SetCommandData (AdvDiscordCommands.Framework.Command command, string name, string description, IUser author, CommandAccessability accessability) {
 
             command.Description = description;
             command.Name = name;

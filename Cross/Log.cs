@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Lomztein.Moduthulhu.Core.Bot
+namespace Lomztein.Moduthulhu.Cross
 {
     public static class Log
     {
         public enum Type { SYSTEM, BOT, MODULE, CONFIG, CHAT, CHANNEL, SERVER, USER, WARNING, EXCEPTION, CRITICAL }
-        private static ConsoleColor [ ] typeColor = new ConsoleColor[] {
+        public static ConsoleColor[] TypeColor { get; private set; } = new ConsoleColor[] {
 
             ConsoleColor.Blue, // SYSTEM
             ConsoleColor.Cyan, // BOT
@@ -23,11 +23,15 @@ namespace Lomztein.Moduthulhu.Core.Bot
             ConsoleColor.DarkRed, // EXCEPTION
             ConsoleColor.Red // CRITICAL
         };
-        
-        public static void Write (Type type, string text) {
-            Console.ForegroundColor = typeColor [ (int)type ];
-            Console.WriteLine ($"[{type.ToString ()}] - [{DateTime.Now.ToString ()}] {text}");
+
+        public static void Write(ConsoleColor color, string prefix, string text) {
+            Console.ForegroundColor = color;
+            Console.WriteLine ($"[{prefix}] - [{DateTime.Now.ToString ()}] {text}");
             Console.ResetColor ();
+        }
+
+        public static void Write (Type type, string text) {
+            Write (TypeColor[(int)type], type.ToString (), text);
         }
 
         public static void Write (Exception exception) {
@@ -36,6 +40,10 @@ namespace Lomztein.Moduthulhu.Core.Bot
 
         public static void Write(string text) {
             Write (Type.BOT, text);
+        }
+
+        public static ConsoleColor GetColor (Type type) {
+            return TypeColor[(int)type];
         }
     }
 }

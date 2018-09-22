@@ -1,5 +1,5 @@
 ﻿using Lomztein.AdvDiscordCommands.Framework;
-using Lomztein.Moduthulhu.Modules.CommandRoot;
+using Lomztein.Moduthulhu.Modules.Command;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Discord;
 using Lomztein.Moduthulhu.Modules.CustomCommands.Data;
 using Lomztein.AdvDiscordCommands.Framework.Categories;
+using Lomztein.AdvDiscordCommands.Extensions;
 
 namespace Lomztein.Moduthulhu.Modules.CustomCommands
 {

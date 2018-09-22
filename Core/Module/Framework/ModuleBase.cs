@@ -18,8 +18,8 @@ namespace Lomztein.Moduthulhu.Core.Module.Framework
 
         public virtual string [ ] RequiredModules { get; } = new string [ 0 ];
 
-        public ModuleHandler ParentModuleHandler { get; set; }
-        public BotClient ParentBotClient { get; set; }
+        public ModuleLoader ParentModuleHandler { get; set; }
+        public Core ParentBotClient { get; set; }
 
         public abstract void Initialize ();
 

@@ -11,9 +11,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Lomztein.Moduthulhu.Modules.CommandRoot;
+using Lomztein.Moduthulhu.Modules.Command;
 using Lomztein.AdvDiscordCommands.Framework;
 using Lomztein.AdvDiscordCommands.Framework.Categories;
+using Lomztein.Moduthulhu.Cross;
 
 namespace Lomztein.Moduthulhu.Modules.Clock.Birthday
 {

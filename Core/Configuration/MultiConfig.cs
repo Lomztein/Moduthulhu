@@ -2,6 +2,7 @@
 using Discord.WebSocket;
 using Lomztein.Moduthulhu.Core.Bot;
 using Lomztein.Moduthulhu.Core.IO;
+using Lomztein.Moduthulhu.Cross;
 using System;
 using System.Collections.Generic;
 using System.IO;

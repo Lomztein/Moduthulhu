@@ -6,7 +6,7 @@ using System.Text;
 using Lomztein.AdvDiscordCommands.Framework;
 using Lomztein.AdvDiscordCommands.Extensions;
 
-namespace Lomztein.Moduthulhu.Modules.CommandRoot
+namespace Lomztein.Moduthulhu.Modules.Command
 {
     public class StandardCommandsModule : ModuleBase {
 
@@ -18,7 +18,7 @@ namespace Lomztein.Moduthulhu.Modules.CommandRoot
 
         public override string [ ] RequiredModules { get => new string [ ] { "Lomztein_Command Root" }; }
 
-        private Command [ ] commands = new Command [ ] {
+        private AdvDiscordCommands.Framework.Command [ ] commands = new AdvDiscordCommands.Framework.Command [ ] {
                 new HelpCommand (),
                 new DiscordCommandSet (),
                 new FlowCommandSet (),

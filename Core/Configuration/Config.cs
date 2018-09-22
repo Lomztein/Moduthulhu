@@ -1,4 +1,4 @@
-﻿using Lomztein.Moduthulhu.Core.Bot;
+﻿using Lomztein.Moduthulhu.Cross;
 using Lomztein.Moduthulhu.Core.IO;
 using Newtonsoft.Json;
 using System;

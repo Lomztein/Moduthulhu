@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
 using Lomztein.Moduthulhu.Modules.Misc.Shipping.Commands;
-using Lomztein.Moduthulhu.Modules.CommandRoot;
+using Lomztein.Moduthulhu.Modules.Command;
 using Lomztein.AdvDiscordCommands.Extensions;
 
 namespace Lomztein.Moduthulhu.Modules.Misc.Shipping {

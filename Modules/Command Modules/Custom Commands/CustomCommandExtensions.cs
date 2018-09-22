@@ -37,6 +37,7 @@ namespace Lomztein.Moduthulhu.Modules.CustomCommands
             commandData.accessability = command.Accessability;
             commandData.ownerID = command.OwnerID;
             commandData.name = command.Name;
+            commandData.description = command.Description;
         }
 
         public static bool ContainsCommandByName (this ICommandSet commandSet, string name) {

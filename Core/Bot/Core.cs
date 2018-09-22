@@ -7,23 +7,31 @@ using System.IO;
 using System.Threading;
 using System.Linq;
 using System.Collections.Generic;
+using Lomztein.Moduthulhu.Cross;
 
 namespace Lomztein.Moduthulhu.Core.Bot {
 
     /// <summary>
     /// A wrapper for the Discord.NET DiscordClient.
     /// </summary>
-    public class BotClient : IDiscordClient {
+    public class Core : IDiscordClient {
+
+        // TODO: Split BotClient into a Core class and a IClientWrapper interface.
+        // TODO: Move the Clock systems into the main Core area.
+        // TODO: Allow for on-the-fly changing of avatar/username
+        // TODO: Allow for sending bot-wide messages directly in console.
 
         public TimeSpan Uptime { get => DateTime.Now - BootDate; }
         public DateTime BootDate { get; private set; }
 
-        public DiscordSocketClient discordClient;
-        private ModuleHandler moduleHandler;
+        public DiscordSocketClient DiscordClient { get; private set; }
+        public ModuleLoader ModuleLoader { get; private set; }
 
-        private string token;
+        private string Token { get => File.ReadAllLines (BaseDirectory + "/token.txt")[0]; }
 
-        public string baseDirectory = AppContext.BaseDirectory;
+        public string BaseDirectory { get => AppContext.BaseDirectory; }
+        public string AvatarPath { get => BaseDirectory + "avatar.png"; }
+        public string UsernamePath { get => BaseDirectory + "username.txt"; }
 
         private DiscordSocketConfig socketConfig = new DiscordSocketConfig () {
             DefaultRetryMode = RetryMode.AlwaysRetry,
@@ -42,31 +50,46 @@ namespace Lomztein.Moduthulhu.Core.Bot {
         }
 
         private async Task Connect () {
-            token = File.ReadAllText (baseDirectory + "/token.txt");
-
             Log.Write (Log.Type.BOT, "Initializing bot client!");
-            discordClient = new DiscordSocketClient (socketConfig);
+            DiscordClient = new DiscordSocketClient (socketConfig);
             Log.Write (Log.Type.BOT, "Logging in!");
-            await discordClient.LoginAsync (TokenType.Bot, token);
-            await discordClient.StartAsync ();
+            await DiscordClient.LoginAsync (TokenType.Bot, Token);
+            await DiscordClient.StartAsync ();
         }
 
         private void Initialize () {
             InitializeListeners ();
-            moduleHandler = new ModuleHandler (this, baseDirectory + "/Modules/");
+            Status.Set ("CorePath", BaseDirectory);
+            ModuleLoader = new ModuleLoader (this, BaseDirectory + "/Modules/");
         }
         
         private void InitializeListeners () {
-            discordClient.Disconnected += OnDisconnected;
-            discordClient.JoinedGuild += OnJoinedGuild;
-            discordClient.Connected += OnConnected;
-            discordClient.Ready += OnReady;
-            discordClient.Log += OnLog;
+            DiscordClient.Disconnected += OnDisconnected;
+            DiscordClient.JoinedGuild += OnJoinedGuild;
+            DiscordClient.Connected += OnConnected;
+            DiscordClient.Ready += OnReady;
+            DiscordClient.Log += OnLog;
         }
 
         private Task OnJoinedGuild(SocketGuild arg) {
-            moduleHandler.AutoConfigureModules (); // Reload configuration when joined a new server.
+            ModuleLoader.AutoConfigureModules (); // Reload configuration when joined a new server.
             return Task.CompletedTask;
+        }
+
+        private void ModifyUserOnLaunch () {
+            if (File.Exists (AvatarPath))
+                SetAvatar (AvatarPath);
+            if (File.Exists (UsernamePath))
+                SetUsername (File.ReadAllLines (UsernamePath)[0]);
+        }
+
+        public void SetAvatar (string filePath) {
+            Image image = new Image (filePath);
+            DiscordClient.CurrentUser.ModifyAsync (x => x.Avatar = image );
+        }
+
+        public void SetUsername (string username) {
+            DiscordClient.CurrentUser.ModifyAsync (x => x.Username = username);
         }
 
         private Task OnLog(LogMessage log) {
@@ -88,13 +111,13 @@ namespace Lomztein.Moduthulhu.Core.Bot {
         }
 
         public void UpdateUptimeDisplay () {
-            discordClient.SetGameAsync ("Current uptime: " + Math.Floor (Uptime.TotalDays) + " days.");
+            DiscordClient.SetGameAsync ("Current uptime: " + Math.Floor (Uptime.TotalDays) + " days.");
         }
 
         private async Task Disconnect () {
-            await discordClient.LogoutAsync ();
-            discordClient.Dispose ();
-            moduleHandler.ShutdownAllModules ();
+            await DiscordClient.LogoutAsync ();
+            DiscordClient.Dispose ();
+            ModuleLoader.ShutdownAllModules ();
             isReady = false;
         }
 
@@ -115,17 +138,17 @@ namespace Lomztein.Moduthulhu.Core.Bot {
         public bool IsMultiserver () {
             if (!isReady)
                 throw new InvalidOperationException ("Cannot call IsMultiserver before bot is fully booted and connected.");
-            return discordClient.Guilds.Count != 1;
+            return DiscordClient.Guilds.Count != 1;
         }
 
         public SocketGuild GetGuild () {
             if (IsMultiserver ())
                 throw new InvalidOperationException ("You shouldn't request a guild without ID from a multiserver bot.");
-            return discordClient.Guilds.FirstOrDefault ();
+            return DiscordClient.Guilds.FirstOrDefault ();
         }
 
         public SocketGuild GetGuild (ulong id) {
-            return discordClient.GetGuild (id);
+            return DiscordClient.GetGuild (id);
         }
 
         public SocketGuildUser GetUser (ulong id) {
@@ -169,82 +192,82 @@ namespace Lomztein.Moduthulhu.Core.Bot {
         }
 
         // Implement wrappers for the internal discord client.
-        public ConnectionState ConnectionState => ((IDiscordClient)discordClient).ConnectionState;
+        public ConnectionState ConnectionState => ((IDiscordClient)DiscordClient).ConnectionState;
 
-        public ISelfUser CurrentUser => ((IDiscordClient)discordClient).CurrentUser;
+        public ISelfUser CurrentUser => ((IDiscordClient)DiscordClient).CurrentUser;
 
-        public TokenType TokenType => ((IDiscordClient)discordClient).TokenType;
+        public TokenType TokenType => ((IDiscordClient)DiscordClient).TokenType;
 
         public Task StartAsync() {
-            return ((IDiscordClient)discordClient).StartAsync ();
+            return ((IDiscordClient)DiscordClient).StartAsync ();
         }
 
         public Task StopAsync() {
-            return ((IDiscordClient)discordClient).StopAsync ();
+            return ((IDiscordClient)DiscordClient).StopAsync ();
         }
 
         public Task<IApplication> GetApplicationInfoAsync(RequestOptions options = null) {
-            return ((IDiscordClient)discordClient).GetApplicationInfoAsync (options);
+            return ((IDiscordClient)DiscordClient).GetApplicationInfoAsync (options);
         }
 
         public Task<IChannel> GetChannelAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null) {
-            return ((IDiscordClient)discordClient).GetChannelAsync (id, mode, options);
+            return ((IDiscordClient)DiscordClient).GetChannelAsync (id, mode, options);
         }
 
         public Task<IReadOnlyCollection<IPrivateChannel>> GetPrivateChannelsAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null) {
-            return ((IDiscordClient)discordClient).GetPrivateChannelsAsync (mode, options);
+            return ((IDiscordClient)DiscordClient).GetPrivateChannelsAsync (mode, options);
         }
 
         public Task<IReadOnlyCollection<IDMChannel>> GetDMChannelsAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null) {
-            return ((IDiscordClient)discordClient).GetDMChannelsAsync (mode, options);
+            return ((IDiscordClient)DiscordClient).GetDMChannelsAsync (mode, options);
         }
 
         public Task<IReadOnlyCollection<IGroupChannel>> GetGroupChannelsAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null) {
-            return ((IDiscordClient)discordClient).GetGroupChannelsAsync (mode, options);
+            return ((IDiscordClient)DiscordClient).GetGroupChannelsAsync (mode, options);
         }
 
         public Task<IReadOnlyCollection<IConnection>> GetConnectionsAsync(RequestOptions options = null) {
-            return ((IDiscordClient)discordClient).GetConnectionsAsync (options);
+            return ((IDiscordClient)DiscordClient).GetConnectionsAsync (options);
         }
 
         public Task<IGuild> GetGuildAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null) {
-            return ((IDiscordClient)discordClient).GetGuildAsync (id, mode, options);
+            return ((IDiscordClient)DiscordClient).GetGuildAsync (id, mode, options);
         }
 
         public Task<IReadOnlyCollection<IGuild>> GetGuildsAsync(CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null) {
-            return ((IDiscordClient)discordClient).GetGuildsAsync (mode, options);
+            return ((IDiscordClient)DiscordClient).GetGuildsAsync (mode, options);
         }
 
         public Task<IGuild> CreateGuildAsync(string name, IVoiceRegion region, Stream jpegIcon = null, RequestOptions options = null) {
-            return ((IDiscordClient)discordClient).CreateGuildAsync (name, region, jpegIcon, options);
+            return ((IDiscordClient)DiscordClient).CreateGuildAsync (name, region, jpegIcon, options);
         }
 
         public Task<IInvite> GetInviteAsync(string inviteId, RequestOptions options = null) {
-            return ((IDiscordClient)discordClient).GetInviteAsync (inviteId, options);
+            return ((IDiscordClient)DiscordClient).GetInviteAsync (inviteId, options);
         }
 
         public Task<IUser> GetUserAsync(ulong id, CacheMode mode = CacheMode.AllowDownload, RequestOptions options = null) {
-            return ((IDiscordClient)discordClient).GetUserAsync (id, mode, options);
+            return ((IDiscordClient)DiscordClient).GetUserAsync (id, mode, options);
         }
 
         public Task<IUser> GetUserAsync(string username, string discriminator, RequestOptions options = null) {
-            return ((IDiscordClient)discordClient).GetUserAsync (username, discriminator, options);
+            return ((IDiscordClient)DiscordClient).GetUserAsync (username, discriminator, options);
         }
 
         public Task<IReadOnlyCollection<IVoiceRegion>> GetVoiceRegionsAsync(RequestOptions options = null) {
-            return ((IDiscordClient)discordClient).GetVoiceRegionsAsync (options);
+            return ((IDiscordClient)DiscordClient).GetVoiceRegionsAsync (options);
         }
 
         public Task<IVoiceRegion> GetVoiceRegionAsync(string id, RequestOptions options = null) {
-            return ((IDiscordClient)discordClient).GetVoiceRegionAsync (id, options);
+            return ((IDiscordClient)DiscordClient).GetVoiceRegionAsync (id, options);
         }
 
         public Task<IWebhook> GetWebhookAsync(ulong id, RequestOptions options = null) {
-            return ((IDiscordClient)discordClient).GetWebhookAsync (id, options);
+            return ((IDiscordClient)DiscordClient).GetWebhookAsync (id, options);
         }
 
         public void Dispose() {
-            ((IDiscordClient)discordClient).Dispose ();
+            ((IDiscordClient)DiscordClient).Dispose ();
         }
         // Wrappers' done ya'll.
     }

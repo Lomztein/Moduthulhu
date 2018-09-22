@@ -1,7 +1,7 @@
 ﻿using Lomztein.AdvDiscordCommands.Framework;
 using Lomztein.AdvDiscordCommands.Framework.Categories;
 using Lomztein.Moduthulhu.Core.Module.Framework;
-using Lomztein.Moduthulhu.Modules.CommandRoot;
+using Lomztein.Moduthulhu.Modules.Command;
 using System;
 using System.Collections.Generic;
 using System.Text;

@@ -12,10 +12,14 @@ namespace Lomztein.Moduthulhu.Core.Bot.Messaging
     public static class MessageControl
     {
         public static async Task<IUserMessage> SendMessage(ITextChannel channel, string text, bool isTTS = false, Embed embed = null) {
-            if (text == null)
+
+            if (text == null) {
                 text = "";
-            if (string.IsNullOrWhiteSpace (text) && embed == null)
+            }
+
+            if (string.IsNullOrWhiteSpace (text) && embed == null) {
                 return null;
+            }
 
             return await channel.SendMessageAsync (text, isTTS, embed);
         }

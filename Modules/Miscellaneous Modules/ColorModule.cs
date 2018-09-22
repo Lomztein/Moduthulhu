@@ -3,7 +3,7 @@ using Lomztein.AdvDiscordCommands.Extensions;
 using Lomztein.AdvDiscordCommands.Framework;
 using Lomztein.Moduthulhu.Core.Configuration;
 using Lomztein.Moduthulhu.Core.Module.Framework;
-using Lomztein.Moduthulhu.Modules.CommandRoot;
+using Lomztein.Moduthulhu.Modules.Command;
 using System;
 using System.Collections.Generic;
 using System.Linq;

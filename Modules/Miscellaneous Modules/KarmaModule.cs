@@ -4,7 +4,7 @@ using Lomztein.Moduthulhu.Core.Configuration;
 using Lomztein.Moduthulhu.Core.Extensions;
 using Lomztein.Moduthulhu.Core.IO;
 using Lomztein.Moduthulhu.Core.Module.Framework;
-using Lomztein.Moduthulhu.Modules.CommandRoot;
+using Lomztein.Moduthulhu.Modules.Command;
 using Lomztein.Moduthulhu.Modules.Misc.Karma.Commands;
 using Newtonsoft.Json;
 using System;

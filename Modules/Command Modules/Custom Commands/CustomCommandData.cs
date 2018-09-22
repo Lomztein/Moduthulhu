@@ -19,7 +19,7 @@ namespace Lomztein.Moduthulhu.Modules.CustomCommands.Data
             command.OwnerID = ownerID;
             command.Accessability = accessability;
 
-            if (command is Command cmd) {
+            if (command is AdvDiscordCommands.Framework.Command cmd) {
                 cmd.Name = name;
                 cmd.Description = description;
             }
@@ -44,22 +44,9 @@ namespace Lomztein.Moduthulhu.Modules.CustomCommands.Data
 
     public class CustomSetData : CustomCommandData {
 
-        // The only limitation to nested sets currently, is deserialization of the data. I can't quite figure it out right now,
-        // so I've constricted it to only allow a single layer sets. I doubt multiple-layer sets would be used much regardless, 
-        // but I'd still like to figure it out at some point in the future. For now, this will do.
-        public List<CustomChainData> nestedCommands = new List<CustomChainData> ();
-
         public override ICustomCommand CreateFrom() {
             CustomCommandSet newSet = new CustomCommandSet ();
             ApplyTo (newSet);
-
-            List<ICustomCommand> newCommands = new List<ICustomCommand> ();
-            foreach (var nested in nestedCommands) {
-                ICustomCommand cmd = nested.CreateFrom ();
-                newCommands.Add (cmd);
-            }
-
-            newSet.AddCommands (newCommands.Cast<Command>().ToArray ());
             return newSet;
         }
 

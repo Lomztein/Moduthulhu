@@ -11,6 +11,7 @@ using Lomztein.Moduthulhu.Core.IO;
 using Lomztein.AdvDiscordCommands.Extensions;
 using Lomztein.Moduthulhu.Core.Bot;
 using Discord.Rest;
+using Lomztein.Moduthulhu.Cross;
 
 namespace Lomztein.Moduthulhu.Modules.Clock.ActivityMonitor
 {
