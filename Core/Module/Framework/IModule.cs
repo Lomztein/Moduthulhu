@@ -1,4 +1,5 @@
 ﻿using Lomztein.Moduthulhu.Core.Bot;
+using Lomztein.Moduthulhu.Core.Bot.Client.Sharding;
 using Lomztein.Moduthulhu.Core.Configuration;
 using System;
 using System.Collections.Generic;
@@ -44,14 +45,14 @@ namespace Lomztein.Moduthulhu.Core.Module.Framework
         string [ ] RequiredModules { get; }
 
         /// <summary>
-        /// The module handler that loaded and contains this module. Is set by the module handler.
+        /// The module handler that contains this module. Is set when the module is created.
         /// </summary>
-        ModuleLoader ParentModuleHandler { get; set; }
+        ModuleContainer ParentContainer { get; set; }
 
         /// <summary>
-        /// The bot client that parents the module handler that loaded this module. Is set by the module handler.
+        /// The bot client that parents the module handler that loaded this module. Is set when the module is created.
         /// </summary>
-        Bot.Core ParentBotClient { get; set; }
+        Shard ParentShard { get; set; }
 
         /// <summary>
         /// This runs before the bot has been fully connected and config automatically loaded. Use this for anything that can modify your configuration needs, or if you're providing framework for other modules.
@@ -69,7 +70,7 @@ namespace Lomztein.Moduthulhu.Core.Module.Framework
         void PostInitialize();
 
         /// <summary>
-        /// This is called if the module is shut down for whatever reason. Use this to undo changes you might have done to the BotClient or other modules.
+        /// This is called if the module is shut down for whatever reason. Use this to undo changes you might have done to the Core or other modules.
         /// </summary>
         void Shutdown();
     }

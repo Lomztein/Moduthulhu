@@ -24,11 +24,9 @@ namespace Lomztein.Moduthulhu.Core.Bot {
 
         public DateTime BootDate { get; private set; }
 
-        public ClientManager ClientManager { get; private set; }
-        public ModuleLoader ModuleLoader { get; private set; }
-        public Clock.Clock Clock { get; private set; }
-
-        private string Token { get => File.ReadAllLines (BaseDirectory + "/token.txt")[0]; }
+        internal ClientManager ClientManager { get; private set; }
+        internal ModuleLoader ModuleLoader { get; private set; }
+        internal Clock.Clock Clock { get; private set; }
 
         public string BaseDirectory { get => AppContext.BaseDirectory; }
 
@@ -36,12 +34,14 @@ namespace Lomztein.Moduthulhu.Core.Bot {
             DefaultRetryMode = RetryMode.AlwaysRetry,
         };
 
-        public async Task InitializeCore() {
+        public async Task InitializeCore () {
             BootDate = DateTime.Now;
 
             ClientManager = new ClientManager (this);
             ModuleLoader = new ModuleLoader (this);
             Clock = new Clock.Clock (1);
+
+            ClientManager.InitializeClients ();
 
             await Task.Delay (-1);
             Log.Write (Log.Type.BOT, "Shutting down..");

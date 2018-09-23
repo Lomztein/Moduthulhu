@@ -4,40 +4,58 @@ using System.Collections.Generic;
 using System.Text;
 using Lomztein.Moduthulhu.Core.Bot.Client.Sharding;
 using Lomztein.Moduthulhu.Cross;
+using System.IO;
+using System.Threading.Tasks;
 
 namespace Lomztein.Moduthulhu.Core.Bot.Client
 {
     public class BotClient
     {
+        //internal const int GUILDS_PER_SHARD = 2000;
         internal ClientManager ClientManager { get; private set; }
         internal Core Core { get => ClientManager.Core; }
         public TimeSpan Uptime { get => DateTime.Now - Core.BootDate; }
 
         public string Name { get; private set; }
-        private string Token { get; set; }
+        internal string Token { get; set; }
 
-        internal List<Shard> ActiveShards { get; private set; }
-        public int ActiveShardsCount { get => ActiveShards.Count; }
-        public int TotalShards { get; private set; }
+        public string BaseDirectory { get => ClientManager.ClientsDirectory + "\\" + Name + "\\"; }
 
-        internal BotClient (ClientManager clientManager, string token, string name) {
-            Log.Write (Log.Type.BOT, "Creating bot client " + name + " with token " + Token);
+        internal Shard[] Shards { get; private set; }
+        public int TotalShards { get; private set; } = 1;
+
+        internal BotClient (ClientManager clientManager, string name) {
+
             ClientManager = clientManager;
-            Token = token;
+
             Name = name;
+            Token = File.ReadAllLines (BaseDirectory + "token.txt")[0];
+
+            Shards = new Shard[TotalShards];
+
+            Log.Write (Log.Type.BOT, "Creating bot client " + Name + " with token " + Token);
         }
 
-        internal void Kill () {
-            throw new NotImplementedException ();
+        internal void InitializeShards () {
+
+            for (int i = 0; i < TotalShards; i++) {
+                Shards[i] = SpawnShard (i);
+            }
+
+            foreach (Shard shard in Shards) {
+                shard.Initialize ();
+            }    
+
+        }
+
+        internal async Task Kill () {
+            foreach (Shard shard in Shards) {
+                await shard.Kill ();
+            }
         }
 
         internal Shard SpawnShard (int shardId) {
-
-            if (ActiveShards.Count == TotalShards - 1)
-                throw new InvalidOperationException ("Spawning another shard would exceed the shard amount of this client.");
-
             Shard shard = new Shard (this, shardId);
-            ActiveShards.Add (shard);
             return shard;
         }
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Lomztein.Moduthulhu.Core.Bot;
 using Lomztein.Moduthulhu.Core.Configuration;
+using Lomztein.Moduthulhu.Core.Bot.Client.Sharding;
 
 namespace Lomztein.Moduthulhu.Core.Module.Framework
 {
@@ -18,8 +19,8 @@ namespace Lomztein.Moduthulhu.Core.Module.Framework
 
         public virtual string [ ] RequiredModules { get; } = new string [ 0 ];
 
-        public ModuleLoader ParentModuleHandler { get; set; }
-        public Core ParentBotClient { get; set; }
+        public ModuleContainer ParentContainer { get; set; }
+        public Shard ParentShard { get; set; }
 
         public abstract void Initialize ();
 

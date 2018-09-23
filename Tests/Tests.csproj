@@ -14,7 +14,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Core\Core.csproj" />
-    <ProjectReference Include="..\Modules\Modules.csproj" />
   </ItemGroup>
 
   <ItemGroup>
