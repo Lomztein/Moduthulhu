@@ -51,7 +51,7 @@ namespace Lomztein.Moduthulhu.Core.Module.Framework
         /// <summary>
         /// The bot client that parents the module handler that loaded this module. Is set by the module handler.
         /// </summary>
-        Core ParentBotClient { get; set; }
+        Bot.Core ParentBotClient { get; set; }
 
         /// <summary>
         /// This runs before the bot has been fully connected and config automatically loaded. Use this for anything that can modify your configuration needs, or if you're providing framework for other modules.

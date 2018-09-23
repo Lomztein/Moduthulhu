@@ -6,24 +6,16 @@ using System.Threading;
 using Lomztein.Moduthulhu.Core.Extensions;
 using Discord.WebSocket;
 
-namespace Lomztein.Moduthulhu.Modules.Clock
+namespace Lomztein.Moduthulhu.Core.Clock
 {
-    public class ClockModule : ModuleBase, IConfigurable<SingleConfig>
+    public class Clock
     {
-        public override string Name => "Clock Module";
-        public override string Description => "Base module for handling objects that need to update automatically.";
-        public override string Author => "Lomztein";
+        private List<ITickable> Tickables { get; set; } = new List<ITickable> ();
+        private Thread ClockThread { get; set; }
 
-        public override bool Multiserver => true;
-
-        private List<ITickable> tickables = new List<ITickable> ();
-        [AutoConfig] private SingleEntry<int, SocketGuild> tickFrequency = new SingleEntry<int, SocketGuild> (x => 1, "TickFrequency", false);
-        private bool running;
-
-        public SingleConfig Configuration { get; set; } = new SingleConfig ();
-        private Thread clockThread;
-
-        private DateTime lastTick;
+        private DateTime LastTick { get; set; }
+        private bool IsRunning { get; set; }
+        private int TickFrequency { get; set; }
 
         public delegate void TickEvent(DateTime currentTick, DateTime lastTick);
 
@@ -33,38 +25,35 @@ namespace Lomztein.Moduthulhu.Modules.Clock
         public event TickEvent OnMonthPassed;
         public event TickEvent OnYearPassed;
 
-        public override void Initialize() {
-            clockThread = new Thread (Run);
-            clockThread.Start ();
-        }
-
-        public override void Shutdown() {
-            Stop ();
-            foreach (ITickable tickable in tickables) {
-                if (tickable is IModule module)
-                    ParentModuleHandler.ShutdownModule (module);
-            }
+        public Clock (int tickFrequency) {
+            TickFrequency = tickFrequency;
+            Start ();
         }
 
         public void AddTickable (ITickable tickable) {
-            tickables.Add (tickable);
+            Tickables.Add (tickable);
         }
 
-        public void Stop() => running = false;
+        public void Stop() => IsRunning = false;
+
+        public void Start () {
+            ClockThread = new Thread (new ThreadStart (Run));
+            ClockThread.Start ();
+        }
 
         private void Run () {
-            int milliseconds = (int)Math.Round (1f / tickFrequency.GetValue ()) * 1000;
-            running = true;
+            int milliseconds = (int)Math.Round (1d / TickFrequency * 1000d);
+            IsRunning = true;
 
-            while (running) {
+            while (IsRunning) {
                 Thread.Sleep (milliseconds);
-                Tick (DateTime.Now, lastTick);
-                lastTick = DateTime.Now;
+                Tick (DateTime.Now, LastTick);
+                LastTick = DateTime.Now;
             }
         }
 
         private void Tick (DateTime curTick, DateTime lTick) {
-            tickables.ForEach (x => x.Tick (lastTick, DateTime.Now));
+            Tickables.ForEach (x => x.Tick (LastTick, DateTime.Now));
 
             if (MinutePassed (curTick, lTick))
                 OnMinutePassed?.Invoke (curTick, lTick);

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Lomztein.Moduthulhu.Modules.Clock
+namespace Lomztein.Moduthulhu.Core.Clock
 {
     public interface ITickable
     {
