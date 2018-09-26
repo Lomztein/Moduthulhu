@@ -27,6 +27,7 @@ namespace Lomztein.Moduthulhu.Core.Bot {
         internal ClientManager ClientManager { get; private set; }
         internal ModuleLoader ModuleLoader { get; private set; }
         internal Clock.Clock Clock { get; private set; }
+        internal ErrorReporter ErrorReporter { get; private set; }
 
         public string BaseDirectory { get => AppContext.BaseDirectory; }
 
@@ -43,9 +44,15 @@ namespace Lomztein.Moduthulhu.Core.Bot {
 
             ClientManager.InitializeClients ();
 
+            ErrorReporter = new ErrorReporter (this, BaseDirectory + "superadmins");
+            ClientManager.OnExceptionCaught += ClientManager_OnExceptionCaught;
+
             await Task.Delay (-1);
             Log.Write (Log.Type.BOT, "Shutting down..");
         }
 
+        private void ClientManager_OnExceptionCaught(Exception obj) {
+            ErrorReporter.ReportError (obj);
+        }
     }
 }

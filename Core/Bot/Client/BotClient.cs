@@ -6,6 +6,8 @@ using Lomztein.Moduthulhu.Core.Bot.Client.Sharding;
 using Lomztein.Moduthulhu.Cross;
 using System.IO;
 using System.Threading.Tasks;
+using Discord.WebSocket;
+using System.Linq;
 
 namespace Lomztein.Moduthulhu.Core.Bot.Client
 {
@@ -23,6 +25,11 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client
 
         internal Shard[] Shards { get; private set; }
         public int TotalShards { get; private set; } = 1;
+        public IEnumerable<SocketGuild> AllGuilds { get => Shards.SelectMany (x => x.Guilds); }
+
+        public event Action<Shard> OnShardSpawned;
+        public event Action<Shard> OnShardKilled;
+        public event Action<Exception> OnExceptionCaught;
 
         internal BotClient (ClientManager clientManager, string name) {
 
@@ -42,20 +49,30 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client
                 Shards[i] = SpawnShard (i);
             }
 
-            foreach (Shard shard in Shards) {
-                shard.Initialize ();
-            }    
-
         }
 
         internal async Task Kill () {
             foreach (Shard shard in Shards) {
-                await shard.Kill ();
+                await KillShard (shard);
             }
+        }
+
+        internal async Task KillShard (Shard shard) {
+            await shard.Kill ();
+            OnShardKilled?.Invoke (shard);
+        }
+
+        internal async Task RestartShard (Shard shard) {
+            int id = shard.ShardId;
+            await KillShard (shard);
+            SpawnShard (id);
         }
 
         internal Shard SpawnShard (int shardId) {
             Shard shard = new Shard (this, shardId);
+            shard.Initialize ();
+            OnShardSpawned?.Invoke (shard);
+            shard.OnExceptionCaught += OnExceptionCaught;
             return shard;
         }
 
