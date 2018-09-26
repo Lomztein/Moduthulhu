@@ -18,32 +18,9 @@ namespace Lomztein.Moduthulhu.Core.Extensions
             return (split[1], split[0]);
         }
 
-        public static void ModuleLog(IModule module, string text) {
-            Cross.Log.Write (Cross.Log.GetColor (Cross.Log.Type.MODULE), module.CompactizeName (), text);
-        }
-
         public static void Log(this IModule module, string text) {
-            ModuleLog (module, text);
+            Cross.Log.Write (Cross.Log.GetColor (Cross.Log.Type.MODULE), $"{module.CompactizeName ()} - { module.ParentShard.BotClient.Name} - S{ module.ParentShard.ShardId}/{ module.ParentShard.BotClient.TotalShards}", text);
         }
 
-        public static bool ContainsPrerequisites (this IModule module, IEnumerable<IModule> list) {
-
-            foreach (string required in module.RequiredModules) {
-
-                string name = required.DecompactizeModuleName ().name;
-                string author = required.DecompactizeModuleName ().author;
-
-                IModule prerequisite = list.FirstOrDefault (x => x.Name == name && x.Author == author);
-                bool enabled = prerequisite == null ? false : prerequisite.ContainsPrerequisites (list);
-
-                if (!enabled) {
-                    Cross.Log.Write (Cross.Log.Type.CRITICAL, $"Module {module.CompactizeName ()} can't load due to missing module prerequisite {required}.");
-                    return false;
-                } else
-                    return true;
-            }
-
-            return true;
-        }
     }
 }

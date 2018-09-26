@@ -27,14 +27,41 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding
 
         public int ShardId { get; private set; }
 
-        internal Shard (BotClient parentManager, int shardId) {
+        public event Func<SocketChannel, Task> ChannelCreated;
+        public event Func<SocketChannel, Task> ChannelDestroyed;
+        public event Func<SocketChannel, SocketChannel, Task> ChannelUpdated;
+        public event Func<SocketGuild, Task> GuildAvailable;
+        public event Func<SocketGuild, Task> GuildMembersDownloaded;
+        public event Func<SocketGuildUser, SocketGuildUser, Task> GuildMemberUpdated;
+        public event Func<SocketGuild, Task> GuildUnavailable;
+        public event Func<SocketGuild, SocketGuild, Task> GuildUpdated;
+        public event Func<SocketGuild, Task> JoinedGuild;
+        public event Func<SocketGuild, Task> LeftGuild;
+        public event Func<Cacheable<IMessage, ulong>, ISocketMessageChannel, Task> MessageDeleted;
+        public event Func<SocketMessage, Task> MessageReceived;
+        public event Func<Cacheable<IMessage, ulong>, SocketMessage, ISocketMessageChannel, Task> MessageUpdated;
+        public event Func<Cacheable<IUserMessage, ulong>, ISocketMessageChannel, SocketReaction, Task> ReactionAdded;
+        public event Func<Cacheable<IUserMessage, ulong>, ISocketMessageChannel, SocketReaction, Task> ReactionRemoved;
+        public event Func<Cacheable<IUserMessage, ulong>, ISocketMessageChannel, Task> ReactionsCleared;
+        public event Func<SocketRole, Task> RoleCreated;
+        public event Func<SocketRole, Task> RoleDeleted;
+        public event Func<SocketRole, SocketRole, Task> RoleUpdated;
+        public event Func<SocketUser, SocketGuild, Task> UserBanned;
+        public event Func<SocketUser, ISocketMessageChannel, Task> UserIsTyping;
+        public event Func<SocketGuildUser, Task> UserJoined;
+        public event Func<SocketGuildUser, Task> UserLeft;
+        public event Func<SocketUser, SocketGuild, Task> UserUnbanned;
+        public event Func<SocketUser, SocketUser, Task> UserUpdated;
+        public event Func<SocketUser, SocketVoiceState, SocketVoiceState, Task> UserVoiceStateUpdated;
+
+        internal Shard(BotClient parentManager, int shardId) {
             BotClient = parentManager;
             ShardId = shardId;
         }
 
         internal void Begin () {
-            ThreadStart start = new ThreadStart (Initialize);
-            Thread = new Thread (start);
+            ThreadStart init = new ThreadStart (Initialize);
+            Thread = new Thread (init);
         }
 
         internal async void Initialize () {
@@ -48,7 +75,17 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding
             await Start ();
             await Login ();
 
-            Client.MessageReceived += Client_MessageReceived;
+            ModuleContainer = new ModuleContainer (this);
+            ModuleContainer.InstantiateModules ();
+            ModuleContainer.InitializeModules ();
+            InitializeErrorHandling ();
+
+            Client.Ready += Client_Ready;
+        }
+
+        private Task Client_Ready() {
+            Log.Write (Log.Type.BOT, $"Client {BotClient.Name} shard {ShardId} is ready and connected.");
+            return Task.CompletedTask;
         }
 
         private Task Client_MessageReceived(SocketMessage arg) {
@@ -81,6 +118,43 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding
             await Logout ();
             await Stop ();
             Client.Dispose ();
+        }
+
+        public override string ToString() => $"{BotClient} - S{ShardId}/{BotClient.TotalShards}";
+
+        private void InitializeErrorHandling() {
+            Client.ChannelCreated += x => { try { return ChannelCreated?.Invoke (x); } catch (Exception exc) { OnExceptionCaught (exc); return Task.CompletedTask; } };
+            Client.ChannelDestroyed += x => { try { return ChannelDestroyed?.Invoke (x); } catch (Exception exc) { OnExceptionCaught (exc); return Task.CompletedTask; } };
+            Client.ChannelUpdated += (x, y) => { try { return ChannelUpdated?.Invoke (x, y); } catch (Exception exc) { OnExceptionCaught (exc); return Task.CompletedTask; } };
+            Client.GuildAvailable += x => { try { return GuildAvailable?.Invoke (x); } catch (Exception exc) { OnExceptionCaught (exc); return Task.CompletedTask; } };
+            Client.GuildMembersDownloaded += x => { try { return GuildMembersDownloaded?.Invoke (x); } catch (Exception exc) { OnExceptionCaught (exc); return Task.CompletedTask; } };
+            Client.GuildMemberUpdated += (x, y) => { try { return GuildMemberUpdated?.Invoke (x, y); } catch (Exception exc) { OnExceptionCaught (exc); return Task.CompletedTask; } };
+            Client.GuildUnavailable += x => { try { return GuildUnavailable?.Invoke (x); } catch (Exception exc) { OnExceptionCaught (exc); return Task.CompletedTask; } };
+            Client.GuildUpdated += (x, y) => { try { return GuildUpdated?.Invoke (x, y); } catch (Exception exc) { OnExceptionCaught (exc); return Task.CompletedTask; } };
+            Client.JoinedGuild += x => { try { return JoinedGuild?.Invoke (x); } catch (Exception exc) { OnExceptionCaught (exc); return Task.CompletedTask; } };
+            Client.LeftGuild += x => { try { return LeftGuild?.Invoke (x); } catch (Exception exc) { OnExceptionCaught (exc); return Task.CompletedTask; } };
+            Client.MessageDeleted += (x, y) => { try { return MessageDeleted?.Invoke (x, y); } catch (Exception exc) { OnExceptionCaught (exc); return Task.CompletedTask; } };
+            Client.MessageReceived += x => { try { return MessageReceived?.Invoke (x); } catch (Exception exc) { OnExceptionCaught (exc); return Task.CompletedTask; } };
+            Client.MessageUpdated += (x, y, z) => { try { return MessageUpdated?.Invoke (x, y, z); } catch (Exception exc) { OnExceptionCaught (exc); return Task.CompletedTask; } };
+            Client.ReactionAdded += (x, y, z) => { try { return ReactionAdded?.Invoke (x, y, z); } catch (Exception exc) { OnExceptionCaught (exc); return Task.CompletedTask; } };
+            Client.ReactionRemoved += (x, y, z) => { try { return ReactionRemoved?.Invoke (x, y, z); } catch (Exception exc) { OnExceptionCaught (exc); return Task.CompletedTask; } };
+            Client.ReactionsCleared += (x, y) => { try { return ReactionsCleared?.Invoke (x, y); } catch (Exception exc) { OnExceptionCaught (exc); return Task.CompletedTask; } };
+            Client.RoleCreated += x => { try { return RoleCreated?.Invoke (x); } catch (Exception exc) { OnExceptionCaught (exc); return Task.CompletedTask; } };
+            Client.RoleDeleted += x => { try { return RoleDeleted?.Invoke (x); } catch (Exception exc) { OnExceptionCaught (exc); return Task.CompletedTask; } };
+            Client.RoleUpdated += (x, y) => { try { return RoleUpdated?.Invoke (x, y); } catch (Exception exc) { OnExceptionCaught (exc); return Task.CompletedTask; } };
+            Client.UserBanned += (x, y) => { try { return UserBanned?.Invoke (x, y); } catch (Exception exc) { OnExceptionCaught (exc); return Task.CompletedTask; } };
+            Client.UserIsTyping += (x, y) => { try { return UserIsTyping?.Invoke (x, y); } catch (Exception exc) { OnExceptionCaught (exc); return Task.CompletedTask; } };
+            Client.UserJoined += x => { try { return UserJoined?.Invoke (x); } catch (Exception exc) { OnExceptionCaught (exc); return Task.CompletedTask; } };
+            Client.UserLeft += x => { try { return UserLeft?.Invoke (x); } catch (Exception exc) { OnExceptionCaught (exc); return Task.CompletedTask; } };
+            Client.UserUnbanned += (x, y) => { try { return UserUnbanned?.Invoke (x, y); } catch (Exception exc) { OnExceptionCaught (exc); return Task.CompletedTask; } };
+            Client.UserUpdated += (x, y) => { try { return UserUpdated?.Invoke (x, y); } catch (Exception exc) { OnExceptionCaught (exc); return Task.CompletedTask; } };
+            Client.UserVoiceStateUpdated += (x, y, z) => { try { return UserVoiceStateUpdated?.Invoke (x, y, z); } catch (Exception exc) { OnExceptionCaught (exc); return Task.CompletedTask; } };
+        }
+
+        private async void OnExceptionCaught (Exception exception) {
+            Log.Write (exception);
+            // TODO: Only restart the shard instead of the entire client.
+            await ClientManager.RestartClient (BotClient);
         }
 
     }

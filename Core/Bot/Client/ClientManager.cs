@@ -13,12 +13,13 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client
 
         internal string ClientsDirectory { get => Core.BaseDirectory + "Clients"; }
 
-        internal ClientManager (Core core) {
+        internal ClientManager (Core core) {    
             Core = core;
         }
 
         internal BotClient SpawnClient (string name) {
             BotClient client = new BotClient (this, name);
+            client.InitializeShards ();
             ActiveClients.Add (client);
             return client;
         }
@@ -26,6 +27,12 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client
         internal async Task KillClient (BotClient client) {
             await client.Kill ();
             ActiveClients.Remove (client);
+        }
+
+        internal async Task RestartClient (BotClient client) {
+            string name = client.Name;
+            await KillClient (client);
+            SpawnClient (name);
         }
 
         private string[] GetClientPaths () {
@@ -41,7 +48,6 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client
 
                 string name = Path.GetFileName (client);
                 BotClient newClient = SpawnClient (name);
-                newClient.InitializeShards ();
 
             }
 

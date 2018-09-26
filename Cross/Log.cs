@@ -27,7 +27,6 @@ namespace Lomztein.Moduthulhu.Cross
         public static void Write(ConsoleColor color, string prefix, string text) {
             Console.ForegroundColor = color;
             Console.WriteLine ($"[{prefix}] - [{DateTime.Now.ToString ()}] {text}");
-            Console.ResetColor ();
         }
 
         public static void Write (Type type, string text) {

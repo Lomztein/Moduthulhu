@@ -34,7 +34,7 @@ namespace Lomztein.Moduthulhu.Core.Bot {
             DefaultRetryMode = RetryMode.AlwaysRetry,
         };
 
-        public async Task InitializeCore () {
+        internal async Task InitializeCore () {
             BootDate = DateTime.Now;
 
             ClientManager = new ClientManager (this);
@@ -45,13 +45,6 @@ namespace Lomztein.Moduthulhu.Core.Bot {
 
             await Task.Delay (-1);
             Log.Write (Log.Type.BOT, "Shutting down..");
-        }
-
-        private Task OnLog(LogMessage log) {
-            Log.Write (Log.Type.BOT, log.Severity + " - " + log.Message);
-            if (log.Exception != null)
-                Log.Write (log.Exception);
-            return Task.CompletedTask;
         }
 
     }

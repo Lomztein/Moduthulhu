@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="ModuleManagerModule.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Core\Core.csproj" />
+    <ProjectReference Include="..\TestingModule2\TestingModule2.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Advanced-Discord-Commands">
+      <HintPath>..\..\Advanced-Discord-Commands\Advanced-Discord-Commands\bin\Debug\netcoreapp2.0\Advanced-Discord-Commands.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>

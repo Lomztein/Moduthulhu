@@ -13,9 +13,50 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding
 {
     public class ModuleContainer
     {
-        internal Shard ParentShard { get; private set; }
-        public ModuleLoader Loader { get => ParentShard.Core.ModuleLoader; }
+        private Shard ParentShard { get; set; }
+        private ModuleLoader Loader { get => ParentShard.Core.ModuleLoader; }
+
         public List<IModule> Modules { get; private set; }
+
+
+        internal void InstantiateModules () {
+
+            ModuleFilter filter = new ModuleFilter (
+                x => IsModuleEnabled (x.CompactizeName ())
+                );
+
+            Log.Write (Log.Type.MODULE, $"Instantiating modules for {ParentShard}..");
+            Modules = Loader.InstantiateAll ().ToList ();
+            Modules = filter.FilterModules (Modules).ToList ();
+        }
+
+        internal void InitializeModules () {
+            
+            // Pre-initialize
+            foreach (IModule module in Modules) {
+
+                module.ParentShard = ParentShard;
+                module.ParentContainer = this;
+
+                module.Log ("Pre-initializing..");
+                module.PreInitialize ();
+            }
+
+            AutoConfigureModules ();
+
+            // Initialize
+            foreach (IModule module in Modules) {
+                module.Log ("Initializing..");
+                module.Initialize ();
+            }
+
+            // Post-initialize
+            foreach (IModule module in Modules) {
+                module.Log ("Post-initializing..");
+                module.PostInitialize ();
+            }
+
+        }
 
         public ModuleContainer (Shard parentShard) {
             ParentShard = parentShard;
@@ -37,23 +78,14 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding
             return true;
         }
 
-        private List<IModule> FilterEnabledModules(IEnumerable<IModule> toCheck) {
-            toCheck = toCheck.Where (x => IsModuleEnabled (x.CompactizeName ())).ToList ();
-
-            var clone = toCheck.ToList ();
-            toCheck = toCheck.Where (x => x.ContainsPrerequisites (clone)).ToList ();
-
-            return toCheck.ToList ();
-        }
-
-        public void ShutdownModule(IModule module) {
+        internal void ShutdownModule(IModule module) {
             Log.Write (Log.Type.MODULE, "Shutting down module: " + module.CompactizeName ());
             module.Shutdown ();
         }
 
-        public void ClearModuleCache() => Modules = new List<IModule> ();
+        private void ClearModuleCache() => Modules = new List<IModule> ();
 
-        public void ShutdownAllModules() {
+        internal void ShutdownAllModules() {
             Log.Write (Log.Type.MODULE, "Shutting down all modules..");
             foreach (IModule module in Modules)
                 ShutdownModule (module);
@@ -76,7 +108,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding
             return null;
         }
 
-        public void AutoConfigureModules() {
+        internal void AutoConfigureModules() {
             List<SocketGuild> allGuilds = ParentShard.Guilds.ToList ();
 
             foreach (IModule module in Modules) {

@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Lomztein.Moduthulhu.Core.Extensions
 {
     public static class StringExtensions
     {
+        public static string Singlify(this IEnumerable<string> enumerable, string connector = ", ") => Singlify (enumerable.ToArray (), connector);
+
         public static string Singlify (this string[] array, string connector = ", ") {
             string result = "";
             for (int i = 0; i < array.Length; i++) {

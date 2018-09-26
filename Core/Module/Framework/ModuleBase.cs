@@ -4,6 +4,7 @@ using System.Text;
 using Lomztein.Moduthulhu.Core.Bot;
 using Lomztein.Moduthulhu.Core.Configuration;
 using Lomztein.Moduthulhu.Core.Bot.Client.Sharding;
+using Lomztein.Moduthulhu.Core.Extensions;
 
 namespace Lomztein.Moduthulhu.Core.Module.Framework
 {
@@ -17,8 +18,6 @@ namespace Lomztein.Moduthulhu.Core.Module.Framework
         public virtual string AuthorURL { get; } = "";
         public virtual string PatchURL { get; } = "";
 
-        public virtual string [ ] RequiredModules { get; } = new string [ 0 ];
-
         public ModuleContainer ParentContainer { get; set; }
         public Shard ParentShard { get; set; }
 
@@ -28,6 +27,8 @@ namespace Lomztein.Moduthulhu.Core.Module.Framework
         public virtual void PostInitialize () { }
 
         public abstract void Shutdown();
+
+        private void Log(string contents) => ModuleExtensions.Log (this, contents);
 
     }
 }

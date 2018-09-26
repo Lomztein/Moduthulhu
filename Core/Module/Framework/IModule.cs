@@ -40,11 +40,6 @@ namespace Lomztein.Moduthulhu.Core.Module.Framework
         string PatchURL { get; }
 
         /// <summary>
-        /// Does your module have any hard dependancies that it just needs to run? Add them here in format [MODULEAUTHOR]_[MODULENAME]
-        /// </summary>
-        string [ ] RequiredModules { get; }
-
-        /// <summary>
         /// The module handler that contains this module. Is set when the module is created.
         /// </summary>
         ModuleContainer ParentContainer { get; set; }

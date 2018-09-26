@@ -59,5 +59,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client
             return shard;
         }
 
+        public override string ToString() => Name;
+
     }
 }

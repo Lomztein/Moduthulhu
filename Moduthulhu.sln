@@ -13,6 +13,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Upkeeper", "Upkeeper\Upkeep
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cross", "Cross\Cross.csproj", "{539C3338-FA66-4737-B2D7-57478A1DB286}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestingModule", "TestingModule\TestingModule.csproj", "{C94C89A5-C875-4D12-9FE5-4616BA030456}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestingModule2", "TestingModule2\TestingModule2.csproj", "{8983224B-A4FA-4B84-836C-9DFB6FAB8589}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +43,14 @@ Global
 		{539C3338-FA66-4737-B2D7-57478A1DB286}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{539C3338-FA66-4737-B2D7-57478A1DB286}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{539C3338-FA66-4737-B2D7-57478A1DB286}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C94C89A5-C875-4D12-9FE5-4616BA030456}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C94C89A5-C875-4D12-9FE5-4616BA030456}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C94C89A5-C875-4D12-9FE5-4616BA030456}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C94C89A5-C875-4D12-9FE5-4616BA030456}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8983224B-A4FA-4B84-836C-9DFB6FAB8589}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8983224B-A4FA-4B84-836C-9DFB6FAB8589}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8983224B-A4FA-4B84-836C-9DFB6FAB8589}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8983224B-A4FA-4B84-836C-9DFB6FAB8589}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
