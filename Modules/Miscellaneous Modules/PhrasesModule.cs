@@ -27,7 +27,7 @@ namespace Lomztein.Moduthulhu.Modules.Misc.Phrases
         [AutoConfig] private MultiEntry<List<Phrase>, SocketGuild> phrases = new MultiEntry<List<Phrase>, SocketGuild> (x => new List<Phrase> () { new Phrase (), new Phrase () }, "Phrases", true);
 
         public override void Initialize() {
-            ParentBotClient.discordClient.MessageReceived += OnMessageRecieved;
+            ParentShard.MessageReceived += OnMessageRecieved;
             ConfigurationManager.AddConverter (new PhraseConfigConverter ());
         }
 
@@ -60,7 +60,7 @@ namespace Lomztein.Moduthulhu.Modules.Misc.Phrases
         }
 
         public override void Shutdown() {
-            ParentBotClient.discordClient.MessageReceived -= OnMessageRecieved;
+            ParentShard.MessageReceived -= OnMessageRecieved;
         }
 
         public class Phrase {

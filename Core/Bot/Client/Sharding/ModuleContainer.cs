@@ -14,13 +14,18 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding
     public class ModuleContainer
     {
         private Shard ParentShard { get; set; }
+        private BotClient ParentClient { get => ParentShard.BotClient; }
+
         private ModuleLoader Loader { get => ParentShard.Core.ModuleLoader; }
+
+        private Dictionary<string, bool> IsEnabledCache { get; set; }
+        private string EnabledCachePath { get => ParentClient.BaseDirectory + "enabled"; }
 
         public List<IModule> Modules { get; private set; }
 
-
         internal void InstantiateModules () {
 
+            LoadEnabledCache ();
             ModuleFilter filter = new ModuleFilter (
                 x => IsModuleEnabled (x.CompactizeName ())
                 );
@@ -28,6 +33,14 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding
             Log.Write (Log.Type.MODULE, $"Instantiating modules for {ParentShard}..");
             Modules = Loader.InstantiateAll ().ToList ();
             Modules = filter.FilterModules (Modules).ToList ();
+
+            ModuleFilter dependencyFilter = new ModuleFilter (
+                x => x.GetDependencyNames ().All (y => Modules.Any (z => z.GetType ().Name == y))
+                );
+
+            Modules = dependencyFilter.FilterModules (Modules).ToList ();
+            SaveEnabledCache ();
+
         }
 
         internal void InitializeModules () {
@@ -62,7 +75,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding
             ParentShard = parentShard;
         }
 
-        public T GetModule<T>() {
+        public T GetModule<T>() where T : IModule {
             IModule module = Modules.Find (x => x is T);
             if (module == null)
                 return default (T);
@@ -70,12 +83,16 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding
                 return (T)module;
         }
 
-        public bool IsModuleLoaded<T>() {
+        public bool IsModuleLoaded<T>() where T : IModule {
             return GetModule<T> () != null;
         }
 
         private bool IsModuleEnabled(string compactName) {
-            return true;
+
+            if (!IsEnabledCache.ContainsKey (compactName))
+                IsEnabledCache.Add (compactName, false);
+            return IsEnabledCache[compactName];
+
         }
 
         internal void ShutdownModule(IModule module) {
@@ -90,6 +107,16 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding
             foreach (IModule module in Modules)
                 ShutdownModule (module);
             ClearModuleCache ();
+        }
+
+        private void LoadEnabledCache () {
+            IsEnabledCache = JSONSerialization.DeserializeFile<Dictionary<string, bool>> (EnabledCachePath);
+            if (IsEnabledCache == null)
+                IsEnabledCache = new Dictionary<string, bool> ();
+        }
+
+        private void SaveEnabledCache () {
+            JSONSerialization.SerializeObject (IsEnabledCache, EnabledCachePath, true);
         }
 
         /// <summary>

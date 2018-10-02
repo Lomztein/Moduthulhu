@@ -55,7 +55,7 @@ namespace Lomztein.Moduthulhu.Modules.Misc.Shipping {
         public override void Initialize() {
             LoadData ();
             commands = new ShippingCommands () { ParentModule = this };
-            ParentModuleHandler.GetModule<CommandRootModule> ().AddCommands (commands);
+            ParentContainer.GetCommandRoot ().AddCommands (commands);
         }
 
         public Ship Ship (SocketGuildUser shipper, SocketGuildUser shippieOne, SocketGuildUser shippieTwo, out bool succesful) {
@@ -180,7 +180,7 @@ namespace Lomztein.Moduthulhu.Modules.Misc.Shipping {
         }
 
         public override void Shutdown() {
-            ParentModuleHandler.GetModule<CommandRootModule> ().RemoveCommands (commands);
+            ParentContainer.GetCommandRoot ().RemoveCommands (commands);
         }
 
     }
@@ -211,10 +211,10 @@ namespace Lomztein.Moduthulhu.Modules.Misc.Shipping {
 
         public (SocketGuild guild, SocketGuildUser shipper, SocketGuildUser shippieOne, SocketGuildUser shippeTwo) GetGuildObjects()
         {
-            SocketGuild _guild = parentModule.ParentBotClient.GetGuild(GuildId);
-            SocketGuildUser _shipper = parentModule.ParentBotClient.GetUser(GuildId, Shipper);
-            SocketGuildUser _shippieOne = parentModule.ParentBotClient.GetUser(GuildId, ShippieOne);
-            SocketGuildUser _shippieTwo = parentModule.ParentBotClient.GetUser(GuildId, ShippieTwo);
+            SocketGuild _guild = parentModule.ParentShard.GetGuild(GuildId);
+            SocketGuildUser _shipper = parentModule.ParentShard.GetUser(GuildId, Shipper);
+            SocketGuildUser _shippieOne = parentModule.ParentShard.GetUser(GuildId, ShippieOne);
+            SocketGuildUser _shippieTwo = parentModule.ParentShard.GetUser(GuildId, ShippieTwo);
             return (_guild, _shipper, _shippieOne, _shippieTwo);
         }
 
@@ -254,8 +254,8 @@ namespace Lomztein.Moduthulhu.Modules.Misc.Shipping {
 
         public override string ToString()
         {
-            SocketGuildUser one = parentModule.ParentBotClient.GetUser(GuildId, ShippieOne);
-            SocketGuildUser two = parentModule.ParentBotClient.GetUser(GuildId, ShippieTwo);
+            SocketGuildUser one = parentModule.ParentShard.GetUser(GuildId, ShippieOne);
+            SocketGuildUser two = parentModule.ParentShard.GetUser(GuildId, ShippieTwo);
 
             return $"{one.GetShownName()} x {two.GetShownName()} - {GetShipName()}";
         }
@@ -271,8 +271,8 @@ namespace Lomztein.Moduthulhu.Modules.Misc.Shipping {
 
         public string GenerateContractedName()
         {
-            SocketGuildUser one = parentModule.ParentBotClient.GetUser(GuildId, ShippieOne);
-            SocketGuildUser two = parentModule.ParentBotClient.GetUser(GuildId, ShippieTwo);
+            SocketGuildUser one = parentModule.ParentShard.GetUser(GuildId, ShippieOne);
+            SocketGuildUser two = parentModule.ParentShard.GetUser(GuildId, ShippieTwo);
 
             int maxLength = Math.Max(one.GetShownName().Length, two.GetShownName().Length);
 

@@ -43,7 +43,7 @@ namespace Lomztein.Moduthulhu.Cross
             File.WriteAllText (path, obj.ToString ());
         }
 
-        public static void SerializeObject (object obj, string path, bool format = false) {
+        public static void SerializeObject(object obj, string path, bool format = false) {
             path = Path.ChangeExtension (path, jsonExtension);
             Directory.CreateDirectory (Path.GetDirectoryName (path));
 

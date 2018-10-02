@@ -33,13 +33,13 @@ namespace Lomztein.Moduthulhu.Modules.CustomCommands
 
         public override void Initialize() {
             customCommandCommands = new CustomCommandCommands () { ParentModule = this };
-            commandRootModule = ParentModuleHandler.GetModule<CommandRootModule> ();
+            commandRootModule = ParentContainer.GetModule<CommandRootModule>();
             commandRootModule.AddCommands (customCommandCommands);
             LoadData ();
         }
 
         public override void Shutdown() {
-            ParentModuleHandler.GetModule<CommandRootModule> ().RemoveCommands (customCommandCommands);
+            ParentContainer.GetCommandRoot ().RemoveCommands (customCommandCommands);
             commandRootModule.RemoveCommands (customCommands.ToArray ());
         }
 
@@ -68,7 +68,7 @@ namespace Lomztein.Moduthulhu.Modules.CustomCommands
 
         public void AddCommands(params ICustomCommand[] commands) {
             customCommands.AddRange (commands);
-            ParentModuleHandler.GetModule<CommandRootModule> ().AddCommands (commands);
+            ParentContainer.GetCommandRoot ().AddCommands (commands);
             SaveData ();
         }
 

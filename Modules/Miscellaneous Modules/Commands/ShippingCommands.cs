@@ -117,13 +117,13 @@ namespace Lomztein.Moduthulhu.Modules.Misc.Shipping.Commands {
                     WithTitle ("Ships containing " + user.GetShownName () + ".");
 
                 foreach (var ship in catagorized) {
-                    var shippers = ship.Select (x => ParentModule.ParentBotClient.GetUser (data.Message.GetGuild ().Id, x.Shipper));
+                    var shippers = ship.Select (x => ParentModule.ParentShard.GetUser (data.Message.GetGuild ().Id, x.Shipper));
                     string shipperNames = "";
                     foreach (var shipper in shippers) {
                         shipperNames += shipper.GetShownName () + "\n";
                     }
 
-                    SocketGuildUser companion = ParentModule.ParentBotClient.GetUser (data.Message.GetGuild ().Id, ship.Key);
+                    SocketGuildUser companion = ParentModule.ParentShard.GetUser (data.Message.GetGuild ().Id, ship.Key);
                     builder.AddField ("Shipped with " + companion.GetShownName () + " as " + ship.FirstOrDefault ().GetShipName () + ", " + ship.Count () + " times by:", shipperNames);
                 }
 
@@ -170,11 +170,11 @@ namespace Lomztein.Moduthulhu.Modules.Misc.Shipping.Commands {
                 var leaderboard = ParentModule.GetShipLeaderboard (data.Message.GetGuild ());
 
                 EmbedBuilder builder = new EmbedBuilder ().
-                    WithAuthor (ParentModule.ParentBotClient.discordClient.CurrentUser).
+                    WithAuthor (ParentModule.ParentShard.Client.CurrentUser).
                     WithTitle ("All ships on " + data.Message.GetGuild ().Name + ".");
 
                 foreach (var pair in leaderboard) {
-                    SocketGuildUser shippie = ParentModule.ParentBotClient.GetUser (data.Message.GetGuild ().Id, pair.Key);
+                    SocketGuildUser shippie = ParentModule.ParentShard.GetUser (data.Message.GetGuild ().Id, pair.Key);
                     string ships = "";
 
                     foreach (Shipping.Ship ship in pair.Value) {

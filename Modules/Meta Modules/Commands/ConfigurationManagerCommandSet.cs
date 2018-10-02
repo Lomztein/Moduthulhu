@@ -58,7 +58,7 @@ namespace Lomztein.Moduthulhu.Modules.Meta.Commands {
 
             [Overload (typeof (void), "Change a specific key in a searched for module.")]
             public Task<Result> Execute(CommandMetadata data, string moduleSearch, string key, params string[] inputValues) {
-                if (ParentModule.ParentModuleHandler.FuzzySearchModule (moduleSearch) is IConfigurable configurable)
+                if (ParentModule.ParentContainer.FuzzySearchModule (moduleSearch) is IConfigurable configurable)
                     return Execute (data, configurable, key, inputValues);
                 return TaskResult (null, $"Error - No configurable module was found when \"" + moduleSearch + "\" was searched.");
             }
@@ -89,7 +89,7 @@ namespace Lomztein.Moduthulhu.Modules.Meta.Commands {
 
             [Overload (typeof (void), "Add to a specific key in a searched for module.")]
             public Task<Result> Execute(CommandMetadata data, string moduleSearch, string key, params string[] inputValues) {
-                if (ParentModule.ParentModuleHandler.FuzzySearchModule (moduleSearch) is IConfigurable configurable)
+                if (ParentModule.ParentContainer.FuzzySearchModule (moduleSearch) is IConfigurable configurable)
                     return Execute (data, configurable, key, inputValues);
                 return TaskResult (null, $"Error - No configurable module was found when \"" + moduleSearch + "\" was searched.");
             }
@@ -120,7 +120,7 @@ namespace Lomztein.Moduthulhu.Modules.Meta.Commands {
 
             [Overload (typeof (void), "Remove value from a specific key in a searched for module.")]
             public Task<Result> Execute(CommandMetadata data, string moduleSearch, string key, int index) {
-                if (ParentModule.ParentModuleHandler.FuzzySearchModule (moduleSearch) is IConfigurable configurable)
+                if (ParentModule.ParentContainer.FuzzySearchModule (moduleSearch) is IConfigurable configurable)
                     return Execute (data, configurable, key, index);
                 return TaskResult (null, $"Error - No configurable module was found when \"" + moduleSearch + "\" was searched.");
             }
@@ -152,7 +152,7 @@ namespace Lomztein.Moduthulhu.Modules.Meta.Commands {
 
             [Overload (typeof (string), "List every value in a list/enumerable type configuration entry in the search module.")]
             public Task<Result> Execute(CommandMetadata data, string moduleSearch, string key) {
-                if (ParentModule.ParentModuleHandler.FuzzySearchModule (moduleSearch) is IConfigurable configurable)
+                if (ParentModule.ParentContainer.FuzzySearchModule (moduleSearch) is IConfigurable configurable)
                     return Execute (data, configurable, key);
                 return TaskResult (null, $"Error - No configurable module was found when \"" + moduleSearch + "\" was searched.");
             }
@@ -178,13 +178,13 @@ namespace Lomztein.Moduthulhu.Modules.Meta.Commands {
 
             [Overload (typeof (string), "List every single configuration entry in all modules.")]
             public Task<Result> Execute (CommandMetadata data) {
-                string all = ParentModule.ListEntriesInModules (ParentModule.ParentModuleHandler.GetActiveModules (), data.Message.GetGuild ().Id, x => true);
+                string all = ParentModule.ListEntriesInModules (ParentModule.ParentContainer.Modules, data.Message.GetGuild ().Id, x => true);
                 return TaskResult (all, all);
             }
 
             [Overload (typeof (string), "List every value in a list/enumerable type configuration entry in the search module.")]
             public Task<Result> Execute(CommandMetadata data, string moduleSearch) {
-                if (ParentModule.ParentModuleHandler.FuzzySearchModule (moduleSearch) is IConfigurable configurable) {
+                if (ParentModule.ParentContainer.FuzzySearchModule (moduleSearch) is IConfigurable configurable) {
                     string all = ParentModule.ListEntriesInModules (new IModule[] { configurable as IModule }, data.Message.GetGuild ().Id, x => true);
                     return TaskResult (all, all);
                 }
@@ -203,13 +203,13 @@ namespace Lomztein.Moduthulhu.Modules.Meta.Commands {
 
             [Overload (typeof (string), "List every single configuration entry in all modules that hasn't been manually set.")]
             public Task<Result> Execute(CommandMetadata data) {
-                string all = ParentModule.ListEntriesInModules (ParentModule.ParentModuleHandler.GetActiveModules (), data.Message.GetGuild ().Id, x => !x.ManuallySet);
+                string all = ParentModule.ListEntriesInModules (ParentModule.ParentContainer.Modules, data.Message.GetGuild ().Id, x => !x.ManuallySet);
                 return TaskResult (all, all);
             }
 
             [Overload (typeof (string), "List every value in a list/enumerable type configuration entry in the search module.")]
             public Task<Result> Execute(CommandMetadata data, string moduleSearch) {
-                if (ParentModule.ParentModuleHandler.FuzzySearchModule (moduleSearch) is IConfigurable configurable) {
+                if (ParentModule.ParentContainer.FuzzySearchModule (moduleSearch) is IConfigurable configurable) {
                     string all = ParentModule.ListEntriesInModules (new IModule[] { configurable as IModule }, data.Message.GetGuild ().Id, x => true);
                     return TaskResult (all, all);
                 }

@@ -39,6 +39,7 @@ namespace Lomztein.Moduthulhu.Core.Module
 
         }
 
+        // This is unlikely to be the most, if at all an effecient method, but it seems to work just fine.
         public IEnumerable<Type> Order (IEnumerable<Type> moduleTypes) {
 
             List<Type> toOrder = moduleTypes.ToList ();

@@ -44,15 +44,11 @@ namespace Lomztein.Moduthulhu.Core.Bot {
 
             ClientManager.InitializeClients ();
 
-            ErrorReporter = new ErrorReporter (this, BaseDirectory + "superadmins");
-            ClientManager.OnExceptionCaught += ClientManager_OnExceptionCaught;
+            ErrorReporter = new ErrorReporter (this);
+            ClientManager.OnExceptionCaught += ErrorReporter.ReportError;
 
             await Task.Delay (-1);
             Log.Write (Log.Type.BOT, "Shutting down..");
-        }
-
-        private void ClientManager_OnExceptionCaught(Exception obj) {
-            ErrorReporter.ReportError (obj);
         }
     }
 }

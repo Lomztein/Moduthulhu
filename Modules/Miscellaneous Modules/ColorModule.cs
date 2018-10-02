@@ -14,6 +14,7 @@ using Lomztein.AdvDiscordCommands.Framework.Categories;
 
 namespace Lomztein.Moduthulhu.Modules.Misc.Color
 {
+    [Dependency ("CommandRootModule")]
     public class ColourModule : ModuleBase, IConfigurable<MultiConfig> {
 
         public const string PREFIX = "cl_";
@@ -21,8 +22,6 @@ namespace Lomztein.Moduthulhu.Modules.Misc.Color
         public override string Name => "COLOURS";
         public override string Description => "This module is scientifically proven to improve funkyness by about 4%.";
         public override string Author => "Lomztein";
-
-        public override string [ ] RequiredModules => new string [ ] { "Lomztein_Command Root" };
 
         public override bool Multiserver => true;
 
@@ -35,8 +34,8 @@ namespace Lomztein.Moduthulhu.Modules.Misc.Color
 
         public override void Initialize() {
             colorCommand.ParentModule = this;
-            ParentModuleHandler.GetModule<CommandRootModule> ().commandRoot.AddCommands (colorCommand);
-            ParentBotClient.discordClient.UserJoined += OnUserJoined;
+            ParentContainer.GetCommandRoot ().AddCommands (colorCommand);
+            ParentShard.UserJoined += OnUserJoined;
         }
 
         private Task OnUserJoined(SocketGuildUser guildUser) {
@@ -47,13 +46,13 @@ namespace Lomztein.Moduthulhu.Modules.Misc.Color
 
         private async void GiveRandomColourAsync (SocketGuildUser guildUser) {
             Dictionary<ulong, string> localColours = colourIdentification.GetEntry (guildUser.Guild);
-            SocketRole randomRole = ParentBotClient.GetRole (guildUser.Guild.Id, localColours.ElementAt (new Random ().Next (localColours.Count)).Key);
+            SocketRole randomRole = ParentShard.GetRole (guildUser.Guild.Id, localColours.ElementAt (new Random ().Next (localColours.Count)).Key);
             await guildUser.AsyncSecureAddRole (randomRole);
         }
 
         public override void Shutdown() {
-            ParentModuleHandler.GetModule<CommandRootModule> ().commandRoot.RemoveCommands (colorCommand);
-            ParentBotClient.discordClient.UserJoined -= OnUserJoined;
+            ParentContainer.GetCommandRoot ().RemoveCommands (colorCommand);
+            ParentShard.UserJoined -= OnUserJoined;
         }
 
         public class SetColour : ModuleCommand<ColourModule> {
@@ -77,7 +76,7 @@ namespace Lomztein.Moduthulhu.Modules.Misc.Color
 
                     foreach (var entry in ParentModule.colourIdentification.GetEntry (data.Message.GetGuild ())) {
                         if (entry.Value.ToUpper () == colorName.ToUpper ()) {
-                            role = ParentModule.ParentBotClient.GetRole (data.Message.GetGuild ().Id, entry.Key);
+                            role = ParentModule.ParentShard.GetRole (data.Message.GetGuild ().Id, entry.Key);
                             name = entry.Value;
                             break;
                         }

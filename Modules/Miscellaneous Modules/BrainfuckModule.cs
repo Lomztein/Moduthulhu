@@ -23,11 +23,11 @@ namespace Lomztein.ModularDiscordBot.Modules.Misc.Brainfuck
 
         public override void Initialize() {
             command = new BrainfuckCommand () { ParentModule = this };
-            ParentModuleHandler.GetModule<CommandRootModule> ().AddCommands (command);
+            ParentContainer.GetCommandRoot ().AddCommands (command);
         }
 
         public override void Shutdown() {
-            ParentModuleHandler.GetModule<CommandRootModule> ().RemoveCommands (command);
+            ParentContainer.GetCommandRoot ().RemoveCommands (command);
         }
 
         private async Task<string> Run (string program, ulong channelID) {

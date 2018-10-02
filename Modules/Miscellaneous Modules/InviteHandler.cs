@@ -7,18 +7,19 @@ using Discord;
 using Discord.WebSocket;
 using Lomztein.Moduthulhu.Core.Bot;
 using Lomztein.Moduthulhu.Cross;
+using Lomztein.Moduthulhu.Core.Bot.Client.Sharding;
 
 namespace Lomztein.Moduthulhu.Modules.ServerMessages
 {
     public class InviteHandler
     {
         public static Dictionary<ulong, Dictionary<string, RestInviteMetadata>> savedInvites = new Dictionary<ulong, Dictionary<string, RestInviteMetadata>> ();
-        public Core.Bot.Core parentBotClient;
+        public Shard ParentShard;
 
-        public InviteHandler (Core.Bot.Core _parent) {
-            parentBotClient = _parent;
+        public InviteHandler (Shard shard) {
+            ParentShard = shard;
 
-            foreach (SocketGuild guild in parentBotClient.DiscordClient.Guilds) {
+            foreach (SocketGuild guild in ParentShard.Guilds) {
                 UpdateData (null, guild);
             }
         }

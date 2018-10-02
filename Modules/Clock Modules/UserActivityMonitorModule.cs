@@ -15,13 +15,11 @@ using Lomztein.Moduthulhu.Cross;
 
 namespace Lomztein.Moduthulhu.Modules.Clock.ActivityMonitor
 {
-    public class UserActivityMonitorModule : ModuleBase, ITickable, IConfigurable<MultiConfig> {
+    public class UserActivityMonitorModule : ModuleBase, IConfigurable<MultiConfig> {
 
         public override string Name => "User Activity Module";
-        public override string Description => "Catagorises people into configurable roles based on their last date of activity. Not recommended, but possible for multiserver.";
+        public override string Description => "Catagorises people into configurable roles based on their last date of activity.";
         public override string Author => "Lomztein";
-
-        public override string [ ] RequiredModules => new string[] { "Lomztein_Clock Module"};
 
         public override bool Multiserver => true;
 
@@ -38,18 +36,18 @@ namespace Lomztein.Moduthulhu.Modules.Clock.ActivityMonitor
         }
 
         public override void Initialize () {
-
             LoadData ();
-
-            ParentBotClient.discordClient.MessageReceived += DiscordClient_MessageReceived;
-            ParentBotClient.discordClient.UserVoiceStateUpdated += DiscordClient_UserVoiceStateUpdated;
-            ParentBotClient.discordClient.UserJoined += DiscordClient_UserJoined;
+            ParentShard.MessageReceived += DiscordClient_MessageReceived;
+            ParentShard.UserVoiceStateUpdated += DiscordClient_UserVoiceStateUpdated;
+            ParentShard.UserJoined += DiscordClient_UserJoined;
+            this.GetClock ().OnDayPassed += CheckAll;
         }
 
         public override void Shutdown() {
-            ParentBotClient.discordClient.MessageReceived += DiscordClient_MessageReceived;
-            ParentBotClient.discordClient.UserVoiceStateUpdated += DiscordClient_UserVoiceStateUpdated;
-            ParentBotClient.discordClient.UserJoined += DiscordClient_UserJoined;
+            ParentShard.MessageReceived -= DiscordClient_MessageReceived;
+            ParentShard.UserVoiceStateUpdated -= DiscordClient_UserVoiceStateUpdated;
+            ParentShard.UserJoined -= DiscordClient_UserJoined;
+            this.GetClock ().OnDayPassed -= CheckAll;
         }
 
         private Task DiscordClient_UserJoined(SocketGuildUser arg) {
@@ -69,10 +67,6 @@ namespace Lomztein.Moduthulhu.Modules.Clock.ActivityMonitor
         private Task DiscordClient_MessageReceived(SocketMessage arg) {
             RecordActivity (arg.Author as SocketGuildUser, DateTime.Now);
             return Task.CompletedTask;
-        }
-
-        public override void PostInitialize () {
-            ParentModuleHandler.GetModule<ClockModule> ().AddTickable (this);
         }
 
         public async void RecordActivity(SocketGuildUser user, DateTime time) {
@@ -140,17 +134,14 @@ namespace Lomztein.Moduthulhu.Modules.Clock.ActivityMonitor
 
         }
 
-        public async void Tick(DateTime lastTick, DateTime now) {
-            if (ClockModule.DayPassed (lastTick, now)) {
-
-                await UpdateAll ();
-                SaveData ();
-            }
+        public async void CheckAll(DateTime lastTick, DateTime now) {
+            await UpdateAll ();
+            SaveData ();
         }
 
         private async Task UpdateAll () {
             List<SocketGuildUser> users = new List<SocketGuildUser> ();
-            ParentBotClient.discordClient.Guilds.ToList ().ForEach (x => users.AddRange (x.Users));
+            ParentShard.Guilds.ToList ().ForEach (x => users.AddRange (x.Users));
 
             foreach (SocketGuildUser u in users) {
 

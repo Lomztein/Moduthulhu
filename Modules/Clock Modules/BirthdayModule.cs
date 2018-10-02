@@ -15,6 +15,7 @@ using Lomztein.Moduthulhu.Modules.Command;
 using Lomztein.AdvDiscordCommands.Framework;
 using Lomztein.AdvDiscordCommands.Framework.Categories;
 using Lomztein.Moduthulhu.Cross;
+using Lomztein.Moduthulhu.Core.Clock;
 
 namespace Lomztein.Moduthulhu.Modules.Clock.Birthday
 {
@@ -41,6 +42,7 @@ namespace Lomztein.Moduthulhu.Modules.Clock.Birthday
             allBirthdays = DataSerialization.DeserializeData<Dictionary<ulong, Dictionary<ulong, BirthdayDate>>> (dataFilePath);
             if (allBirthdays == null)
                 allBirthdays = new Dictionary<ulong, Dictionary<ulong, BirthdayDate>> ();
+            this.GetClock ().OnHourPassed += (prev, now) => TestBirthdays (now);
         }
 
         private void SaveData() => DataSerialization.SerializeData (allBirthdays, dataFilePath);
@@ -48,8 +50,6 @@ namespace Lomztein.Moduthulhu.Modules.Clock.Birthday
         public override void Initialize() {
             LoadData ();
             command = new BirthdayCommand () { ParentModule = this };
-            ParentModuleHandler.GetModule<CommandRootModule> ().AddCommands (command);
-            ParentModuleHandler.GetModule<ClockModule> ().AddTickable (this);
         }
 
         public void SetBirthday(ulong guildID, ulong userID, DateTime date) {
@@ -63,7 +63,7 @@ namespace Lomztein.Moduthulhu.Modules.Clock.Birthday
         }
 
         public override void Shutdown() {
-            ParentModuleHandler.GetModule<CommandRootModule> ().RemoveCommands (command);
+            ParentContainer.GetModule<CommandRootModule> ().RemoveCommands (command);
         }
 
         public void Tick(DateTime prevTick, DateTime now) {
@@ -77,11 +77,11 @@ namespace Lomztein.Moduthulhu.Modules.Clock.Birthday
 
                     if (user.Value.IsNow ()) {
 
-                        SocketGuildUser guildUser = ParentBotClient.GetUser (guild.Key, user.Key);
+                        SocketGuildUser guildUser = ParentShard.GetUser (guild.Key, user.Key);
                         if (guildUser == null)
                             return; // User doesn't exist anymore, may have left the server.
 
-                        SocketTextChannel guildChannel = ParentBotClient.GetChannel (guild.Key, announcementChannel.GetEntry (guildUser.Guild)) as SocketTextChannel;
+                        SocketTextChannel guildChannel = ParentShard.GetTextChannel (guild.Key, announcementChannel.GetEntry (guildUser.Guild));
                         AnnounceBirthday (guildChannel, guildUser, user.Value);
                         user.Value.SetLastPassedToNow ();
                         SaveData ();

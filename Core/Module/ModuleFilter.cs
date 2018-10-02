@@ -16,11 +16,7 @@ namespace Lomztein.Moduthulhu.Core.Module
 
         internal IEnumerable<IModule> FilterModules (IEnumerable<IModule> modules) {
             IEnumerable<IModule> result = modules;
-
-            foreach (var filter in Filters) {
-                result = result.Where (x => filter(x));
-            }
-
+            Filters.ForEach (x => result = result.Where (y => x(y)));
             return result;
         }
     }

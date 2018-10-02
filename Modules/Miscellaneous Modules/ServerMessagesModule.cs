@@ -36,14 +36,14 @@ namespace Lomztein.Moduthulhu.Modules.ServerMessages {
         private InviteHandler inviteHandler;
 
         public override void Initialize() {
-            ParentBotClient.discordClient.JoinedGuild += OnJoinedNewGuild;
-            ParentBotClient.discordClient.UserJoined += OnUserJoinedGuild;
-            ParentBotClient.discordClient.UserLeft += OnUserLeftGuild;
-            ParentBotClient.discordClient.UserBanned += OnUserBannedFromGuild;
-            ParentBotClient.discordClient.UserUnbanned += OnUserUnbannedFromGuild;
-            ParentBotClient.discordClient.GuildMemberUpdated += OnGuildMemberUpdated;
+            ParentShard.JoinedGuild += OnJoinedNewGuild;
+            ParentShard.UserJoined += OnUserJoinedGuild;
+            ParentShard.UserLeft += OnUserLeftGuild;
+            ParentShard.UserBanned += OnUserBannedFromGuild;
+            ParentShard.UserUnbanned += OnUserUnbannedFromGuild;
+            ParentShard.GuildMemberUpdated += OnGuildMemberUpdated;
 
-            inviteHandler = new InviteHandler (ParentBotClient);
+            inviteHandler = new InviteHandler (ParentShard);
         }
 
         private Task OnGuildMemberUpdated(SocketGuildUser arg1, SocketGuildUser arg2) {
@@ -120,7 +120,7 @@ namespace Lomztein.Moduthulhu.Modules.ServerMessages {
         }
 
         private Task OnJoinedNewGuild(SocketGuild guild) {
-            SendMessage (guild, onJoinedNewGuild, "[BOTNAME]", ParentBotClient.discordClient.CurrentUser.GetShownName ());
+            SendMessage (guild, onJoinedNewGuild, "[BOTNAME]", ParentShard.Client.CurrentUser.GetShownName ());
             inviteHandler.UpdateData (null, guild);
             return Task.CompletedTask;
         }
@@ -129,7 +129,7 @@ namespace Lomztein.Moduthulhu.Modules.ServerMessages {
             if (!this.IsConfigured (guild.Id))
                 return;
 
-            SocketTextChannel channel = ParentBotClient.GetChannel (guild.Id, channelIDs.GetEntry (guild)) as SocketTextChannel;
+            SocketTextChannel channel = ParentShard.GetChannel (guild.Id, channelIDs.GetEntry (guild)) as SocketTextChannel;
             string [ ] guildMessages = messages.GetEntry (guild);
             string message = guildMessages [ new Random ().Next (0, guildMessages.Length) ];
 
@@ -140,12 +140,12 @@ namespace Lomztein.Moduthulhu.Modules.ServerMessages {
         }
 
         public override void Shutdown() {
-            ParentBotClient.discordClient.JoinedGuild -= OnJoinedNewGuild;
-            ParentBotClient.discordClient.UserJoined -= OnUserJoinedGuild;
-            ParentBotClient.discordClient.UserLeft -= OnUserLeftGuild;
-            ParentBotClient.discordClient.UserBanned -= OnUserBannedFromGuild;
-            ParentBotClient.discordClient.UserUnbanned -= OnUserUnbannedFromGuild;
-            ParentBotClient.discordClient.GuildMemberUpdated -= OnGuildMemberUpdated;
+            ParentShard.JoinedGuild -= OnJoinedNewGuild;
+            ParentShard.UserJoined -= OnUserJoinedGuild;
+            ParentShard.UserLeft -= OnUserLeftGuild;
+            ParentShard.UserBanned -= OnUserBannedFromGuild;
+            ParentShard.UserUnbanned -= OnUserUnbannedFromGuild;
+            ParentShard.GuildMemberUpdated -= OnGuildMemberUpdated;
         }
     }
 }

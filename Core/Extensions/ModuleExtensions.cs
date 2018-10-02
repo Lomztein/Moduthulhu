@@ -22,5 +22,7 @@ namespace Lomztein.Moduthulhu.Core.Extensions
             Cross.Log.Write (Cross.Log.GetColor (Cross.Log.Type.MODULE), $"{module.CompactizeName ()} - { module.ParentShard.BotClient.Name} - S{ module.ParentShard.ShardId}/{ module.ParentShard.BotClient.TotalShards}", text);
         }
 
+        public static string[] GetDependencyNames(this IModule module) => module.GetType ().GetCustomAttributes (typeof (DependencyAttribute), false).Cast<DependencyAttribute> ().Select (x => x.DependencyName).ToArray ();
+
     }
 }

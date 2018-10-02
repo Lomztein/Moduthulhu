@@ -32,9 +32,9 @@ namespace Lomztein.Moduthulhu.Modules.Voice
         private Dictionary<ulong, List<ulong>> temporaryChannels; // This isn't for config, but instead for keeping track of the active channels.
 
         public override void Initialize() {
-            ParentBotClient.discordClient.UserVoiceStateUpdated += UserVoiceStateUpdated;
-            ParentBotClient.discordClient.ChannelCreated += OnChannelCreated;
-            ParentBotClient.discordClient.ChannelDestroyed += OnChannelDeleted;
+            ParentShard.UserVoiceStateUpdated += UserVoiceStateUpdated;
+            ParentShard.ChannelCreated += OnChannelCreated;
+            ParentShard.ChannelDestroyed += OnChannelDeleted;
         }
 
         public override void PostInitialize() {
@@ -46,7 +46,7 @@ namespace Lomztein.Moduthulhu.Modules.Voice
                 temporaryChannels.Add (value.Key, new List<ulong> ());
             }
 
-            var guilds = ParentBotClient.discordClient.Guilds;
+            var guilds = ParentShard.Guilds;
             foreach (SocketGuild guild in guilds) {
                 var nonCachedChannels = guild.VoiceChannels.Where (x => !defaultChannels.GetEntry (guild).Contains (x.Id));
                 temporaryChannels[guild.Id] = nonCachedChannels.Select (x => x.Id).ToList ();
@@ -121,7 +121,7 @@ namespace Lomztein.Moduthulhu.Modules.Voice
         }
 
         private SocketVoiceChannel FindEmptyTemporaryChannel (SocketGuild guild) {
-            var temps = temporaryChannels[guild.Id].Select (x => ParentBotClient.GetChannel (guild.Id, x) as SocketVoiceChannel);
+            var temps = temporaryChannels[guild.Id].Select (x => ParentShard.GetChannel (guild.Id, x) as SocketVoiceChannel);
             return temps.LastOrDefault (x => x.Users.Count == 0);
         }
 
@@ -142,9 +142,9 @@ namespace Lomztein.Moduthulhu.Modules.Voice
         }
 
         public override void Shutdown() {
-            ParentBotClient.discordClient.UserVoiceStateUpdated -= UserVoiceStateUpdated;
-            ParentBotClient.discordClient.ChannelCreated -= OnChannelCreated;
-            ParentBotClient.discordClient.ChannelDestroyed -= OnChannelDeleted;
+            ParentShard.UserVoiceStateUpdated -= UserVoiceStateUpdated;
+            ParentShard.ChannelCreated -= OnChannelCreated;
+            ParentShard.ChannelDestroyed -= OnChannelDeleted;
         }
     }
 }

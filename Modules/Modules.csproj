@@ -19,7 +19,7 @@
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="xcopy &quot;$(TargetPath)&quot; &quot;$(SolutionDir)\Core\bin\Debug\netcoreapp2.0\Modules\&quot;" />
+    <Exec Command="xcopy &quot;$(TargetPath)&quot; &quot;$(SolutionDir)Core\bin\Debug\netcoreapp2.0\Modules\&quot; /y" />
   </Target>
 
 </Project>

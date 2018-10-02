@@ -8,6 +8,7 @@ using Lomztein.AdvDiscordCommands.Extensions;
 
 namespace Lomztein.Moduthulhu.Modules.Command
 {
+    [Dependency ("CommandRootModule")]
     public class StandardCommandsModule : ModuleBase {
 
         public override string Name => "Standard Commands";
@@ -15,8 +16,6 @@ namespace Lomztein.Moduthulhu.Modules.Command
         public override string Author => "Lomztein";
 
         public override bool Multiserver => true;
-
-        public override string [ ] RequiredModules { get => new string [ ] { "Lomztein_Command Root" }; }
 
         private AdvDiscordCommands.Framework.Command [ ] commands = new AdvDiscordCommands.Framework.Command [ ] {
                 new HelpCommand (),
@@ -29,12 +28,12 @@ namespace Lomztein.Moduthulhu.Modules.Command
         };
 
         public override void Initialize() {
-            var root = ParentModuleHandler.GetCommandRoot ();
+            var root = ParentContainer.GetCommandRoot ();
             root.AddCommands (commands);
         }
 
         public override void Shutdown() {
-            var root = ParentModuleHandler.GetCommandRoot ();
+            var root = ParentContainer.GetCommandRoot ();
             root.RemoveCommands (commands);
         }
     }

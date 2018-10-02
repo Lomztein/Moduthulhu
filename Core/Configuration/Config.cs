@@ -28,9 +28,7 @@ namespace Lomztein.Moduthulhu.Core.Configuration {
             Name = _name;
         }
 
-        public Config() {
-            Name = "Unnamed Config";
-        }
+        public Config() : this ("Unnamed Config") { }
 
         public abstract void Load();
 

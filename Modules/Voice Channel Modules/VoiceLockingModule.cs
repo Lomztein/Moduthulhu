@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 
 namespace Lomztein.Moduthulhu.Modules.Voice
 {
+    [Dependency ("CommandRootModule")]
     public class VoiceLockingModule : ModuleBase, IConfigurable<MultiConfig> {
 
         public override string Name => "Voice Locking";
@@ -21,8 +22,6 @@ namespace Lomztein.Moduthulhu.Modules.Voice
         public override string Author => "Lomztein";
 
         public override bool Multiserver => true;
-
-        public override string [ ] RequiredModules => new string [ ] { "Lomztein_Command Root" };
 
         [AutoConfig] private MultiEntry<List<ulong>, SocketGuild> nonLockableChannels = new MultiEntry<List<ulong>, SocketGuild> (x => new List<ulong> (), "NonLockableChannels");
         [AutoConfig] private MultiEntry<ulong, SocketGuild> moveToChannel = new MultiEntry<ulong, SocketGuild> (x => x.AFKChannel.ZeroIfNull (), "PrisonChannel");
@@ -35,12 +34,12 @@ namespace Lomztein.Moduthulhu.Modules.Voice
 
         public override void Initialize() {
             lockingCommandSet.ParentModule = this;
-            ParentBotClient.discordClient.UserVoiceStateUpdated += OnUserVoiceStateUpdated;
-            ParentModuleHandler.GetModule<CommandRootModule> ().commandRoot.AddCommands (lockingCommandSet);
+            ParentShard.UserVoiceStateUpdated += OnUserVoiceStateUpdated;
+            ParentContainer.GetModule<CommandRootModule> ().commandRoot.AddCommands (lockingCommandSet);
         }
 
         public override void PostInitialize() {
-            if (ParentModuleHandler.GetModule<AutoVoiceNameModule>() is AutoVoiceNameModule autoVoiceModule) { // You can do this?
+            if (ParentContainer.GetModule<AutoVoiceNameModule>() is AutoVoiceNameModule autoVoiceModule) { // You can do this?
                 autoVoiceModule.AddTag (new AutoVoiceNameModule.Tag ("🔒", x => IsChannelLocked (x)));
             }
         }
@@ -62,13 +61,13 @@ namespace Lomztein.Moduthulhu.Modules.Voice
         }
 
         private async void KickUserToPrison (SocketGuildUser user) {
-            SocketVoiceChannel prison = ParentBotClient.GetChannel (moveToChannel.GetEntry (user.Guild)) as SocketVoiceChannel;
+            SocketVoiceChannel prison = ParentShard.GetVoiceChannel (user.Guild.Id, moveToChannel.GetEntry (user.Guild));
             await user.ModifyAsync (x => x.Channel = prison);
         }
 
         public override void Shutdown() {
-            ParentBotClient.discordClient.UserVoiceStateUpdated -= OnUserVoiceStateUpdated;
-            var root = ParentModuleHandler.GetModule<CommandRootModule> ().commandRoot;
+            ParentShard.UserVoiceStateUpdated -= OnUserVoiceStateUpdated;
+            var root = ParentContainer.GetModule<CommandRootModule> ().commandRoot;
             root.RemoveCommands (lockingCommandSet);
         }
 
@@ -99,13 +98,13 @@ namespace Lomztein.Moduthulhu.Modules.Voice
 
         public List<SocketGuildUser> GetAllowedMembers (SocketVoiceChannel channel) {
             if (lockedChannels.ContainsKey (channel.Id)) {
-                return lockedChannels [ channel.Id ].allowedMembers.Select (x => ParentBotClient.GetUser (channel.Guild.Id, x)).ToList ();
+                return lockedChannels [ channel.Id ].allowedMembers.Select (x => ParentShard.GetUser (channel.Guild.Id, x)).ToList ();
             }
             return null;
         }
 
         private void UpdateChannelName (SocketVoiceChannel channel) {
-            if (ParentModuleHandler.GetModule<AutoVoiceNameModule> () is AutoVoiceNameModule autoVoiceModule) {
+            if (ParentContainer.GetModule<AutoVoiceNameModule> () is AutoVoiceNameModule autoVoiceModule) {
                 autoVoiceModule.UpdateChannel (channel);
             }
         }

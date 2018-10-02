@@ -5,6 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using Lomztein.Moduthulhu.Core.Bot;
+using Lomztein.Moduthulhu.Core.Bot.Client.Sharding;
+using Lomztein.Moduthulhu.Core.Extensions;
 
 namespace Lomztein.Moduthulhu.Modules.Meta.Extensions
 {
@@ -19,7 +21,7 @@ namespace Lomztein.Moduthulhu.Modules.Meta.Extensions
                 .AddField ("Multiserver", module.Multiserver, true)
                 .AddField ("Autopatching", Uri.IsWellFormedUriString (module.PatchURL, UriKind.Absolute), true);
 
-            AddDependanciesInline ("Prerequisite Modules", module.RequiredModules);
+            AddDependanciesInline ("Prerequisite Modules", module.GetDependencyNames ());
 
             void AddDependanciesInline (string header, string[] dependancies) { // Never did I ever say I knew how to spell.
 
@@ -37,8 +39,8 @@ namespace Lomztein.Moduthulhu.Modules.Meta.Extensions
             return builder.Build ();
         }
 
-        public static Embed GetModuleListEmbed (this ModuleLoader handler) {
-            IModule[] allModules = handler.GetActiveModules ();
+        public static Embed GetModuleListEmbed (this ModuleContainer container) {
+            IModule[] allModules = container.Modules.ToArray ();
 
             EmbedBuilder builder = new EmbedBuilder ()
                 .WithAuthor ("Module Information")

@@ -23,7 +23,7 @@ namespace Lomztein.Moduthulhu.Modules.Meta.Commands
             Category = AdditionalCategories.Management;
 
             commandsInSet = new List<ICommand> () {
-                new List (), new Get (), new Info (), new Reload (),
+                new List (), new Get (), new Info (),// new Reload (),
             };
         }
 
@@ -37,13 +37,13 @@ namespace Lomztein.Moduthulhu.Modules.Meta.Commands
 
             [Overload (typeof (IModule), "Get a module from the parent manager by name and author.")]
             public Task<Result> Execute (CommandMetadata data, string name, string author) {
-                IModule result = ParentModule.ParentModuleHandler.GetModule (name, author);
+                IModule result = ParentModule.ParentContainer.Modules.Find (x => x.Name.ToUpper ().Contains (name.ToUpper ()) || x.Author.ToUpper ().Contains (author.ToUpper ()));
                 return TaskResult (result, result.CompactizeName ());
             }
 
             [Overload (typeof (IModule), "Get a module from the parent manager by seach string.")]
             public Task<Result> Execute(CommandMetadata data, string search) {
-                IModule result = ParentModule.ParentModuleHandler.FuzzySearchModule (search);
+                IModule result = ParentModule.ParentContainer.FuzzySearchModule (search);
                 return TaskResult (result, result.CompactizeName ());
             }
 
@@ -59,7 +59,7 @@ namespace Lomztein.Moduthulhu.Modules.Meta.Commands
 
             [Overload (typeof (Embed), "Display a list of all currently active modules.")]
             public Task<Result> Execute (CommandMetadata data) {
-                return TaskResult (ParentModule.ParentModuleHandler.GetModuleListEmbed (), "");
+                return TaskResult (ParentModule.ParentContainer.GetModuleListEmbed (), "");
             }
 
         }
@@ -79,7 +79,7 @@ namespace Lomztein.Moduthulhu.Modules.Meta.Commands
 
             [Overload (typeof (Embed), "Display information about a specific module found by name.")]
             public Task<Result> Execute(CommandMetadata data, string search) {
-                IModule module = ParentModule.ParentModuleHandler.FuzzySearchModule (search);
+                IModule module = ParentModule.ParentContainer.FuzzySearchModule (search);
                 return TaskResult (module?.GetModuleEmbed (), "");
             }
         }
@@ -96,7 +96,6 @@ namespace Lomztein.Moduthulhu.Modules.Meta.Commands
 
             [Overload (typeof (void), "Reload modules from the module folder.")]
             public Task<Result> Execute (CommandMetadata data) {
-                ParentModule.ParentModuleHandler.ReloadModules ();
                 return TaskResult (null, "Modules have been reloaded.");
             }
 

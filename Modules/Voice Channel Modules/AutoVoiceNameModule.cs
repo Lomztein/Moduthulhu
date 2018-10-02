@@ -13,6 +13,8 @@ using System.Linq;
 using System.Threading.Tasks;
 
 namespace Lomztein.Moduthulhu.Modules.Voice {
+
+    [Dependency ("CommandRootModule")]
     public class AutoVoiceNameModule : ModuleBase, IConfigurable<MultiConfig> {
 
         public override string Name => "Auto Voice Names";
@@ -23,8 +25,6 @@ namespace Lomztein.Moduthulhu.Modules.Voice {
 
         [AutoConfig] private MultiEntry<Dictionary<ulong, string>, SocketGuild> channelNames = new MultiEntry<Dictionary<ulong, string>, SocketGuild> (x => x.VoiceChannels.ToDictionary (y => y.Id, z => z.Name), "ChannelNames");
         [AutoConfig] private MultiEntry<List<ulong>, SocketGuild> toIgnore = new MultiEntry<List<ulong>, SocketGuild> (x => new List<ulong> (), "ToIgnore");
-
-        public override string [ ] RequiredModules => new string [ ] { "Lomztein_Command Root" };
 
         // Tag specific configuration
         [AutoConfig] private MultiEntry<ulong, SocketGuild> musicBotID = new MultiEntry<ulong, SocketGuild> (x => 0, "MusicBotID");
@@ -39,11 +39,11 @@ namespace Lomztein.Moduthulhu.Modules.Voice {
 
         public override void Initialize() {
             commandSet = new VoiceNameSet () { ParentModule = this };
-            ParentModuleHandler.GetModule<CommandRootModule> ().commandRoot.AddCommands (commandSet);
-            ParentBotClient.discordClient.ChannelCreated += OnChannelCreated;
-            ParentBotClient.discordClient.ChannelDestroyed += OnChannelDestroyed;
-            ParentBotClient.discordClient.UserVoiceStateUpdated += OnVoiceStateUpdated;
-            ParentBotClient.discordClient.GuildMemberUpdated += OnGuildMemberUpdated;
+            ParentContainer.GetCommandRoot ().AddCommands (commandSet);
+            ParentShard.ChannelCreated += OnChannelCreated;
+            ParentShard.ChannelDestroyed += OnChannelDestroyed;
+            ParentShard.UserVoiceStateUpdated += OnVoiceStateUpdated;
+            ParentShard.GuildMemberUpdated += OnGuildMemberUpdated;
             InitDefaultTags ();
         }
 
@@ -75,7 +75,7 @@ namespace Lomztein.Moduthulhu.Modules.Voice {
 
                 string name = channelNames.GetEntry (channel.Guild).GetValueOrDefault (channel.Id);
 
-                if (ParentBotClient.GetChannel (channel.Guild.Id, channel.Id) == null)
+                if (ParentShard.GetChannel (channel.Guild.Id, channel.Id) == null)
                     return;
 
                 if (toIgnore.GetEntry (channel.Guild).Contains (channel.Id))
@@ -156,11 +156,11 @@ namespace Lomztein.Moduthulhu.Modules.Voice {
         }
 
         public override void Shutdown() {
-            ParentModuleHandler.GetModule<CommandRootModule> ().commandRoot.RemoveCommands (commandSet);
-            ParentBotClient.discordClient.ChannelCreated -= OnChannelCreated;
-            ParentBotClient.discordClient.ChannelDestroyed -= OnChannelDestroyed;
-            ParentBotClient.discordClient.UserVoiceStateUpdated -= OnVoiceStateUpdated;
-            ParentBotClient.discordClient.GuildMemberUpdated -= OnGuildMemberUpdated;
+            ParentContainer.GetCommandRoot ().RemoveCommands (commandSet);
+            ParentShard.ChannelCreated -= OnChannelCreated;
+            ParentShard.ChannelDestroyed -= OnChannelDestroyed;
+            ParentShard.UserVoiceStateUpdated -= OnVoiceStateUpdated;
+            ParentShard.GuildMemberUpdated -= OnGuildMemberUpdated;
         }
 
         public void AddTag (Tag newTag) {

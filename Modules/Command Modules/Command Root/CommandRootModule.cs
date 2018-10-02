@@ -47,7 +47,7 @@ namespace Lomztein.Moduthulhu.Modules.Command {
         }
 
         public override void Initialize() {
-            ParentBotClient.discordClient.MessageReceived += OnMessageRecieved;
+            ParentShard.MessageReceived += OnMessageRecieved;
         }
 
         public override void PostInitialize() {
@@ -61,26 +61,21 @@ namespace Lomztein.Moduthulhu.Modules.Command {
 
         // This is neccesary since awaiting the result in the event would halt the rest of the bot, and we don't really want that.
         private async void AwaitAndSend(SocketMessage arg) {
+            var result = await commandRoot.EnterCommand (arg.Content, arg as SocketUserMessage, arg.GetGuild ().Id);
+            if (result != null) {
 
-            try {
-                var result = await commandRoot.EnterCommand (arg.Content, arg as SocketUserMessage, arg.GetGuild ().Id);
-                if (result != null) {
+                if (result.Exception != null)
+                    Log.Write (Log.Type.EXCEPTION, result.Exception.TargetSite.Name);
 
-                    if (result.Exception != null)
-                        Log.Write (Log.Type.EXCEPTION, result.Exception.TargetSite.Name);
+                if (result.Value is ISendable sendable)
+                    await sendable.SendAsync (arg.Channel);
 
-                    if (result.Value is ISendable sendable)
-                        await sendable.SendAsync (arg.Channel);
-
-                    await MessageControl.SendMessage (arg.Channel as ITextChannel, result?.GetMessage (), false, result?.Value as Embed);
-                }
-            } catch (Exception e) {
-                Log.Write (e);
+                await MessageControl.SendMessage (arg.Channel as ITextChannel, result?.GetMessage (), false, result?.Value as Embed);
             }
         }
 
         public override void Shutdown() {
-            ParentBotClient.discordClient.MessageReceived -= OnMessageRecieved;
+            ParentShard.MessageReceived -= OnMessageRecieved;
         }
 
         public List<ICommand> GetCommands() {

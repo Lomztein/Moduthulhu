@@ -24,16 +24,16 @@ namespace Lomztein.Moduthulhu.Modules.Meta
 
         public override void Initialize() {
             commandSet = new ConfigurationManagerCommandSet () { ParentModule = this };
-            ParentModuleHandler.GetModule<CommandRootModule> ().AddCommands (commandSet);
+            ParentContainer.GetCommandRoot ().AddCommands (commandSet);
         }
 
         public override void Shutdown() {
-            ParentModuleHandler.GetModule<CommandRootModule> ().RemoveCommands (commandSet);
+            ParentContainer.GetCommandRoot ().RemoveCommands (commandSet);
         }
 
         public List<IConfigurable> GetModulesWithEntry(ulong id, string key) {
 
-            IModule[] allModules = ParentModuleHandler.GetActiveModules ();
+            IModule[] allModules = ParentContainer.Modules.ToArray () ;
             List<IConfigurable> withKey = new List<IConfigurable> ();
 
             foreach (IModule module in allModules) {

@@ -1,9 +1,11 @@
 ﻿using Lomztein.Moduthulhu.Core.Module.Framework;
+using Lomztein.Moduthulhu.Modules.Command;
 using Lomztein.Moduthulhu.Modules.Meta.Commands;
 using System;
 
 namespace Lomztein.Moduthulhu.Modules.Meta
 {
+    [Dependency ("CommandRootModule")]
     public class ModuleManagerModule : ModuleBase {
 
         public override string Name => "Module Manager";
@@ -12,17 +14,15 @@ namespace Lomztein.Moduthulhu.Modules.Meta
 
         public override bool Multiserver => true;
 
-        public override string [ ] RequiredModules => new string [ ] { "Lomztein_Command Root" };
-
         private ModuleManagerCommandSet moduleCommands = new ModuleManagerCommandSet ();
 
         public override void Initialize() {
             moduleCommands.ParentModule = this;
-            ParentModuleHandler.GetModule<Command.CommandRootModule> ().commandRoot.AddCommands (moduleCommands);
+            ParentContainer.GetCommandRoot ().AddCommands (moduleCommands);
         }
 
         public override void Shutdown() {
-            ParentModuleHandler.GetModule<Command.CommandRootModule> ().commandRoot.RemoveCommands (moduleCommands);
+            ParentContainer.GetCommandRoot ().RemoveCommands (moduleCommands);
         }
 
     }

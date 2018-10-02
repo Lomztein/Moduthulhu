@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 
 namespace Lomztein.Moduthulhu.Modules.Misc.Karma
 {
+    [Dependency ("CommandRootModule")]
     public class KarmaModule : ModuleBase, IConfigurable<MultiConfig> {
 
         public override string Name => "Karma";
@@ -24,8 +25,6 @@ namespace Lomztein.Moduthulhu.Modules.Misc.Karma
 
         public MultiConfig Configuration { get; set; } = new MultiConfig ();
 
-        public override string [ ] RequiredModules => new string [ ] { "Lomztein_Command Root" };
-
         [AutoConfig] private MultiEntry<ulong, SocketGuild> upvoteEmoteId = new MultiEntry<ulong, SocketGuild> (x => x.Emotes.FirstOrDefault (y => y.Name == "upvote").ZeroIfNull (), "UpvoteEmoteID", true);
         [AutoConfig] private MultiEntry<ulong, SocketGuild> downvoteEmoteId = new MultiEntry<ulong, SocketGuild> (x => x.Emotes.FirstOrDefault (y => y.Name == "downvote").ZeroIfNull (), "DownvoteEmoteID", true);
 
@@ -34,10 +33,10 @@ namespace Lomztein.Moduthulhu.Modules.Misc.Karma
         private KarmaCommand karmaCommand = new KarmaCommand ();
 
         public override void Initialize() {
-            ParentBotClient.discordClient.ReactionAdded += OnReactionAdded;
-            ParentBotClient.discordClient.ReactionRemoved += OnReactionRemoved;
+            ParentShard.ReactionAdded += OnReactionAdded;
+            ParentShard.ReactionRemoved += OnReactionRemoved;
             karmaCommand.ParentModule = this;
-            ParentModuleHandler.GetModule<CommandRootModule> ().commandRoot.AddCommands (karmaCommand);
+            ParentContainer.GetCommandRoot ().AddCommands (karmaCommand);
             LoadKarma ();
         }
 
@@ -73,9 +72,9 @@ namespace Lomztein.Moduthulhu.Modules.Misc.Karma
         }
 
         public override void Shutdown() {
-            ParentBotClient.discordClient.ReactionAdded -= OnReactionAdded;
-            ParentBotClient.discordClient.ReactionRemoved -= OnReactionRemoved;
-            ParentModuleHandler.GetModule<CommandRootModule> ().commandRoot.RemoveCommands (karmaCommand);
+            ParentShard.ReactionAdded -= OnReactionAdded;
+            ParentShard.ReactionRemoved -= OnReactionRemoved;
+            ParentContainer.GetCommandRoot ().RemoveCommands (karmaCommand);
         }
 
         private void LoadKarma () {
