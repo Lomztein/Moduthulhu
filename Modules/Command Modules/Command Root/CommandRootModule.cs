@@ -1,24 +1,22 @@
-﻿using Lomztein.Moduthulhu.Core.Module.Framework;
-using System;
+﻿using Discord;
 using Discord.WebSocket;
-using System.Threading.Tasks;
-using Discord;
-using Lomztein.Moduthulhu.Core.Bot;
-using System.Collections.Generic;
-using Lomztein.Moduthulhu.Core.Bot.Messaging;
-using Lomztein.Moduthulhu.Core.Configuration;
-using Lomztein.Moduthulhu.Core.Bot.Misc;
-using Lomztein.Moduthulhu.Core.Bot.Messaging.Advanced;
-using Lomztein.AdvDiscordCommands.Framework.Interfaces;
-using Lomztein.AdvDiscordCommands.Framework;
-using System.Linq;
-using Lomztein.Moduthulhu.Modules.Meta.Extensions;
-using Lomztein.Moduthulhu.Core.Extensions;
-using Lomztein.AdvDiscordCommands.Framework.Execution;
-using Lomztein.Moduthulhu.Cross;
 using Lomztein.AdvDiscordCommands.Extensions;
+using Lomztein.AdvDiscordCommands.Framework;
+using Lomztein.AdvDiscordCommands.Framework.Interfaces;
+using Lomztein.Moduthulhu.Core.Bot.Messaging;
+using Lomztein.Moduthulhu.Core.Bot.Messaging.Advanced;
+using Lomztein.Moduthulhu.Core.Bot.Misc;
+using Lomztein.Moduthulhu.Core.Configuration;
+using Lomztein.Moduthulhu.Core.Extensions;
+using Lomztein.Moduthulhu.Core.Module.Framework;
+using Lomztein.Moduthulhu.Cross;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Lomztein.Moduthulhu.Modules.Command {
+
     public class CommandRootModule : ModuleBase, ICommandSet, IConfigurable<MultiConfig> {
 
         public override string Name => "Command Root";
@@ -54,13 +52,13 @@ namespace Lomztein.Moduthulhu.Modules.Command {
             commandRoot.InitializeCommands ();
         }
 
-        private Task OnMessageRecieved(SocketMessage arg) {
-            AwaitAndSend (arg);
-            return Task.CompletedTask;
+        private async Task OnMessageRecieved(SocketMessage arg) {
+            await AwaitAndSend (arg);
         }
 
         // This is neccesary since awaiting the result in the event would halt the rest of the bot, and we don't really want that.
-        private async void AwaitAndSend(SocketMessage arg) {
+        private async Task AwaitAndSend(SocketMessage arg) {
+
             var result = await commandRoot.EnterCommand (arg.Content, arg as SocketUserMessage, arg.GetGuild ().Id);
             if (result != null) {
 
@@ -72,6 +70,7 @@ namespace Lomztein.Moduthulhu.Modules.Command {
 
                 await MessageControl.SendMessage (arg.Channel as ITextChannel, result?.GetMessage (), false, result?.Value as Embed);
             }
+
         }
 
         public override void Shutdown() {

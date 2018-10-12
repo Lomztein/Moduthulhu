@@ -30,6 +30,7 @@ namespace Lomztein.Moduthulhu.Core.Configuration {
 
         public Config() : this ("Unnamed Config") { }
 
+        // TODO: Consider offloading the raw data IO into a ConfigSource type or something. This would allow seamless swapping between storage methods.
         public abstract void Load();
 
         public abstract void Save();
