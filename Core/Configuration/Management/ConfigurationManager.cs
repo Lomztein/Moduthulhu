@@ -8,6 +8,8 @@ using Lomztein.Moduthulhu.Core.Configuration.Management.Adders;
 
 namespace Lomztein.Moduthulhu.Core.Configuration.Management {
 
+    // TODO: Figure out a way to use a "Source" system for easier configuration. As in instead of text input, a user can just type in a channel name or something, and a "SourceCoverter" can convert it automatically.
+
     /// <summary>
     /// Contains a bunch of methods for modifying and listing configuration during runtime. There are few compile-time checks in place due to a large amount of dynamics and objects, so be careful.
     /// </summary>

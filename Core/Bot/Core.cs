@@ -17,9 +17,6 @@ namespace Lomztein.Moduthulhu.Core.Bot {
     /// </summary>
     public class Core {
 
-        // TODO: Split BotClient into a Core class and a IClientWrapper interface.
-        // TODO: Move the Clock systems into the main Core area.
-        // TODO: Allow for on-the-fly changing of avatar/username
         // TODO: Allow for sending bot-wide messages directly in console.
 
         public DateTime BootDate { get; private set; }
@@ -28,6 +25,7 @@ namespace Lomztein.Moduthulhu.Core.Bot {
         internal ModuleLoader ModuleLoader { get; private set; }
         internal Clock.Clock Clock { get; private set; }
         internal ErrorReporter ErrorReporter { get; private set; }
+        public UserList BotAdministrators { get; private set; }
 
         public string BaseDirectory { get => AppContext.BaseDirectory; }
 
@@ -46,6 +44,7 @@ namespace Lomztein.Moduthulhu.Core.Bot {
 
             ErrorReporter = new ErrorReporter (this);
             ClientManager.OnExceptionCaught += ErrorReporter.ReportError;
+            BotAdministrators = new UserList (Path.Combine (BaseDirectory, "AdministratorIDs"));
 
             await Task.Delay (-1);
             Log.Write (Log.Type.BOT, "Shutting down..");

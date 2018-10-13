@@ -13,12 +13,12 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding
 {
     public class Shard {
 
-        internal BotClient BotClient { get; private set; }
+        public BotClient BotClient { get; private set; }
         internal ClientManager ClientManager { get => BotClient.ClientManager; }
-        internal Core Core { get => BotClient.Core; }
+        public Core Core { get => BotClient.Core; }
 
         internal ModuleLoader ModuleLoader { get => BotClient.Core.ModuleLoader; }
-        internal ModuleContainer ModuleContainer { get; private set; }
+        public ModuleContainer ModuleContainer { get; private set; }
 
         public DiscordSocketClient Client { get; private set; }
         public IReadOnlyCollection<SocketGuild> Guilds { get => Client.Guilds; }
@@ -84,12 +84,18 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding
             await Login ();
             await AwaitConnected ();
 
+            UserIsTyping += Shard_UserIsTyping;
+
             ModuleContainer = new ModuleContainer (this);
             ModuleContainer.InstantiateModules ();
             ModuleContainer.InitializeModules ();
             InitializeErrorHandling ();
 
             Client.Ready += Client_Ready;
+        }
+
+        private Task Shard_UserIsTyping(SocketUser arg1, ISocketMessageChannel arg2) {
+            throw new Exception (arg1.Username);
         }
 
         private Task Client_Ready() {
@@ -132,38 +138,46 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding
         public override string ToString() => $"{BotClient} - S{ShardId}/{BotClient.TotalShards}";
 
         private void InitializeErrorHandling() {
-            Client.ChannelCreated           += async (x) =>         { try { await ChannelCreated?.Invoke (x);              } catch (Exception exc) { ExceptionCaught (exc); } };
-            Client.ChannelDestroyed         += async (x) =>         { try { await ChannelDestroyed?.Invoke (x);            } catch (Exception exc) { ExceptionCaught (exc); } };
-            Client.ChannelUpdated           += async (x, y) =>      { try { await ChannelUpdated?.Invoke (x, y);           } catch (Exception exc) { ExceptionCaught (exc); } };
-            Client.GuildAvailable           += async (x) =>         { try { await GuildAvailable?.Invoke (x);              } catch (Exception exc) { ExceptionCaught (exc); } };
-            Client.GuildMembersDownloaded   += async (x) =>         { try { await GuildMembersDownloaded?.Invoke (x);      } catch (Exception exc) { ExceptionCaught (exc); } };
-            Client.GuildMemberUpdated       += async (x, y) =>      { try { await GuildMemberUpdated?.Invoke (x, y);       } catch (Exception exc) { ExceptionCaught (exc); } };
-            Client.GuildUnavailable         += async (x) =>         { try { await GuildUnavailable?.Invoke (x);            } catch (Exception exc) { ExceptionCaught (exc); } };
-            Client.GuildUpdated             += async (x, y) =>      { try { await GuildUpdated?.Invoke (x, y);             } catch (Exception exc) { ExceptionCaught (exc); } };
-            Client.JoinedGuild              += async (x) =>         { try { await JoinedGuild?.Invoke (x);                 } catch (Exception exc) { ExceptionCaught (exc); } };
-            Client.LeftGuild                += async (x) =>         { try { await LeftGuild?.Invoke (x);                   } catch (Exception exc) { ExceptionCaught (exc); } };
-            Client.MessageDeleted           += async (x, y) =>      { try { await MessageDeleted?.Invoke (x, y);           } catch (Exception exc) { ExceptionCaught (exc); } };
-            Client.MessageReceived          += async (x) =>         { try { await MessageReceived?.Invoke (x);             } catch (Exception exc) { ExceptionCaught (exc); } };
-            Client.MessageUpdated           += async (x, y, z) =>   { try { await MessageUpdated?.Invoke (x, y, z);        } catch (Exception exc) { ExceptionCaught (exc); } };
-            Client.ReactionAdded            += async (x, y, z) =>   { try { await ReactionAdded?.Invoke (x, y, z);         } catch (Exception exc) { ExceptionCaught (exc); } };
-            Client.ReactionRemoved          += async (x, y, z) =>   { try { await ReactionRemoved?.Invoke (x, y, z);       } catch (Exception exc) { ExceptionCaught (exc); } };
-            Client.ReactionsCleared         += async (x, y) =>      { try { await ReactionsCleared?.Invoke (x, y);         } catch (Exception exc) { ExceptionCaught (exc); } };
-            Client.RoleCreated              += async (x) =>         { try { await RoleCreated?.Invoke (x);                 } catch (Exception exc) { ExceptionCaught (exc); } };
-            Client.RoleDeleted              += async (x) =>         { try { await RoleDeleted?.Invoke (x);                 } catch (Exception exc) { ExceptionCaught (exc); } };
-            Client.RoleUpdated              += async (x, y) =>      { try { await RoleUpdated?.Invoke (x, y);              } catch (Exception exc) { ExceptionCaught (exc); } };
-            Client.UserBanned               += async (x, y) =>      { try { await UserBanned?.Invoke (x, y);               } catch (Exception exc) { ExceptionCaught (exc); } };
-            Client.UserIsTyping             += async (x, y) =>      { try { await UserIsTyping?.Invoke (x, y);             } catch (Exception exc) { ExceptionCaught (exc); } };
-            Client.UserJoined               += async (x) =>         { try { await UserJoined?.Invoke (x);                  } catch (Exception exc) { ExceptionCaught (exc); } };
-            Client.UserLeft                 += async (x) =>         { try { await UserLeft?.Invoke (x);                    } catch (Exception exc) { ExceptionCaught (exc); } };
-            Client.UserUnbanned             += async (x, y) =>      { try { await UserUnbanned?.Invoke (x, y);             } catch (Exception exc) { ExceptionCaught (exc); } };
-            Client.UserUpdated              += async (x, y) =>      { try { await UserUpdated?.Invoke (x, y);              } catch (Exception exc) { ExceptionCaught (exc); } };
-            Client.UserVoiceStateUpdated    += async (x, y, z) =>   { try { await UserVoiceStateUpdated?.Invoke (x, y, z); } catch (Exception exc) { ExceptionCaught (exc); } };
+            Client.ChannelCreated           += async (x) =>         { try { await HackyInvoke (ChannelCreated, x);              } catch (Exception exc) { ExceptionCaught (exc); } };
+            Client.ChannelDestroyed         += async (x) =>         { try { await HackyInvoke (ChannelDestroyed, x);            } catch (Exception exc) { ExceptionCaught (exc); } };
+            Client.ChannelUpdated           += async (x, y) =>      { try { await HackyInvoke (ChannelUpdated, x, y);           } catch (Exception exc) { ExceptionCaught (exc); } };
+            Client.GuildAvailable           += async (x) =>         { try { await HackyInvoke (GuildAvailable, x);              } catch (Exception exc) { ExceptionCaught (exc); } };
+            Client.GuildMembersDownloaded   += async (x) =>         { try { await HackyInvoke (GuildMembersDownloaded, x);      } catch (Exception exc) { ExceptionCaught (exc); } };
+            Client.GuildMemberUpdated       += async (x, y) =>      { try { await HackyInvoke (GuildMemberUpdated, x, y);       } catch (Exception exc) { ExceptionCaught (exc); } };
+            Client.GuildUnavailable         += async (x) =>         { try { await HackyInvoke (GuildUnavailable, x);            } catch (Exception exc) { ExceptionCaught (exc); } };
+            Client.GuildUpdated             += async (x, y) =>      { try { await HackyInvoke (GuildUpdated, x, y);             } catch (Exception exc) { ExceptionCaught (exc); } };
+            Client.JoinedGuild              += async (x) =>         { try { await HackyInvoke (JoinedGuild, x);                 } catch (Exception exc) { ExceptionCaught (exc); } };
+            Client.LeftGuild                += async (x) =>         { try { await HackyInvoke (LeftGuild, x);                   } catch (Exception exc) { ExceptionCaught (exc); } };
+            Client.MessageDeleted           += async (x, y) =>      { try { await HackyInvoke (MessageDeleted, x, y);           } catch (Exception exc) { ExceptionCaught (exc); } };
+            Client.MessageReceived          += async (x) =>         { try { await HackyInvoke (MessageReceived, x);             } catch (Exception exc) { ExceptionCaught (exc); } };
+            Client.MessageUpdated           += async (x, y, z) =>   { try { await HackyInvoke (MessageUpdated, x, y, z);        } catch (Exception exc) { ExceptionCaught (exc); } };
+            Client.ReactionAdded            += async (x, y, z) =>   { try { await HackyInvoke (ReactionAdded, x, y, z);         } catch (Exception exc) { ExceptionCaught (exc); } };
+            Client.ReactionRemoved          += async (x, y, z) =>   { try { await HackyInvoke (ReactionRemoved, x, y, z);       } catch (Exception exc) { ExceptionCaught (exc); } };
+            Client.ReactionsCleared         += async (x, y) =>      { try { await HackyInvoke (ReactionsCleared, x, y);         } catch (Exception exc) { ExceptionCaught (exc); } };
+            Client.RoleCreated              += async (x) =>         { try { await HackyInvoke (RoleCreated, x);                 } catch (Exception exc) { ExceptionCaught (exc); } };
+            Client.RoleDeleted              += async (x) =>         { try { await HackyInvoke (RoleDeleted, x);                 } catch (Exception exc) { ExceptionCaught (exc); } };
+            Client.RoleUpdated              += async (x, y) =>      { try { await HackyInvoke (RoleUpdated, x, y);              } catch (Exception exc) { ExceptionCaught (exc); } };
+            Client.UserBanned               += async (x, y) =>      { try { await HackyInvoke (UserBanned, x, y);               } catch (Exception exc) { ExceptionCaught (exc); } };
+            Client.UserIsTyping             += async (x, y) =>      { try { await HackyInvoke (UserIsTyping, x, y);             } catch (Exception exc) { ExceptionCaught (exc); } };
+            Client.UserJoined               += async (x) =>         { try { await HackyInvoke (UserJoined, x);                  } catch (Exception exc) { ExceptionCaught (exc); } };
+            Client.UserLeft                 += async (x) =>         { try { await HackyInvoke (UserLeft, x);                    } catch (Exception exc) { ExceptionCaught (exc); } };
+            Client.UserUnbanned             += async (x, y) =>      { try { await HackyInvoke (UserUnbanned, x, y);             } catch (Exception exc) { ExceptionCaught (exc); } };
+            Client.UserUpdated              += async (x, y) =>      { try { await HackyInvoke (UserUpdated,x, y);               } catch (Exception exc) { ExceptionCaught (exc); } };
+            Client.UserVoiceStateUpdated    += async (x, y, z) =>   { try { await HackyInvoke (UserVoiceStateUpdated, x, y, z); } catch (Exception exc) { ExceptionCaught (exc); } };
+         }
+
+        // May the gods of code have mercy on my soul.
+        private async Task HackyInvoke (dynamic function, params object[] parameters) {
+            if (function == null)
+                return;
+            Type type = function.GetType ();
+            await type.GetMethod ("Invoke").Invoke (function, parameters);
         }
 
-        private async void ExceptionCaught (Exception exception) {
-            Log.Write (exception);
-            await Client.SetGameAsync (exception.Message + " - " + exception.GetType ().Name + " at " + exception.TargetSite.Name + " in " + exception.Source);
-            OnExceptionCaught?.Invoke (exception);
+        private async void ExceptionCaught(Exception inner) {
+            Log.Write (inner);
+            await Client.SetGameAsync (inner.Message + " - " + inner.GetType ().Name + " at " + inner.TargetSite.Name + " in " + inner.Source);
+            OnExceptionCaught?.Invoke (inner);
         }
 
         // Status related stuff

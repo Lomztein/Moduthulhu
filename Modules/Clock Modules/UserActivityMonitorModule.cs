@@ -18,7 +18,7 @@ namespace Lomztein.Moduthulhu.Modules.Clock.ActivityMonitor
     public class UserActivityMonitorModule : ModuleBase, IConfigurable<MultiConfig> {
 
         public override string Name => "User Activity Module";
-        public override string Description => "Catagorises people into configurable roles based on their last date of activity.";
+        public override string Description => "Categorises people into configurable roles based on their last date of activity.";
         public override string Author => "Lomztein";
 
         public override bool Multiserver => true;
@@ -69,8 +69,8 @@ namespace Lomztein.Moduthulhu.Modules.Clock.ActivityMonitor
             if (user == null)
                 return;
 
-            //if (this.IsConfigured (user.Guild.Id))
-            //    return;
+            if (this.IsConfigured (user.Guild.Id))
+                return;
 
             SocketGuild guild = user.Guild;
 
@@ -139,8 +139,6 @@ namespace Lomztein.Moduthulhu.Modules.Clock.ActivityMonitor
                 if (!userActivity[u.Guild.Id].ContainsKey (u.Id)) {
                     await RecordActivity (u, DateTime.Now);
                 }
-
-                await UpdateUser (u);
             }
         }
 

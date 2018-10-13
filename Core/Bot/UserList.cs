@@ -1,4 +1,5 @@
-﻿using Lomztein.Moduthulhu.Cross;
+﻿using Discord;
+using Lomztein.Moduthulhu.Cross;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,6 +18,7 @@ namespace Lomztein.Moduthulhu.Core.Bot
         }
 
         public bool Contains(ulong id) => Users.Contains (id);
+        public bool Contains(IUser user) => Users.Contains (user.Id);
 
         public void AddUser(ulong id) {
             Users.Add (id);

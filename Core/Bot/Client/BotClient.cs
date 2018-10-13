@@ -15,21 +15,24 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client
     {
         //internal const int GUILDS_PER_SHARD = 2000;
         internal ClientManager ClientManager { get; private set; }
-        internal Core Core { get => ClientManager.Core; }
+        public Core Core { get => ClientManager.Core; }
         public TimeSpan Uptime { get => DateTime.Now - Core.BootDate; }
 
         public string Name { get; private set; }
         internal string Token { get; set; }
 
-        public string BaseDirectory { get => ClientManager.ClientsDirectory + "\\" + Name + "\\"; }
+        public string BaseDirectory { get => ClientManager.ClientsDirectory + "/" + Name + "/"; }
 
         internal Shard[] Shards { get; private set; }
         public int TotalShards { get; private set; } = 1;
         public IEnumerable<SocketGuild> AllGuilds { get => Shards.SelectMany (x => x.Guilds); }
+        public DiscordSocketClient FirstClient { get => Shards.First ().Client; }
 
         public event Action<Shard> OnShardSpawned;
         public event Action<Shard> OnShardKilled;
         public event Action<Exception> OnExceptionCaught;
+
+        public UserList ClientAdministrators { get; private set; }
 
         internal BotClient (ClientManager clientManager, string name) {
 
@@ -37,6 +40,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client
 
             Name = name;
             Token = File.ReadAllLines (BaseDirectory + "token.txt")[0];
+            ClientAdministrators = new UserList (Path.Combine (BaseDirectory, "ClientAdministratorIDs"));
 
             Shards = new Shard[TotalShards];
 
@@ -52,9 +56,11 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client
         }
 
         internal async Task Kill () {
-            foreach (Shard shard in Shards) {
-                await KillShard (shard);
-            }
+            await ClientManager.KillClient (this);
+        }
+
+        public async Task Restart () {
+            await ClientManager.RestartClient (this);
         }
 
         internal async Task KillShard (Shard shard) {

@@ -18,7 +18,7 @@ namespace Lomztein.Moduthulhu.Cross
         public static string GetStatusPath() {
             string currentDirectory = AppContext.BaseDirectory;
             string root = Directory.GetParent (currentDirectory).Parent.FullName;
-            return root + "\\" + "Status";
+            return root + "/" + "Status";
         }
 
         public static T Get<T> (string tokenName) {

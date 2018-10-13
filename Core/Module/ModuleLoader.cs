@@ -17,12 +17,9 @@ namespace Lomztein.Moduthulhu.Core.Module
 {
     internal class ModuleLoader {
 
-        // This class could use a refactoring, it's gotten a bit messy.
-        // TODO: Create a proper dependancy tree and order initialization based on that, as well as allowing for better on-the-fly swapping.
-        // TODO: Figure out much more robust error handling for modules.
-        // TODO: Rework the flow of this class in order to be much cleaner.
+        // TODO: Improve on-the-fly disabling and enabling of modules using the dependancy tree.
 
-        internal string BaseDirectory { get => Core.BaseDirectory + "//Modules"; }
+        internal string BaseDirectory { get => Core.BaseDirectory + "/Modules"; }
         private List<Type> LoadedModuleTypes { get; set; } = new List<Type> ();
 
         internal ModuleDependencyTree DependencyTree { get; private set; }

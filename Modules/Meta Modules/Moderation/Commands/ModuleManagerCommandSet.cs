@@ -19,7 +19,7 @@ namespace Lomztein.Moduthulhu.Modules.Meta.Commands
     {
         public ModuleManagerCommandSet () {
             Name = "modules";
-            Description = "Get information about modules.";
+            Description = "Get module info.";
             Category = AdditionalCategories.Management;
 
             commandsInSet = new List<ICommand> () {
@@ -31,7 +31,7 @@ namespace Lomztein.Moduthulhu.Modules.Meta.Commands
 
             public Get () {
                 Name = "get";
-                Description = "Get a module object.";
+                Description = "Get module object.";
                 Category = AdditionalCategories.Management;
             }
 
@@ -53,7 +53,7 @@ namespace Lomztein.Moduthulhu.Modules.Meta.Commands
 
             public List () {
                 Name = "list";
-                Description = "Display a list of modules.";
+                Description = "Display module list.";
                 Category = AdditionalCategories.Management;
             }
 
@@ -68,7 +68,7 @@ namespace Lomztein.Moduthulhu.Modules.Meta.Commands
 
             public Info () {
                 Name = "info";
-                Description = "Display information about a module.";
+                Description = "Display module info.";
                 Category = AdditionalCategories.Management;
             }
 
@@ -90,6 +90,7 @@ namespace Lomztein.Moduthulhu.Modules.Meta.Commands
                 Name = "reload";
                 Description = "Reload modules.";
                 Category = AdditionalCategories.Management;
+                CommandEnabled = false;
 
                 RequiredPermissions.Add (GuildPermission.Administrator);
             }

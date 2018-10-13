@@ -28,8 +28,8 @@ namespace Lomztein.Moduthulhu.Modules.Command {
         string INamed.Name { get => Name; set => throw new NotImplementedException (); }
         string INamed.Description { get => Description; set => throw new NotImplementedException (); }
 
-        [AutoConfig] private MultiEntry<char, SocketGuild> trigger = new MultiEntry<char, SocketGuild> (x => '!', "Trigger");
-        [AutoConfig] private MultiEntry<char, SocketGuild> hiddenTrigger = new MultiEntry<char, SocketGuild> (x => '/', "HiddenTrigger");
+        [AutoConfig] private MultiEntry<char> trigger = new MultiEntry<char> (x => '!', "Trigger");
+        [AutoConfig] private MultiEntry<char> hiddenTrigger = new MultiEntry<char> (x => '/', "HiddenTrigger");
 
         public MultiConfig Configuration { get; set; } = new MultiConfig ();
 
