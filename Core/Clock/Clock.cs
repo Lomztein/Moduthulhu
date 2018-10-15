@@ -25,6 +25,8 @@ namespace Lomztein.Moduthulhu.Core.Clock
         public event TickEvent OnMonthPassed;
         public event TickEvent OnYearPassed;
 
+        public event Action<Exception> OnExceptionCaught;
+
         public Clock (int tickFrequency) {
             TickFrequency = tickFrequency;
             Start ();
@@ -53,18 +55,22 @@ namespace Lomztein.Moduthulhu.Core.Clock
         }
 
         private void Tick (DateTime curTick, DateTime lTick) {
-            Tickables.ForEach (x => x.Tick (LastTick, DateTime.Now));
+            try {
+                Tickables.ForEach (x => x.Tick (LastTick, DateTime.Now));
 
-            if (MinutePassed (curTick, lTick))
-                OnMinutePassed?.Invoke (curTick, lTick);
-            if (HourPassed (curTick, lTick))
-                OnHourPassed?.Invoke (curTick, lTick);
-            if (DayPassed (curTick, lTick))
-                OnDayPassed?.Invoke (curTick, lTick);
-            if (MonthPassed (curTick, lTick))
-                OnMonthPassed?.Invoke (curTick, lTick);
-            if (YearPassed (curTick, lTick))
-                OnYearPassed?.Invoke (curTick, lTick);
+                if (MinutePassed (curTick, lTick))
+                    OnMinutePassed?.Invoke (curTick, lTick);
+                if (HourPassed (curTick, lTick))
+                    OnHourPassed?.Invoke (curTick, lTick);
+                if (DayPassed (curTick, lTick))
+                    OnDayPassed?.Invoke (curTick, lTick);
+                if (MonthPassed (curTick, lTick))
+                    OnMonthPassed?.Invoke (curTick, lTick);
+                if (YearPassed (curTick, lTick))
+                    OnYearPassed?.Invoke (curTick, lTick);
+            } catch (Exception exc) {
+                OnExceptionCaught?.Invoke (exc);
+            }
         }
 
         // Just for good measure.

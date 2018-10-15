@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 
 namespace Lomztein.Moduthulhu.Core.Bot.Client
 {
-    internal class ClientManager
+    public class ClientManager
     {
-        internal Core Core { get; private set; }
+        public Core Core { get; private set; }
         internal List<BotClient> ActiveClients { get; private set; } = new List<BotClient> ();
         public IEnumerable<SocketGuild> AllGuilds { get => ActiveClients.SelectMany (x => x.AllGuilds); }
 
@@ -39,7 +39,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client
             OnClientKilled?.Invoke (client);
         }
 
-        internal async Task RestartClient (BotClient client) {
+        public async Task RestartClient (BotClient client) {
             string name = client.Name;
             await KillClient (client);
             SpawnClient (name);

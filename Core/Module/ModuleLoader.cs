@@ -19,7 +19,7 @@ namespace Lomztein.Moduthulhu.Core.Module
 
         // TODO: Improve on-the-fly disabling and enabling of modules using the dependancy tree.
 
-        internal string BaseDirectory { get => Core.BaseDirectory + "/Modules"; }
+        internal string BaseDirectory { get => Core.BaseDirectory + "Modules"; }
         private List<Type> LoadedModuleTypes { get; set; } = new List<Type> ();
 
         internal ModuleDependencyTree DependencyTree { get; private set; }

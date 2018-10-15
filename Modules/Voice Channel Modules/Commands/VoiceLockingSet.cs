@@ -18,7 +18,7 @@ namespace Lomztein.Moduthulhu.Modules.Voice.Commands {
 
         public VoiceLockingSet() {
             Name = "voice";
-            Description = "A command set for locking voice channels.";
+            Description = "Voice related commands.";
             Category = AdditionalCategories.Voice;
 
             commandsInSet = new List<ICommand> () {
@@ -77,7 +77,7 @@ namespace Lomztein.Moduthulhu.Modules.Voice.Commands {
 
             public Invite() {
                 Name = "invite";
-                Description = "Invite someone to your locked channel.";
+                Description = "Invite someone.";
                 Category = LockingCategory;
 
             }
@@ -100,7 +100,7 @@ namespace Lomztein.Moduthulhu.Modules.Voice.Commands {
 
             public Kick() {
                 Name = "kick";
-                Description = "Kick someone from your locked channel.";
+                Description = "Kick someone.";
                 Category = LockingCategory;
             }
 

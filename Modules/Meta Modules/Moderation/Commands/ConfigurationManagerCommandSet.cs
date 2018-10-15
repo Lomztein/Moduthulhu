@@ -20,7 +20,7 @@ namespace Lomztein.Moduthulhu.Modules.Meta.Commands {
 
         public ConfigurationManagerCommandSet() {
             Name = "config";
-            Description = "Commands for configuring the bot.";
+            Description = "Bot configuration.";
             RequiredPermissions.Add (GuildPermission.ManageGuild);
             Category = AdditionalCategories.Management;
 
@@ -76,7 +76,7 @@ namespace Lomztein.Moduthulhu.Modules.Meta.Commands {
 
             public Add () {
                 Name = "add";
-                Description = "Add a value to a list-type entry.";
+                Description = "Add to an entry.";
                 Category = AdditionalCategories.Management;
                 RequiredPermissions.Add (GuildPermission.ManageGuild);
             }
@@ -107,7 +107,7 @@ namespace Lomztein.Moduthulhu.Modules.Meta.Commands {
 
             public Remove() {
                 Name = "remove";
-                Description = "Remove a value from a list-type entry.";
+                Description = "Remove from an entry.";
                 Category = AdditionalCategories.Management;
                 RequiredPermissions.Add (GuildPermission.ManageGuild);
             }
@@ -138,7 +138,7 @@ namespace Lomztein.Moduthulhu.Modules.Meta.Commands {
 
             public List () {
                 Name = "list";
-                Description = "List all values in a list-type entry.";
+                Description = "List an entry.";
                 Category = AdditionalCategories.Management;
                 RequiredPermissions.Add (GuildPermission.ManageGuild);
             }
@@ -171,7 +171,7 @@ namespace Lomztein.Moduthulhu.Modules.Meta.Commands {
 
             public All() {
                 Name = "all";
-                Description = "Show every single configuration entry.";
+                Description = "Show every entry.";
                 Category = AdditionalCategories.Management;
                 RequiredPermissions.Add (Discord.GuildPermission.ManageGuild);
             }
@@ -196,7 +196,7 @@ namespace Lomztein.Moduthulhu.Modules.Meta.Commands {
 
             public Unset() {
                 Name = "unset";
-                Description = "Show every configuration entry that hasn't been set.";
+                Description = "Show unset entry.";
                 Category = AdditionalCategories.Management;
                 RequiredPermissions.Add (Discord.GuildPermission.ManageGuild);
             }

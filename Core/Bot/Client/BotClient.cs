@@ -14,7 +14,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client
     public class BotClient
     {
         //internal const int GUILDS_PER_SHARD = 2000;
-        internal ClientManager ClientManager { get; private set; }
+        public ClientManager ClientManager { get; private set; }
         public Core Core { get => ClientManager.Core; }
         public TimeSpan Uptime { get => DateTime.Now - Core.BootDate; }
 
@@ -56,11 +56,10 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client
         }
 
         internal async Task Kill () {
-            await ClientManager.KillClient (this);
-        }
-
-        public async Task Restart () {
-            await ClientManager.RestartClient (this);
+            foreach (Shard shard in Shards) {
+                await KillShard (shard);
+            }
+            Shards = new Shard[TotalShards];
         }
 
         internal async Task KillShard (Shard shard) {

@@ -41,10 +41,14 @@ namespace Lomztein.Moduthulhu.Core.Bot {
             Clock = new Clock.Clock (1);
 
             ClientManager.InitializeClients ();
-
             ErrorReporter = new ErrorReporter (this);
+
             ClientManager.OnExceptionCaught += ErrorReporter.ReportError;
+            Clock.OnExceptionCaught += ErrorReporter.ReportError;
+
             BotAdministrators = new UserList (Path.Combine (BaseDirectory, "AdministratorIDs"));
+
+            Status.Set ("CorePath", BaseDirectory);
 
             await Task.Delay (-1);
             Log.Write (Log.Type.BOT, "Shutting down..");

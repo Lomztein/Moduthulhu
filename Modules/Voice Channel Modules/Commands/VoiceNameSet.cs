@@ -15,7 +15,7 @@ namespace Lomztein.Moduthulhu.Modules.Voice.Commands
     {
         public VoiceNameSet () {
             Name = "voice";
-            Description = "Command related to voice channels.";
+            Description = "Voice related commands.";
             Category = AdditionalCategories.Voice;
 
             commandsInSet = new List<ICommand> () {
@@ -27,7 +27,7 @@ namespace Lomztein.Moduthulhu.Modules.Voice.Commands
 
             public CustomName () {
                 Name = "name";
-                Description = "Custom names for channel.";
+                Description = "Specify channel name.";
                 Category = AdditionalCategories.Voice;
             }
 

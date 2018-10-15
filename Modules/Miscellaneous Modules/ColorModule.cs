@@ -59,7 +59,7 @@ namespace Lomztein.Moduthulhu.Modules.Misc.Color
 
             public SetColour () {
                 Name = "setcolour";
-                Description = "Set your personal color to something funky.";
+                Description = "Funkyfy yourself.";
                 Category = StandardCategories.Utility;
             }
 

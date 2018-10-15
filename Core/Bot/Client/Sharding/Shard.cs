@@ -84,18 +84,12 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding
             await Login ();
             await AwaitConnected ();
 
-            UserIsTyping += Shard_UserIsTyping;
-
             ModuleContainer = new ModuleContainer (this);
             ModuleContainer.InstantiateModules ();
             ModuleContainer.InitializeModules ();
             InitializeErrorHandling ();
 
             Client.Ready += Client_Ready;
-        }
-
-        private Task Shard_UserIsTyping(SocketUser arg1, ISocketMessageChannel arg2) {
-            throw new Exception (arg1.Username);
         }
 
         private Task Client_Ready() {
@@ -175,6 +169,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding
         }
 
         private async void ExceptionCaught(Exception inner) {
+            inner = inner.InnerException ?? inner;
             Log.Write (inner);
             await Client.SetGameAsync (inner.Message + " - " + inner.GetType ().Name + " at " + inner.TargetSite.Name + " in " + inner.Source);
             OnExceptionCaught?.Invoke (inner);

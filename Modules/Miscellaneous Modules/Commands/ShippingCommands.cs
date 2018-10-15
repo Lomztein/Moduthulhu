@@ -18,7 +18,7 @@ namespace Lomztein.Moduthulhu.Modules.Misc.Shipping.Commands {
 
         public ShippingCommands() {
             Name = "shipping";
-            Description = "The most important commands.";
+            Description = "Most important commands.";
             Category = StandardCategories.Fun;
 
             commandsInSet = new List<ICommand> () {
@@ -75,7 +75,7 @@ namespace Lomztein.Moduthulhu.Modules.Misc.Shipping.Commands {
 
             public Shipname() {
                 Name = "name";
-                Description = "Name a ship something special.";
+                Description = "Specify ship name.";
                 Category = StandardCategories.Fun;
             }
 
@@ -98,7 +98,7 @@ namespace Lomztein.Moduthulhu.Modules.Misc.Shipping.Commands {
 
             public List() {
                 Name = "list";
-                Description = "List all ships containing a person.";
+                Description = "List all with someone.";
                 Category = StandardCategories.Fun;
             }
 
@@ -161,7 +161,7 @@ namespace Lomztein.Moduthulhu.Modules.Misc.Shipping.Commands {
 
             public ATPs() {
                 Name = "atps";
-                Description = "Show a leaderboard of all true pairs.";
+                Description = "Show a leaderboard.";
                 Category = StandardCategories.Fun;
             }
 

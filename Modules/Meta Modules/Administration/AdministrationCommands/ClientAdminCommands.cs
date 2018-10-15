@@ -45,7 +45,7 @@ namespace Lomztein.Moduthulhu.Modules.Administration.AdministrationCommands
 
             [Overload (typeof (void), "Restart the client if something is messed up. Might take a while if it's on a lot of servers.")]
             public async Task<Result> Execute (CommandMetadata metadata) {
-                await ParentModule.ParentShard.BotClient.Restart ();
+                await ParentModule.ParentShard.BotClient.ClientManager.RestartClient (ParentModule.ParentShard.BotClient);
                 return new Result (null, "Restarting client...");
             }
 
