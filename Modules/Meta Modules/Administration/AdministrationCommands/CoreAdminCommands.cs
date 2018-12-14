@@ -1,5 +1,8 @@
-﻿using Lomztein.AdvDiscordCommands.Framework;
+﻿using Discord;
+using Lomztein.AdvDiscordCommands.Framework;
 using Lomztein.AdvDiscordCommands.Framework.Interfaces;
+using Lomztein.Moduthulhu.Core.Bot.Client;
+using Lomztein.Moduthulhu.Core.Bot.Messaging.Advanced;
 using Lomztein.Moduthulhu.Core.Module.Framework;
 using Lomztein.Moduthulhu.Modules.Command;
 using Lomztein.Moduthulhu.Modules.CustomCommands.Categories;
@@ -30,6 +33,7 @@ namespace Lomztein.Moduthulhu.Modules.Administration.AdministrationCommands
             commandsInSet = new List<ICommand> {
                 new ShutdownCommand (),
                 new RestartCommand (),
+                new StatusCommand (),
                 new PatchCommand (),
             };
         }
@@ -64,6 +68,36 @@ namespace Lomztein.Moduthulhu.Modules.Administration.AdministrationCommands
             public Task<Result> Execute (CommandMetadata metadata) {
                 Environment.Exit (0);
                 return TaskResult (null, "Restarting...");
+            }
+
+        }
+
+        public class StatusCommand : CoreAdminCommand {
+
+            public StatusCommand () : base () {
+                Name = "status";
+                Description = "Check core status.";
+                Category = AdditionalCategories.Management;
+            }
+
+            [Overload (typeof (LargeEmbed), "Check the status for the core and its clients.")]
+            public Task<Result> Execute (CommandMetadata metadata) {
+                LargeEmbed embed = new LargeEmbed();
+
+                EmbedBuilder builder = new EmbedBuilder()
+                    .WithTitle("Core Process Status")
+                    .WithAuthor(ParentModule.ParentShard.Client.CurrentUser)
+                    .WithDescription(ParentModule.ParentShard.Core.GetStatusString())
+                    .WithCurrentTimestamp();
+
+                // Lasagna is one of my favorite foods.
+                foreach (BotClient client in ParentModule.ParentShard.BotClient.ClientManager.ClientSlots)
+                {
+                    builder.AddField(client.GetStatusString(), "```" + client.GetShardsStatus() + "```");
+                }
+
+                embed.CreateFrom(builder);
+                return TaskResult (embed, "");
             }
 
         }

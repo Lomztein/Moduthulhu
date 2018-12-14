@@ -38,13 +38,12 @@ namespace Lomztein.Moduthulhu.Modules.Misc.Color
             ParentShard.UserJoined += OnUserJoined;
         }
 
-        private Task OnUserJoined(SocketGuildUser guildUser) {
+        private async Task OnUserJoined(SocketGuildUser guildUser) {
             if (this.IsConfigured (guildUser.Guild.Id))
-                GiveRandomColourAsync (guildUser);
-            return Task.CompletedTask;
+                await GiveRandomColourAsync (guildUser);
         }
 
-        private async void GiveRandomColourAsync (SocketGuildUser guildUser) {
+        private async Task GiveRandomColourAsync (SocketGuildUser guildUser) {
             Dictionary<ulong, string> localColours = colourIdentification.GetEntry (guildUser.Guild);
             SocketRole randomRole = ParentShard.GetRole (guildUser.Guild.Id, localColours.ElementAt (new Random ().Next (localColours.Count)).Key);
             await guildUser.AsyncSecureAddRole (randomRole);

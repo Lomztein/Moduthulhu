@@ -121,7 +121,7 @@ namespace Lomztein.Moduthulhu.Modules.Clock.ActivityMonitor
 
         }
 
-        public async void CheckAll(DateTime lastTick, DateTime now) {
+        public async Task CheckAll(DateTime lastTick, DateTime now) {
             await UpdateAll ();
             SaveData ();
         }

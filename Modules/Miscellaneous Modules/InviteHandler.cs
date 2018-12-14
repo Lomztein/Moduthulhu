@@ -18,13 +18,17 @@ namespace Lomztein.Moduthulhu.Modules.ServerMessages
 
         public InviteHandler (Shard shard) {
             ParentShard = shard;
+        }
 
-            foreach (SocketGuild guild in ParentShard.Guilds) {
-                UpdateData (null, guild);
+        public async Task Intialize()
+        {
+            foreach (SocketGuild guild in ParentShard.Guilds)
+            {
+                await UpdateData(null, guild);
             }
         }
 
-        public async void UpdateData(IReadOnlyCollection<RestInviteMetadata> readOnly, SocketGuild guild) {
+        public async Task UpdateData(IReadOnlyCollection<RestInviteMetadata> readOnly, SocketGuild guild) {
             try {
                 if (readOnly == null)
                     readOnly = await guild.GetInvitesAsync ();
@@ -45,7 +49,7 @@ namespace Lomztein.Moduthulhu.Modules.ServerMessages
                 RestInviteMetadata result = null;
 
                 if (!savedInvites.ContainsKey (guild.Id))
-                    UpdateData (null, guild); // Shouldn't happen, but just in case it does happen.
+                    await UpdateData (null, guild); // Shouldn't happen, but just in case it does happen.
 
                 foreach (var key in dict) {
                     if (savedInvites[guild.Id].ContainsKey (key.Key)) {
@@ -58,7 +62,7 @@ namespace Lomztein.Moduthulhu.Modules.ServerMessages
                     }
                 }
 
-                UpdateData (newInvites, guild);
+                await UpdateData (newInvites, guild);
                 return result;
             } catch (Exception e) {
                 Log.Write (e);

@@ -54,21 +54,19 @@ namespace Lomztein.Moduthulhu.Modules.Voice {
             AddTag (new Tag ("🌎", x => x.Users.Any (y => y.Roles.Any (z => z.Id == internationalRoleID.GetEntry (x.Guild)))));
         }
 
-        private Task OnGuildMemberUpdated(SocketGuildUser prev, SocketGuildUser cur) {
+        private async Task OnGuildMemberUpdated(SocketGuildUser prev, SocketGuildUser cur) {
             if (cur.VoiceChannel != null)
-                UpdateChannel (cur.VoiceChannel);
-            return Task.CompletedTask;
+                await UpdateChannel (cur.VoiceChannel);
         }
 
-        private Task OnVoiceStateUpdated(SocketUser user, SocketVoiceState prev, SocketVoiceState cur) {
+        private async Task OnVoiceStateUpdated(SocketUser user, SocketVoiceState prev, SocketVoiceState cur) {
             if (prev.VoiceChannel != null)
-                UpdateChannel (prev.VoiceChannel);
+                await UpdateChannel (prev.VoiceChannel);
             if (cur.VoiceChannel != null)
-                UpdateChannel (cur.VoiceChannel);
-            return Task.CompletedTask;
+                await UpdateChannel (cur.VoiceChannel);
         }
 
-        public async void UpdateChannel(SocketVoiceChannel channel) {
+        public async Task UpdateChannel(SocketVoiceChannel channel) {
             string highestGame = "";
 
             if (channel != null) {
@@ -146,13 +144,12 @@ namespace Lomztein.Moduthulhu.Modules.Voice {
             return Task.CompletedTask;
         }
 
-        private Task OnChannelCreated(SocketChannel channel) {
+        private async Task OnChannelCreated(SocketChannel channel) {
             if (channel is SocketVoiceChannel voice) {
                 channelNames.Values [ voice.Guild.Id ].Add (voice.Id, voice.Name);
                 Configuration.SetEntry (voice.Guild.Id, "ChannelNames", channelNames.GetEntry (voice.Guild), true);
-                UpdateChannel (voice);
+                await UpdateChannel (voice);
             }
-            return Task.CompletedTask;
         }
 
         public override void Shutdown() {
@@ -188,17 +185,17 @@ namespace Lomztein.Moduthulhu.Modules.Voice {
             return tagString;
         }
 
-        public void SetCustomName (SocketVoiceChannel channel, string name) {
+        public async Task SetCustomName (SocketVoiceChannel channel, string name) {
             if (!customNames.ContainsKey (channel.Id))
                 customNames.Add (channel.Id, name);
             else
                 customNames [ channel.Id ] = name;
-            UpdateChannel (channel);
+            await UpdateChannel (channel);
         }
 
-        public void ResetCustomName (SocketVoiceChannel channel) {
+        public async Task ResetCustomName (SocketVoiceChannel channel) {
             customNames.Remove (channel.Id);
-            UpdateChannel (channel);
+            await UpdateChannel (channel);
         }
 
         public class Tag {

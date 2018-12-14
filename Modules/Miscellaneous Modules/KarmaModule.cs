@@ -40,17 +40,15 @@ namespace Lomztein.Moduthulhu.Modules.Misc.Karma
             LoadKarma ();
         }
 
-        private Task OnReactionRemoved(Cacheable<IUserMessage, ulong> arg1, ISocketMessageChannel arg2, SocketReaction arg3) {
-            OnReactionChanged (arg1, arg3, -1);
-            return Task.CompletedTask;
+        private async Task OnReactionRemoved(Cacheable<IUserMessage, ulong> arg1, ISocketMessageChannel arg2, SocketReaction arg3) {
+            await OnReactionChanged (arg1, arg3, -1);
         }
 
-        private Task OnReactionAdded(Cacheable<IUserMessage, ulong> arg1, ISocketMessageChannel arg2, SocketReaction arg3) {
-            OnReactionChanged (arg1, arg3, 1);
-            return Task.CompletedTask;
+        private async Task OnReactionAdded(Cacheable<IUserMessage, ulong> arg1, ISocketMessageChannel arg2, SocketReaction arg3) {
+            await OnReactionChanged (arg1, arg3, 1);
         }
 
-        private async void OnReactionChanged(Cacheable<IUserMessage, ulong> cache, SocketReaction reaction, int direction) {
+        private async Task OnReactionChanged(Cacheable<IUserMessage, ulong> cache, SocketReaction reaction, int direction) {
             IUserMessage message = await cache.DownloadAsync ();
             
             if (message == null)

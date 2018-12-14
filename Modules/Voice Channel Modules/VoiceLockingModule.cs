@@ -44,23 +44,21 @@ namespace Lomztein.Moduthulhu.Modules.Voice
             }
         }
 
-        private Task OnUserVoiceStateUpdated(SocketUser user, SocketVoiceState prevState, SocketVoiceState newState) {
+        private async Task OnUserVoiceStateUpdated(SocketUser user, SocketVoiceState prevState, SocketVoiceState newState) {
             SocketGuildUser guildUser = user as SocketGuildUser;
             if (guildUser == null)
-                return Task.CompletedTask; // Return instantly if not in a guild.
+                return; // Return instantly if not in a guild.
 
             if (newState.VoiceChannel != null && !IsUserAllowed (guildUser, newState.VoiceChannel)) {
-                KickUserToPrison (guildUser);
+                await KickUserToPrison (guildUser);
             }
 
             if (prevState.VoiceChannel != null) {
-                CheckLock (prevState.VoiceChannel);
+                await CheckLock (prevState.VoiceChannel);
             }
-
-            return Task.CompletedTask;
         }
 
-        private async void KickUserToPrison (SocketGuildUser user) {
+        private async Task KickUserToPrison (SocketGuildUser user) {
             SocketVoiceChannel prison = ParentShard.GetVoiceChannel (user.Guild.Id, moveToChannel.GetEntry (user.Guild));
             await user.ModifyAsync (x => x.Channel = prison);
         }
@@ -81,19 +79,19 @@ namespace Lomztein.Moduthulhu.Modules.Voice
             return lockedChannels [ channel.Id ].allowedMembers.Contains (user.Id);
         }
 
-        public void LockChannel (SocketVoiceChannel channel, IEnumerable<SocketGuildUser> initialMembers) {
+        public async Task LockChannel (SocketVoiceChannel channel, IEnumerable<SocketGuildUser> initialMembers) {
             if (channel == channel.Guild.AFKChannel)
                 throw new ArgumentException ("You cannot lock the AFK channel, that would be mean.");
 
             if (!lockedChannels.ContainsKey (channel.Id))
                 lockedChannels.Add (channel.Id, new Lock (channel.Id, initialMembers.Select (x => x.Id).ToList ()));
 
-            UpdateChannelName (channel);
+            await UpdateChannelName (channel);
         }
 
-        public void UnlockChannel (SocketVoiceChannel channel) {
+        public async Task UnlockChannel (SocketVoiceChannel channel) {
             lockedChannels.Remove (channel.Id);
-            UpdateChannelName (channel);
+            await UpdateChannelName (channel);
         }
 
         public List<SocketGuildUser> GetAllowedMembers (SocketVoiceChannel channel) {
@@ -103,9 +101,9 @@ namespace Lomztein.Moduthulhu.Modules.Voice
             return null;
         }
 
-        private void UpdateChannelName (SocketVoiceChannel channel) {
+        private async Task UpdateChannelName (SocketVoiceChannel channel) {
             if (ParentContainer.GetModule<AutoVoiceNameModule> () is AutoVoiceNameModule autoVoiceModule) {
-                autoVoiceModule.UpdateChannel (channel);
+                await autoVoiceModule.UpdateChannel (channel);
             }
         }
 
@@ -115,9 +113,9 @@ namespace Lomztein.Moduthulhu.Modules.Voice
             return null;
         }
 
-        private void CheckLock (SocketVoiceChannel channel) {
+        private async Task CheckLock (SocketVoiceChannel channel) {
             if (channel.Users.Count == 0)
-                UnlockChannel (channel);
+                await UnlockChannel (channel);
         }
 
         public class Lock {

@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Discord.WebSocket;
+using Lomztein.AdvDiscordCommands.Extensions;
 using Lomztein.AdvDiscordCommands.Framework;
 using System;
 using System.Collections.Generic;
@@ -10,23 +11,17 @@ namespace Lomztein.Moduthulhu.Modules.Voice.Extensions
 {
     public static class UserExtensions {
 
-        public static bool IsInVoiceChannel(this IUser user, out Task<Result> result, out SocketGuildUser gUser) {
+        public static SocketGuildUser IsInVoiceChannel(this IUser user) {
             if (user is SocketGuildUser guildUser) {
-                gUser = guildUser;
 
                 if (guildUser.VoiceChannel != null) {
-                    result = null;
-                    return true;
+                    return guildUser;
                 } else {
-                    result = Task.FromResult(new Result (null, "Error - You're not in a voice channel."));
-                    return false;
+                    throw new InvalidOperationException($"**{user.GetShownName()}** is not currently in a voic channel.");
                 }
             }
 
-            result = Task.FromResult (new Result (null, "Error - Something went terribly wrong, Ragnarok is coming."));
-            gUser = null;
-
-            return false;
+            throw new InvalidOperationException ("Something went terribly wrong, Ragnarok is coming.");
         }
     }
 }

@@ -17,6 +17,7 @@ namespace Lomztein.Moduthulhu.Modules.Voice.Commands
             Name = "voice";
             Description = "Voice related commands.";
             Category = AdditionalCategories.Voice;
+            Flatname = "vname";
 
             commandsInSet = new List<ICommand> () {
                 new CustomName (),
@@ -29,24 +30,27 @@ namespace Lomztein.Moduthulhu.Modules.Voice.Commands
                 Name = "name";
                 Description = "Specify channel name.";
                 Category = AdditionalCategories.Voice;
+                Flatname = "vname";
             }
 
             [Overload (typeof (void), "Reset a custom channel name.")]
-            public Task<Result> Execute (CommandMetadata data) {
-                if (data.Message.Author.IsInVoiceChannel (out Task<Result> errorResult, out SocketGuildUser guildUser)) {
-                    ParentModule.ResetCustomName (guildUser.VoiceChannel);
-                    return TaskResult (null, "Succesfully reset custom voice channel name.");
+            public async Task<Result> Execute (CommandMetadata data) {
+                SocketGuildUser user = data.Message.Author.IsInVoiceChannel();
+                if (user != null) {
+                    await ParentModule.ResetCustomName (user.VoiceChannel);
+                    return new Result (null, "Succesfully reset custom voice channel name.");
                 }
-                return errorResult;
+                return new Result(null, "You aren't in a voice channel at the moment. At least not on this server.");
             }
 
-            [Overload (typeof (void), "Reset a custom channel name.")]
-            public Task<Result> Execute(CommandMetadata data, string name) {
-                if (data.Message.Author.IsInVoiceChannel (out Task<Result> errorResult, out SocketGuildUser guildUser)) {
-                    ParentModule.SetCustomName (guildUser.VoiceChannel, name);
-                    return TaskResult (null, $"Succesfully set custom voice channel name to {name}.");
+            [Overload (typeof (void), "Set a custom channel name.")]
+            public async Task<Result> Execute(CommandMetadata data, string name) {
+                SocketGuildUser guildUser = data.Message.Author.IsInVoiceChannel();
+                if (guildUser != null) {
+                    await ParentModule.SetCustomName (guildUser.VoiceChannel, name);
+                    return new Result(null, $"Succesfully set custom voice channel name to {name}.");
                 }
-                return errorResult;
+                return new Result(null, "You aren't in a voice channel at the moment. At least not on this server.");
             }
         }
     }

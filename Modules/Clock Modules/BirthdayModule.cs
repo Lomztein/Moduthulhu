@@ -19,7 +19,7 @@ using Lomztein.Moduthulhu.Core.Clock;
 
 namespace Lomztein.Moduthulhu.Modules.Clock.Birthday
 {
-    public class BirthdayModule : ModuleBase, ITickable, IConfigurable<MultiConfig> {
+    public class BirthdayModule : ModuleBase, IConfigurable<MultiConfig> {
 
         private const string dataFilePath = "Birthdays";
 
@@ -66,11 +66,7 @@ namespace Lomztein.Moduthulhu.Modules.Clock.Birthday
             ParentContainer.GetModule<CommandRootModule> ().RemoveCommands (command);
         }
 
-        public void Tick(DateTime prevTick, DateTime now) {
-            TestBirthdays (now);
-        }
-
-        private void TestBirthdays(DateTime now) {
+        private async Task TestBirthdays(DateTime now) {
 
             foreach (var guild in allBirthdays) {
                 foreach (var user in guild.Value) {
@@ -82,16 +78,18 @@ namespace Lomztein.Moduthulhu.Modules.Clock.Birthday
                             return; // User doesn't exist anymore, may have left the server.
 
                         SocketTextChannel guildChannel = ParentShard.GetTextChannel (guild.Key, announcementChannel.GetEntry (guildUser.Guild));
-                        AnnounceBirthday (guildChannel, guildUser, user.Value);
+                        await AnnounceBirthday (guildChannel, guildUser, user.Value);
                         user.Value.SetLastPassedToNow ();
                         SaveData ();
                     }
 
                 }
             }
+
+            return;
         }
 
-        public async void AnnounceBirthday(ITextChannel channel, SocketGuildUser user, BirthdayDate date) {
+        public async Task AnnounceBirthday(ITextChannel channel, SocketGuildUser user, BirthdayDate date) {
             string age = date.GetAge ().ToString () + date.GetAgeSuffix ();
             string message = announcementMessage.GetEntry (channel.Guild).Replace ("[USERNAME]", user.GetShownName ()).Replace ("[AGE]", age);
             await channel.SendMessageAsync (message);

@@ -31,12 +31,11 @@ namespace Lomztein.Moduthulhu.Modules.Misc.Phrases
             ConfigurationManager.AddConverter (new PhraseConfigConverter ());
         }
 
-        private Task OnMessageRecieved(SocketMessage message) {
-            CheckAndRespond (message);
-            return Task.CompletedTask;
+        private async Task OnMessageRecieved(SocketMessage message) {
+            await CheckAndRespond (message);
         }
 
-        private async void CheckAndRespond (SocketMessage message) {
+        private async Task CheckAndRespond (SocketMessage message) {
 
             if (message is SocketUserMessage userMessage && userMessage.GetGuild () != null) {
 

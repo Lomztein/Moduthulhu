@@ -5,46 +5,46 @@ using Lomztein.Moduthulhu.Core.Configuration;
 using System.Threading;
 using Lomztein.Moduthulhu.Core.Extensions;
 using Discord.WebSocket;
+using System.Threading.Tasks;
 
 namespace Lomztein.Moduthulhu.Core.Clock
 {
     public class Clock
     {
-        private List<ITickable> Tickables { get; set; } = new List<ITickable> ();
         private Thread ClockThread { get; set; }
 
         private DateTime LastTick { get; set; }
         private bool IsRunning { get; set; }
         private int TickFrequency { get; set; }
 
-        public delegate void TickEvent(DateTime currentTick, DateTime lastTick);
+        public delegate Task TickEvent(DateTime currentTick, DateTime lastTick);
 
+        public event TickEvent OnSecondPassed;
         public event TickEvent OnMinutePassed;
         public event TickEvent OnHourPassed;
         public event TickEvent OnDayPassed;
         public event TickEvent OnMonthPassed;
         public event TickEvent OnYearPassed;
 
-        public event Action<Exception> OnExceptionCaught;
+        public event Func<Exception, Task> ExceptionCaught;
 
         public Clock (int tickFrequency) {
             TickFrequency = tickFrequency;
             Start ();
         }
 
-        public void AddTickable (ITickable tickable) {
-            Tickables.Add (tickable);
-        }
-
         public void Stop() => IsRunning = false;
 
         public void Start () {
-            ClockThread = new Thread (new ThreadStart (Run));
+            ClockThread = new Thread (new ThreadStart (Run)) {
+                Name = "Clock"
+            };
             ClockThread.Start ();
         }
 
         private void Run () {
             int milliseconds = (int)Math.Round (1d / TickFrequency * 1000d);
+            LastTick = DateTime.Now;
             IsRunning = true;
 
             while (IsRunning) {
@@ -56,8 +56,7 @@ namespace Lomztein.Moduthulhu.Core.Clock
 
         private void Tick (DateTime curTick, DateTime lTick) {
             try {
-                Tickables.ForEach (x => x.Tick (LastTick, DateTime.Now));
-
+                OnSecondPassed?.Invoke(curTick, lTick);
                 if (MinutePassed (curTick, lTick))
                     OnMinutePassed?.Invoke (curTick, lTick);
                 if (HourPassed (curTick, lTick))
@@ -69,7 +68,7 @@ namespace Lomztein.Moduthulhu.Core.Clock
                 if (YearPassed (curTick, lTick))
                     OnYearPassed?.Invoke (curTick, lTick);
             } catch (Exception exc) {
-                OnExceptionCaught?.Invoke (exc);
+                ExceptionCaught?.Invoke (exc);
             }
         }
 

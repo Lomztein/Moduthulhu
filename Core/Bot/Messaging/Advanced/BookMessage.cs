@@ -45,16 +45,16 @@ namespace Lomztein.Moduthulhu.Core.Bot.Messaging.Advanced {
                 Pages = pages;
             }
 
-            public void Flip (int amount) {
+            public async Task Flip (int amount) {
                 Index = (uint)(Index + amount) % (uint)Pages.Length - 1;
-                UpdateMessageAsync ();
+                await UpdateMessageAsync ();
             }
 
-            public async void UpdateMessageAsync () {
+            public async Task UpdateMessageAsync () {
                 await Message.ModifyAsync (x => x.Content = CurrentPage);
             }
 
-            public async void SendAsync (IMessageChannel channel) {
+            public async Task SendAsync (IMessageChannel channel) {
                 var message = await channel.SendMessageAsync (CurrentPage);
                 await message.AddReactionAsync (new Emoji (LeftArrow));
                 await message.AddReactionAsync (new Emoji (RightArrow));

@@ -38,16 +38,18 @@ namespace Lomztein.Moduthulhu.Modules.Voice.Commands {
             }
 
             [Overload (typeof (void), "Lock the voicechannel you're currently in.")]
-            public Task<Result> Execute(CommandMetadata data) {
-                if (data.Message.Author.IsInVoiceChannel (out Task<Result> result, out SocketGuildUser guildUser)) {
+            public async Task<Result> Execute(CommandMetadata data) {
+                SocketGuildUser guildUser = data.Message.Author.IsInVoiceChannel();
+                if (guildUser != null)
+                {
                     if (!ParentModule.IsChannelLocked (guildUser.VoiceChannel)) {
-                        ParentModule.LockChannel (guildUser.VoiceChannel, guildUser.VoiceChannel.Users);
-                        return TaskResult (null, $"Channel **{guildUser.VoiceChannel.Name}** succesfully locked!");
+                        await ParentModule.LockChannel (guildUser.VoiceChannel, guildUser.VoiceChannel.Users);
+                        return new Result (null, $"Channel **{guildUser.VoiceChannel.Name}** succesfully locked!");
                     } else {
-                        return TaskResult (null, $"Error - Channel **{guildUser.VoiceChannel.Name}** is already locked.");
+                        return new Result (null, $"Error - Channel **{guildUser.VoiceChannel.Name}** is already locked.");
                     }
                 }
-                return result;
+                return new Result(null, "You aren't in a voice channel currently, at least not on this server.");
             }
         }
 
@@ -60,16 +62,18 @@ namespace Lomztein.Moduthulhu.Modules.Voice.Commands {
             }
 
             [Overload (typeof (void), "Unlock the voicechannel you're currently in.")]
-            public Task<Result> Execute(CommandMetadata data) {
-                if (data.Message.Author.IsInVoiceChannel (out Task<Result> result, out SocketGuildUser guildUser)) {
+            public async Task<Result> Execute(CommandMetadata data) {
+                SocketGuildUser guildUser = data.Message.Author.IsInVoiceChannel();
+                if (guildUser != null) {
                     if (ParentModule.IsChannelLocked (guildUser.VoiceChannel)) {
-                        ParentModule.UnlockChannel (guildUser.VoiceChannel);
-                        return TaskResult (null, $"Channel **{guildUser.VoiceChannel.Name}** succesfully unlocked!");
+                        await ParentModule.UnlockChannel (guildUser.VoiceChannel);
+                        return new Result (null, $"Channel **{guildUser.VoiceChannel.Name}** succesfully unlocked!");
                     } else {
-                        return TaskResult (null, $"Error - Channel **{guildUser.VoiceChannel.Name}** isn't locked.");
+                        return new Result(null, $"Error - Channel **{guildUser.VoiceChannel.Name}** isn't locked.");
                     }
                 }
-                return result;
+                return new Result(null, "You aren't in a voice channel currently, at least not on this server.");
+
             }
         }
 
@@ -84,7 +88,9 @@ namespace Lomztein.Moduthulhu.Modules.Voice.Commands {
 
             [Overload (typeof (void), "Invite someone to your currently locked voice channel.")]
             public Task<Result> Execute(CommandMetadata data, SocketGuildUser user) {
-                if (data.Message.Author.IsInVoiceChannel (out Task<Result> result, out SocketGuildUser guildUser)) {
+                SocketGuildUser guildUser = data.Message.Author.IsInVoiceChannel();
+                if (guildUser != null)
+                {
                     if (ParentModule.IsChannelLocked (guildUser.VoiceChannel)) {
                         ParentModule.GetLock (guildUser.VoiceChannel).AddMember (user);
                         return TaskResult (null, $"Channel **{user.GetShownName ()}** succesfully invited!");
@@ -92,29 +98,39 @@ namespace Lomztein.Moduthulhu.Modules.Voice.Commands {
                         return TaskResult (null, $"Error - Channel **{guildUser.VoiceChannel.Name}** isn't locked.");
                     }
                 }
-                return result;
+                return TaskResult(null, "You aren't in a voice channel currently, at least not on this server.");
+
             }
         }
 
-        public class Kick : ModuleCommand<VoiceLockingModule> {
+        public class Kick : ModuleCommand<VoiceLockingModule>
+        {
 
-            public Kick() {
+            public Kick()
+            {
                 Name = "kick";
                 Description = "Kick someone.";
                 Category = LockingCategory;
             }
 
-            [Overload (typeof (void), "Kick someone from your currently locked voice channel.")]
-            public Task<Result> Execute(CommandMetadata data, SocketGuildUser user) {
-                if (data.Message.Author.IsInVoiceChannel (out Task<Result> result, out SocketGuildUser guildUser)) {
-                    if (ParentModule.IsChannelLocked (guildUser.VoiceChannel)) {
-                        ParentModule.GetLock (guildUser.VoiceChannel).KickMember (user);
-                        return TaskResult (null, $"Channel **{user.GetShownName ()}** succesfully kicked!");
-                    } else {
-                        return TaskResult (null, $"Error - Channel **{guildUser.VoiceChannel.Name}** isn't locked.");
+            [Overload(typeof(void), "Kick someone from your currently locked voice channel.")]
+            public Task<Result> Execute(CommandMetadata data, SocketGuildUser user)
+            {
+                SocketGuildUser guildUser = data.Message.Author.IsInVoiceChannel();
+                if (guildUser != null)
+                {
+                    if (ParentModule.IsChannelLocked(guildUser.VoiceChannel))
+                    {
+                        ParentModule.GetLock(guildUser.VoiceChannel).KickMember(user);
+                        return TaskResult(null, $"Channel **{user.GetShownName()}** succesfully kicked!");
+                    }
+                    else
+                    {
+                        return TaskResult(null, $"Error - Channel **{guildUser.VoiceChannel.Name}** isn't locked.");
                     }
                 }
-                return result;
+                return TaskResult(null, "You aren't in a voice channel currently, at least not on this server.");
+
             }
         }
     }

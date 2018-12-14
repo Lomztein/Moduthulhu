@@ -16,4 +16,8 @@
     <ProjectReference Include="..\Cross\Cross.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Webserver\Website\" />
+  </ItemGroup>
+
 </Project>

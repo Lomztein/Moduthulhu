@@ -83,17 +83,17 @@ namespace Lomztein.Moduthulhu.Modules.Voice
             return Task.CompletedTask;
         }
 
-        private Task UserVoiceStateUpdated (SocketUser user, SocketVoiceState prevState, SocketVoiceState curState) {
+        private async Task UserVoiceStateUpdated (SocketUser user, SocketVoiceState prevState, SocketVoiceState curState) {
             SocketGuildUser guildUser = user as SocketGuildUser;
             if (guildUser == null)
-                return Task.CompletedTask; // Break off instantly if this is in a private DM. Can you even call bots directly?
+                return; // Break off instantly if this is in a private DM. Can you even call bots directly?
 
-            CheckAndModifyChannelCount (guildUser);
-            return Task.CompletedTask;
+            await CheckAndModifyChannelCount (guildUser);
+            return;
         }
 
         // Have to put it in a seperate async void function, so it doesn't block the event. Async root?
-        private async void CheckAndModifyChannelCount (SocketGuildUser user) {
+        private async Task CheckAndModifyChannelCount (SocketGuildUser user) {
 
             List<SocketVoiceChannel> voiceChannels = user.Guild.VoiceChannels.ToList ();
 

@@ -44,45 +44,40 @@ namespace Lomztein.Moduthulhu.Modules.ServerMessages {
             ParentShard.GuildMemberUpdated += OnGuildMemberUpdated;
 
             inviteHandler = new InviteHandler (ParentShard);
+#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
+            inviteHandler.Intialize();
+#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
         }
 
-        private Task OnGuildMemberUpdated(SocketGuildUser arg1, SocketGuildUser arg2) {
-            CheckAndAnnounceNameChange (arg1, arg2);
-            return Task.CompletedTask;
+        private async Task OnGuildMemberUpdated(SocketGuildUser arg1, SocketGuildUser arg2) {
+            await CheckAndAnnounceNameChange (arg1, arg2);
         }
 
-        private void CheckAndAnnounceNameChange(SocketGuildUser before, SocketGuildUser after) {
+        private async Task CheckAndAnnounceNameChange(SocketGuildUser before, SocketGuildUser after) {
 
             if (before == null || after == null)
                 return;
 
             if (before.GetShownName () != after.GetShownName ()) {
-                SendMessage (after.Guild, onUserNameChanged, "[USERNAME]", before.GetShownName (), "[NEWNAME]", after.GetShownName ());
+                await SendMessage (after.Guild, onUserNameChanged, "[USERNAME]", before.GetShownName (), "[NEWNAME]", after.GetShownName ());
             }
         }
 
-        private Task OnUserUnbannedFromGuild(SocketUser user, SocketGuild guild) {
-            SendMessage (guild, onUserUnbannedFromGuild, "[USERNAME]", user.GetShownName ());
-            return Task.CompletedTask;
+        private async Task OnUserUnbannedFromGuild(SocketUser user, SocketGuild guild) {
+            await SendMessage (guild, onUserUnbannedFromGuild, "[USERNAME]", user.GetShownName ());
         }
 
-        private Task OnUserLeftGuild(SocketGuildUser user) {
-            SendMessage (user.Guild, onUserLeftGuild, "[USERNAME]", user.GetShownName ());
-
-            KickAgesomeIfLomzBannedOrKickedAsync (user, user.Guild, false);
-
-            return Task.CompletedTask;
+        private async Task OnUserLeftGuild(SocketGuildUser user) {
+            await SendMessage (user.Guild, onUserLeftGuild, "[USERNAME]", user.GetShownName ());
+            await KickAgesomeIfLomzBannedOrKickedAsync (user, user.Guild, false);
         }
 
-        private Task OnUserBannedFromGuild(SocketUser user, SocketGuild guild) {
-            SendMessage (guild, onUserBannedFromGuild, "[USERNAME]", user.GetShownName ());
-
-            KickAgesomeIfLomzBannedOrKickedAsync (user, guild, true);
-
-            return Task.CompletedTask;
+        private async Task OnUserBannedFromGuild(SocketUser user, SocketGuild guild) {
+            await SendMessage (guild, onUserBannedFromGuild, "[USERNAME]", user.GetShownName ());
+            await KickAgesomeIfLomzBannedOrKickedAsync (user, guild, true);
         }
 
-        private async void KickAgesomeIfLomzBannedOrKickedAsync (SocketUser user, SocketGuild guild, bool ban) {
+        private async Task KickAgesomeIfLomzBannedOrKickedAsync (SocketUser user, SocketGuild guild, bool ban) {
 
             if (!KickAgesome1OnLomzLeftOrBanned.GetEntry (guild))
                 return;
@@ -106,26 +101,24 @@ namespace Lomztein.Moduthulhu.Modules.ServerMessages {
             } catch (Exception) { }
         }
 
-        private Task OnUserJoinedGuild(SocketGuildUser user) {
-            OnUserJoinedGuildAsync (user);
-            return Task.CompletedTask;
+        private async Task OnUserJoinedGuild(SocketGuildUser user) {
+            await OnUserJoinedGuildAsync (user);
         }
 
-        private async void OnUserJoinedGuildAsync (SocketGuildUser user) {
+        private async Task OnUserJoinedGuildAsync (SocketGuildUser user) {
             RestInviteMetadata invite = await inviteHandler.FindInviter (user.Guild);
             if (invite == null)
-                SendMessage (user.Guild, onUserJoinedGuild, "[USERNAME]", user.GetShownName ());
+                await SendMessage (user.Guild, onUserJoinedGuild, "[USERNAME]", user.GetShownName ());
             else
-                SendMessage (user.Guild, onUserJoinedGuildByInvite, "[USERNAME]", user.GetShownName (), "[INVITERNAME]", invite.Inviter.GetShownName ());
+                await SendMessage (user.Guild, onUserJoinedGuildByInvite, "[USERNAME]", user.GetShownName (), "[INVITERNAME]", invite.Inviter.GetShownName ());
         }
 
-        private Task OnJoinedNewGuild(SocketGuild guild) {
-            SendMessage (guild, onJoinedNewGuild, "[BOTNAME]", ParentShard.Client.CurrentUser.GetShownName ());
-            inviteHandler.UpdateData (null, guild);
-            return Task.CompletedTask;
+        private async Task OnJoinedNewGuild(SocketGuild guild) {
+            await SendMessage (guild, onJoinedNewGuild, "[BOTNAME]", ParentShard.Client.CurrentUser.GetShownName ());
+            await inviteHandler.UpdateData (null, guild);
         }
 
-        private async void SendMessage (SocketGuild guild, MultiEntry<string[], SocketGuild> messages, params string[] findAndReplace) {
+        private async Task SendMessage (SocketGuild guild, MultiEntry<string[], SocketGuild> messages, params string[] findAndReplace) {
             if (!this.IsConfigured (guild.Id))
                 return;
 

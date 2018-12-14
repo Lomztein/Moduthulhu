@@ -20,6 +20,7 @@ namespace Lomztein.Moduthulhu.Core.Bot {
         // TODO: Allow for sending bot-wide messages directly in console.
 
         public DateTime BootDate { get; private set; }
+        public TimeSpan Uptime { get => DateTime.Now - BootDate; }
 
         internal ClientManager ClientManager { get; private set; }
         internal ModuleLoader ModuleLoader { get; private set; }
@@ -43,8 +44,8 @@ namespace Lomztein.Moduthulhu.Core.Bot {
             ClientManager.InitializeClients ();
             ErrorReporter = new ErrorReporter (this);
 
-            ClientManager.OnExceptionCaught += ErrorReporter.ReportError;
-            Clock.OnExceptionCaught += ErrorReporter.ReportError;
+            ClientManager.ExceptionCaught += ErrorReporter.ReportError;
+            Clock.ExceptionCaught += ErrorReporter.ReportError;
 
             BotAdministrators = new UserList (Path.Combine (BaseDirectory, "AdministratorIDs"));
 
@@ -53,5 +54,7 @@ namespace Lomztein.Moduthulhu.Core.Bot {
             await Task.Delay (-1);
             Log.Write (Log.Type.BOT, "Shutting down..");
         }
+
+        public string GetStatusString() => $"Core uptime: {Uptime}";
     }
 }

@@ -4,6 +4,7 @@ using System.Text;
 using System.Linq;
 using Discord.WebSocket;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace Lomztein.Moduthulhu.Core.Bot
 {
@@ -16,11 +17,11 @@ namespace Lomztein.Moduthulhu.Core.Bot
             ParentCore = core;
         }
 
-        internal void ReportError (Exception exception) {
-
+        internal Task ReportError (Exception exception) {
             string message = (exception.Message + " - " + exception.StackTrace);
+            Cross.Log.Write (exception);
             File.AppendAllText (ParentCore.BaseDirectory + "errors.txt", message);
-
+            return Task.CompletedTask;
         }
     }
 }

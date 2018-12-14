@@ -11,39 +11,42 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client
     public class ClientManager
     {
         public Core Core { get; private set; }
-        internal List<BotClient> ActiveClients { get; private set; } = new List<BotClient> ();
-        public IEnumerable<SocketGuild> AllGuilds { get => ActiveClients.SelectMany (x => x.AllGuilds); }
+        public BotClient[] ClientSlots { get; private set; } = new BotClient[0];
+        public IEnumerable<SocketGuild> AllGuilds { get => ClientSlots.SelectMany (x => x.AllGuilds); }
 
         internal string ClientsDirectory { get => Core.BaseDirectory + "Clients"; }
 
-        internal event Action<BotClient> OnClientSpawned;
-        internal event Action<BotClient> OnClientKilled;
-        internal event Action<Exception> OnExceptionCaught;
+        internal event Action<BotClient> ClientSpawned;
+        internal event Action<BotClient> ClientKilled;
+        internal event Func<Exception, Task> ExceptionCaught;
 
         internal ClientManager (Core core) {    
             Core = core;
         }
 
-        internal BotClient SpawnClient (string name) {
-            BotClient client = new BotClient (this, name);
+        internal BotClient SpawnClient (string name, int slotIndex) {
+            BotClient client = new BotClient (this, name, slotIndex);
             client.InitializeShards ();
-            ActiveClients.Add (client);
-            OnClientSpawned?.Invoke (client);
-            client.OnExceptionCaught += OnExceptionCaught;
+            ClientSlots[slotIndex] = client;
+            ClientSpawned?.Invoke (client);
+            client.ExceptionCaught += ExceptionCaught;
             return client;
         }
 
         internal async Task KillClient (BotClient client) {
+            ClientSlots[client.ClientSlotIndex] = null;
             await client.Kill ();
-            ActiveClients.Remove (client);
-            OnClientKilled?.Invoke (client);
+            ClientKilled?.Invoke (client);
         }
 
         public async Task RestartClient (BotClient client) {
             string name = client.Name;
+            int index = client.ClientSlotIndex;
             await KillClient (client);
-            SpawnClient (name);
+            SpawnClient (name, index);
         }
+
+        public bool IsClientAlive (int clientIndex) => ClientSlots[clientIndex] != null;
 
         private string[] GetClientPaths () {
             if (!Directory.Exists (ClientsDirectory))
@@ -54,10 +57,12 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client
         internal void InitializeClients () {
 
             string[] clients = GetClientPaths ();
-            foreach (string client in clients) {
+            ClientSlots = new BotClient[clients.Length];
+            for (int i = 0; i < clients.Length; i++) {
 
+                string client = clients[i];
                 string name = Path.GetFileName (client);
-                BotClient newClient = SpawnClient (name);
+                BotClient newClient = SpawnClient (name, i);
 
             }
 
