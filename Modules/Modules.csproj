@@ -19,7 +19,8 @@
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="xcopy &quot;$(TargetPath)&quot; &quot;$(SolutionDir)Core\bin\Debug\netcoreapp2.0\Modules\&quot; /y" />
+    <Exec Command="xcopy &quot;$(TargetPath)&quot; &quot;$(SolutionDir)Core\bin\Debug\netcoreapp2.0\Modules\&quot; /y" Condition=" '$(OS)' == 'Windows_NT' "/>
+    <Exec Command="rsync -av --delete &quot;$(TargetPath)&quot; &quot;$(SolutionDir)Core/bin/Debug/netcoreapp2.0/Modules/&quot;" Condition=" '$(OS)' == 'Unix' "/>
   </Target>
 
 </Project>
