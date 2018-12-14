@@ -72,21 +72,19 @@ namespace Lomztein.Moduthulhu.Modules.CustomCommands
             SaveData ();
         }
 
-        private static void SetCommandData (AdvDiscordCommands.Framework.Command command, string name, string description, IUser author, CommandAccessability accessability) {
+        private static void SetCommandData (ICustomCommand command, string name, string description, IUser author, CommandAccessability accessability) {
 
             command.Description = description;
             command.Name = name;
 
-            ICustomCommand custom = command as ICustomCommand;
-
-            custom.Accessability = accessability;
+            command.Accessability = accessability;
 
             if (accessability == CommandAccessability.Private)
-                custom.OwnerID = author.Id;
+                command.OwnerID = author.Id;
 
             if (accessability == CommandAccessability.Public) {
                 if (author is SocketGuildUser guildUser) {
-                    custom.OwnerID = guildUser.Guild.Id;
+                    command.OwnerID = guildUser.Guild.Id;
                 } else {
                     return;
                 }

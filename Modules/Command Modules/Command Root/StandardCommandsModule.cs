@@ -17,7 +17,7 @@ namespace Lomztein.Moduthulhu.Modules.Command
 
         public override bool Multiserver => true;
 
-        private AdvDiscordCommands.Framework.Command [ ] commands = new AdvDiscordCommands.Framework.Command [ ] {
+        private AdvDiscordCommands.Framework.Interfaces.ICommand [ ] commands = new AdvDiscordCommands.Framework.Interfaces.ICommand[ ] {
                 new HelpCommand (),
                 new DiscordCommandSet (),
                 new FlowCommandSet (),
