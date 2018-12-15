@@ -63,7 +63,7 @@ namespace Lomztein.Moduthulhu.Modules.Command {
             if (result != null) {
 
                 if (result.Exception != null)
-                    Log.Write (Log.Type.EXCEPTION, result.Exception.TargetSite.Name);
+                    Log.Write (result.Exception);
 
                 if (result.Value is ISendable sendable)
                     await sendable.SendAsync (arg.Channel);
