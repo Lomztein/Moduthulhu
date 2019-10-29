@@ -3,7 +3,7 @@ using Lomztein.AdvDiscordCommands.Framework;
 using Lomztein.AdvDiscordCommands.Framework.Interfaces;
 using Lomztein.Moduthulhu.Core.Bot.Client;
 using Lomztein.Moduthulhu.Core.Bot.Messaging.Advanced;
-using Lomztein.Moduthulhu.Core.Module.Framework;
+using Lomztein.Moduthulhu.Core.Plugin.Framework;
 using Lomztein.Moduthulhu.Modules.Command;
 using Lomztein.Moduthulhu.Modules.CustomCommands.Categories;
 using System;
@@ -18,7 +18,7 @@ namespace Lomztein.Moduthulhu.Modules.Administration.AdministrationCommands
         public class CoreAdminCommand : AdministratorCommand {
 
             public CoreAdminCommand () {
-                AdministratorSource = (() => ParentModule.ParentShard.Core.BotAdministrators);
+                AdministratorSource = (() => ParentModule.ParentShard.Core.CoreAdministrators);
                 AdministratorTypeName = "core";
             }
 

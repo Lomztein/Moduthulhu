@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Lomztein.Moduthulhu.Modules.Command;
-using Lomztein.Moduthulhu.Core.Module.Framework;
+using Lomztein.Moduthulhu.Core.Plugin.Framework;
 using Lomztein.AdvDiscordCommands.Framework;
 using Lomztein.Moduthulhu.Core.Bot;
 

@@ -8,7 +8,7 @@ using Lomztein.Moduthulhu.Core.Bot.Messaging.Advanced;
 using Lomztein.Moduthulhu.Core.Bot.Misc;
 using Lomztein.Moduthulhu.Core.Configuration;
 using Lomztein.Moduthulhu.Core.Extensions;
-using Lomztein.Moduthulhu.Core.Module.Framework;
+using Lomztein.Moduthulhu.Core.Plugin.Framework;
 using Lomztein.Moduthulhu.Cross;
 using System;
 using System.Collections.Generic;
@@ -17,7 +17,7 @@ using System.Threading.Tasks;
 
 namespace Lomztein.Moduthulhu.Modules.Command {
 
-    public class CommandRootModule : ModuleBase, ICommandSet, IConfigurable<MultiConfig> {
+    public class CommandRootModule : PluginBase, ICommandSet, IConfigurable<MultiConfig> {
 
         public override string Name => "Command Root";
         public override string Description => "A base module for implementing the Advanced Discord Commands framework.";

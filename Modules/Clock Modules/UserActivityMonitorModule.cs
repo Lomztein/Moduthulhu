@@ -1,4 +1,4 @@
-﻿using Lomztein.Moduthulhu.Core.Module.Framework;
+﻿using Lomztein.Moduthulhu.Core.Plugin.Framework;
 using Discord.WebSocket;
 using Discord;
 using System;
@@ -12,10 +12,12 @@ using Lomztein.AdvDiscordCommands.Extensions;
 using Lomztein.Moduthulhu.Core.Bot;
 using Discord.Rest;
 using Lomztein.Moduthulhu.Cross;
+using Lomztein.Moduthulhu.Core.Configuration.Management.Converters;
+using Lomztein.Moduthulhu.Core.Configuration.Management;
 
 namespace Lomztein.Moduthulhu.Modules.Clock.ActivityMonitor
 {
-    public class UserActivityMonitorModule : ModuleBase, IConfigurable<MultiConfig> {
+    public class UserActivityMonitorModule : PluginBase, IConfigurable<MultiConfig> {
 
         public override string Name => "User Activity Module";
         public override string Description => "Categorises people into configurable roles based on their last date of activity.";
@@ -26,7 +28,7 @@ namespace Lomztein.Moduthulhu.Modules.Clock.ActivityMonitor
         public MultiConfig Configuration { get; set; } = new MultiConfig ();
 
         private Dictionary<ulong, Dictionary<ulong, DateTime>> userActivity;
-        [AutoConfig] private MultiEntry<ActivityRole[], SocketGuild> activityRoles = new MultiEntry<ActivityRole[], SocketGuild> (x => new ActivityRole[] { new ActivityRole (0, 7), new ActivityRole (0, 30) }, "ActivityRoles", true);
+        [AutoConfig] private MultiEntry<ActivityRole[], SocketGuild> activityRoles = new MultiEntry<ActivityRole[], SocketGuild> (x => new ActivityRole[] { }, "ActivityRoles", true);
 
         private void SaveData () => DataSerialization.SerializeData (userActivity, "UserActivity");
         private void LoadData() {
@@ -40,6 +42,7 @@ namespace Lomztein.Moduthulhu.Modules.Clock.ActivityMonitor
             ParentShard.MessageReceived += DiscordClient_MessageReceived;
             ParentShard.UserVoiceStateUpdated += DiscordClient_UserVoiceStateUpdated;
             ParentShard.UserJoined += DiscordClient_UserJoined;
+            ConfigurationManager.AddConverter(new ActivityRoleConverter());
             this.GetClock ().OnDayPassed += CheckAll;
         }
 
@@ -149,6 +152,16 @@ namespace Lomztein.Moduthulhu.Modules.Clock.ActivityMonitor
             public ActivityRole (ulong _id, uint _threshold) {
                 id = _id;
                 threshold = _threshold;
+            }
+        }
+
+        public class ActivityRoleConverter : IConfigConverter
+        {
+            public Type TargetType => throw new NotImplementedException();
+
+            public object Convert(Type targetType, params string[] input)
+            {
+                return new ActivityRole(ulong.Parse(input[0]), uint.Parse(input[1]));
             }
         }
     }       

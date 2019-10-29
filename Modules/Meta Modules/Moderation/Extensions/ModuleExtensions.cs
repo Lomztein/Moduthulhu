@@ -1,6 +1,6 @@
 ﻿using Discord;
-using Lomztein.Moduthulhu.Core.Module;
-using Lomztein.Moduthulhu.Core.Module.Framework;
+using Lomztein.Moduthulhu.Core.Plugin;
+using Lomztein.Moduthulhu.Core.Plugin.Framework;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -12,7 +12,7 @@ namespace Lomztein.Moduthulhu.Modules.Meta.Extensions
 {
     public static class ModuleExtensions
     {
-        public static Embed GetModuleEmbed (this IModule module) {
+        public static Embed GetModuleEmbed (this IPlugin module) {
             EmbedBuilder builder = new EmbedBuilder ()
                 .WithTitle (module.Name)
                 .WithDescription (module.Description)
@@ -39,8 +39,8 @@ namespace Lomztein.Moduthulhu.Modules.Meta.Extensions
             return builder.Build ();
         }
 
-        public static Embed GetModuleListEmbed (this ModuleContainer container) {
-            IModule[] allModules = container.Modules.ToArray ();
+        public static Embed GetModuleListEmbed (this PluginManager container) {
+            IPlugin[] allModules = container.Modules.ToArray ();
 
             EmbedBuilder builder = new EmbedBuilder ()
                 .WithAuthor ("Module Information")
@@ -48,7 +48,7 @@ namespace Lomztein.Moduthulhu.Modules.Meta.Extensions
                 .WithDescription ("All currently installed, enabled and active modules.")
                 .WithFooter (allModules.Length + " modules active.");
 
-            foreach (IModule module in allModules) {
+            foreach (IPlugin module in allModules) {
                 builder.AddField (module.Name, module.Description);
             }
 

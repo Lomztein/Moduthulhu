@@ -1,5 +1,5 @@
 ﻿using System;
-using Lomztein.Moduthulhu.Core.Module.Framework;
+using Lomztein.Moduthulhu.Core.Plugin.Framework;
 using System.Collections.Generic;
 using Lomztein.Moduthulhu.Core.Configuration;
 using System.Threading;

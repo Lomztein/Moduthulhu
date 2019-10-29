@@ -1,7 +1,7 @@
 ﻿using Discord.WebSocket;
 using Lomztein.Moduthulhu.Core.Configuration;
 using Lomztein.Moduthulhu.Core.Extensions;
-using Lomztein.Moduthulhu.Core.Module.Framework;
+using Lomztein.Moduthulhu.Core.Plugin.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +12,7 @@ using Lomztein.Moduthulhu.Modules.Misc.Shipping;
 
 namespace Lomztein.Moduthulhu.Modules.Voice
 {
-    public class AutoVoiceCreatorModule : ModuleBase, IConfigurable<MultiConfig> {
+    public class AutoVoiceCreatorModule : PluginBase, IConfigurable<MultiConfig> {
 
         public override string Name => "Auto Voice Creator";
         public override string Description => "Creates new voice channels when all others are full.";

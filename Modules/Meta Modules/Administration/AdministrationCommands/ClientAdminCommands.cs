@@ -17,7 +17,7 @@ namespace Lomztein.Moduthulhu.Modules.Administration.AdministrationCommands
         public class ClientAdminCommand : AdministratorCommand {
 
             public ClientAdminCommand() {
-                AdministratorSource = (() => ParentModule.ParentShard.BotClient.ClientAdministrators);
+                AdministratorSource = (() => ParentModule.ParentShard.BotClient._clientAdministrators);
                 AdministratorTypeName = "client";
             }
 

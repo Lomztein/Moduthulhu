@@ -1,5 +1,5 @@
 ﻿using Lomztein.AdvDiscordCommands.Framework;
-using Lomztein.Moduthulhu.Core.Module.Framework;
+using Lomztein.Moduthulhu.Core.Plugin.Framework;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -12,13 +12,13 @@ namespace Lomztein.Moduthulhu.Modules.Command
 
     }
 
-    public class ModuleCommand<T> : AdvDiscordCommands.Framework.Command, IModuleCommand<T> where T : IModule {
+    public class ModuleCommand<T> : AdvDiscordCommands.Framework.Command, IModuleCommand<T> where T : IPlugin {
 
         public T ParentModule { get; set; }
 
     }
 
-    public class ModuleCommandSet<T> : CommandSet, IModuleCommand<T> where T : IModule {
+    public class ModuleCommandSet<T> : CommandSet, IModuleCommand<T> where T : IPlugin {
 
         public T ParentModule { get; set; }
 

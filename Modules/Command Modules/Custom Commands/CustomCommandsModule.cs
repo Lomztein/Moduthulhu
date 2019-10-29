@@ -3,7 +3,7 @@ using Discord.WebSocket;
 using Lomztein.AdvDiscordCommands.Framework;
 using Lomztein.AdvDiscordCommands.Framework.Interfaces;
 using Lomztein.Moduthulhu.Core.IO;
-using Lomztein.Moduthulhu.Core.Module.Framework;
+using Lomztein.Moduthulhu.Core.Plugin.Framework;
 using Lomztein.Moduthulhu.Modules.Command;
 using Lomztein.Moduthulhu.Modules.CustomCommands.Commands;
 using Lomztein.Moduthulhu.Modules.CustomCommands.Data;
@@ -16,7 +16,7 @@ using System.Text;
 
 namespace Lomztein.Moduthulhu.Modules.CustomCommands
 {
-    public class CustomCommandsModule : ModuleBase {
+    public class CustomCommandsModule : PluginBase {
 
         public const string customCommandFileName = "CustomCommands";
 

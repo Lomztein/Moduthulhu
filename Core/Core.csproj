@@ -8,16 +8,18 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Webserver\**" />
+    <EmbeddedResource Remove="Webserver\**" />
+    <None Remove="Webserver\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Discord.Net" Version="2.0.0-beta" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Cross\Cross.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Webserver\Website\" />
   </ItemGroup>
 
 </Project>

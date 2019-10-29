@@ -3,7 +3,7 @@ using Lomztein.AdvDiscordCommands.Extensions;
 using Lomztein.AdvDiscordCommands.Framework;
 using Lomztein.Moduthulhu.Core.Configuration;
 using Lomztein.Moduthulhu.Core.Extensions;
-using Lomztein.Moduthulhu.Core.Module.Framework;
+using Lomztein.Moduthulhu.Core.Plugin.Framework;
 using Lomztein.Moduthulhu.Modules.Command;
 using Lomztein.Moduthulhu.Modules.Voice.Commands;
 using System;
@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 namespace Lomztein.Moduthulhu.Modules.Voice
 {
     [Dependency ("CommandRootModule")]
-    public class VoiceLockingModule : ModuleBase, IConfigurable<MultiConfig> {
+    public class VoiceLockingModule : PluginBase, IConfigurable<MultiConfig> {
 
         public override string Name => "Voice Locking";
         public override string Description => "Allows people to lock voice channels.";

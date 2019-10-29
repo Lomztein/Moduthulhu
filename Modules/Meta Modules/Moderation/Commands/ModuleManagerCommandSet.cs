@@ -2,7 +2,7 @@
 using Lomztein.AdvDiscordCommands.Framework;
 using Lomztein.Moduthulhu.Core.Configuration;
 using Lomztein.Moduthulhu.Core.Extensions;
-using Lomztein.Moduthulhu.Core.Module.Framework;
+using Lomztein.Moduthulhu.Core.Plugin.Framework;
 using Lomztein.Moduthulhu.Modules.Command;
 using Lomztein.Moduthulhu.Modules.Meta.Extensions;
 using System.Linq;
@@ -35,15 +35,15 @@ namespace Lomztein.Moduthulhu.Modules.Meta.Commands
                 Category = AdditionalCategories.Management;
             }
 
-            [Overload (typeof (IModule), "Get a module from the parent manager by name and author.")]
+            [Overload (typeof (IPlugin), "Get a module from the parent manager by name and author.")]
             public Task<Result> Execute (CommandMetadata data, string name, string author) {
-                IModule result = ParentModule.ParentContainer.Modules.Find (x => x.Name.ToUpper ().Contains (name.ToUpper ()) || x.Author.ToUpper ().Contains (author.ToUpper ()));
+                IPlugin result = ParentModule.ParentContainer.Modules.Find (x => x.Name.ToUpper ().Contains (name.ToUpper ()) || x.Author.ToUpper ().Contains (author.ToUpper ()));
                 return TaskResult (result, result.CompactizeName ());
             }
 
-            [Overload (typeof (IModule), "Get a module from the parent manager by seach string.")]
+            [Overload (typeof (IPlugin), "Get a module from the parent manager by seach string.")]
             public Task<Result> Execute(CommandMetadata data, string search) {
-                IModule result = ParentModule.ParentContainer.FuzzySearchModule (search);
+                IPlugin result = ParentModule.ParentContainer.FuzzySearchModule (search);
                 return TaskResult (result, result.CompactizeName ());
             }
 
@@ -73,13 +73,13 @@ namespace Lomztein.Moduthulhu.Modules.Meta.Commands
             }
 
             [Overload (typeof (Embed), "Display information about a specific module.")]
-            public Task<Result> Execute (CommandMetadata data, IModule module) {
+            public Task<Result> Execute (CommandMetadata data, IPlugin module) {
                 return TaskResult (module?.GetModuleEmbed (), "");
             }
 
             [Overload (typeof (Embed), "Display information about a specific module found by name.")]
             public Task<Result> Execute(CommandMetadata data, string search) {
-                IModule module = ParentModule.ParentContainer.FuzzySearchModule (search);
+                IPlugin module = ParentModule.ParentContainer.FuzzySearchModule (search);
                 return TaskResult (module?.GetModuleEmbed (), "");
             }
         }

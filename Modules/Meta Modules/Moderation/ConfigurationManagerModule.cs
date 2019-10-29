@@ -1,6 +1,6 @@
 ﻿using Lomztein.Moduthulhu.Core.Configuration;
 using Lomztein.Moduthulhu.Core.Extensions;
-using Lomztein.Moduthulhu.Core.Module.Framework;
+using Lomztein.Moduthulhu.Core.Plugin.Framework;
 using Lomztein.Moduthulhu.Modules.Command;
 using Lomztein.Moduthulhu.Modules.Meta.Commands;
 using System;
@@ -12,7 +12,7 @@ using static Lomztein.Moduthulhu.Core.Configuration.Config;
 
 namespace Lomztein.Moduthulhu.Modules.Meta
 {
-    public class ConfigurationManagerModule : ModuleBase {
+    public class ConfigurationManagerModule : PluginBase {
 
         public override string Name => "Configuration Manager";
         public override string Description => "Used for interacting with and changing configuration.";
@@ -33,10 +33,10 @@ namespace Lomztein.Moduthulhu.Modules.Meta
 
         public List<IConfigurable> GetModulesWithEntry(ulong id, string key) {
 
-            IModule[] allModules = ParentContainer.Modules.ToArray () ;
+            IPlugin[] allModules = ParentContainer.Modules.ToArray () ;
             List<IConfigurable> withKey = new List<IConfigurable> ();
 
-            foreach (IModule module in allModules) {
+            foreach (IPlugin module in allModules) {
 
                 if (module is IConfigurable configurableModule) {
                     Config config = configurableModule.GetConfig ();
@@ -50,10 +50,10 @@ namespace Lomztein.Moduthulhu.Modules.Meta
         }
 
 
-        public string ListEntriesInModules(IEnumerable<IModule> modules, ulong id, Predicate<Entry> predicate) {
+        public string ListEntriesInModules(IEnumerable<IPlugin> modules, ulong id, Predicate<Entry> predicate) {
 
             string list = "";
-            foreach (IModule module in modules) {
+            foreach (IPlugin module in modules) {
 
                 if (module is IConfigurable configurable) {
 

@@ -1,4 +1,4 @@
-﻿using Lomztein.Moduthulhu.Core.Module.Framework;
+﻿using Lomztein.Moduthulhu.Core.Plugin.Framework;
 using Lomztein.AdvDiscordCommands.ExampleCommands;
 using System;
 using System.Collections.Generic;
@@ -9,7 +9,7 @@ using Lomztein.AdvDiscordCommands.Extensions;
 namespace Lomztein.Moduthulhu.Modules.Command
 {
     [Dependency ("CommandRootModule")]
-    public class StandardCommandsModule : ModuleBase {
+    public class StandardCommandsModule : PluginBase {
 
         public override string Name => "Standard Commands";
         public override string Description => "A module that adds all standard commands from the Advanced Discord Commands library.";

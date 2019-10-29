@@ -5,7 +5,7 @@ using Lomztein.AdvDiscordCommands.Framework.Interfaces;
 using Lomztein.Moduthulhu.Core.Configuration;
 using Lomztein.Moduthulhu.Core.Configuration.Management;
 using Lomztein.Moduthulhu.Core.Extensions;
-using Lomztein.Moduthulhu.Core.Module.Framework;
+using Lomztein.Moduthulhu.Core.Plugin.Framework;
 using Lomztein.Moduthulhu.Modules.Command;
 using Lomztein.Moduthulhu.Modules.CustomCommands.Categories;
 using System;
@@ -25,7 +25,7 @@ namespace Lomztein.Moduthulhu.Modules.Meta.Commands {
             Category = AdditionalCategories.Management;
 
             commandsInSet = new List<ICommand> () {
-                new Change (), new Add (), new Remove (),
+                new Change (), new Add (), new Remove (), new Set (),
                 new List (), new All (), new Unset (),
             };
         }
@@ -33,7 +33,7 @@ namespace Lomztein.Moduthulhu.Modules.Meta.Commands {
         protected static bool ReturnErrorIfMulitple (List<IConfigurable> configurables, string key, out Task<Result> result) {
             result = null;
             if (configurables.Count > 1) {
-                string allNames = configurables.Select (x => (x as IModule).CompactizeName ()).ToArray ().Singlify ();
+                string allNames = configurables.Select (x => (x as IPlugin).CompactizeName ()).ToArray ().Singlify ();
                 result = Task.FromResult (new Result (null, $"Error - Multiple modules contains key \"{key}\", please try again while specifying between the following: {allNames}"));
 
                 return true ;
@@ -56,19 +56,20 @@ namespace Lomztein.Moduthulhu.Modules.Meta.Commands {
                 return TaskResult (null, $"Succesfully set \"{key}\" to {inputValues.Singlify ()}");
             }
 
+            [Overload(typeof(void), "Change a specified configuration key.")]
+            public Task<Result> Execute(CommandMetadata data, string key, params string[] inputValues)
+            {
+                var configurables = ParentModule.GetModulesWithEntry(data.Message.GetGuild().Id, key);
+                if (ReturnErrorIfMulitple(configurables, key, out var result))
+                    return result;
+                return Execute(data, configurables.Single(), key, inputValues);
+            }
+
             [Overload (typeof (void), "Change a specific key in a searched for module.")]
             public Task<Result> Execute(CommandMetadata data, string moduleSearch, string key, params string[] inputValues) {
                 if (ParentModule.ParentContainer.FuzzySearchModule (moduleSearch) is IConfigurable configurable)
                     return Execute (data, configurable, key, inputValues);
                 return TaskResult (null, $"Error - No configurable module was found when \"" + moduleSearch + "\" was searched.");
-            }
-
-            [Overload (typeof (void), "Change a specified configuration key.")]
-            public Task<Result> Execute(CommandMetadata data, string key, params string[] inputValues) {
-                var configurables = ParentModule.GetModulesWithEntry (data.Message.GetGuild ().Id, key);
-                if (ReturnErrorIfMulitple (configurables, key, out var result))
-                    return result;
-                return Execute (data, configurables.Single (), key, inputValues);
             }
         }
 
@@ -83,8 +84,17 @@ namespace Lomztein.Moduthulhu.Modules.Meta.Commands {
 
             [Overload (typeof (void), "Add a value to a list/enumerable type configuration entry in the given IConfigurable.")]
             public Task<Result> Execute (CommandMetadata data, IConfigurable configurable, string key, params string[] inputValues) {
-                configurable.AddToEntry ( data.Message.GetGuild ().Id, key, true, true, inputValues);
+                configurable.ChangeEnumerable ( data.Message.GetGuild ().Id, key, int.MaxValue, true, true, ConfigurationManager.ChangeType.Add, inputValues);
                 return TaskResult (null, $"Succesfully added \"{inputValues.Singlify ()}\" to \"{key}\"");
+            }
+
+            [Overload(typeof(void), "Add to a specified configuration key.")]
+            public Task<Result> Execute(CommandMetadata data, string key, params string[] inputValues)
+            {
+                var configurables = ParentModule.GetModulesWithEntry(data.Message.GetGuild().Id, key);
+                if (ReturnErrorIfMulitple(configurables, key, out var result))
+                    return result;
+                return Execute(data, configurables.Single(), key, inputValues);
             }
 
             [Overload (typeof (void), "Add to a specific key in a searched for module.")]
@@ -94,13 +104,6 @@ namespace Lomztein.Moduthulhu.Modules.Meta.Commands {
                 return TaskResult (null, $"Error - No configurable module was found when \"" + moduleSearch + "\" was searched.");
             }
 
-            [Overload (typeof (void), "Add to a specified configuration key.")]
-            public Task<Result> Execute(CommandMetadata data, string key, params string[] inputValues) {
-                var configurables = ParentModule.GetModulesWithEntry (data.Message.GetGuild ().Id, key);
-                if (ReturnErrorIfMulitple (configurables, key, out var result))
-                    return result;
-                return Execute (data, configurables.Single (), key, inputValues);
-            }
         }
 
         public class Remove : ModuleCommand<ConfigurationManagerModule> {
@@ -114,8 +117,17 @@ namespace Lomztein.Moduthulhu.Modules.Meta.Commands {
 
             [Overload (typeof (void), "Remove a value from a list/enumerable type configuration entry in the given IConfigurable.")]
             public Task<Result> Execute(CommandMetadata data, IConfigurable configurable, string key, int index) {
-                object obj = configurable.RemoveFromEntry (data.Message.GetGuild ().Id, key, true, true, index);
+                object obj = configurable.ChangeEnumerable (data.Message.GetGuild ().Id, key, index, true, true, ConfigurationManager.ChangeType.Remove);
                 return TaskResult (null, $"Succesfully removed \"{obj}\" from \"{key}\"");
+            }
+
+            [Overload(typeof(void), "Remove a value from a specified configuration key.")]
+            public Task<Result> Execute(CommandMetadata data, string key, int index)
+            {
+                var configurables = ParentModule.GetModulesWithEntry(data.Message.GetGuild().Id, key);
+                if (ReturnErrorIfMulitple(configurables, key, out var result))
+                    return result;
+                return Execute(data, configurables.Single(), key, index);
             }
 
             [Overload (typeof (void), "Remove value from a specific key in a searched for module.")]
@@ -124,13 +136,40 @@ namespace Lomztein.Moduthulhu.Modules.Meta.Commands {
                     return Execute (data, configurable, key, index);
                 return TaskResult (null, $"Error - No configurable module was found when \"" + moduleSearch + "\" was searched.");
             }
+        }
 
-            [Overload (typeof (void), "Remove a value from a specified configuration key.")]
-            public Task<Result> Execute(CommandMetadata data, string key, int index) {
-                var configurables = ParentModule.GetModulesWithEntry (data.Message.GetGuild ().Id, key);
-                if (ReturnErrorIfMulitple (configurables, key, out var result))
+        public class Set : ModuleCommand<ConfigurationManagerModule>
+        {
+            public Set ()
+            {
+                Name = "set";
+                Description = "Set at index in an entry.";
+                Category = AdditionalCategories.Management;
+                RequiredPermissions.Add(GuildPermission.ManageGuild);
+            }
+
+            [Overload(typeof(void), "Set a value in a list/enumerable type configuration entry in the given IConfigurable.")]
+            public Task<Result> Execute(CommandMetadata data, IConfigurable configurable, string key, int index, params string[] input)
+            {
+                object obj = configurable.ChangeEnumerable(data.Message.GetGuild().Id, key, index, true, true, ConfigurationManager.ChangeType.Set, input);
+                return TaskResult(null, $"Succesfully set \"{obj}\" to \"{input.Singlify ()}\"");
+            }
+
+            [Overload(typeof(void), "Remove a value from a specified configuration key.")]
+            public Task<Result> Execute(CommandMetadata data, string key, int index, params string[] input)
+            {
+                var configurables = ParentModule.GetModulesWithEntry(data.Message.GetGuild().Id, key);
+                if (ReturnErrorIfMulitple(configurables, key, out var result))
                     return result;
-                return Execute (data, configurables.Single (), key, index);
+                return Execute(data, configurables.Single(), key, index);
+            }
+
+            [Overload(typeof(void), "Remove value from a specific key in a searched for module.")]
+            public Task<Result> Execute(CommandMetadata data, string moduleSearch, string key, int index, params string[] input)
+            {
+                if (ParentModule.ParentContainer.FuzzySearchModule(moduleSearch) is IConfigurable configurable)
+                    return Execute(data, configurable, key, index);
+                return TaskResult(null, $"Error - No configurable module was found when \"" + moduleSearch + "\" was searched.");
             }
         }
 
@@ -149,20 +188,20 @@ namespace Lomztein.Moduthulhu.Modules.Meta.Commands {
                 return TaskResult (list, list);
             }
 
+            [Overload(typeof(string), "List every value in a list/enumerable type configuration entry.")]
+            public Task<Result> Execute(CommandMetadata data, string key)
+            {
+                var configurables = ParentModule.GetModulesWithEntry(data.Message.GetGuild().Id, key);
+                if (ReturnErrorIfMulitple(configurables, key, out var result))
+                    return result;
+                return Execute(data, configurables.Single(), key);
+            }
 
             [Overload (typeof (string), "List every value in a list/enumerable type configuration entry in the search module.")]
             public Task<Result> Execute(CommandMetadata data, string moduleSearch, string key) {
                 if (ParentModule.ParentContainer.FuzzySearchModule (moduleSearch) is IConfigurable configurable)
                     return Execute (data, configurable, key);
                 return TaskResult (null, $"Error - No configurable module was found when \"" + moduleSearch + "\" was searched.");
-            }
-
-            [Overload (typeof (string), "List every value in a list/enumerable type configuration entry.")]
-            public Task<Result> Execute(CommandMetadata data, string key) {
-                var configurables = ParentModule.GetModulesWithEntry (data.Message.GetGuild ().Id, key);
-                if (ReturnErrorIfMulitple (configurables, key, out var result))
-                    return result;
-                return Execute (data, configurables.Single (), key);
             }
 
         }
@@ -185,7 +224,7 @@ namespace Lomztein.Moduthulhu.Modules.Meta.Commands {
             [Overload (typeof (string), "List every value in a list/enumerable type configuration entry in the search module.")]
             public Task<Result> Execute(CommandMetadata data, string moduleSearch) {
                 if (ParentModule.ParentContainer.FuzzySearchModule (moduleSearch) is IConfigurable configurable) {
-                    string all = ParentModule.ListEntriesInModules (new IModule[] { configurable as IModule }, data.Message.GetGuild ().Id, x => true);
+                    string all = ParentModule.ListEntriesInModules (new IPlugin[] { configurable as IPlugin }, data.Message.GetGuild ().Id, x => true);
                     return TaskResult (all, all);
                 }
                 return TaskResult (null, $"Error - No configurable module was found when \"" + moduleSearch + "\" was searched.");
@@ -210,7 +249,7 @@ namespace Lomztein.Moduthulhu.Modules.Meta.Commands {
             [Overload (typeof (string), "List every value in a list/enumerable type configuration entry in the search module.")]
             public Task<Result> Execute(CommandMetadata data, string moduleSearch) {
                 if (ParentModule.ParentContainer.FuzzySearchModule (moduleSearch) is IConfigurable configurable) {
-                    string all = ParentModule.ListEntriesInModules (new IModule[] { configurable as IModule }, data.Message.GetGuild ().Id, x => true);
+                    string all = ParentModule.ListEntriesInModules (new IPlugin[] { configurable as IPlugin }, data.Message.GetGuild ().Id, x => true);
                     return TaskResult (all, all);
                 }
                 return TaskResult (null, $"Error - No configurable module was found when \"" + moduleSearch + "\" was searched.");

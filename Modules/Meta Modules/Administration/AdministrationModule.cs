@@ -1,4 +1,4 @@
-﻿using Lomztein.Moduthulhu.Core.Module.Framework;
+﻿using Lomztein.Moduthulhu.Core.Plugin.Framework;
 using Lomztein.Moduthulhu.Modules.Administration.AdministrationCommands;
 using Lomztein.Moduthulhu.Modules.Command;
 using System;
@@ -8,7 +8,7 @@ using System.Text;
 namespace Lomztein.Moduthulhu.Modules.Administration
 {
     [Dependency ("CommandRootModule")]
-    public class AdministrationModule : ModuleBase {
+    public class AdministrationModule : PluginBase {
 
         public override string Name => "Administration Module";
         public override string Description => "Module for administrating the core and client processes.";

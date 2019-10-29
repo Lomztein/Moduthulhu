@@ -2,7 +2,7 @@
 using Lomztein.AdvDiscordCommands.Extensions;
 using Lomztein.AdvDiscordCommands.Framework;
 using Lomztein.Moduthulhu.Core.Configuration;
-using Lomztein.Moduthulhu.Core.Module.Framework;
+using Lomztein.Moduthulhu.Core.Plugin.Framework;
 using Lomztein.Moduthulhu.Modules.Command;
 using System;
 using System.Collections.Generic;
@@ -15,7 +15,7 @@ using Lomztein.AdvDiscordCommands.Framework.Categories;
 namespace Lomztein.Moduthulhu.Modules.Misc.Color
 {
     [Dependency ("CommandRootModule")]
-    public class ColourModule : ModuleBase, IConfigurable<MultiConfig> {
+    public class ColourModule : PluginBase, IConfigurable<MultiConfig> {
 
         public const string PREFIX = "cl_";
 

@@ -1,4 +1,4 @@
-﻿using Lomztein.Moduthulhu.Core.Module.Framework;
+﻿using Lomztein.Moduthulhu.Core.Plugin.Framework;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -14,7 +14,7 @@ using Lomztein.Moduthulhu.Core.Configuration.Management;
 
 namespace Lomztein.Moduthulhu.Modules.Misc.Phrases
 {
-    public class PhrasesModule : ModuleBase, IConfigurable<MultiConfig> {
+    public class PhrasesModule : PluginBase, IConfigurable<MultiConfig> {
 
         public override string Name => "Response Phrases";
         public override string Description => "Responds to certain phrases from certain people in certain channels with a certain chance.";
@@ -24,7 +24,7 @@ namespace Lomztein.Moduthulhu.Modules.Misc.Phrases
 
         public MultiConfig Configuration { get; set; } = new MultiConfig ();
 
-        [AutoConfig] private MultiEntry<List<Phrase>, SocketGuild> phrases = new MultiEntry<List<Phrase>, SocketGuild> (x => new List<Phrase> () { new Phrase (), new Phrase () }, "Phrases", true);
+        [AutoConfig] private MultiEntry<List<Phrase>, SocketGuild> phrases = new MultiEntry<List<Phrase>, SocketGuild> (x => new List<Phrase> () { }, "Phrases", true);
 
         public override void Initialize() {
             ParentShard.MessageReceived += OnMessageRecieved;

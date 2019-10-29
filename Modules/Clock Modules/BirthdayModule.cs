@@ -4,7 +4,7 @@ using Lomztein.AdvDiscordCommands.Extensions;
 using Lomztein.Moduthulhu.Core.Bot;
 using Lomztein.Moduthulhu.Core.Configuration;
 using Lomztein.Moduthulhu.Core.IO;
-using Lomztein.Moduthulhu.Core.Module.Framework;
+using Lomztein.Moduthulhu.Core.Plugin.Framework;
 using Lomztein.Moduthulhu.Core.Extensions;
 using System;
 using System.Collections.Generic;
@@ -19,7 +19,7 @@ using Lomztein.Moduthulhu.Core.Clock;
 
 namespace Lomztein.Moduthulhu.Modules.Clock.Birthday
 {
-    public class BirthdayModule : ModuleBase, IConfigurable<MultiConfig> {
+    public class BirthdayModule : PluginBase, IConfigurable<MultiConfig> {
 
         private const string dataFilePath = "Birthdays";
 

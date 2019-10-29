@@ -2,7 +2,7 @@
 using Discord.WebSocket;
 using Lomztein.AdvDiscordCommands.Extensions;
 using Lomztein.Moduthulhu.Core.Bot;
-using Lomztein.Moduthulhu.Core.Module.Framework;
+using Lomztein.Moduthulhu.Core.Plugin.Framework;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -14,7 +14,7 @@ using Lomztein.Moduthulhu.Cross;
 
 namespace Lomztein.Moduthulhu.Modules.Misc.Logging
 {
-    public class LoggingModule : ModuleBase {
+    public class LoggingModule : PluginBase {
 
         public override string Name => "Activity Logging";
         public override string Description => "Logs just about every event the bot sees to console. Few things excluded.";

@@ -3,7 +3,7 @@ using Discord.WebSocket;
 using Lomztein.Moduthulhu.Core.Configuration;
 using Lomztein.Moduthulhu.Core.Extensions;
 using Lomztein.Moduthulhu.Core.IO;
-using Lomztein.Moduthulhu.Core.Module.Framework;
+using Lomztein.Moduthulhu.Core.Plugin.Framework;
 using Lomztein.Moduthulhu.Modules.Command;
 using Lomztein.Moduthulhu.Modules.Misc.Karma.Commands;
 using Newtonsoft.Json;
@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 namespace Lomztein.Moduthulhu.Modules.Misc.Karma
 {
     [Dependency ("CommandRootModule")]
-    public class KarmaModule : ModuleBase, IConfigurable<MultiConfig> {
+    public class KarmaModule : PluginBase, IConfigurable<MultiConfig> {
 
         public override string Name => "Karma";
         public override string Description => "Keep track of an accurate representation of peoples self-worth.";

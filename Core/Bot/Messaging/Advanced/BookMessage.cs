@@ -50,7 +50,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Messaging.Advanced {
                 await UpdateMessageAsync ();
             }
 
-            public async Task UpdateMessageAsync () {
+            private async Task UpdateMessageAsync () {
                 await Message.ModifyAsync (x => x.Content = CurrentPage);
             }
 

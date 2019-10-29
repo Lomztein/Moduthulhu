@@ -1,6 +1,6 @@
 ﻿using Discord.WebSocket;
 using Lomztein.Moduthulhu.Core.IO;
-using Lomztein.Moduthulhu.Core.Module.Framework;
+using Lomztein.Moduthulhu.Core.Plugin.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +12,7 @@ using Lomztein.AdvDiscordCommands.Extensions;
 namespace Lomztein.Moduthulhu.Modules.Misc.Shipping {
     // There is arguably a bit of spaghetti in this file, as Ships contain and use references to this parent module quite often.
     // However, it is entirely restricted to this file and the commands file.
-    public class ShippingModule : ModuleBase {
+    public class ShippingModule : PluginBase {
 
         public const string shipFileName = "Ships";
         public const string nameFileName = "Shipnames";

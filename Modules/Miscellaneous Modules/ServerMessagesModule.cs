@@ -1,5 +1,5 @@
 ﻿using Discord.WebSocket;
-using Lomztein.Moduthulhu.Core.Module.Framework;
+using Lomztein.Moduthulhu.Core.Plugin.Framework;
 using Lomztein.AdvDiscordCommands.Extensions;
 using Lomztein.Moduthulhu.Core.Extensions;
 using System;
@@ -14,7 +14,7 @@ using Discord;
 
 namespace Lomztein.Moduthulhu.Modules.ServerMessages {
 
-    public class ServerMessagesModule : ModuleBase, IConfigurable<MultiConfig> {
+    public class ServerMessagesModule : PluginBase, IConfigurable<MultiConfig> {
 
         public override string Name => "Server Messages";
         public override string Description => "Sends a variety of messages on certain events.";

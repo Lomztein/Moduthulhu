@@ -1,4 +1,4 @@
-﻿using Lomztein.Moduthulhu.Core.Module.Framework;
+﻿using Lomztein.Moduthulhu.Core.Plugin.Framework;
 using Lomztein.Moduthulhu.Modules.Command;
 using Lomztein.Moduthulhu.Modules.Meta.Commands;
 using System;
@@ -6,7 +6,7 @@ using System;
 namespace Lomztein.Moduthulhu.Modules.Meta
 {
     [Dependency ("CommandRootModule")]
-    public class ModuleManagerModule : ModuleBase {
+    public class ModuleManagerModule : PluginBase {
 
         public override string Name => "Module Manager";
         public override string Description => "Manually keep track of and manage modules.";

@@ -1,6 +1,6 @@
 ﻿using Lomztein.AdvDiscordCommands.Framework;
 using Lomztein.AdvDiscordCommands.Framework.Categories;
-using Lomztein.Moduthulhu.Core.Module.Framework;
+using Lomztein.Moduthulhu.Core.Plugin.Framework;
 using Lomztein.Moduthulhu.Modules.Command;
 using System;
 using System.Collections.Generic;
@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Lomztein.ModularDiscordBot.Modules.Misc.Brainfuck
 {
-    public class BrainfuckModule : ModuleBase {
+    public class BrainfuckModule : PluginBase {
 
         public override string Name => "Brainfuck";
         public override string Description => "why does this exist";
