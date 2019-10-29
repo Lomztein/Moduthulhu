@@ -85,16 +85,16 @@ namespace Lomztein.Moduthulhu.Modules.Misc.Karma
             DataSerialization.SerializeData (karma, "Karma");
         }
 
-        private void ChangeKarma (IUser giver, IUser reciever, int direction) {
-            if (giver.Id == reciever.Id)
+        private void ChangeKarma (IUser giver, IUser receiver, int direction) {
+            if (giver.Id == receiver.Id)
                 return; // Can't go around giving yourself karma, ye twat.
-            if (!karma.ContainsKey (reciever.Id))
-                karma.Add (reciever.Id, new Selfworth ());
+            if (!karma.ContainsKey (receiver.Id))
+                karma.Add (receiver.Id, new Selfworth ());
 
             if (direction > 0)
-                karma [ reciever.Id ].Upvote ();
+                karma [ receiver.Id ].Upvote ();
             else if (direction < 0)
-                karma [ reciever.Id ].Downvote ();
+                karma [ receiver.Id ].Downvote ();
 
             SaveKarma ();
         }
