@@ -1,13 +1,8 @@
-﻿using Lomztein.Moduthulhu.Core.Bot;
-using Lomztein.Moduthulhu.Core.Bot.Client.Sharding;
-using Lomztein.Moduthulhu.Core.Configuration;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using Lomztein.Moduthulhu.Core.Bot.Client.Sharding;
 
-namespace Lomztein.Moduthulhu.Core.Module.Framework
+namespace Lomztein.Moduthulhu.Core.Plugin.Framework
 {
-    public interface IModule {
+    public interface IPlugin {
 
         /// <summary>
         /// Your module name, used to easily identify it.
@@ -38,11 +33,6 @@ namespace Lomztein.Moduthulhu.Core.Module.Framework
         /// If you have a server that new module patches can be downloaded from, put the URL to the module file here. CURRENTLY NOT USED.
         /// </summary>
         string PatchURL { get; }
-
-        /// <summary>
-        /// The module handler that contains this module. Is set when the module is created.
-        /// </summary>
-        ModuleContainer ParentContainer { get; set; }
 
         /// <summary>
         /// The bot client that parents the module handler that loaded this module. Is set when the module is created.

@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Lomztein.Moduthulhu.Core.Module
+namespace Lomztein.Moduthulhu.Core.Plugin
 {
-    public class ModulePatcher
+    public class PluginPatcher
     {
 
     }

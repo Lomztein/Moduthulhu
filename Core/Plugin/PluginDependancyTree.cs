@@ -2,17 +2,17 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Linq;
-using Lomztein.Moduthulhu.Core.Module.Framework;
+using Lomztein.Moduthulhu.Core.Plugin.Framework;
 using Lomztein.Moduthulhu.Cross;
 using Lomztein.Moduthulhu.Core.Extensions;
 
-namespace Lomztein.Moduthulhu.Core.Module
+namespace Lomztein.Moduthulhu.Core.Plugin
 {
-    public class ModuleDependencyTree
+    public class PluginDependancyTree
     {
         internal Branch[] AllBranches { get; private set; }
 
-        internal ModuleDependencyTree (params Type[] types) {
+        internal PluginDependancyTree (params Type[] types) {
             AllBranches = ConstructBranches (types);
             ConnectBranches (AllBranches);
         }
@@ -31,7 +31,7 @@ namespace Lomztein.Moduthulhu.Core.Module
 
             foreach (Branch branch in branches) {
 
-                DependencyAttribute[] dependencies = branch.Module.GetCustomAttributes (typeof (DependencyAttribute), false).Cast<DependencyAttribute>().ToArray ();
+                DependencyAttribute[] dependencies = branch.Plugin.GetCustomAttributes (typeof (DependencyAttribute), false).Cast<DependencyAttribute>().ToArray ();
                 string[] dependencyModules = dependencies.Select (x => x.DependencyName).ToArray ();
                 branch.SetDependancies (dependencyModules.Select (x => GetBranch (x)).ToArray ());
 
@@ -56,7 +56,7 @@ namespace Lomztein.Moduthulhu.Core.Module
                 Type currentType = toOrder[currentIndex];
                 Branch currentBranch = GetBranch (currentType.Name);
                 
-                if (currentBranch.Dependencies.Length == 0 || currentBranch.Dependencies.All (x => x != null && allSoFar.Contains (x.Module))) {
+                if (currentBranch.Dependencies.Length == 0 || currentBranch.Dependencies.All (x => x != null && allSoFar.Contains (x.Plugin))) {
                     allSoFar.Add (currentType);
                     toOrder.RemoveAt (currentIndex);
                     currentIndex = 0;
@@ -70,23 +70,23 @@ namespace Lomztein.Moduthulhu.Core.Module
         }
 
         private Branch GetBranch (string moduleType) {
-            Branch branch = AllBranches.FirstOrDefault (x => x.Module.Name == moduleType);
+            Branch branch = AllBranches.FirstOrDefault (x => x.Plugin.Name == moduleType);
             if (branch == null)
                 Log.Write (Log.Type.CRITICAL, $"Module type {moduleType} cannot be found, perhaps it is missing in the Modules folder.");
             return branch;
         }
 
         public Type[] GetDependencies (Type moduleType) {
-            return GetBranch (moduleType.Name).Dependencies.Select (x => x.Module).ToArray ();
+            return GetBranch (moduleType.Name).Dependencies.Select (x => x.Plugin).ToArray ();
         }
 
         internal class Branch {
 
-            internal Type Module { get; set; }
+            internal Type Plugin { get; set; }
             internal Branch[] Dependencies { get; set; }
 
             internal Branch(Type module) {
-                Module = module;
+                Plugin = module;
             }
 
             internal void SetDependancies (params Branch[] dependancies) {
