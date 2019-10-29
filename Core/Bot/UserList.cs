@@ -18,7 +18,6 @@ namespace Lomztein.Moduthulhu.Core.Bot
         }
 
         public bool Contains(ulong id) => Users.Contains (id);
-        public bool Contains(IUser user) => Users.Contains (user.Id);
 
         public void AddUser(ulong id) {
             Users.Add (id);

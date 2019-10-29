@@ -2,7 +2,7 @@
 using Discord;
 using Discord.WebSocket;
 using System.Threading.Tasks;
-using Lomztein.Moduthulhu.Core.Module;
+using Lomztein.Moduthulhu.Core.Plugin;
 using System.IO;
 using System.Threading;
 using System.Linq;
@@ -12,47 +12,44 @@ using Lomztein.Moduthulhu.Core.Bot.Client;
 
 namespace Lomztein.Moduthulhu.Core.Bot {
 
-    /// <summary>
-    /// A wrapper for the Discord.NET DiscordClient.
-    /// </summary>
     public class Core {
-
-        // TODO: Allow for sending bot-wide messages directly in console.
-
         public DateTime BootDate { get; private set; }
         public TimeSpan Uptime { get => DateTime.Now - BootDate; }
 
-        internal ClientManager ClientManager { get; private set; }
-        internal ModuleLoader ModuleLoader { get; private set; }
-        internal Clock.Clock Clock { get; private set; }
-        internal ErrorReporter ErrorReporter { get; private set; }
-        public UserList BotAdministrators { get; private set; }
+        private ClientManager _clientManager;
+        private ErrorReporter _errorReporter;
+        private UserList _coreAdministrators;
 
-        public string BaseDirectory { get => AppContext.BaseDirectory; }
-
-        private DiscordSocketConfig socketConfig = new DiscordSocketConfig () {
-            DefaultRetryMode = RetryMode.AlwaysRetry,
-        };
+        internal string BaseDirectory { get => AppContext.BaseDirectory; }
 
         internal async Task InitializeCore () {
+
+            // Set up core
             BootDate = DateTime.Now;
+            _coreAdministrators = new UserList(Path.Combine(BaseDirectory, "AdministratorIDs"));
+            Status.Set("CorePath", BaseDirectory);
 
-            ClientManager = new ClientManager (this);
-            ModuleLoader = new ModuleLoader (this);
-            Clock = new Clock.Clock (1);
+            // Set up exception handler.
+            _errorReporter = new ErrorReporter(this);
 
-            ClientManager.InitializeClients ();
-            ErrorReporter = new ErrorReporter (this);
+            // Set up client manager
+            _clientManager = new ClientManager(this);
+            _clientManager.InitializeClients();
+            _clientManager.ExceptionCaught += OnExceptionCaught;
 
-            ClientManager.ExceptionCaught += ErrorReporter.ReportError;
-            Clock.ExceptionCaught += ErrorReporter.ReportError;
-
-            BotAdministrators = new UserList (Path.Combine (BaseDirectory, "AdministratorIDs"));
-
-            Status.Set ("CorePath", BaseDirectory);
-
+            // Keep the core alive.
             await Task.Delay (-1);
             Log.Write (Log.Type.BOT, "Shutting down..");
+        }
+
+        public bool IsCoreAdministrator (ulong userId)
+        {
+            return _coreAdministrators.Contains(userId);
+        }
+
+        private Task OnExceptionCaught(Exception exception)
+        {
+            return _errorReporter.ReportError(exception);
         }
 
         public string GetStatusString() => $"Core uptime: {Uptime}";

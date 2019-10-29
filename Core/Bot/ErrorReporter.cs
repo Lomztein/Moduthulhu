@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 
 namespace Lomztein.Moduthulhu.Core.Bot
 {
-
     internal class ErrorReporter
     {
         private Core ParentCore { get; set; }
@@ -18,7 +17,7 @@ namespace Lomztein.Moduthulhu.Core.Bot
         }
 
         internal Task ReportError (Exception exception) {
-            string message = (exception.Message + " - " + exception.StackTrace);
+            string message = (exception.Message + " - " + exception.StackTrace) + "\n";
             Cross.Log.Write (exception);
             File.AppendAllText (ParentCore.BaseDirectory + "errors.txt", message);
             return Task.CompletedTask;

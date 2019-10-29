@@ -19,88 +19,87 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client
 
         //internal const int GUILDS_PER_SHARD = 2000;
         public ClientManager ClientManager { get; private set; }
-        public Core Core { get => ClientManager.Core; }
 
         public string Name { get; private set; }
-        internal string Token { get; set; }
+        private ClientConfiguration _configuration;
 
         public string BaseDirectory { get => ClientManager.ClientsDirectory + "/" + Name + "/"; }
 
-        internal Shard[] Shards { get; private set; }
-        internal int ClientSlotIndex { get; private set; }
-        public int TotalShards { get; private set; } = 1;
-        public IEnumerable<SocketGuild> AllGuilds { get => Shards.SelectMany (x => x.Guilds); }
-        public DiscordSocketClient FirstClient { get => Shards.First ().Client; }
+        private Shard[] _shards;
+        private IEnumerable<SocketGuild> AllGuilds { get => _shards.SelectMany (x => x.Guilds); }
+        private DiscordSocketClient FirstClient { get => _shards.First ().Client; }
 
-        public event Action<Shard> ShardSpawned;
-        public event Action<Shard> ShardKilled;
         public event Func<Exception, Task> ExceptionCaught;
 
-        public UserList ClientAdministrators { get; private set; }
+        private UserList _clientAdministrators;
 
-        internal BotClient (ClientManager clientManager, string name, int slotIndex) {
+        internal BotClient (ClientManager clientManager, string name) {
 
             BootDate = DateTime.Now;
             ClientManager = clientManager;
             Name = name;
-            ClientSlotIndex = slotIndex;
 
-            Token = File.ReadAllLines (BaseDirectory + "token.txt")[0];
-            ClientAdministrators = new UserList (Path.Combine (BaseDirectory, "ClientAdministratorIDs"));
+            _configuration = LoadConfiguration(BaseDirectory + "Configuration");
+            _clientAdministrators = new UserList (Path.Combine (BaseDirectory, "ClientAdministratorIDs"));
 
-            Core.Clock.OnDayPassed += Clock_OnDayPassed;
-
-            Shards = new Shard[TotalShards];
-
-            Log.Write (Log.Type.BOT, "Creating bot client " + Name + " with token " + Token);
+            Log.Write (Log.Type.BOT, "Creating bot client " + Name + " with token " + _configuration.Token);
         }
 
-        private Task Clock_OnDayPassed(DateTime currentTick, DateTime lastTick) {
+        private ClientConfiguration LoadConfiguration (string path)
+        {
+            Log.Write(Log.Type.BOT, "Loading configuration for client " + Name + ".");
+            _configuration = ClientConfiguration.Load(path);
+            if (_configuration == null)
+            {
+                // If no file exists, create a new one.
+                _configuration = new ClientConfiguration();
+                _configuration.Save(path);
+            }
+
+            _configuration.CheckValidity();
+            
+            return _configuration;
+        }
+
+        private Task UpdateStatus (DateTime currentTick, DateTime lastTick) {
             FirstClient.SetActivityAsync (new Game ($"on {AllGuilds.Count ()} servers with {AllGuilds.Sum (x => x.MemberCount)} users for  {(int)Uptime.TotalDays} days."));
             return Task.CompletedTask;
         }
 
+        public async void Initialize ()
+        {
+            InitializeShards();
+            await AwaitAllConnected();
+            await UpdateStatus(DateTime.Now, DateTime.Now);
+        }
+
         internal void InitializeShards () {
-            for (int i = 0; i < TotalShards; i++) {
-                Shards[i] = SpawnShard (i);
+            _shards = new Shard[_configuration.TotalShards];
+            for (int i = _configuration.ShardRange.Min; i < _configuration.ShardRange.Max; i++) {
+                _shards[i] = CreateShard (i, _configuration.TotalShards);
+                _shards[i].Run();
             }
         }
 
-        internal async Task Kill () {
-            foreach (Shard shard in Shards) {
-                await KillShard (shard);
-            }
-            Shards = new Shard[TotalShards];
-        }
-
-        internal async Task KillShard (Shard shard) {
-            await shard.Kill ();
-            ShardKilled?.Invoke (shard);
-        }
-
-        internal async Task RestartShard (Shard shard) {
-            int id = shard.ShardId;
-            await KillShard (shard);
-            SpawnShard (id);
-        }
-
-        internal Shard SpawnShard (int shardId) {
-            Shard shard = new Shard (this, shardId);
-            shard.Begin ();
-            ShardSpawned?.Invoke (shard);
-            shard.ExceptionCaught += ExceptionCaught;
-            shard.LoggedIn += Shard_ReadyAsync;
+        internal Shard CreateShard (int shardId, int totalShards) {
+            Shard shard = new Shard (this, shardId, totalShards);
+            shard.ExceptionCaught += OnExceptionCaught;
             return shard;
         }
 
-        private async Task Shard_ReadyAsync() {
-            await Task.WhenAll (Shards.Select (x => x.AwaitConnected ()).ToArray ());
-            await Clock_OnDayPassed (DateTime.Now, DateTime.Now);
+        private Task OnExceptionCaught (Exception exception)
+        {
+            FirstClient.SetGameAsync(exception.Message + " from " + exception.Source + " in " + exception.TargetSite);
+            return ExceptionCaught?.Invoke(exception);
+        }
+
+        private async Task AwaitAllConnected () {
+            await Task.WhenAll (_shards.Select (x => x.AwaitConnected ()).ToArray ());
         }
 
         public override string ToString() => Name;
 
-        public string GetStatusString() => $"Name: {Name} - Index: {ClientSlotIndex} - Shards: {Shards.Sum (x => x == null ? 0 : 1)} / {TotalShards}";
-        public string GetShardsStatus() => Shards.Select (x => x == null ? "Dead shard; please restart client." : x.GetStatusString ()).Singlify ("\n");
+        public string GetStatusString() => $"Name: {Name} - Shards: {_shards.Sum (x => x == null ? 0 : 1)} / {_configuration.TotalShards}";
+        public string GetShardsStatus() => _shards.Select (x => x == null ? "Dead shard; please restart client." : x.GetStatusString ()).Singlify ("\n");
     }
 }
