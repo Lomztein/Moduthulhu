@@ -4,7 +4,7 @@ using System.IO;
 using System.Reflection;
 using Newtonsoft.Json.Linq;
 
-namespace Lomztein.Moduthulhu.Cross
+namespace Lomztein.Moduthulhu.Core.IO
 {
     /// <summary>
     /// Various JSON related serialization methods. Using the IO methods force the file extension to .json, for consistancy.

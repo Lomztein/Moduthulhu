@@ -7,7 +7,6 @@ using System.IO;
 using System.Threading;
 using System.Linq;
 using System.Collections.Generic;
-using Lomztein.Moduthulhu.Cross;
 using Lomztein.Moduthulhu.Core.Bot.Client;
 
 namespace Lomztein.Moduthulhu.Core.Bot {
@@ -21,13 +20,13 @@ namespace Lomztein.Moduthulhu.Core.Bot {
         private UserList _coreAdministrators;
 
         internal string BaseDirectory { get => AppContext.BaseDirectory; }
+        internal string DataDirectory { get => AppContext.BaseDirectory + "/Data/"; }
 
         internal async Task InitializeCore () {
 
             // Set up core
             BootDate = DateTime.Now;
             _coreAdministrators = new UserList(Path.Combine(BaseDirectory, "AdministratorIDs"));
-            Status.Set("CorePath", BaseDirectory);
 
             // Set up exception handler.
             _errorReporter = new ErrorReporter(this);

@@ -1,4 +1,4 @@
-﻿using Lomztein.Moduthulhu.Cross;
+﻿using Lomztein.Moduthulhu.Core.IO;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -17,7 +17,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client
         public int TotalShards;
         public string Token;
 
-        public void CheckValidity () // Might be better just returning a simple string with a reason, but I wanted to try something more strongly typed, so to speak.
+        public void CheckValidity ()
         {
             if (!ShardRange.IsValid())
                 throw new InvalidConfigurationException("Shard range is invalid.");

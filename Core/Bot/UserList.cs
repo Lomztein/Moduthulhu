@@ -1,5 +1,5 @@
 ﻿using Discord;
-using Lomztein.Moduthulhu.Cross;
+using Lomztein.Moduthulhu.Core.IO;
 using System;
 using System.Collections.Generic;
 using System.Linq;

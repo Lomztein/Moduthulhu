@@ -4,7 +4,6 @@ using System.Reflection;
 using System.IO;
 using System.Runtime.Loader;
 using System.Linq;
-using Lomztein.Moduthulhu.Cross;
 
 namespace Lomztein.Moduthulhu.Core.Plugin
 {

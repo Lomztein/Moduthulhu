@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Lomztein.Moduthulhu.Cross
+namespace Lomztein.Moduthulhu.Core
 {
     public static class Log
     {

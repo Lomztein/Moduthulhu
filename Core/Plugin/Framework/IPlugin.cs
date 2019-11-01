@@ -37,7 +37,7 @@ namespace Lomztein.Moduthulhu.Core.Plugin.Framework
         /// <summary>
         /// The bot client that parents the module handler that loaded this module. Is set when the module is created.
         /// </summary>
-        Shard ParentShard { get; set; }
+        GuildHandler GuildHandler { get; set; }
 
         /// <summary>
         /// This runs before the bot has been fully connected and config automatically loaded. Use this for anything that can modify your configuration needs, or if you're providing framework for other modules.

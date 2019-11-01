@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Text;
 using System.Linq;
 using Lomztein.Moduthulhu.Core.Plugin.Framework;
-using Lomztein.Moduthulhu.Cross;
 using Lomztein.Moduthulhu.Core.Extensions;
 
 namespace Lomztein.Moduthulhu.Core.Plugin

@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using Lomztein.Moduthulhu.Core.Bot.Client.Sharding;
-using Lomztein.Moduthulhu.Cross;
 using System.IO;
 using System.Threading.Tasks;
 using Discord.WebSocket;
@@ -82,7 +81,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client
         }
 
         internal Shard CreateShard (int shardId, int totalShards) {
-            Shard shard = new Shard (this, shardId, totalShards);
+            Shard shard = new Shard (this, _configuration.Token, shardId, totalShards);
             shard.ExceptionCaught += OnExceptionCaught;
             return shard;
         }

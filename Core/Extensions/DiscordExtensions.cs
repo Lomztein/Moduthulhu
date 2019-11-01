@@ -17,10 +17,7 @@ namespace Lomztein.Moduthulhu.Core.Extensions
                 return "null";
 
             if (channel is SocketGuildChannel guildChannel) {
-                if (guildChannel.Category != null)
-                    return $"{guildChannel.Guild.Name} / {guildChannel.Category.Name} / {guildChannel.Name}";
-                else
-                    return $"{guildChannel.Guild.Name} / {guildChannel.Name}";
+                return $"{guildChannel.Guild.Name} / {guildChannel.Name}";
             }
 
             if (channel is SocketDMChannel dmChannel)

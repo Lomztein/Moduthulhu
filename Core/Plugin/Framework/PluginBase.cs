@@ -17,7 +17,7 @@ namespace Lomztein.Moduthulhu.Core.Plugin.Framework
         public virtual string AuthorURL { get; } = "";
         public virtual string PatchURL { get; } = "";
 
-        public Shard ParentShard { get; set; }
+        public GuildHandler GuildHandler { get; set; }
 
         public abstract void Initialize ();
 
