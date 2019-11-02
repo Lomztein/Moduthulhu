@@ -15,7 +15,7 @@ namespace Lomztein.Moduthulhu.Core.Bot {
         public DateTime BootDate { get; private set; }
         public TimeSpan Uptime { get => DateTime.Now - BootDate; }
 
-        private ClientManager _clientManager;
+        private BotClient _client;
         private ErrorReporter _errorReporter;
         private UserList _coreAdministrators;
 
@@ -32,9 +32,9 @@ namespace Lomztein.Moduthulhu.Core.Bot {
             _errorReporter = new ErrorReporter(this);
 
             // Set up client manager
-            _clientManager = new ClientManager(this);
-            _clientManager.InitializeClients();
-            _clientManager.ExceptionCaught += OnExceptionCaught;
+            _client = new BotClient(this);
+            _client.ExceptionCaught += OnExceptionCaught;
+            _client.Initialize();
 
             // Keep the core alive.
             await Task.Delay (-1);
