@@ -6,7 +6,7 @@ using Lomztein.Moduthulhu.Core.Extensions;
 using Discord.WebSocket;
 using System.Threading.Tasks;
 
-namespace Lomztein.Moduthulhu.Core.Clock
+namespace Lomztein.Moduthulhu.Core
 {
     public class Clock
     {
@@ -27,16 +27,16 @@ namespace Lomztein.Moduthulhu.Core.Clock
 
         public event Func<Exception, Task> ExceptionCaught;
 
-        public Clock (int tickFrequency) {
+        public Clock (int tickFrequency, string name) {
             TickFrequency = tickFrequency;
-            Start ();
+            Start (name);
         }
 
         public void Stop() => IsRunning = false;
 
-        public void Start () {
-            ClockThread = new Thread (new ThreadStart (Run)) {
-                Name = "Clock"
+        public void Start (string name) {
+            ClockThread = new Thread(new ThreadStart(Run)) {
+                Name = name
             };
             ClockThread.Start ();
         }
