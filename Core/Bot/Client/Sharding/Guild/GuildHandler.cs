@@ -27,9 +27,8 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
             Moduthulhu.Core.Log.Write(Moduthulhu.Core.Log.Type.BOT, $"Initializing GuildHandler for Guild {GetGuild().Name}.");
 
             Data = new DataManager(GuildId);
-
-            Data.Set("TestValue", GetGuild ().Name);
-            Moduthulhu.Core.Log.Write(Moduthulhu.Core.Log.Type.CRITICAL, Data.Get<string>("TestValue"));
+        
+        
         }
 
         public void Kill ()

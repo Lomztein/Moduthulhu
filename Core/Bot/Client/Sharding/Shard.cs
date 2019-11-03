@@ -61,11 +61,11 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding
             Client.LeftGuild += KillGuildHandler;
             Client.Disconnected += Client_Disconnected;
 
-            RouteEvents();
-
             await Start ();
             await Login ();
             await AwaitConnected ();
+
+            RouteEvents();
 
             InitInitialHandlers();
         }
