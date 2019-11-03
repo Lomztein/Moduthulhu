@@ -5,12 +5,16 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding
+namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
 {
     public class GuildHandler
     {
         private Shard _shard;
         public ulong GuildId { get; private set; }
+
+        public PluginManager Plugins { get; private set; } = new PluginManager();
+        public ConfigurationManager Config { get; private set; } = new ConfigurationManager();
+        public DataManager Data { get; private set; }
 
         public GuildHandler (Shard shard, ulong guildId)
         {
@@ -20,11 +24,17 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding
 
         public void Initialize ()
         {
+            Moduthulhu.Core.Log.Write(Moduthulhu.Core.Log.Type.BOT, $"Initializing GuildHandler for Guild {GetGuild().Name}.");
 
+            Data = new DataManager(GuildId);
+
+            Data.Set("TestValue", GetGuild ().Name);
+            Moduthulhu.Core.Log.Write(Moduthulhu.Core.Log.Type.CRITICAL, Data.Get<string>("TestValue"));
         }
 
         public void Kill ()
         {
+            Moduthulhu.Core.Log.Write(Moduthulhu.Core.Log.Type.BOT, $"Killing GuildHandler for Guild {GetGuild().Name}.");
 
         }
 
@@ -129,12 +139,12 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding
         #endregion
 
         public SocketGuild GetGuild() => _shard.GetGuild(GuildId);
-        public SocketGuildUser GetUser(ulong userId) => GetGuild()?.GetUser(userId);
-        public SocketGuildChannel GetChannel(ulong channelId) => GetGuild()?.GetChannel(channelId);
-        public SocketTextChannel GetTextChannel(ulong channelId) => _shard.GetChannel(GuildId, channelId) as SocketTextChannel;
-        public SocketVoiceChannel GetVoiceChannel(ulong channelId) => _shard.GetChannel(GuildId, channelId) as SocketVoiceChannel;
-        public SocketCategoryChannel GetCategoryChannel(ulong channelId) => _shard.GetChannel(GuildId, channelId) as SocketCategoryChannel;
-        public SocketRole GetRole(ulong roleId) => GetGuild()?.GetRole(roleId);
+        public SocketGuildUser GetUser(ulong userId) => GetGuild().GetUser(userId);
+        public SocketGuildChannel GetChannel(ulong channelId) => GetGuild().GetChannel(channelId);
+        public SocketTextChannel GetTextChannel(ulong channelId) => GetChannel(channelId) as SocketTextChannel;
+        public SocketVoiceChannel GetVoiceChannel(ulong channelId) => GetChannel(channelId) as SocketVoiceChannel;
+        public SocketCategoryChannel GetCategoryChannel(ulong channelId) => GetChannel(channelId) as SocketCategoryChannel;
+        public SocketRole GetRole(ulong roleId) => GetGuild().GetRole(roleId);
 
     }
 }

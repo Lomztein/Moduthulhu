@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Lomztein.Moduthulhu.Core.Bot;
 using Lomztein.Moduthulhu.Core.Bot.Client.Sharding;
+using Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild;
 using Lomztein.Moduthulhu.Core.Extensions;
 
 namespace Lomztein.Moduthulhu.Core.Plugin.Framework

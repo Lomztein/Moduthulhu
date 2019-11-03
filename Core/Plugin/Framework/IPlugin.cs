@@ -1,4 +1,5 @@
 ﻿using Lomztein.Moduthulhu.Core.Bot.Client.Sharding;
+using Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild;
 
 namespace Lomztein.Moduthulhu.Core.Plugin.Framework
 {

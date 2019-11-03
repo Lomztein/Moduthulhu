@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Lomztein.Moduthulhu.Core.IO.Database.Repositories
 {
-    internal class IdentityKeyValueRepository<TIdentity, TKey, TValue>
+    internal class IdentityKeyValueRepository<TIdentifier, TKey, TValue>
     {
         private string _tableName;
 
@@ -24,36 +24,43 @@ namespace Lomztein.Moduthulhu.Core.IO.Database.Repositories
         private void CreateTableIfAbsent ()
         {
             IDatabaseConnector db = GetConnector();
-            var res = db.ReadQuery("SELECT COUNT(*) AS count FROM information_schema.tables WHERE table.name = @name", new Dictionary<string, object>() { { "name", _tableName } });
-            if ((int)res[0]["count"] == 0)
+            var res = db.ReadQuery("SELECT COUNT(*) AS count FROM information_schema.tables WHERE table_name = @table", new Dictionary<string, object>() { { "@table", _tableName } });
+            if ((long)res[0]["count"] == 0)
             {
-                db.UpdateQuery("CREATE TABLE @name (identity bigint, key text, value text);", new Dictionary<string, object>() { { "name", _tableName } });
+                db.UpdateQuery($"CREATE TABLE {_tableName} (identifier text, key text, value text, CONSTRAINT identkey UNIQUE (identifier, key));", new Dictionary<string, object>());
             }
         }
 
-        public void Create(TIdentity identity, TKey key, TValue value)
+        public void Create(TIdentifier identifier, TKey key, TValue value)
         {
             IDatabaseConnector db = GetConnector();
-            db.UpdateQuery("INSERT INTO @table VALUES (@identity, @key, @value)", new Dictionary<string, object>() { { "table", _tableName }, { "identity", identity }, { "key", key }, { "value", value } });
+            db.UpdateQuery($"INSERT INTO {_tableName} VALUES (@identifier, @key, @value)", new Dictionary<string, object>() { { "@identifier", identifier }, { "@key", key }, { "@value", value } });
         }
 
-        public TValue Read (TIdentity identity, TKey key)
+        public TValue Read (TIdentifier identifier, TKey key)
         {
             IDatabaseConnector db = GetConnector();
-            var res = db.ReadQuery("SELECT value FROM @name WHERE identity = @identity AND key = @key", new Dictionary<string, object>() { { "name", _tableName }, { "identity", identity }, { "key", key } });
+            var res = db.ReadQuery($"SELECT value FROM {_tableName} WHERE identifier = @identifier AND key = @key", new Dictionary<string, object>() { { "@identifier", identifier }, { "@key", key } });
             return res.Length == 0 ? default : (TValue)res.Single ().FirstOrDefault ().Value;
         }
 
-        public void Update (TIdentity identity, TKey key, TValue value)
+        public void Update (TIdentifier identifier, TKey key, TValue value)
         {
             IDatabaseConnector db = GetConnector();
-            db.UpdateQuery("UPDATE @table SET value = @value WHERE identity = @identity AND key = @key", new Dictionary<string, object>() { { "table", _tableName }, { "identity", identity }, { "key", key }, { "value", value } });
+            db.UpdateQuery($"UPDATE {_tableName} SET value = @value WHERE identifier = @identity AND key = @key", new Dictionary<string, object>() { { "@identifier", identifier }, { "@key", key }, { "@value", value } });
         }
 
-        public void Delete (TIdentity identity, TKey key)
+        public void Delete (TIdentifier identifier, TKey key)
         {
             IDatabaseConnector db = GetConnector();
-            db.UpdateQuery("DELETE FROM @table WHERE identity = @identity AND key = @key", new Dictionary<string, object>() { { "table", _tableName }, { "identity", identity }, { "key", key } });
+            db.UpdateQuery($"DELETE FROM {_tableName} WHERE identifier = @identity AND key = @key", new Dictionary<string, object>() { { "@identifier", identifier }, { "@key", key } });
+        }
+
+        public void InsertOrUpdate (TIdentifier identifier, TKey key, TValue value) // Totally did not steal this from Stack Overflow.
+        {
+            IDatabaseConnector db = GetConnector();
+            string query = $"INSERT INTO {_tableName} VALUES (@identifier, @key, @value) ON CONFLICT ON CONSTRAINT identkey DO UPDATE SET value = @value WHERE {_tableName}.identifier = @identifier AND {_tableName}.key = @key";
+            db.UpdateQuery(query, new Dictionary<string, object>() { { "@identifier", identifier }, { "@key", key }, { "@value", value } });
         }
     }
 }
