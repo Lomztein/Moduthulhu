@@ -9,11 +9,11 @@ namespace Lomztein.Moduthulhu.Core.Plugin
 {
     public class PluginDependancyTree
     {
-        internal Branch[] AllBranches { get; private set; }
+        private Branch[] _branches;
 
         internal PluginDependancyTree (params Type[] types) {
-            AllBranches = ConstructBranches (types);
-            ConnectBranches (AllBranches);
+            _branches = ConstructBranches (types);
+            ConnectBranches (_branches);
         }
 
         private Branch[] ConstructBranches (Type[] types) {
@@ -69,7 +69,7 @@ namespace Lomztein.Moduthulhu.Core.Plugin
         }
 
         private Branch GetBranch (string moduleType) {
-            Branch branch = AllBranches.FirstOrDefault (x => x.Plugin.Name == moduleType);
+            Branch branch = _branches.FirstOrDefault (x => x.Plugin.Name == moduleType);
             if (branch == null)
                 Log.Write (Log.Type.CRITICAL, $"Module type {moduleType} cannot be found, perhaps it is missing in the Modules folder.");
             return branch;

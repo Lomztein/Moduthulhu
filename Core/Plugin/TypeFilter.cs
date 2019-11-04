@@ -6,16 +6,16 @@ using System.Linq;
 
 namespace Lomztein.Moduthulhu.Core.Plugin
 {
-    internal class PluginFilter
+    internal class TypeFilter
     {
-        private List<Predicate<IPlugin>> Filters { get; set; } = new List<Predicate<IPlugin>> ();
+        private List<Predicate<Type>> Filters { get; set; } = new List<Predicate<Type>> ();
 
-        internal PluginFilter (params Predicate<IPlugin>[] filters) {
+        internal TypeFilter (params Predicate<Type>[] filters) {
             Filters = filters.ToList ();
         }
 
-        internal IEnumerable<IPlugin> FilterModules (IEnumerable<IPlugin> modules) {
-            IEnumerable<IPlugin> result = modules;
+        internal IEnumerable<Type> FilterModules (IEnumerable<Type> modules) {
+            IEnumerable<Type> result = modules;
             Filters.ForEach (x => result = result.Where (y => x(y)));
             return result;
         }
