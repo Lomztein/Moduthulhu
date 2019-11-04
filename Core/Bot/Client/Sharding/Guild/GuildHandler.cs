@@ -13,8 +13,8 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
         public ulong GuildId { get; private set; }
 
         public PluginManager Plugins { get; private set; } = new PluginManager();
-        public ConfigurationManager Config { get; private set; } = new ConfigurationManager();
         public DataManager Data { get; private set; }
+        public DataManager Config { get; private set; }
 
         public GuildHandler (Shard shard, ulong guildId)
         {
@@ -26,7 +26,8 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
         {
             Moduthulhu.Core.Log.Write(Moduthulhu.Core.Log.Type.BOT, $"Initializing GuildHandler for Guild {GetGuild().Name}.");
 
-            Data = new DataManager(GuildId);
+            Data = new DataManager(GuildId, "plugindata");
+            Config = new DataManager(GuildId, "pluginconfig");
         
         
         }
