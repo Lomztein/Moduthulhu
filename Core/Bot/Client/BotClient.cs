@@ -21,7 +21,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client
 
         private ClientConfiguration _configuration;
 
-        public string BaseDirectory { get => Core.DataDirectory; }
+        public string DataDirectory { get => Core.DataDirectory; }
 
         private Shard[] _shards;
         private IEnumerable<SocketGuild> AllGuilds { get => _shards.SelectMany (x => x.Guilds); }
@@ -36,7 +36,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client
             BootDate = DateTime.Now;
             Core = core;
 
-            _configuration = LoadConfiguration(BaseDirectory + "Configuration");
+            _configuration = LoadConfiguration(DataDirectory + "Configuration");
 
             Log.Write (Log.Type.BOT, "Creating bot client with token " + _configuration.Token);
         }

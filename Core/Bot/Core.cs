@@ -19,8 +19,8 @@ namespace Lomztein.Moduthulhu.Core.Bot {
         private ErrorReporter _errorReporter;
         private UserList _coreAdministrators;
 
-        internal string BaseDirectory { get => AppContext.BaseDirectory; }
-        internal string DataDirectory { get => AppContext.BaseDirectory + "/Data/"; }
+        internal static string BaseDirectory { get => AppContext.BaseDirectory; }
+        internal static string DataDirectory { get => AppContext.BaseDirectory + "/Data"; }
 
         internal async Task InitializeCore () {
 
