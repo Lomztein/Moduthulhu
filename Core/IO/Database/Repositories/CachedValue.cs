@@ -45,10 +45,14 @@ namespace Lomztein.Moduthulhu.Core.IO.Database.Repositories
                 Store();
             }
         }
-
-        private void Store ()
+        public void Store ()
         {
             _repo.Set(_identity, _key, _value);
+        }
+
+        public void Reset ()
+        {
+            _value = default;
         }
     }
 }
