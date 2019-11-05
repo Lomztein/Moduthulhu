@@ -9,27 +9,22 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
 {
     public class GuildHandler
     {
-        private Shard _shard;
+        private readonly Shard _shard;
         public ulong GuildId { get; private set; }
 
-        public PluginManager Plugins { get; private set; } = new PluginManager();
-        public DataManager Data { get; private set; }
-        public DataManager Config { get; private set; }
+        public PluginManager Plugins { get; private set; }
 
         public GuildHandler (Shard shard, ulong guildId)
         {
             _shard = shard;
             GuildId = guildId;
+            Plugins = new PluginManager(this);
         }
 
         public void Initialize ()
         {
             Moduthulhu.Core.Log.Write(Moduthulhu.Core.Log.Type.BOT, $"Initializing GuildHandler for Guild {GetGuild().Name}.");
 
-            Data = new DataManager(GuildId, "plugindata");
-            Config = new DataManager(GuildId, "pluginconfig");
-        
-        
         }
 
         public void Kill ()

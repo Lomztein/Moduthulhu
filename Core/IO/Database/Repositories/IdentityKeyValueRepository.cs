@@ -7,7 +7,7 @@ namespace Lomztein.Moduthulhu.Core.IO.Database.Repositories
 {
     internal class IdentityKeyValueRepository<TIdentifier, TKey, TValue>
     {
-        private string _tableName;
+        private readonly string _tableName;
 
         public IdentityKeyValueRepository (string tableName)
         {
