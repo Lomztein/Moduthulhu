@@ -18,15 +18,15 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding
         public BotClient BotClient { get; private set; }
 
         public DiscordSocketClient Client { get; private set; }
-        private List<GuildHandler> _guildHandlers = new List<GuildHandler>();
+        private readonly List<GuildHandler> _guildHandlers = new List<GuildHandler>();
         public IReadOnlyCollection<SocketGuild> Guilds { get => Client.Guilds; }
         public bool IsConnected { get => Client != null && Guilds.Count > 0 && Guilds.First().IsConnected; }
 
         private Thread _thread;
 
-        private string _token;
-        private int _shardId;
-        private int _totalShards;
+        private readonly string _token;
+        private readonly int _shardId;
+        private readonly int _totalShards;
 
         public event Func<Exception, Task> ExceptionCaught;
 

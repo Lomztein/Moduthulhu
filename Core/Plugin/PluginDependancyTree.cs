@@ -9,7 +9,7 @@ namespace Lomztein.Moduthulhu.Core.Plugin
 {
     public class PluginDependancyTree
     {
-        private Branch[] _branches;
+        private readonly Branch[] _branches;
 
         internal PluginDependancyTree (params Type[] types) {
             _branches = ConstructBranches (types);

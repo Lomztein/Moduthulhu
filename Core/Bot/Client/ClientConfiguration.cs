@@ -41,13 +41,21 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client
         {
             JSONSerialization.SerializeObject(this, path);
         }
+    }
 
-        public class InvalidConfigurationException : Exception
+    public class InvalidConfigurationException : Exception
+    {
+        public InvalidConfigurationException(string message) : base(message)
         {
-            public InvalidConfigurationException(string message) : base(message)
-            {
 
-            }
+        }
+
+        public InvalidConfigurationException()
+        {
+        }
+
+        public InvalidConfigurationException(string message, Exception innerException) : base(message, innerException)
+        {
         }
     }
 }

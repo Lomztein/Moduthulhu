@@ -27,7 +27,7 @@ namespace Lomztein.Moduthulhu.Core.IO
                 }
             }
 
-            return default (T);
+            return default;
         }
 
         public static JObject LoadAsJObject (string path) {

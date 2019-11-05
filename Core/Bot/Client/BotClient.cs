@@ -27,7 +27,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client
         private IEnumerable<SocketGuild> AllGuilds { get => _shards.SelectMany (x => x.Guilds); }
         private DiscordSocketClient FirstClient { get => _shards.First ().Client; }
 
-        private Clock _statusClock = new Clock(1, "StatusClock");
+        private readonly Clock _statusClock = new Clock(1, "StatusClock");
 
         public event Func<Exception, Task> ExceptionCaught;
 
@@ -67,6 +67,9 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client
             InitializeShards();
             await AwaitAllConnected();
             await UpdateStatus(DateTime.Now, DateTime.Now);
+
+            _statusClock.OnDayPassed += UpdateStatus;
+            _statusClock.Start();
         }
 
         internal void InitializeShards () {

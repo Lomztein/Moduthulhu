@@ -9,8 +9,8 @@ namespace Lomztein.Moduthulhu.Core.Bot.Misc
 
         public T Id { get; set; }
 
-        public FakeEntity(T _id) {
-            Id = _id;
+        public FakeEntity(T id) {
+            Id = id;
         }
     }
 }

@@ -10,16 +10,10 @@ namespace Lomztein.Moduthulhu.Core.Bot
 {
     internal class ErrorReporter
     {
-        private Core ParentCore { get; set; }
-
-        internal ErrorReporter (Core core) {
-            ParentCore = core;
-        }
-
         internal Task ReportError (Exception exception) {
             string message = (exception.Message + " - " + exception.StackTrace) + "\n";
             Log.Write (exception);
-            File.AppendAllText (ParentCore.BaseDirectory + "errors.txt", message);
+            File.AppendAllText (Core.DataDirectory + "errors.txt", message);
             return Task.CompletedTask;
         }
     }

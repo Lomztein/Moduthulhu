@@ -1,0 +1,19 @@
+﻿[*.cs]
+
+# IDE0055: Fix formatting
+dotnet_diagnostic.IDE0055.severity = silent
+
+# CA2100: Review SQL queries for security vulnerabilities
+dotnet_diagnostic.CA2100.severity = silent
+
+# IDE0022: Use block body for methods
+csharp_style_expression_bodied_methods = false:silent
+
+# CA2007: Consider calling ConfigureAwait on the awaited task
+dotnet_diagnostic.CA2007.severity = silent
+
+# CA1062: Validate arguments of public methods
+dotnet_diagnostic.CA1062.severity = silent
+
+# CA1051: Do not declare visible instance fields
+dotnet_diagnostic.CA1051.severity = silent

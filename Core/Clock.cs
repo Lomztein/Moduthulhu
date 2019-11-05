@@ -10,11 +10,12 @@ namespace Lomztein.Moduthulhu.Core
 {
     public class Clock
     {
-        private Thread ClockThread { get; set; }
+        private readonly string _name;
+        private readonly int _tickFrequency;
+        private Thread _clockThread;
 
-        private DateTime LastTick { get; set; }
-        private bool IsRunning { get; set; }
-        private int TickFrequency { get; set; }
+        private DateTime _lastTick;
+        private bool _isRunning;
 
         public delegate Task TickEvent(DateTime currentTick, DateTime lastTick);
 
@@ -28,28 +29,28 @@ namespace Lomztein.Moduthulhu.Core
         public event Func<Exception, Task> ExceptionCaught;
 
         public Clock (int tickFrequency, string name) {
-            TickFrequency = tickFrequency;
-            Start (name);
+            _tickFrequency = tickFrequency;
+            _name = name;
         }
 
-        public void Stop() => IsRunning = false;
+        public void Stop() => _isRunning = false;
 
-        public void Start (string name) {
-            ClockThread = new Thread(new ThreadStart(Run)) {
-                Name = name
+        public void Start () {
+            _clockThread = new Thread(new ThreadStart(Run)) {
+                Name = _name
             };
-            ClockThread.Start ();
+            _clockThread.Start ();
         }
 
         private void Run () {
-            int milliseconds = (int)Math.Round (1d / TickFrequency * 1000d);
-            LastTick = DateTime.Now;
-            IsRunning = true;
+            int milliseconds = (int)Math.Round (1d / _tickFrequency * 1000d);
+            _lastTick = DateTime.Now;
+            _isRunning = true;
 
-            while (IsRunning) {
+            while (_isRunning) {
                 Thread.Sleep (milliseconds);
-                Tick (DateTime.Now, LastTick);
-                LastTick = DateTime.Now;
+                Tick (DateTime.Now, _lastTick);
+                _lastTick = DateTime.Now;
             }
         }
 

@@ -40,15 +40,19 @@ namespace Lomztein.Moduthulhu.Core.IO.Database
         {
             using (NpgsqlConnection connection = GetConnection(GetConnectionString()))
             {
-                NpgsqlCommand cmd = PrepareQuery(query, parameters);
-                cmd.Connection = connection;
-                using (NpgsqlDataAdapter adapter = new NpgsqlDataAdapter(cmd))
+                using (NpgsqlCommand cmd = PrepareQuery(query, parameters))
                 {
-                    DataSet data = new DataSet();
-                    data.Reset();
+                    cmd.Connection = connection;
+                    using (NpgsqlDataAdapter adapter = new NpgsqlDataAdapter(cmd))
+                    {
+                        using (DataSet data = new DataSet())
+                        {
+                            data.Reset();
 
-                    adapter.Fill(data);
-                    return ConvertDataSetToTableDictionary(data);
+                            adapter.Fill(data);
+                            return ConvertDataSetToTableDictionary(data);
+                        }
+                    }
                 }
             }
         }
@@ -95,7 +99,5 @@ namespace Lomztein.Moduthulhu.Core.IO.Database
 
             return tableDict;
         }
-
-        private Dictionary<string, object>[] Empty () => new Dictionary<string, object>[] { new Dictionary<string, object>() };
     }
 }

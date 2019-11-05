@@ -15,7 +15,7 @@ namespace Lomztein.Moduthulhu.Core.IO.Database
 
             // Grap all Property members with the ModelProperty attribuet of the previously recieved type, through reflection.
             IEnumerable<PropertyInfo> properties = modelType.GetProperties().Where (x => x.GetCustomAttribute<ModelPropertyAttribute>() != null);
-            properties = properties.Count() == 0 ? modelType.GetProperties() : properties; // If none were found previously, just select all properties.
+            properties = !properties.Any() ? modelType.GetProperties() : properties; // If none were found previously, just select all properties.
 
             for (int i = 0; i < properties.Count (); i++)
             {

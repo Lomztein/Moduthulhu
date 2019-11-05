@@ -29,7 +29,7 @@ namespace Lomztein.Moduthulhu.Core.Bot {
             _coreAdministrators = new UserList(Path.Combine(BaseDirectory, "AdministratorIDs"));
 
             // Set up exception handler.
-            _errorReporter = new ErrorReporter(this);
+            _errorReporter = new ErrorReporter();
 
             // Set up client manager
             _client = new BotClient(this);
