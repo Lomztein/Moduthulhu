@@ -17,7 +17,6 @@ namespace Lomztein.Moduthulhu.Core.Bot {
 
         private BotClient _client;
         private ErrorReporter _errorReporter;
-        private UserList _coreAdministrators;
 
         internal static string BaseDirectory { get => AppContext.BaseDirectory; }
         internal static string DataDirectory { get => AppContext.BaseDirectory + "/Data"; }
@@ -26,7 +25,6 @@ namespace Lomztein.Moduthulhu.Core.Bot {
 
             // Set up core
             BootDate = DateTime.Now;
-            _coreAdministrators = new UserList(Path.Combine(BaseDirectory, "AdministratorIDs"));
 
             // Set up exception handler.
             _errorReporter = new ErrorReporter();
@@ -39,11 +37,6 @@ namespace Lomztein.Moduthulhu.Core.Bot {
             // Keep the core alive.
             await Task.Delay (-1);
             Log.Write (Log.Type.BOT, "Shutting down..");
-        }
-
-        public bool IsCoreAdministrator (ulong userId)
-        {
-            return _coreAdministrators.Contains(userId);
         }
 
         private Task OnExceptionCaught(Exception exception)

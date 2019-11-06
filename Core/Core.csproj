@@ -5,19 +5,21 @@
     <TargetFramework>netcoreapp2.1</TargetFramework>
     <StartupObject></StartupObject>
     <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
+    <PackageId>Lomztein.Moduthulhu.Core.Assemblies</PackageId>
+    <Version>2.0.0-beta</Version>
+    <Authors>Lomztein</Authors>
+    <Product>Moduthulhu Core Assemblies</Product>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <Description>The assemblies for the Modular Discord Bot by Lomztein, uploaded as a NuGet to streamline the process of creating new third party modules. Look to project repository for more information and a basic guide. Build using the Discord.NET Discord API wrapper by RougeException.</Description>
+    <PackageProjectUrl>https://github.com/Lomztein/Moduthulhu</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/Lomztein/Moduthulhu.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <NeutralLanguage>en</NeutralLanguage>
+    <Copyright>Copyright (c) 2018 - 2019 Marcus L. Jensen</Copyright>
+    <PackageIconUrl></PackageIconUrl>
+    <icon>https://i.imgur.com/STOT7SZ.png</icon>
   </PropertyGroup>
-
-  <ItemGroup>
-    <Compile Remove="Plugin\Standard Plugins\Admin Plugins\**" />
-    <Compile Remove="Plugin\Standard Plugins\Meta Modules\**" />
-    <Compile Remove="Webserver\**" />
-    <EmbeddedResource Remove="Plugin\Standard Plugins\Admin Plugins\**" />
-    <EmbeddedResource Remove="Plugin\Standard Plugins\Meta Modules\**" />
-    <EmbeddedResource Remove="Webserver\**" />
-    <None Remove="Plugin\Standard Plugins\Admin Plugins\**" />
-    <None Remove="Plugin\Standard Plugins\Meta Modules\**" />
-    <None Remove="Webserver\**" />
-  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Discord.Net" Version="2.1.1" />
@@ -28,6 +30,13 @@
     </PackageReference>
     <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
     <PackageReference Include="Npgsql" Version="4.1.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\Advanced-Discord-Commands\LICENSE">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>

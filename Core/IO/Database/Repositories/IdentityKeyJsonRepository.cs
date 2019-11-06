@@ -21,6 +21,7 @@ namespace Lomztein.Moduthulhu.Core.IO.Database.Repositories
         public T Get<T> (ulong id, string key)
         {
             string json = _dataRepo.Get(id.ToString (), key);
+            if (json == null) return default;
             T obj = JsonConvert.DeserializeObject<T>(json);
             return obj;
         }
