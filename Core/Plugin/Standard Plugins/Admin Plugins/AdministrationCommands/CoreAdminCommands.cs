@@ -1,29 +1,20 @@
 ﻿using Discord;
+using Discord.Net;
 using Lomztein.AdvDiscordCommands.Framework;
 using Lomztein.AdvDiscordCommands.Framework.Interfaces;
 using Lomztein.Moduthulhu.Core.Bot.Client;
 using Lomztein.Moduthulhu.Core.Bot.Messaging.Advanced;
 using Lomztein.Moduthulhu.Core.Plugin.Framework;
-using Lomztein.Moduthulhu.Modules.Command;
-using Lomztein.Moduthulhu.Modules.CustomCommands.Categories;
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Lomztein.Moduthulhu.Modules.Administration.AdministrationCommands
+namespace Lomztein.Moduthulhu.Plugins.Standard
 {
-    public class CoreAdminCommands : ModuleCommandSet<AdministrationModule> {
-
-        public class CoreAdminCommand : AdministratorCommand {
-
-            public CoreAdminCommand () {
-                AdministratorSource = (() => ParentModule.ParentShard.Core.CoreAdministrators);
-                AdministratorTypeName = "core";
-            }
-
-        }
-
+    public class CoreAdminCommands : PluginCommandSet<AdministrationPlugin> {
 
         public CoreAdminCommands () {
             Name = "core";
@@ -32,16 +23,16 @@ namespace Lomztein.Moduthulhu.Modules.Administration.AdministrationCommands
 
             commandsInSet = new List<ICommand> {
                 new ShutdownCommand (),
-                new RestartCommand (),
                 new StatusCommand (),
-                new PatchCommand (),
+                new SetAvatarCommand (),
+                new SetUsernameCommand (),
             };
         }
 
 
-        public class ShutdownCommand : CoreAdminCommand {
+        private class ShutdownCommand : AdministratorCommand {
 
-            public ShutdownCommand () : base () {
+            public ShutdownCommand () {
                 Name = "shutdown";
                 Description = "Shutdown everything.";
                 Category = AdditionalCategories.Management;
@@ -49,32 +40,16 @@ namespace Lomztein.Moduthulhu.Modules.Administration.AdministrationCommands
 
             [Overload (typeof (void), "Shutdown the entire process and all of its clients. Requires manual rebooting.")]
             public Task<Result> Execute (CommandMetadata metadata) {
-                Cross.Status.Set ("IsRunning", false);
                 Environment.Exit (0);
                 return TaskResult (null, "Shutting down...");
             }
 
         }
 
-        public class RestartCommand : CoreAdminCommand {
+        private class StatusCommand : AdministratorCommand
+        {
 
-            public RestartCommand () : base () {
-                Name = "restart";
-                Description = "Restart everything.";
-                Category = AdditionalCategories.Management;
-            }
-
-            [Overload (typeof (void), "Shutdowns and restarts the process, provided the process is running through the Upkeeper.")]
-            public Task<Result> Execute (CommandMetadata metadata) {
-                Environment.Exit (0);
-                return TaskResult (null, "Restarting...");
-            }
-
-        }
-
-        public class StatusCommand : CoreAdminCommand {
-
-            public StatusCommand () : base () {
+            public StatusCommand () {
                 Name = "status";
                 Description = "Check core status.";
                 Category = AdditionalCategories.Management;
@@ -84,17 +59,12 @@ namespace Lomztein.Moduthulhu.Modules.Administration.AdministrationCommands
             public Task<Result> Execute (CommandMetadata metadata) {
                 LargeEmbed embed = new LargeEmbed();
 
+                // TODO: Add status for shards and GuildHandlers.
                 EmbedBuilder builder = new EmbedBuilder()
                     .WithTitle("Core Process Status")
-                    .WithAuthor(ParentModule.ParentShard.Client.CurrentUser)
-                    .WithDescription(ParentModule.ParentShard.Core.GetStatusString())
+                    .WithAuthor(ParentPlugin.GuildHandler.BotUser)
+                    .WithDescription(ParentPlugin.GuildHandler.Core.GetStatusString())
                     .WithCurrentTimestamp();
-
-                // Lasagna is one of my favorite foods.
-                foreach (BotClient client in ParentModule.ParentShard.BotClient.ClientManager.ClientSlots)
-                {
-                    builder.AddField(client.GetStatusString(), "```" + client.GetShardsStatus() + "```");
-                }
 
                 embed.CreateFrom(builder);
                 return TaskResult (embed, "");
@@ -102,20 +72,66 @@ namespace Lomztein.Moduthulhu.Modules.Administration.AdministrationCommands
 
         }
 
-        public class PatchCommand : CoreAdminCommand {
-
-            public PatchCommand () : base () {
-                Name = "patch";
-                Description = "NOT IMPLEMENTED.";
+        private class SetUsernameCommand : AdministratorCommand
+        {
+            public SetUsernameCommand()
+            {
+                Name = "setusername";
+                Description = "Set client username.";
                 Category = AdditionalCategories.Management;
-                CommandEnabled = false;
             }
 
-            [Overload (typeof (void), "Check for updates and patch bot if any are available.")]
-            public Task<Result> Execute (CommandMetadata metadata) {
-                throw new NotImplementedException ("This command hasn't yet been implemented.");
+            [Overload(typeof(void), "Set the clients username to something new.")]
+            public async Task<Result> Execute(CommandMetadata metadata, string newUsername)
+            {
+                try
+                {
+                    await ParentPlugin.GuildHandler.BotUser.ModifyAsync(x => x.Username = newUsername);
+                }
+                catch (RateLimitedException)
+                {
+                    throw new InvalidExecutionException("Rate limit exceeded, please wait a while before trying again.");
+                }
+                catch (HttpException)
+                {
+                    throw new InvalidExecutionException("Username might be too long or contain invalid characters.");
+                }
+                return new Result(null, $"Changed client username to **{newUsername}**.");
+            }
+        }
+
+        private class SetAvatarCommand : AdministratorCommand
+        {
+            public SetAvatarCommand()
+            {
+                Name = "setavatar";
+                Description = "Set client avatar.";
+                Category = AdditionalCategories.Management;
             }
 
+            [Overload(typeof(void), "Set the clients avatar to something from a website.")]
+            public async Task<Result> Execute(CommandMetadata metadata, string uri)
+            {
+                Uri address = new Uri(uri);
+                using (WebClient client = new WebClient())
+                using (Stream stream = await client.OpenReadTaskAsync(address))
+                {
+                    Discord.Image image = new Discord.Image(stream);
+                    try
+                    {
+                        await ParentPlugin.GuildHandler.BotUser.ModifyAsync(x => x.Avatar = image);
+                    }
+                    catch (RateLimitedException)
+                    {
+                        throw new InvalidExecutionException("Rate limit exceeded, please wait a while before trying again.");
+                    }
+                    catch (HttpException)
+                    {
+                        throw new InvalidExecutionException("Image was invalid.");
+                    }
+                }
+                return new Result(null, "Succesfully changed avatar to the one found at " + uri);
+            }
         }
     }
 }

@@ -3,7 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Lomztein.Moduthulhu.Modules.CustomCommands.Categories
+namespace Lomztein.Moduthulhu.Plugins.Standard
+
 {
     public static class AdditionalCategories
     {

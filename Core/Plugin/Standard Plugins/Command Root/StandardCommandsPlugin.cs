@@ -6,16 +6,12 @@ using System.Text;
 using Lomztein.AdvDiscordCommands.Framework;
 using Lomztein.AdvDiscordCommands.Extensions;
 
-namespace Lomztein.Moduthulhu.Modules.Command
+namespace Lomztein.Moduthulhu.Plugins.Standard
+
 {
-    [Dependency ("CommandRootModule")]
-    public class StandardCommandsModule : PluginBase {
-
-        public override string Name => "Standard Commands";
-        public override string Description => "A module that adds all standard commands from the Advanced Discord Commands library.";
-        public override string Author => "Lomztein";
-
-        public override bool Multiserver => true;
+    [Descriptor("Lomztein", "Standard Commands", "Implements all the default commands from the command framework.")]
+    [Source("https://github.com/Lomztein", "https://github.com/Lomztein/Moduthulhu")]
+    public class StandardCommandsPlugin : PluginBase {
 
         private AdvDiscordCommands.Framework.Interfaces.ICommand [ ] commands = new AdvDiscordCommands.Framework.Interfaces.ICommand[ ] {
                 new HelpCommand (),
@@ -28,13 +24,11 @@ namespace Lomztein.Moduthulhu.Modules.Command
         };
 
         public override void Initialize() {
-            var root = ParentContainer.GetCommandRoot ();
-            root.AddCommands (commands);
+            SendMessage ("CommandRoot.AddCommands", commands);
         }
 
         public override void Shutdown() {
-            var root = ParentContainer.GetCommandRoot ();
-            root.RemoveCommands (commands);
+            SendMessage ("CommandRoot.RemoveCommands", commands);
         }
     }
 }
