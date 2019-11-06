@@ -7,7 +7,7 @@ using Lomztein.Moduthulhu.Core.Extensions;
 
 namespace Lomztein.Moduthulhu.Core.Plugin
 {
-    public class PluginDependancyTree
+    internal class PluginDependancyTree
     {
         private readonly Branch[] _branches;
 

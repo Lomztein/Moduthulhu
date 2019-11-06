@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Lomztein.Moduthulhu.Core.Plugin
 {
-    public class PluginPatcher
+    internal class PluginPatcher
     {
 
     }

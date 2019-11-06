@@ -7,11 +7,11 @@ namespace Lomztein.Moduthulhu.Core.Plugin.Framework
     [AttributeUsage (AttributeTargets.Class)]
     public class SourceAttribute : Attribute
     {
-        public Uri AuthorURI { get; private set; }
-        public Uri ProjectURI { get; private set; }
-        public Uri PatchURI { get; private set; }
+        public string AuthorURI { get; private set; }
+        public string ProjectURI { get; private set; }
+        public string PatchURI { get; private set; }
 
-        public SourceAttribute (Uri author, Uri project, Uri patch)
+        public SourceAttribute (string author = null, string project = null, string patch = null)
         {
             AuthorURI = author;
             ProjectURI = project;

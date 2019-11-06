@@ -6,7 +6,7 @@ namespace Lomztein.Moduthulhu.Core
 {
     public static class Log
     {
-        public enum Type { SYSTEM, BOT, MODULE, CONFIG, CHAT, CHANNEL, SERVER, USER, WARNING, EXCEPTION, CRITICAL }
+        public enum Type { SYSTEM, BOT, PLUGIN, CONFIG, CHAT, CHANNEL, SERVER, USER, WARNING, EXCEPTION, CRITICAL }
         public static ConsoleColor[] TypeColor { get; private set; } = new ConsoleColor[] {
 
             ConsoleColor.Blue, // SYSTEM

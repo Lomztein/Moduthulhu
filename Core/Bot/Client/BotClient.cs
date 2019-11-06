@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Discord.WebSocket;
 using System.Linq;
 using Lomztein.Moduthulhu.Core.Extensions;
+using Lomztein.Moduthulhu.Core.Plugin;
 
 namespace Lomztein.Moduthulhu.Core.Bot.Client
 {
@@ -21,7 +22,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client
 
         private ClientConfiguration _configuration;
 
-        public string DataDirectory { get => Core.DataDirectory; }
+        public static string DataDirectory { get => Core.DataDirectory; }
 
         private Shard[] _shards;
         private IEnumerable<SocketGuild> AllGuilds { get => _shards.SelectMany (x => x.Guilds); }
@@ -36,7 +37,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client
             BootDate = DateTime.Now;
             Core = core;
 
-            _configuration = LoadConfiguration(DataDirectory + "Configuration");
+            _configuration = LoadConfiguration(DataDirectory + "/Configuration");
 
             Log.Write (Log.Type.BOT, "Creating bot client with token " + _configuration.Token);
         }
@@ -64,6 +65,8 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client
 
         public async void Initialize ()
         {
+            PluginLoader.ReloadPluginAssemblies();
+
             InitializeShards();
             await AwaitAllConnected();
             await UpdateStatus(DateTime.Now, DateTime.Now);
