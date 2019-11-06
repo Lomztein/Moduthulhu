@@ -9,7 +9,8 @@ namespace Lomztein.Moduthulhu.Core.Plugin
 {
     internal static class AssemblyLoader {
 
-        public static Assembly[] LoadAssemblies (params string[] paths) {
+        public static Assembly[] LoadAssemblies (string directory) {
+            string[] paths = Directory.GetFiles(directory);
             return paths.Select (x => LoadAssembly (x)).ToArray ();
         }
 
@@ -27,7 +28,7 @@ namespace Lomztein.Moduthulhu.Core.Plugin
             foreach (Type type in allTypes) {
 
                 if (type.GetInterfaces().Contains(typeof (T))) {
-                    Log.Write (Log.Type.MODULE, $"{typeof(T).Name} type \"{type.Name}\" loaded.");
+                    Log.Write (Log.Type.PLUGIN, $"{typeof(T).Name} type \"{type.Name}\" loaded.");
                     exportedTypes.Add (type);
                 }
             }
@@ -40,14 +41,9 @@ namespace Lomztein.Moduthulhu.Core.Plugin
             return assemblies.SelectMany(x => ExtractTypes<T>(x)).ToArray();
         }
 
-        public static Type[] LoadAndExtractTypes<T> (string path)
+        public static Type[] LoadAndExtractTypes<T> (string directory)
         {
-            return ExtractTypes<T>(LoadAssembly(path));
-        }
-
-        public static Type[] LoadAndExtractTypes<T> (string[] path)
-        {
-            return ExtractTypes<T>(LoadAssemblies(path));
+            return ExtractTypes<T>(LoadAssemblies(directory));
         }
 
         public static T Instantiate<T>(Type type) where T : class
