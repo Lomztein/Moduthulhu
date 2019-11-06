@@ -10,23 +10,27 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
     public class PluginManager
     {
         private readonly List<IPlugin> _activePlugins = new List<IPlugin>();
-        public IPlugin[] ActivePlugins => _activePlugins.ToArray();
 
         private GuildHandler _parentHandler;
 
         private CachedValue<List<string>> _enabledPlugins;
-        private Dictionary<string, Func<object, object>> _messageEndpoints = new Dictionary<string, Func<object, object>>();
+
+        // TODO: Consider seperating plugin management and plugin communication in to different classes.
+        private Dictionary<string, Func<object, object>> _messageFunctions = new Dictionary<string, Func<object, object>>();
+        private Dictionary<string, Action<object>> _messageActions = new Dictionary<string, Action<object>>();
 
         public PluginManager (GuildHandler parent)
         {
             _parentHandler = parent;
             _enabledPlugins = new CachedValue<List<string>>(new IdentityKeyJsonRepository("plugindata"), _parentHandler.GuildId, "EnabledPlugins", () => PluginLoader.GetAllPlugins ().Where (x => PluginLoader.IsStandard (x)).Select (y => Plugin.Framework.Plugin.CompactizeName (y)).ToList ());
-            _enabledPlugins.SetValue (PluginLoader.GetAllPlugins().Where(x => PluginLoader.IsStandard(x)).Select(y => Plugin.Framework.Plugin.CompactizeName(y)).ToList ()); // This forces the manager to load all standard plugins at startup, remove later and replace with togglability.
+            _enabledPlugins.SetValue (PluginLoader.GetAllPlugins().Where(x => PluginLoader.IsStandard(x)).Select(y => Plugin.Framework.Plugin.CompactizeName(y)).ToList());
         }
+
+        public IPlugin[] GetActivePlugins() => _activePlugins.ToArray();
 
         public void ShutdownPlugins ()
         {
-            Log.Write(Log.Type.PLUGIN, "Shutting down plugins for guild " + _parentHandler.GetGuild().Name);
+            Log.Write(Log.Type.PLUGIN, "Shutting down plugins for handler " + _parentHandler.Name);
             foreach (IPlugin plugin in _activePlugins)
             {
                 Log.Write(Log.Type.PLUGIN, "Shutting down plugin " + Plugin.Framework.Plugin.CompactizeName(plugin.GetType()));
@@ -76,9 +80,14 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
 
         public object SendMessage (string target, object value = null)
         {
-            if (_messageEndpoints.ContainsKey (target))
+            if (_messageFunctions.ContainsKey (target))
             {
-                return _messageEndpoints[target](value);
+                return _messageFunctions[target](value);
+            }
+            if (_messageActions.ContainsKey(target))
+            {
+                _messageActions[target](value);
+                return null;
             }
             else
             {
@@ -89,23 +98,43 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
 
         public T SendMessage<T>(string target, object value = null) => (T)SendMessage(target, value);
 
-        public void RegisterMessageFunction (string identifier, Func<object, object> function)
+        public void RegisterMessageFunction(string identifier, Func<object, object> function)
         {
             Log.Write(Log.Type.CONFIG, $"Registering message function {identifier}..");
-            if (_messageEndpoints.ContainsKey (identifier))
+            if (FunctionOrActionExists(identifier))
             {
-                Log.Write(Log.Type.WARNING, $"Attempted to register message function {identifier}, but it already exists.");
+                Log.Write(Log.Type.WARNING, $"Attempted to register message function {identifier}, but the given key is already registered.");
             }
             else
             {
-                _messageEndpoints.Add(identifier, function);
+                _messageFunctions.Add(identifier, function);
             }
         }
 
+        public void RegisterMessageAction(string identifier, Action<object> action)
+        {
+            Log.Write(Log.Type.CONFIG, $"Registering message function {identifier}..");
+            if (FunctionOrActionExists(identifier))
+            {
+                Log.Write(Log.Type.WARNING, $"Attempted to register message action {identifier}, but the given key is already registered.");
+            }
+            else
+            {
+                _messageActions.Add(identifier, action);
+            }
+        }
+
+        public bool FunctionOrActionExists(string ident) => _messageFunctions.ContainsKey(ident) || _messageActions.ContainsKey(ident);
+
         public void UnregisterMessageFunction (string identifier)
         {
-            _messageEndpoints.Remove(identifier);
+            _messageFunctions.Remove(identifier);
         }
+        public void UnregisterMessageAction(string identifier)
+        {
+            _messageActions.Remove(identifier);
+        }
+
         public void AddPlugin (string pluginName)
         {
             _enabledPlugins.GetValue().Add(pluginName);
