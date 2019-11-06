@@ -24,6 +24,6 @@ namespace Lomztein.Moduthulhu.Core.Plugin.Framework
 
         public static string CompactizeName(Type plugin) => $"{GetAuthor (plugin)}-{GetName (plugin)}-{GetVersion (plugin)}";
 
-        public static void Log(IPlugin plugin, string text) => Core.Log.Write(Core.Log.GetColor(Core.Log.Type.PLUGIN), $"{CompactizeName (plugin.GetType ())} - { plugin.GuildHandler.GetGuild().Name}", text);
+        public static void Log(IPlugin plugin, string text) => Core.Log.Write(Core.Log.GetColor(Core.Log.Type.PLUGIN), $"{CompactizeName (plugin.GetType ())} - { plugin.GuildHandler.Name}", text);
     }
 }

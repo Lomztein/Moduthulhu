@@ -29,6 +29,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client
         private DiscordSocketClient FirstClient { get => _shards.First ().Client; }
 
         private readonly Clock _statusClock = new Clock(1, "StatusClock");
+        private UserList _botAdministrators;
 
         public event Func<Exception, Task> ExceptionCaught;
 
@@ -66,6 +67,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client
         public async void Initialize ()
         {
             PluginLoader.ReloadPluginAssemblies();
+            _botAdministrators = new UserList(Path.Combine(DataDirectory, "/Administrators"));
 
             InitializeShards();
             await AwaitAllConnected();
@@ -81,6 +83,11 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client
                 _shards[i] = CreateShard (i, _configuration.TotalShards);
                 _shards[i].Run();
             }
+        }
+
+        public bool IsBotAdministrator(ulong userId)
+        {
+            return _botAdministrators.Contains(userId);
         }
 
         internal Shard CreateShard (int shardId, int totalShards) {
