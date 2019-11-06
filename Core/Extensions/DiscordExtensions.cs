@@ -55,5 +55,10 @@ namespace Lomztein.Moduthulhu.Core.Extensions
                 return 0;
             return entity.Id;
         }
+
+        public static string ToStringOrNull (this object obj)
+        {
+            return obj == null ? "null" : obj.ToString();
+        }
     }
 }

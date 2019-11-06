@@ -8,13 +8,20 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Plugin\Standard Plugins\Admin Plugins\**" />
+    <Compile Remove="Plugin\Standard Plugins\Meta Modules\**" />
     <Compile Remove="Webserver\**" />
+    <EmbeddedResource Remove="Plugin\Standard Plugins\Admin Plugins\**" />
+    <EmbeddedResource Remove="Plugin\Standard Plugins\Meta Modules\**" />
     <EmbeddedResource Remove="Webserver\**" />
+    <None Remove="Plugin\Standard Plugins\Admin Plugins\**" />
+    <None Remove="Plugin\Standard Plugins\Meta Modules\**" />
     <None Remove="Webserver\**" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Discord.Net" Version="2.1.1" />
+    <PackageReference Include="Lomztein.Advanced-Discord-Commands" Version="1.0.0-beta" />
     <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.7">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
