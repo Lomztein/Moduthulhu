@@ -18,13 +18,13 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client
         public TimeSpan Uptime { get => DateTime.Now - BootDate; }
 
         //internal const int GUILDS_PER_SHARD = 2000;
-        public Core Core { get; private set; }
+        public BotCore Core { get; private set; }
 
         private ClientConfiguration _configuration;
 
-        public static string DataDirectory { get => Core.DataDirectory; }
+        public static string DataDirectory { get => BotCore.DataDirectory; }
 
-        private Shard[] _shards;
+        private BotShard[] _shards;
         private IEnumerable<SocketGuild> AllGuilds { get => _shards.SelectMany (x => x.Guilds); }
         private DiscordSocketClient FirstClient { get => _shards.First ().Client; }
 
@@ -33,7 +33,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client
 
         public event Func<Exception, Task> ExceptionCaught;
 
-        internal BotClient (Core core) {
+        internal BotClient (BotCore core) {
 
             BootDate = DateTime.Now;
             Core = core;
@@ -78,7 +78,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client
         }
 
         internal void InitializeShards () {
-            _shards = new Shard[_configuration.TotalShards];
+            _shards = new BotShard[_configuration.TotalShards];
             for (int i = _configuration.ShardRange.Min; i < _configuration.ShardRange.Max; i++) {
                 _shards[i] = CreateShard (i, _configuration.TotalShards);
                 _shards[i].Run();
@@ -90,8 +90,8 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client
             return _botAdministrators.Contains(userId);
         }
 
-        internal Shard CreateShard (int shardId, int totalShards) {
-            Shard shard = new Shard (this, _configuration.Token, shardId, totalShards);
+        internal BotShard CreateShard (int shardId, int totalShards) {
+            BotShard shard = new BotShard (this, _configuration.Token, shardId, totalShards);
             shard.ExceptionCaught += OnExceptionCaught;
             return shard;
         }

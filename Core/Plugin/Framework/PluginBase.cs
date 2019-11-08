@@ -35,8 +35,8 @@ namespace Lomztein.Moduthulhu.Core.Plugin.Framework
         protected CachedValue<T> GetDataCache<T>(string key, Func<GuildHandler, T> defaultValue) => new CachedValue<T>(new IdentityKeyJsonRepository("plugindata"), GuildHandler.GuildId, key, () => defaultValue(GuildHandler));
         protected CachedValue<T> GetConfigCache<T>(string key, Func<GuildHandler, T> defaultValue) => new CachedValue<T>(new IdentityKeyJsonRepository("pluginconfig"), GuildHandler.GuildId, key, () => defaultValue(GuildHandler));
 
-        protected void RegisterMessageFunction(string identifier, Func<object, object> function) => GuildHandler.Plugins.RegisterMessageFunction(Regex.Replace (Name, " ", "") + "." + identifier, function);
-        protected void RegisterMessageAction(string identifier, Action<object> action) => GuildHandler.Plugins.RegisterMessageAction(Regex.Replace(Name, " ", "") + "." + identifier, action);
+        protected void RegisterMessageFunction(string identifier, Func<object, object> function) => GuildHandler.Plugins.RegisterMessageFunction(Name + "." + identifier, function);
+        protected void RegisterMessageAction(string identifier, Action<object> action) => GuildHandler.Plugins.RegisterMessageAction(Name + "." + identifier, action);
 
         protected void UnregisterMessageFunction(string identifier) => GuildHandler.Plugins.UnregisterMessageFunction(identifier);
         protected void UnregisterMessageAction(string identifier) => GuildHandler.Plugins.UnregisterMessageAction(identifier);

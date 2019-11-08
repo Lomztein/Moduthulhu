@@ -47,7 +47,7 @@ namespace Lomztein.Moduthulhu.Core.IO
             path = Path.ChangeExtension (path, jsonExtension);
             Directory.CreateDirectory (Path.GetDirectoryName (path));
 
-            Log.Write (Log.Type.SYSTEM, "Saving JSON file at " + path);
+            Log.Write (Log.Type.DATA, "Saving JSON file at " + path);
 
             try {
                 string json = JsonConvert.SerializeObject (obj, format ? Formatting.Indented : Formatting.None);

@@ -17,6 +17,7 @@ namespace Lomztein.Moduthulhu.Core.Plugin.Framework
         public static string GetAuthor(Type plugin) => GetDescriptorAttribute(plugin)?.Author;
         public static string GetVersion(Type plugin) => GetDescriptorAttribute(plugin)?.Version;
         public static string GetDescription(Type plugin) => GetDescriptorAttribute(plugin)?.Description;
+        public static bool IsCritical(Type plugin) => GetAttribute<CriticalAttribute>(plugin) != null;
 
         public static Uri GetAuthorURI(Type plugin) => new Uri (GetSourceAttribute(plugin)?.AuthorURI);
         public static Uri GetPatchURI(Type plugin) => new Uri (GetSourceAttribute(plugin)?.PatchURI);

@@ -14,7 +14,7 @@ namespace Lomztein.Moduthulhu.Core.Plugin
         private static Type[] _loadedPlugins;
         private static Type[] _standardPlugins = new Type[] { typeof(LoggerPlugin), typeof(CommandPlugin), typeof(StandardCommandsPlugin), typeof (AdministrationPlugin) };
 
-        public static Type[] GetAllPlugins ()
+        private static Type[] GetAllPlugins ()
         {
             Type[] all = new Type[_loadedPlugins.Length + _standardPlugins.Length];
             for (int i = 0; i < all.Length; i++)
@@ -31,11 +31,14 @@ namespace Lomztein.Moduthulhu.Core.Plugin
             return all;
         }
 
+        private static Type[] _orderedPlugins;
+        public static Type[] GetPlugins() => _orderedPlugins;
+
         public static bool IsStandard(Type pluginType) => _standardPlugins.Contains(pluginType);
 
         public static Type GetPluginType(string name) => GetAllPlugins ().Where ((x) => Framework.Plugin.CompactizeName(x) == name).FirstOrDefault ();
 
-        public static string AssemblyPath => Bot.Core.DataDirectory + "/Plugins";
+        public static string AssemblyPath => Bot.BotCore.DataDirectory + "/Plugins";
 
         public static PluginDependancyTree DependancyTree { get; private set; }
 
@@ -43,7 +46,8 @@ namespace Lomztein.Moduthulhu.Core.Plugin
         {
             if (!Directory.Exists(AssemblyPath)) Directory.CreateDirectory(AssemblyPath);
             _loadedPlugins = AssemblyLoader.LoadAndExtractTypes<IPlugin>(AssemblyPath);
-            DependancyTree = new PluginDependancyTree(_loadedPlugins);
+            DependancyTree = new PluginDependancyTree(GetAllPlugins ());
+            _orderedPlugins = DependancyTree.Order(GetAllPlugins ()).ToArray();
         }
     }
 }
