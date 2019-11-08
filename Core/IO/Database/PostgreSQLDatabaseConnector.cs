@@ -99,5 +99,23 @@ namespace Lomztein.Moduthulhu.Core.IO.Database
 
             return tableDict;
         }
+
+        public void CreateTable(string tableName)
+        {
+            var res = ReadQuery("SELECT 1 FROM information_schema.tables WHERE table_name = @table", new Dictionary<string, object>() { { "@table", tableName } });
+
+            try
+            {
+                if (res.Length == 0)
+                {
+                    Log.Write(Log.Type.DATA, $"Creating missing database table {tableName}.");
+                    UpdateQuery($"CREATE TABLE {tableName} (identifier text, key text, value text, CONSTRAINT {tableName}identkey UNIQUE (identifier, key));", new Dictionary<string, object>());
+                }
+            }
+            catch (NpgsqlException e)
+            {
+                Log.Write(e);
+            }
+        }
     }
 }

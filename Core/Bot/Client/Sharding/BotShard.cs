@@ -10,7 +10,7 @@ using Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild;
 
 namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding
 {
-    public class Shard {
+    public class BotShard {
 
         public DateTime BootDate { get; private set; }
         public TimeSpan Uptime { get => DateTime.Now - BootDate; }
@@ -30,7 +30,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding
 
         public event Func<Exception, Task> ExceptionCaught;
 
-        internal Shard(BotClient parentManager, string token, int shardId, int totalShards) {
+        internal BotShard(BotClient parentManager, string token, int shardId, int totalShards) {
             BotClient = parentManager;
             _token = token;
             _shardId = shardId;

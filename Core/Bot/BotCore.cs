@@ -8,10 +8,10 @@ using System.Threading;
 using System.Linq;
 using System.Collections.Generic;
 using Lomztein.Moduthulhu.Core.Bot.Client;
+using System.Reflection;
 
 namespace Lomztein.Moduthulhu.Core.Bot {
-
-    public class Core {
+    public class BotCore {
         public DateTime BootDate { get; private set; }
         public TimeSpan Uptime { get => DateTime.Now - BootDate; }
 

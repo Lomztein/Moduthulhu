@@ -22,8 +22,8 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
         public PluginManager (GuildHandler parent)
         {
             _parentHandler = parent;
-            _enabledPlugins = new CachedValue<List<string>>(new IdentityKeyJsonRepository("plugindata"), _parentHandler.GuildId, "EnabledPlugins", () => PluginLoader.GetAllPlugins ().Where (x => PluginLoader.IsStandard (x)).Select (y => Plugin.Framework.Plugin.CompactizeName (y)).ToList ());
-            _enabledPlugins.SetValue (PluginLoader.GetAllPlugins().Where(x => PluginLoader.IsStandard(x)).Select(y => Plugin.Framework.Plugin.CompactizeName(y)).ToList());
+            _enabledPlugins = new CachedValue<List<string>>(new IdentityKeyJsonRepository("plugindata"), _parentHandler.GuildId, "EnabledPlugins", () => PluginLoader.GetPlugins().Where (x => PluginLoader.IsStandard (x)).Select (y => Plugin.Framework.Plugin.CompactizeName (y)).ToList ());
+            _enabledPlugins.SetValue (PluginLoader.GetPlugins().Where(x => PluginLoader.IsStandard(x)).Select(y => Plugin.Framework.Plugin.CompactizeName(y)).ToList());
         }
 
         public IPlugin[] GetActivePlugins() => _activePlugins.ToArray();
@@ -100,7 +100,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
 
         public void RegisterMessageFunction(string identifier, Func<object, object> function)
         {
-            Log.Write(Log.Type.CONFIG, $"Registering message function {identifier}..");
+            Log.Write(Log.Type.PLUGIN, $"Registering message function {identifier}..");
             if (FunctionOrActionExists(identifier))
             {
                 Log.Write(Log.Type.WARNING, $"Attempted to register message function {identifier}, but the given key is already registered.");
@@ -113,7 +113,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
 
         public void RegisterMessageAction(string identifier, Action<object> action)
         {
-            Log.Write(Log.Type.CONFIG, $"Registering message function {identifier}..");
+            Log.Write(Log.Type.PLUGIN, $"Registering message action {identifier}..");
             if (FunctionOrActionExists(identifier))
             {
                 Log.Write(Log.Type.WARNING, $"Attempted to register message action {identifier}, but the given key is already registered.");
@@ -137,14 +137,29 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
 
         public void AddPlugin (string pluginName)
         {
+            if (_enabledPlugins.GetValue ().Contains(pluginName))
+            {
+                throw new ArgumentException("Plugin " + pluginName + " is already active.");
+            }
+
             _enabledPlugins.GetValue().Add(pluginName);
             _enabledPlugins.Store();
         }
 
         public void RemovePlugin (string pluginName)
         {
+            if (Plugin.Framework.Plugin.IsCritical (PluginLoader.GetPluginType (pluginName)))
+            {
+                throw new ArgumentException("Plugin " + pluginName + " is marked critical and cannot be disabled.");
+            }
+
             _enabledPlugins.GetValue().Remove(pluginName);
             _enabledPlugins.Store();
+        }
+
+        public bool IsPluginActive (string pluginName) // TODO: Figure out a consistant and simple way to differentiate between plugins. Perhaps a cache of plugin IDs given when their type is loaded? Using strings is at best gonna be a pain in the ass, at worst cause serious issue down the line.
+        {
+            return _activePlugins.Any(x => Plugin.Framework.Plugin.CompactizeName(x.GetType()).StartsWith(pluginName));
         }
     }
 }

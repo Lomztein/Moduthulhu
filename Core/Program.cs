@@ -5,6 +5,6 @@ namespace Lomztein.Moduthulhu.Core
 {
     class Program
     {
-        static void Main(string [ ] args) => new Bot.Core ().InitializeCore ().GetAwaiter ().GetResult ();
+        static void Main(string [ ] args) => new Bot.BotCore ().InitializeCore ().GetAwaiter ().GetResult ();
     }
 }
