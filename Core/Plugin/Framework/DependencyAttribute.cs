@@ -8,9 +8,11 @@ namespace Lomztein.Moduthulhu.Core.Plugin.Framework
     public class DependencyAttribute : Attribute
     {
         public string DependencyName { get; private set; }
+        public string DesiredVersion { get; private set; }
 
-        public DependencyAttribute (string dependency) {
+        public DependencyAttribute (string dependency, string desiredVersion = "1.0.0") {
             DependencyName = dependency;
+            DesiredVersion = desiredVersion;
         }
     }
 }
