@@ -6,7 +6,6 @@ using Lomztein.AdvDiscordCommands.Framework.Interfaces;
 using Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild;
 using Lomztein.Moduthulhu.Core.Bot.Messaging;
 using Lomztein.Moduthulhu.Core.Bot.Messaging.Advanced;
-using Lomztein.Moduthulhu.Core.Bot.Misc;
 using Lomztein.Moduthulhu.Core.Extensions;
 using Lomztein.Moduthulhu.Core.IO.Database.Repositories;
 using Lomztein.Moduthulhu.Core.Plugin.Framework;
