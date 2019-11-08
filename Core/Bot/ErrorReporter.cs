@@ -13,7 +13,7 @@ namespace Lomztein.Moduthulhu.Core.Bot
         internal Task ReportError (Exception exception) {
             string message = (exception.Message + " - " + exception.StackTrace) + "\n";
             Log.Write (exception);
-            File.AppendAllText (Core.DataDirectory + "errors.txt", message);
+            File.AppendAllText (BotCore.DataDirectory + "errors.txt", message);
             return Task.CompletedTask;
         }
     }

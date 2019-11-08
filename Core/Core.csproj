@@ -19,6 +19,7 @@
     <Copyright>Copyright (c) 2018 - 2019 Marcus L. Jensen</Copyright>
     <PackageIconUrl></PackageIconUrl>
     <icon>https://i.imgur.com/STOT7SZ.png</icon>
+    <SignAssembly>false</SignAssembly>
   </PropertyGroup>
 
   <ItemGroup>

@@ -10,15 +10,15 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
     public class GuildHandler
     {
         public string Name { get; private set; }
-        private readonly Shard _shard;
+        private readonly BotShard _shard;
         public SocketSelfUser BotUser => _shard.Client.CurrentUser;
-        public Core Core => _shard.BotClient.Core;
+        public BotCore Core => _shard.BotClient.Core;
 
         public ulong GuildId { get; private set; }
 
         public PluginManager Plugins { get; private set; }
 
-        public GuildHandler (Shard shard, ulong guildId)
+        public GuildHandler (BotShard shard, ulong guildId)
         {
             _shard = shard;
             GuildId = guildId;
