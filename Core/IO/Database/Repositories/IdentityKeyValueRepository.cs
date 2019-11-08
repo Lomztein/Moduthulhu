@@ -17,30 +17,14 @@ namespace Lomztein.Moduthulhu.Core.IO.Database.Repositories
 
         public void Init ()
         {
-            CreateTableIfAbsent();
+            GetConnector().CreateTable(_tableName);
         }
 
-        private IDatabaseConnector GetConnector() => new PostgreSQLDatabaseConnector();
-
-        private void CreateTableIfAbsent ()
-        {
-            IDatabaseConnector db = GetConnector();
-            var res = db.ReadQuery("SELECT 1 FROM information_schema.tables WHERE table_name = @table", new Dictionary<string, object>() { { "@table", _tableName } });
-
-            try
-            {
-                if (res.Length == 0)
-                {
-                    db.UpdateQuery($"CREATE TABLE {_tableName} (identifier text, key text, value text, CONSTRAINT {_tableName}identkey UNIQUE (identifier, key));", new Dictionary<string, object>());
-                }
-            }catch (NpgsqlException e)
-            {
-                Log.Write(e);
-            }
-        }
+        private static IDatabaseConnector GetConnector() => new PostgreSQLDatabaseConnector();
 
         public TValue Get (TIdentifier identifier, TKey key)
         {
+            Log.Write(Log.Type.DATA, $"Querying database table {_tableName} for identifier {identifier} and key {key}.");
             IDatabaseConnector db = GetConnector();
             var res = db.ReadQuery($"SELECT value FROM {_tableName} WHERE identifier = @identifier AND key = @key", new Dictionary<string, object>() { { "@identifier", identifier }, { "@key", key } });
             return res.Length == 0 ? default : (TValue)res.Single ().FirstOrDefault ().Value;
@@ -48,6 +32,7 @@ namespace Lomztein.Moduthulhu.Core.IO.Database.Repositories
 
         public void Set (TIdentifier identifier, TKey key, TValue value)
         {
+            Log.Write(Log.Type.DATA, $"Querying database table {_tableName} to set value at identifier {identifier} and key {key} to {value}.");
             IDatabaseConnector db = GetConnector();
             string query = $"INSERT INTO {_tableName} VALUES (@identifier, @key, @value) ON CONFLICT ON CONSTRAINT {_tableName}identkey DO UPDATE SET value = @value WHERE {_tableName}.identifier = @identifier AND {_tableName}.key = @key";
             db.UpdateQuery(query, new Dictionary<string, object>() { { "@identifier", identifier }, { "@key", key }, { "@value", value } });
