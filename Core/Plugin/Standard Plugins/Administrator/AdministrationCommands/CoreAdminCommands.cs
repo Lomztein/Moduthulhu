@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -26,6 +27,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
                 new StatusCommand (),
                 new SetAvatarCommand (),
                 new SetUsernameCommand (),
+                new VersionCommand (),
             };
         }
 
@@ -131,6 +133,23 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
                     }
                 }
                 return new Result(null, "Succesfully changed avatar to the one found at " + uri);
+            }
+        }
+
+        private class VersionCommand : PluginCommand<AdministrationPlugin>
+        {
+            public VersionCommand()
+            {
+                Name = "version";
+                Description = "Show core version.";
+                Category = AdditionalCategories.Management;
+            }
+
+            [Overload (typeof (string), "Return the current version of the bot core framework.")]
+            public Task<Result> Execute (CommandMetadata metadata)
+            {
+                string version = Assembly.GetEntryAssembly().GetName().Version.ToString ();
+                return TaskResult(version, $"Current Moduthulhu core version is '{version}'");
             }
         }
     }
