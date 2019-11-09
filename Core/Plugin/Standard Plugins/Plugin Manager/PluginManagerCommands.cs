@@ -16,7 +16,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
     {
         public PluginManagerCommands ()
         {
-            Name = "plugin";
+            Name = "plugins";
             Description = "Manage active plugins.";
             Category = AdditionalCategories.Management;
 
@@ -34,7 +34,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
         {
             public AddCommand ()
             {
-                Name = "add";
+                Name = "enable";
                 Description = "Add a plugin.";
                 Category = AdditionalCategories.Management;
             }
@@ -43,7 +43,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
             public Task<Result> Execute(CommandMetadata metadata, string pluginName)
             {
                 ParentPlugin.AddPlugin(pluginName);
-                return TaskResult(null, $"Added plugin {Plugin.GetVersionedFullName(PluginLoader.GetPluginType(pluginName))}.");
+                return TaskResult(null, $"Added plugin {Plugin.GetFullName(PluginLoader.GetPluginType(pluginName))}.");
             }
         }
 
@@ -51,7 +51,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
         {
             public RemoveCommand()
             {
-                Name = "remove";
+                Name = "disable";
                 Description = "Remove a plugin.";
                 Category = AdditionalCategories.Management;
             }
@@ -60,7 +60,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
             public Task<Result> Execute(CommandMetadata metadata, string pluginName)
             {
                 ParentPlugin.RemovePlugin(pluginName);
-                return TaskResult(null, $"Removed plugin {Plugin.GetVersionedFullName(PluginLoader.GetPluginType(pluginName))}.");
+                return TaskResult(null, $"Removed plugin {Plugin.GetFullName(PluginLoader.GetPluginType(pluginName))}.");
             }
         }
 

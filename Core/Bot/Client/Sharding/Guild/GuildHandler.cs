@@ -33,7 +33,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
         public void Initialize ()
         {
             Moduthulhu.Core.Log.Write(Moduthulhu.Core.Log.Type.BOT, $"Initializing GuildHandler for Guild {GetGuild().Name}.");
-            Plugins.ReloadPlugins();
+            Plugins.LoadPlugins();
         }
 
         public void Kill ()

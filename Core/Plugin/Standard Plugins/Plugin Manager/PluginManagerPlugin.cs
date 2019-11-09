@@ -27,9 +27,20 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
             SendMessage("Lomztein-Command Root", "RemoveCommand", _commandSet);
         }
 
-        public bool AddPlugin(string pluginName) => Manager.AddPlugin(pluginName);
+        public bool AddPlugin(string pluginName)
+        {
+            bool value = Manager.AddPlugin(pluginName);
+            Manager.ReloadPlugins();
+            return value;
+        }
 
-        public bool RemovePlugin(string pluginName) => Manager.RemovePlugin(pluginName);
+        public bool RemovePlugin(string pluginName)
+        {
+            bool value = Manager.RemovePlugin(pluginName);
+            Manager.ReloadPlugins();
+            return value;
+        }
+
 
         public void ReloadPlugins() => Manager.ReloadPlugins();
 
