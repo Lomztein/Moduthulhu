@@ -2,7 +2,7 @@
 using Discord;
 using Discord.WebSocket;
 using System.Threading.Tasks;
-using Lomztein.Moduthulhu.Core.Plugin;
+using Lomztein.Moduthulhu.Core.Plugins;
 using System.IO;
 using System.Threading;
 using System.Linq;
@@ -21,6 +21,8 @@ namespace Lomztein.Moduthulhu.Core.Bot {
         internal static string BaseDirectory { get => AppContext.BaseDirectory; }
         internal static string DataDirectory { get => AppContext.BaseDirectory + "/Data"; }
 
+        private CancellationTokenSource _shutdownToken = new CancellationTokenSource();
+
         internal async Task InitializeCore () {
 
             // Set up core
@@ -35,8 +37,13 @@ namespace Lomztein.Moduthulhu.Core.Bot {
             _client.Initialize();
 
             // Keep the core alive.
-            await Task.Delay (-1);
+            await Task.Delay (-1, _shutdownToken.Token);
             Log.Write (Log.Type.BOT, "Shutting down..");
+        }
+
+        public void Shutdown ()
+        {
+            _shutdownToken.Cancel();
         }
 
         private Task OnExceptionCaught(Exception exception)

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using Discord.WebSocket;
 using System.Linq;
 using Lomztein.Moduthulhu.Core.Extensions;
-using Lomztein.Moduthulhu.Core.Plugin;
+using Lomztein.Moduthulhu.Core.Plugins;
 
 namespace Lomztein.Moduthulhu.Core.Bot.Client
 {
@@ -30,6 +30,8 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client
 
         private readonly Clock _statusClock = new Clock(1, "StatusClock");
         private UserList _botAdministrators;
+        private int _consecutiveOfflineMinutes;
+        private int _automaticOfflineMinutesTreshold;
 
         public event Func<Exception, Task> ExceptionCaught;
 
@@ -74,7 +76,31 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client
             await UpdateStatus(DateTime.Now, DateTime.Now);
 
             _statusClock.OnDayPassed += UpdateStatus;
+            _statusClock.OnMinutePassed += StatusClock_OnMinutePassed;
             _statusClock.Start();
+        }
+
+        private Task StatusClock_OnMinutePassed(DateTime currentTick, DateTime lastTick)
+        {
+            if (_shards.Any (x => x.IsConnected == false)) {
+                _consecutiveOfflineMinutes++;
+            }
+            else
+            {
+                _consecutiveOfflineMinutes = 0;
+            }
+
+            if (_consecutiveOfflineMinutes > _automaticOfflineMinutesTreshold)
+            {
+                Log.Write(Log.Type.CRITICAL, "At least one shard has been offline for the past 10 minutes, shutting down automatically..");
+                Shutdown();
+            }
+            return Task.CompletedTask;
+        }
+
+        private void Shutdown()
+        {
+            Core.Shutdown();
         }
 
         internal void InitializeShards () {
