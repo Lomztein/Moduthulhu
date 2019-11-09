@@ -1,6 +1,6 @@
 ﻿using Discord;
 using Discord.WebSocket;
-using Lomztein.Moduthulhu.Core.Plugin.Framework;
+using Lomztein.Moduthulhu.Core.Plugins.Framework;
 using System;
 using System.Threading.Tasks;
 using Lomztein.Moduthulhu.Core.Extensions;

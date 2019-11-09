@@ -5,7 +5,7 @@ using System.IO;
 using System.Runtime.Loader;
 using System.Linq;
 
-namespace Lomztein.Moduthulhu.Core.Plugin
+namespace Lomztein.Moduthulhu.Core.Plugins
 {
     internal static class AssemblyLoader {
 

@@ -1,10 +1,10 @@
-﻿using Lomztein.Moduthulhu.Core.Plugin.Framework;
+﻿using Lomztein.Moduthulhu.Core.Plugins.Framework;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Linq;
 
-namespace Lomztein.Moduthulhu.Core.Plugin
+namespace Lomztein.Moduthulhu.Core.Plugins
 {
     internal class TypeFilter
     {

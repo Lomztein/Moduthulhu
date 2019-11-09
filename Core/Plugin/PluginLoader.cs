@@ -1,4 +1,4 @@
-﻿using Lomztein.Moduthulhu.Core.Plugin.Framework;
+﻿using Lomztein.Moduthulhu.Core.Plugins.Framework;
 using Lomztein.Moduthulhu.Core.Bot;
 using System;
 using System.Collections.Generic;
@@ -7,12 +7,12 @@ using System.IO;
 using Lomztein.Moduthulhu.Plugins.Standard;
 using System.Linq;
 
-namespace Lomztein.Moduthulhu.Core.Plugin
+namespace Lomztein.Moduthulhu.Core.Plugins
 {
     internal static class PluginLoader
     {
         private static Type[] _loadedPlugins;
-        private static Type[] _standardPlugins = new Type[] { typeof(LoggerPlugin), typeof(CommandPlugin), typeof(StandardCommandsPlugin), typeof (AdministrationPlugin) };
+        private static Type[] _standardPlugins = new Type[] { typeof (PluginManagerPlugin), typeof(LoggerPlugin), typeof(CommandPlugin), typeof(StandardCommandsPlugin), typeof (AdministrationPlugin) };
 
         private static Type[] GetAllPlugins ()
         {
@@ -33,12 +33,14 @@ namespace Lomztein.Moduthulhu.Core.Plugin
 
         private static Type[] _orderedPlugins;
         public static Type[] GetPlugins() => _orderedPlugins;
+        public static Type GetPlugin(int id) => GetPlugins()[id];
+        public static int GetID(Type plugin) => GetPlugins().ToList().IndexOf(plugin); 
 
         public static bool IsStandard(Type pluginType) => _standardPlugins.Contains(pluginType);
 
-        public static Type GetPluginType(string name) => GetAllPlugins ().Where ((x) => Framework.Plugin.CompactizeName(x) == name).FirstOrDefault ();
+        public static Type GetPluginType(string name) => Framework.Plugin.Find(GetAllPlugins (), name);
 
-        public static string AssemblyPath => Bot.BotCore.DataDirectory + "/Plugins";
+        public static string AssemblyPath => BotCore.DataDirectory + "/Plugins";
 
         public static PluginDependancyTree DependancyTree { get; private set; }
 

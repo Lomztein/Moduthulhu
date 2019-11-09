@@ -23,7 +23,7 @@ namespace Lomztein.Moduthulhu.Core.IO.Database.Repositories
         }
 
         public T GetValue () {
-            if (_value.Equals (default(T)))
+            if (_value == null || _value.Equals (default(T)))
             {
                 Cache();
             }

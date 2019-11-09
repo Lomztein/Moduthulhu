@@ -1,7 +1,7 @@
 ﻿using Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild;
 using System;
 
-namespace Lomztein.Moduthulhu.Core.Plugin.Framework
+namespace Lomztein.Moduthulhu.Core.Plugins.Framework
 {
     public interface IPlugin {
 

@@ -4,7 +4,7 @@ using Lomztein.AdvDiscordCommands.Framework;
 using Lomztein.AdvDiscordCommands.Framework.Interfaces;
 using Lomztein.Moduthulhu.Core.Bot.Client;
 using Lomztein.Moduthulhu.Core.Bot.Messaging.Advanced;
-using Lomztein.Moduthulhu.Core.Plugin.Framework;
+using Lomztein.Moduthulhu.Core.Plugins.Framework;
 using System;
 using System.Collections.Generic;
 using System.IO;

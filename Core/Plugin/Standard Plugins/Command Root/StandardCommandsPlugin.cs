@@ -1,4 +1,4 @@
-﻿using Lomztein.Moduthulhu.Core.Plugin.Framework;
+﻿using Lomztein.Moduthulhu.Core.Plugins.Framework;
 using Lomztein.AdvDiscordCommands.ExampleCommands;
 using System;
 using System.Collections.Generic;
@@ -24,11 +24,11 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
         };
 
         public override void Initialize() {
-            SendMessage ("Command Root.AddCommands", commands);
+            SendMessage ("Lomztein-Command Root", "AddCommands", commands);
         }
 
         public override void Shutdown() {
-            SendMessage ("Command Root.RemoveCommands", commands);
+            SendMessage ("Lomztein-Command Root", "RemoveCommands", commands);
         }
     }
 }

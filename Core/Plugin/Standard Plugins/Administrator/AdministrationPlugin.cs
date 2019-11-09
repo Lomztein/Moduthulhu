@@ -1,4 +1,4 @@
-﻿using Lomztein.Moduthulhu.Core.Plugin.Framework;
+﻿using Lomztein.Moduthulhu.Core.Plugins.Framework;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -14,11 +14,11 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
 
         public override void Initialize() {
             CoreCommands = new CoreAdminCommands () { ParentPlugin = this };
-            SendMessage("Command Root.AddCommand", CoreCommands);
+            SendMessage("Lomztein-Command Root", "AddCommand", CoreCommands);
         }
 
         public override void Shutdown() {
-            SendMessage("Command Root.RemoveCommand", CoreCommands);
+            SendMessage("Lomztein-Command Root", "RemoveCommand", CoreCommands);
         }
     }
 }
