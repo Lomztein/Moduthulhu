@@ -1,11 +1,11 @@
 ﻿using Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild;
-using Lomztein.Moduthulhu.Core.Plugin;
-using Lomztein.Moduthulhu.Core.Plugin.Framework;
+using Lomztein.Moduthulhu.Core.Plugins;
+using Lomztein.Moduthulhu.Core.Plugins.Framework;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Lomztein.ModuthulhuCore.Core.Plugin.Standard
+namespace Lomztein.Moduthulhu.Plugins.Standard
 {
     [Critical]
     [Dependency ("Lomztein-Command Root")]
@@ -13,21 +13,23 @@ namespace Lomztein.ModuthulhuCore.Core.Plugin.Standard
     [Source ("https://github.com/Lomztein", "https://github.com/Lomztein/Moduthulhu")]
     public class PluginManagerPlugin : PluginBase
     {
-        private PluginManager Manager => GuildHandler.Plugins;
+        public PluginManager Manager => GuildHandler.Plugins;
+        private PluginManagerCommands _commandSet;
 
         public override void Initialize()
         {
-            throw new NotImplementedException();
+            _commandSet = new PluginManagerCommands() { ParentPlugin = this };
+            SendMessage("Lomztein-Command Root", "AddCommand", _commandSet);
         }
 
         public override void Shutdown()
         {
-            throw new NotImplementedException();
+            SendMessage("Lomztein-Command Root", "RemoveCommand", _commandSet);
         }
 
-        public void AddPlugin(string pluginName) => Manager.AddPlugin(pluginName);
+        public bool AddPlugin(string pluginName) => Manager.AddPlugin(pluginName);
 
-        public void RemovePlugin(string pluginName) => Manager.RemovePlugin(pluginName);
+        public bool RemovePlugin(string pluginName) => Manager.RemovePlugin(pluginName);
 
         public void ReloadPlugins() => Manager.ReloadPlugins();
 

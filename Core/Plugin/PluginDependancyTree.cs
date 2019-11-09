@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Linq;
-using Lomztein.Moduthulhu.Core.Plugin.Framework;
+using Lomztein.Moduthulhu.Core.Plugins.Framework;
 using Lomztein.Moduthulhu.Core.Extensions;
 
-namespace Lomztein.Moduthulhu.Core.Plugin
+namespace Lomztein.Moduthulhu.Core.Plugins
 {
     internal class PluginDependancyTree
     {
@@ -29,7 +29,7 @@ namespace Lomztein.Moduthulhu.Core.Plugin
         private void ConnectBranches (Branch[] branches) {
             foreach (Branch branch in branches) {
                 DependencyAttribute[] dependancyAttributes = branch.Plugin.GetCustomAttributes (typeof (DependencyAttribute), false).Cast<DependencyAttribute>().ToArray ();
-                string branchName = Framework.Plugin.CompactizeName(branch.Plugin);
+                string branchName = Framework.Plugin.GetVersionedFullName(branch.Plugin);
                 List<Branch> dependancyBranches = new List<Branch>();
 
                 foreach (DependencyAttribute dependancyAttribute in dependancyAttributes)
@@ -43,7 +43,7 @@ namespace Lomztein.Moduthulhu.Core.Plugin
                     string dependancyVersion = Framework.Plugin.GetVersion(dependancyBranch.Plugin);
                     dependancyBranches.Add(dependancyBranch);
 
-                    Log.Write(Log.Type.PLUGIN, $"Plugin {branchName} linked to dependancy {Framework.Plugin.CompactizeName (dependancyBranch.Plugin)}.");
+                    Log.Write(Log.Type.PLUGIN, $"Plugin {branchName} linked to dependancy {Framework.Plugin.GetVersionedFullName (dependancyBranch.Plugin)}.");
                     if (dependancyAttribute.DesiredVersion != dependancyVersion)
                     {
                         string targetVersion = dependancyAttribute.DesiredVersion;
@@ -70,7 +70,7 @@ namespace Lomztein.Moduthulhu.Core.Plugin
                 }
 
                 Type currentType = toOrder[currentIndex];
-                Branch currentBranch = GetBranch (Framework.Plugin.CompactizeName (currentType));
+                Branch currentBranch = GetBranch (Framework.Plugin.GetVersionedFullName (currentType));
                 
                 if (currentBranch.Dependencies.Length == 0 || currentBranch.Dependencies.All (x => x != null && allSoFar.Contains (x.Plugin))) {
                     allSoFar.Add (currentType);
@@ -90,7 +90,7 @@ namespace Lomztein.Moduthulhu.Core.Plugin
             
             foreach (Branch other in _branches)
             {
-                string oName = Framework.Plugin.CompactizeName(other.Plugin);
+                string oName = Framework.Plugin.GetVersionedFullName(other.Plugin);
                 if (oName.StartsWith(pluginName, StringComparison.Ordinal))
                 {
                     branch = other;
@@ -119,6 +119,14 @@ namespace Lomztein.Moduthulhu.Core.Plugin
         public Type[] GetDependencies (string pluginName) {
             return GetBranch (pluginName).Dependencies.Select (x => x.Plugin).ToArray ();
         }
+
+        public Type[] GetDependants (string pluginName)
+        {
+            Branch branch = GetBranch(pluginName);
+            return _branches.Where(x => x.Dependencies.Contains(branch)).Select (x => x.Plugin).ToArray();
+        }
+
+
 
         internal class Branch {
 

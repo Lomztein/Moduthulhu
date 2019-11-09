@@ -8,14 +8,13 @@ using Lomztein.Moduthulhu.Core.Bot.Messaging;
 using Lomztein.Moduthulhu.Core.Bot.Messaging.Advanced;
 using Lomztein.Moduthulhu.Core.Extensions;
 using Lomztein.Moduthulhu.Core.IO.Database.Repositories;
-using Lomztein.Moduthulhu.Core.Plugin.Framework;
+using Lomztein.Moduthulhu.Core.Plugins.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace Lomztein.Moduthulhu.Plugins.Standard {
-
 
     [Descriptor ("Lomztein", "Command Root", "Default container and manager of bot commands.")]
     [Source ("https://github.com/Lomztein", "https://github.com/Lomztein/Moduthulhu")]
@@ -66,7 +65,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard {
 
                 if (result.Exception != null)
                 {
-                    Log(result.Exception.Message);
+                    Log(result.Exception.Message + " - " + result.Exception.StackTrace);
                 }
 
                 if (result.Value is ISendable sendable)
@@ -79,10 +78,10 @@ namespace Lomztein.Moduthulhu.Plugins.Standard {
         public override void Shutdown() {
             GuildHandler.MessageReceived -= OnMessageRecieved;
 
-            UnregisterMessageAction("AddCommand");
-            UnregisterMessageAction("AddCommands");
-            UnregisterMessageAction("RemoveCommand");
-            UnregisterMessageAction("RemoveCommands");
+            UnregisterMessageDelegate("AddCommand");
+            UnregisterMessageDelegate("AddCommands");
+            UnregisterMessageDelegate("RemoveCommand");
+            UnregisterMessageDelegate("RemoveCommands");
         }
 
         public List<ICommand> GetCommands() {

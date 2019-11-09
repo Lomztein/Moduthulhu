@@ -17,12 +17,14 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
         public ulong GuildId { get; private set; }
 
         public PluginManager Plugins { get; private set; }
+        public PluginMessenger Messenger { get; private set; }
 
         public GuildHandler (BotShard shard, ulong guildId)
         {
             _shard = shard;
             GuildId = guildId;
             Plugins = new PluginManager(this);
+            Messenger = new PluginMessenger();
             Name = GetGuild().Name;
         }
 

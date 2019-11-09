@@ -1,6 +1,6 @@
 ﻿using Lomztein.Moduthulhu.Core.IO.Database.Repositories;
-using Lomztein.Moduthulhu.Core.Plugin;
-using Lomztein.Moduthulhu.Core.Plugin.Framework;
+using Lomztein.Moduthulhu.Core.Plugins;
+using Lomztein.Moduthulhu.Core.Plugins.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,15 +15,10 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
 
         private CachedValue<List<string>> _enabledPlugins;
 
-        // TODO: Consider seperating plugin management and plugin communication in to different classes.
-        private Dictionary<string, Func<object, object>> _messageFunctions = new Dictionary<string, Func<object, object>>();
-        private Dictionary<string, Action<object>> _messageActions = new Dictionary<string, Action<object>>();
-
         public PluginManager (GuildHandler parent)
         {
             _parentHandler = parent;
-            _enabledPlugins = new CachedValue<List<string>>(new IdentityKeyJsonRepository("plugindata"), _parentHandler.GuildId, "EnabledPlugins", () => PluginLoader.GetPlugins().Where (x => PluginLoader.IsStandard (x)).Select (y => Plugin.Framework.Plugin.CompactizeName (y)).ToList ());
-            _enabledPlugins.SetValue (PluginLoader.GetPlugins().Where(x => PluginLoader.IsStandard(x)).Select(y => Plugin.Framework.Plugin.CompactizeName(y)).ToList());
+            _enabledPlugins = new CachedValue<List<string>>(new IdentityKeyJsonRepository("plugindata"), _parentHandler.GuildId, "EnabledPlugins", () => PluginLoader.GetPlugins().Where (x => PluginLoader.IsStandard (x)).Select (y => Plugin.GetVersionedFullName (y)).ToList ());
         }
 
         public IPlugin[] GetActivePlugins() => _activePlugins.ToArray();
@@ -33,7 +28,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
             Log.Write(Log.Type.PLUGIN, "Shutting down plugins for handler " + _parentHandler.Name);
             foreach (IPlugin plugin in _activePlugins)
             {
-                Log.Write(Log.Type.PLUGIN, "Shutting down plugin " + Plugin.Framework.Plugin.CompactizeName(plugin.GetType()));
+                Log.Write(Log.Type.PLUGIN, "Shutting down plugin " + Plugin.GetVersionedFullName(plugin.GetType()));
                 plugin.Shutdown();
             }
             _activePlugins.Clear();
@@ -61,105 +56,79 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
 
             foreach (IPlugin plugin in _activePlugins)
             {
-                Log.Write(Log.Type.PLUGIN, "Pre-initializing plugin " + Plugin.Framework.Plugin.CompactizeName(plugin.GetType()));
+                Log.Write(Log.Type.PLUGIN, "Pre-initializing plugin " + Plugin.GetVersionedFullName(plugin.GetType()));
                 plugin.PreInitialize(_parentHandler);
             }
 
             foreach (IPlugin plugin in _activePlugins)
             {
-                Log.Write(Log.Type.PLUGIN, "Initializng plugin " + Plugin.Framework.Plugin.CompactizeName(plugin.GetType()));
+                Log.Write(Log.Type.PLUGIN, "Initializng plugin " + Plugin.GetVersionedFullName(plugin.GetType()));
                 plugin.Initialize ();
             }
 
             foreach (IPlugin plugin in _activePlugins)
             {
-                Log.Write(Log.Type.PLUGIN, "Post-initializing plugin " + Plugin.Framework.Plugin.CompactizeName(plugin.GetType()));
+                Log.Write(Log.Type.PLUGIN, "Post-initializing plugin " + Plugin.GetVersionedFullName(plugin.GetType()));
                 plugin.PostInitialize ();
             }
         }
 
-        public object SendMessage (string target, object value = null)
+        public bool AddPlugin(string pluginName)
         {
-            if (_messageFunctions.ContainsKey (target))
+            Type pluginType = Plugin.Find(PluginLoader.GetPlugins(), pluginName);
+            if (pluginType != null)
             {
-                return _messageFunctions[target](value);
+                string fullName = Plugin.GetVersionedFullName(pluginType);
+                if (_enabledPlugins.GetValue().Contains(fullName))
+                {
+                    throw new ArgumentException("Plugin " + fullName + " is already active.");
+                }
+
+                Type[] dependancies = PluginLoader.DependancyTree.GetDependencies(fullName);
+                Type[] missing = dependancies.Where(x => !_activePlugins.Any(y => y.GetType() == x)).ToArray();
+                if (missing.Length > 0)
+                {
+                    throw new ArgumentException($"Plugin {fullName} cannot be loaded as it is missing dependancies: {string.Join(",", missing.Select(x => Plugin.GetVersionedFullName(x)))}");
+                }
+
+                _enabledPlugins.GetValue().Add(fullName);
+                _enabledPlugins.Store();
+
+                ReloadPlugins(); // TODO: Consider looking into hotloading plugins instead of reloading all when a single is added or removed, in case it ever becomes an issue.
+                return true;
             }
-            if (_messageActions.ContainsKey(target))
-            {
-                _messageActions[target](value);
-                return null;
-            }
-            else
-            {
-                Log.Write(Log.Type.WARNING, $"Tried to call message function {target}, but it hasn't been registered.");
-                return null;
-            }
+            throw new ArgumentException("No plugin named '" + pluginName + "' is available to be added.");
         }
 
-        public T SendMessage<T>(string target, object value = null) => (T)SendMessage(target, value);
-
-        public void RegisterMessageFunction(string identifier, Func<object, object> function)
+        public bool RemovePlugin(string pluginName)
         {
-            Log.Write(Log.Type.PLUGIN, $"Registering message function {identifier}..");
-            if (FunctionOrActionExists(identifier))
+            if (IsPluginActive(pluginName))
             {
-                Log.Write(Log.Type.WARNING, $"Attempted to register message function {identifier}, but the given key is already registered.");
+                string fullName = Plugin.GetVersionedFullName(Plugin.Find(_activePlugins.Select(x => x.GetType()), pluginName));
+                if (Plugin.IsCritical(PluginLoader.GetPluginType(fullName)))
+                {
+                    throw new ArgumentException("Plugin " + fullName + " is marked critical and cannot be disabled.");
+                }
+
+                Type[] dependants = PluginLoader.DependancyTree.GetDependants(fullName);
+                Type[] active = dependants.Where(x => _activePlugins.Any(y => y.GetType() == x)).ToArray();
+                if (active.Length > 0)
+                {
+                    throw new ArgumentException($"Plugin {fullName} cannot be unloaded as it has active dependancies: {string.Join(",", active.Select(x => Plugin.GetVersionedFullName(x)))}");
+                }
+
+                _enabledPlugins.GetValue().Remove(fullName);
+                _enabledPlugins.Store();
+
+                ReloadPlugins();
+                return true;
             }
-            else
-            {
-                _messageFunctions.Add(identifier, function);
-            }
-        }
-
-        public void RegisterMessageAction(string identifier, Action<object> action)
-        {
-            Log.Write(Log.Type.PLUGIN, $"Registering message action {identifier}..");
-            if (FunctionOrActionExists(identifier))
-            {
-                Log.Write(Log.Type.WARNING, $"Attempted to register message action {identifier}, but the given key is already registered.");
-            }
-            else
-            {
-                _messageActions.Add(identifier, action);
-            }
-        }
-
-        public bool FunctionOrActionExists(string ident) => _messageFunctions.ContainsKey(ident) || _messageActions.ContainsKey(ident);
-
-        public void UnregisterMessageFunction (string identifier)
-        {
-            _messageFunctions.Remove(identifier);
-        }
-        public void UnregisterMessageAction(string identifier)
-        {
-            _messageActions.Remove(identifier);
-        }
-
-        public void AddPlugin (string pluginName)
-        {
-            if (_enabledPlugins.GetValue ().Contains(pluginName))
-            {
-                throw new ArgumentException("Plugin " + pluginName + " is already active.");
-            }
-
-            _enabledPlugins.GetValue().Add(pluginName);
-            _enabledPlugins.Store();
-        }
-
-        public void RemovePlugin (string pluginName)
-        {
-            if (Plugin.Framework.Plugin.IsCritical (PluginLoader.GetPluginType (pluginName)))
-            {
-                throw new ArgumentException("Plugin " + pluginName + " is marked critical and cannot be disabled.");
-            }
-
-            _enabledPlugins.GetValue().Remove(pluginName);
-            _enabledPlugins.Store();
+            throw new ArgumentException("No plugin named '" + pluginName + "' is currently active.");
         }
 
         public bool IsPluginActive (string pluginName) // TODO: Figure out a consistant and simple way to differentiate between plugins. Perhaps a cache of plugin IDs given when their type is loaded? Using strings is at best gonna be a pain in the ass, at worst cause serious issue down the line.
         {
-            return _activePlugins.Any(x => Plugin.Framework.Plugin.CompactizeName(x.GetType()).StartsWith(pluginName));
+            return Plugin.Find (_activePlugins.Select (x => x.GetType ()), pluginName) != null;
         }
     }
 }
