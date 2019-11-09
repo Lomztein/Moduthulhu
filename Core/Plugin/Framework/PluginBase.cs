@@ -8,7 +8,7 @@ using Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild;
 using Lomztein.Moduthulhu.Core.Extensions;
 using Lomztein.Moduthulhu.Core.IO.Database.Repositories;
 
-namespace Lomztein.Moduthulhu.Core.Plugin.Framework
+namespace Lomztein.Moduthulhu.Core.Plugins.Framework
 {
     public abstract class PluginBase : IPlugin {
 
@@ -22,7 +22,6 @@ namespace Lomztein.Moduthulhu.Core.Plugin.Framework
         public Uri ProjectURI => Plugin.GetProjectURI(GetType());
 
         public GuildHandler GuildHandler { get; private set; }
-
         public abstract void Initialize ();
 
         public virtual void PreInitialize (GuildHandler handler) => GuildHandler = handler;
@@ -32,16 +31,15 @@ namespace Lomztein.Moduthulhu.Core.Plugin.Framework
 
         protected void Log(string contents) => Plugin.Log (this, contents);
 
-        protected CachedValue<T> GetDataCache<T>(string key, Func<GuildHandler, T> defaultValue) => new CachedValue<T>(new IdentityKeyJsonRepository("plugindata"), GuildHandler.GuildId, key, () => defaultValue(GuildHandler));
-        protected CachedValue<T> GetConfigCache<T>(string key, Func<GuildHandler, T> defaultValue) => new CachedValue<T>(new IdentityKeyJsonRepository("pluginconfig"), GuildHandler.GuildId, key, () => defaultValue(GuildHandler));
+        protected CachedValue<T> GetDataCache<T>(string key, Func<GuildHandler, T> defaultValue) => new CachedValue<T>(new IdentityKeyJsonRepository("plugindata"), GuildHandler.GuildId, Plugin.GetFullName (GetType ()) + "." + key, () => defaultValue(GuildHandler));
+        protected CachedValue<T> GetConfigCache<T>(string key, Func<GuildHandler, T> defaultValue) => new CachedValue<T>(new IdentityKeyJsonRepository("pluginconfig"), GuildHandler.GuildId, Plugin.GetFullName(GetType()) + "." + key, () => defaultValue(GuildHandler));
 
-        protected void RegisterMessageFunction(string identifier, Func<object, object> function) => GuildHandler.Plugins.RegisterMessageFunction(Name + "." + identifier, function);
-        protected void RegisterMessageAction(string identifier, Action<object> action) => GuildHandler.Plugins.RegisterMessageAction(Name + "." + identifier, action);
+        protected void RegisterMessageFunction(string identifier, Func<object, object> function) => GuildHandler.Messenger.Register(Plugin.GetFullName (GetType ()), identifier, function);
+        protected void RegisterMessageAction(string identifier, Action<object> action) => GuildHandler.Messenger.Register(Plugin.GetFullName(GetType()), identifier, action);
 
-        protected void UnregisterMessageFunction(string identifier) => GuildHandler.Plugins.UnregisterMessageFunction(identifier);
-        protected void UnregisterMessageAction(string identifier) => GuildHandler.Plugins.UnregisterMessageAction(identifier);
+        protected void UnregisterMessageDelegate(string identifier) => GuildHandler.Messenger.Unregister(Plugin.GetFullName(GetType()), identifier);
 
-        protected void SendMessage(string identifier, object value = null) => GuildHandler.Plugins.SendMessage(identifier, value);
-        protected T SendMessage<T>(string identifier, object value = null) => GuildHandler.Plugins.SendMessage<T>(identifier, value);
+        protected void SendMessage(string target, string identifier, object value = null) => GuildHandler.Messenger.SendMessage(target, identifier, value);
+        protected T SendMessage<T>(string target, string identifier, object value = null) => GuildHandler.Messenger.SendMessage<T>(target, identifier, value);
     }
 }
