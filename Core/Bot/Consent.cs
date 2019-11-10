@@ -11,12 +11,12 @@ namespace Lomztein.Moduthulhu.Core.Bot
 
         public static void Init ()
         {
-            GetConnector().CreateTable("consent", "CREATE TABLE consent (guild text, user text, value bool, CONSTRAINT consentguilduser UNIQUE (guild, user)");
+            GetConnector().CreateTable("consent", "CREATE TABLE consent (guild text, userid text, value boolean, CONSTRAINT consentguilduser UNIQUE (guild, userid));");
         }
 
         public static void AssertConsent(ulong guild, ulong user)
         {
-            var queryRes = GetConnector().ReadQuery("SELECT value FROM consent WHERE guild = @guild AND user = @user", new Dictionary<string, object>() { { "@guild", guild }, { "@user", user } });
+            var queryRes = GetConnector().ReadQuery("SELECT value FROM consent WHERE guild = @guild AND userid = @userid", new Dictionary<string, object>() { { "@guild", guild.ToString() }, { "@userid", user.ToString() } });
             if (queryRes.Length == 0)
             {
                 throw new ConsentException("User has not yet decided on consent to storage of personal data.");
@@ -34,8 +34,8 @@ namespace Lomztein.Moduthulhu.Core.Bot
 
         public static void SetConsent (ulong guild, ulong user, bool value)
         {
-            string query = $"INSERT INTO consent VALUES (@guild @user, @value) ON CONFLICT ON CONSTRAINT consentguilduser DO UPDATE SET value = @value WHERE consent.guild = @identifier AND consent.user = @key";
-            GetConnector ().UpdateQuery(query, new Dictionary<string, object>() { { "@guild", guild }, { "@user", user }, { "@value", value } });
+            string query = $"INSERT INTO consent VALUES (@guild, @userid, @value) ON CONFLICT ON CONSTRAINT consentguilduser DO UPDATE SET value = @value WHERE consent.guild = @guild AND consent.userid = @userid";
+            GetConnector().UpdateQuery(query, new Dictionary<string, object>() { { "@guild", guild.ToString() }, { "@userid", user.ToString () }, { "@value", value } });
         }
 
         public static bool TryAssertConsent(ulong guild, ulong user)

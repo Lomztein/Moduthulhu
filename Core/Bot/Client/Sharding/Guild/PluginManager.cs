@@ -163,7 +163,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
             if (IsPluginActive(pluginName))
             {
                 string fullName = Plugin.GetFullName(Plugin.Find(_activePlugins.Select(x => x.GetType()), pluginName));
-                if (Plugin.IsCritical(PluginLoader.GetPluginType(fullName)))
+                if (Plugin.IsCritical(PluginLoader.GetPlugin(fullName)))
                 {
                     throw new ArgumentException("Plugin " + fullName + " is marked critical and cannot be disabled.");
                 }
