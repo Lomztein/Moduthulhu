@@ -12,13 +12,20 @@ namespace Lomztein.Moduthulhu.Core.Plugins.Framework
 {
     public abstract class PluginBase : IPlugin {
 
+        [Obsolete ("Use Plugin.GetName instead.")]
         public string Name => Plugin.GetName(GetType ());
+        [Obsolete ("Use Plugin.GetDescription instead.")]
         public string Description => Plugin.GetDescription(GetType());
+        [Obsolete ("Use Plugin.GetAuthor instead.")]
         public string Author => Plugin.GetAuthor(GetType());
+        [Obsolete ("Use Plugin.GetVersion instead.")]
         public string Version => Plugin.GetVersion(GetType());
 
+        [Obsolete ("Use Plugin.GetAuthorURI instead.")]
         public Uri AuthorURI => Plugin.GetAuthorURI(GetType());
+        [Obsolete ("Use Plugin.GetPatchURI instead.")]
         public Uri PatchURI => Plugin.GetPatchURI(GetType());
+        [Obsolete ("Use Plugin.GetProjectURI instead.")]
         public Uri ProjectURI => Plugin.GetProjectURI(GetType());
 
         public GuildHandler GuildHandler { get; private set; }
@@ -38,6 +45,10 @@ namespace Lomztein.Moduthulhu.Core.Plugins.Framework
         protected void RegisterMessageAction(string identifier, Action<object> action) => GuildHandler.Messenger.Register(Plugin.GetFullName(GetType()), identifier, action);
 
         protected void UnregisterMessageDelegate(string identifier) => GuildHandler.Messenger.Unregister(Plugin.GetFullName(GetType()), identifier);
+        protected void ClearMessageDelegates() => GuildHandler.Messenger.Clear(Plugin.GetFullName(GetType ()));
+
+        protected void AddConfigInfo(string name, string description, Delegate @delegate, params string[] paramNames) => GuildHandler.Config.Add(name, description, Plugin.GetFullName(GetType()), @delegate, paramNames);
+        protected void ClearConfigInfos() => GuildHandler.Config.Clear(Plugin.GetFullName(GetType()));
 
         protected void SendMessage(string target, string identifier, object value = null) => GuildHandler.Messenger.SendMessage(target, identifier, value);
         protected T SendMessage<T>(string target, string identifier, object value = null) => GuildHandler.Messenger.SendMessage<T>(target, identifier, value);

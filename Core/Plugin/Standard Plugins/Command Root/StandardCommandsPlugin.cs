@@ -14,7 +14,6 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
     public class StandardCommandsPlugin : PluginBase {
 
         private AdvDiscordCommands.Framework.Interfaces.ICommand [ ] commands = new AdvDiscordCommands.Framework.Interfaces.ICommand[ ] {
-                new HelpCommand (),
                 new DiscordCommandSet (),
                 new FlowCommandSet (),
                 new MathCommandSet (),

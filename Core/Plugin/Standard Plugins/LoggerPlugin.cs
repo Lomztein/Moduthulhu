@@ -9,7 +9,7 @@ using Lomztein.AdvDiscordCommands.Extensions;
 
 namespace Lomztein.Moduthulhu.Plugins.Standard
 {
-    [Descriptor ("Lomztein", "Logger", "Simple modules to log whatever is going on.", "1.0.0")]
+    [Descriptor ("Lomztein", "Logger", "Simple plugin that logs whatever is going on for debugging purposes. Planned to be queryable to get all logs relating to an individual user or server.", "1.0.0")]
     [Source ("https://github.com/Lomztein", "https://github.com/Lomztein/Moduthulhu")]
     public class LoggerPlugin : PluginBase {
 

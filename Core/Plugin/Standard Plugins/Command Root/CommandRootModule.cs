@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Discord.WebSocket;
+using Lomztein.AdvDiscordCommands.ExampleCommands;
 using Lomztein.AdvDiscordCommands.Extensions;
 using Lomztein.AdvDiscordCommands.Framework;
 using Lomztein.AdvDiscordCommands.Framework.Interfaces;
@@ -44,6 +45,13 @@ namespace Lomztein.Moduthulhu.Plugins.Standard {
                 x => _trigger.GetValue (),
                 x => _hiddenTrigger.GetValue ()
                 );
+
+            _commandRoot.AddCommands(new HelpCommand());
+
+            AddConfigInfo("Set Trigger", "Set trigger character.", new Action<char>(x => _trigger.SetValue(x)), "character");
+            AddConfigInfo("Reset Trigger", "Reset trigger.", new Action (() => _trigger.SetValue('!')));
+            AddConfigInfo("Set Hidden", "Set hidden character.", new Action<char>(x => _trigger.SetValue(x)), "character");
+            AddConfigInfo("Reset Hidden", "Reset hidden.", new Action (() => _trigger.SetValue('/')));
         }
 
         public override void Initialize() {
@@ -79,10 +87,8 @@ namespace Lomztein.Moduthulhu.Plugins.Standard {
         public override void Shutdown() {
             GuildHandler.MessageReceived -= OnMessageRecieved;
 
-            UnregisterMessageDelegate("AddCommand");
-            UnregisterMessageDelegate("AddCommands");
-            UnregisterMessageDelegate("RemoveCommand");
-            UnregisterMessageDelegate("RemoveCommands");
+            ClearMessageDelegates();
+            ClearConfigInfos();
         }
 
         public List<ICommand> GetCommands() {

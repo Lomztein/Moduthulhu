@@ -17,7 +17,7 @@ namespace Lomztein.Moduthulhu.Core.IO.Database.Repositories
 
         public void Init ()
         {
-            GetConnector().CreateTable(_tableName);
+            GetConnector().CreateTable(_tableName, $"CREATE TABLE {_tableName} (identifier text, key text, value text, CONSTRAINT {_tableName}identkey UNIQUE (identifier, key));");
         }
 
         private static IDatabaseConnector GetConnector() => new PostgreSQLDatabaseConnector();

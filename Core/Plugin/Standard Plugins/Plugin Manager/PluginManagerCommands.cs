@@ -1,4 +1,4 @@
-﻿using Discord;
+using Discord;
 using Lomztein.AdvDiscordCommands.Framework;
 using Lomztein.AdvDiscordCommands.Framework.Interfaces;
 using Lomztein.Moduthulhu.Core.Plugins;
@@ -43,7 +43,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
             public Task<Result> Execute(CommandMetadata metadata, string pluginName)
             {
                 ParentPlugin.AddPlugin(pluginName);
-                return TaskResult(null, $"Added plugin {Plugin.GetFullName(PluginLoader.GetPluginType(pluginName))}.");
+                return TaskResult(null, $"Added plugin {Plugin.GetFullName(PluginLoader.GetPlugin(pluginName))}.");
             }
         }
 
@@ -60,7 +60,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
             public Task<Result> Execute(CommandMetadata metadata, string pluginName)
             {
                 ParentPlugin.RemovePlugin(pluginName);
-                return TaskResult(null, $"Removed plugin {Plugin.GetFullName(PluginLoader.GetPluginType(pluginName))}.");
+                return TaskResult(null, $"Removed plugin {Plugin.GetFullName(PluginLoader.GetPlugin(pluginName))}.");
             }
         }
 

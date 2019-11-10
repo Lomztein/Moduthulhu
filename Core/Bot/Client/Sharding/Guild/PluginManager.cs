@@ -1,4 +1,4 @@
-﻿using Lomztein.Moduthulhu.Core.IO.Database.Repositories;
+using Lomztein.Moduthulhu.Core.IO.Database.Repositories;
 using Lomztein.Moduthulhu.Core.Plugins;
 using Lomztein.Moduthulhu.Core.Plugins.Framework;
 using Lomztein.Moduthulhu.Plugins.Standard;
@@ -96,7 +96,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
 
             foreach (string name in toLoad)
             {
-                Type pluginType = PluginLoader.GetPluginType(name);
+                Type pluginType = PluginLoader.GetPlugin(name);
                 if (pluginType == null)
                 {
                     Log.Write(Log.Type.WARNING, $"Attempted to instantiate unloaded/unknown plugin type {name}");
@@ -116,7 +116,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
 
             foreach (IPlugin plugin in _activePlugins)
             {
-                Log.Write(Log.Type.PLUGIN, "Initializng plugin " + Plugin.GetVersionedFullName(plugin.GetType()));
+                Log.Write(Log.Type.PLUGIN, "Initializing plugin " + Plugin.GetVersionedFullName(plugin.GetType()));
                 plugin.Initialize ();
             }
 

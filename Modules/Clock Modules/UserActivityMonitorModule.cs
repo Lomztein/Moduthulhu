@@ -1,19 +1,10 @@
-﻿using Lomztein.Moduthulhu.Core.Plugin.Framework;
-using Discord.WebSocket;
-using Discord;
+﻿using Discord.WebSocket;
 using System;
-using Lomztein.Moduthulhu.Core.Configuration;
-using Lomztein.Moduthulhu.Core.Extensions;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Lomztein.Moduthulhu.Core.IO;
 using Lomztein.AdvDiscordCommands.Extensions;
-using Lomztein.Moduthulhu.Core.Bot;
-using Discord.Rest;
-using Lomztein.Moduthulhu.Cross;
-using Lomztein.Moduthulhu.Core.Configuration.Management.Converters;
-using Lomztein.Moduthulhu.Core.Configuration.Management;
 
 namespace Lomztein.Moduthulhu.Modules.Clock.ActivityMonitor
 {

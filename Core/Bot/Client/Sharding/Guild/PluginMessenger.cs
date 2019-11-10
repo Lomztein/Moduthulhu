@@ -44,6 +44,12 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
             }else _messageRegister.Remove(info);
         }
 
+        public void Clear (string target)
+        {
+            Log.Write(Log.Type.PLUGIN, $"Clearing all registered message actions/functions for target = '{target}'.");
+            _messageRegister.RemoveAll(x => x.Matches(target));
+        }
+
         private class MessageInfo
         {
             private string _target;
