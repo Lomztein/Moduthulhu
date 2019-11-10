@@ -11,6 +11,6 @@ namespace Lomztein.Moduthulhu.Core.IO.Database
 
         void UpdateQuery(string queryString, Dictionary<string, object> parameters);
 
-        void CreateTable(string tableName);
+        void CreateTable(string tableName, string createQuery);
     }
 }

@@ -36,6 +36,8 @@ namespace Lomztein.Moduthulhu.Core.Bot {
             _client.ExceptionCaught += OnExceptionCaught;
             _client.Initialize();
 
+            Consent.Init();
+
             // Keep the core alive.
             await Task.Delay (-1, _shutdownToken.Token);
             Log.Write (Log.Type.BOT, "Shutting down..");
