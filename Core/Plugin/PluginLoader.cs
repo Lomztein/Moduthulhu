@@ -12,7 +12,15 @@ namespace Lomztein.Moduthulhu.Core.Plugins
     internal static class PluginLoader
     {
         private static Type[] _loadedPlugins;
-        private static Type[] _standardPlugins = new Type[] { typeof (PluginManagerPlugin), typeof(LoggerPlugin), typeof(CommandPlugin), typeof(StandardCommandsPlugin), typeof (AdministrationPlugin) };
+        private static Type[] _standardPlugins = new Type[] { 
+            typeof (PluginManagerPlugin),
+            typeof (LoggerPlugin),
+            typeof (CommandPlugin),
+            typeof (StandardCommandsPlugin),
+            typeof (AdministrationPlugin),
+            typeof (ConfigurationPlugin),
+            typeof (ConsentPlugin)
+        };
 
         private static Type[] GetAllPlugins ()
         {
@@ -38,7 +46,7 @@ namespace Lomztein.Moduthulhu.Core.Plugins
 
         public static bool IsStandard(Type pluginType) => _standardPlugins.Contains(pluginType);
 
-        public static Type GetPluginType(string name) => Framework.Plugin.Find(GetAllPlugins (), name);
+        public static Type GetPlugin(string name) => Plugin.Find(GetAllPlugins (), name);
 
         public static string AssemblyPath => BotCore.DataDirectory + "/Plugins";
 

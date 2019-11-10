@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Discord.WebSocket;
+using Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild.Config;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -18,6 +19,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
 
         public PluginManager Plugins { get; private set; }
         public PluginMessenger Messenger { get; private set; }
+        public PluginConfig Config { get; private set; }
 
         public GuildHandler (BotShard shard, ulong guildId)
         {
@@ -25,6 +27,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
             GuildId = guildId;
             Plugins = new PluginManager(this);
             Messenger = new PluginMessenger();
+            Config = new PluginConfig();
             Name = GetGuild().Name;
         }
 

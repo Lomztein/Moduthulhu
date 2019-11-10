@@ -1,8 +1,5 @@
 ﻿using Lomztein.AdvDiscordCommands.Framework;
 using Lomztein.Moduthulhu.Core.Plugins.Framework;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Lomztein.Moduthulhu.Plugins.Standard
 
@@ -13,7 +10,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
 
     }
 
-    public class PluginCommand<T> : AdvDiscordCommands.Framework.Command, IPluginCommand<T> where T : IPlugin {
+    public class PluginCommand<T> : Command, IPluginCommand<T> where T : IPlugin {
 
         public T ParentPlugin { get; set; }
 
@@ -24,8 +21,11 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
         public T ParentPlugin { get; set; }
 
         public override void Initialize() {
-            foreach (AdvDiscordCommands.Framework.Command cmd in commandsInSet) {
-                (cmd as PluginCommand<T>).ParentPlugin = ParentPlugin;
+            foreach (Command cmd in commandsInSet) {
+                if (cmd is PluginCommand<T> child)
+                {
+                    child.ParentPlugin = ParentPlugin;
+                }
             }
             base.Initialize ();
         }
