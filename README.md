@@ -17,7 +17,7 @@ While the core framework is fully functional and unlikely to see breaking change
 ### Core framework
 
  * Runtime loading of plugin functionality, with the ability to toggle them on and off on a per-server basis. 
- * A simple plugin interface that is easy to develop with, and a base class for easier writing of new modules.
+ * A simple plugin interface that is easy to develop with, and a base class for easier writing of new plugins.
  * Inter-plugin communication through a message system, which allows any plugin to call a registered action or function from another plugin.
  * Easy-to-use build-in configuration system that allows for the registration of configuration options, which may then be exposed through any means imaginable.
  * On-the-fly error handling that catches anything that goes wrong in a plugin and prints the full stacktrace to a file, while the bot keeps living.
@@ -50,7 +50,7 @@ That should be the basics. Now to create an actual plugin.
 
 As mentioned previously, the most basic element you should be aware of is the "IPlugin" interface, as this is the interface between plugin and bot framework. However, it isn't really neccesary to worry about it, as it is much easier to work with the "PluginBase" abstract class, the default implementation of IPlugin. Inheriting from PluginBase will provide you with an easy foundation to work with, as well as a bunch of build in utility methods.  Additionally, a Descriptor attribute is required to be added to the class, as it is used to define the plugins author, name, as well as optionally a description and a version. An optional Source attribute may also be added, which contains links to an authors website, a source repository, and a link to where the plugins .dll file may be downloaded for patching.
 
-### Here is an empty class that inherits from ModuleBase:
+### Here is an empty class that inherits from PluginBase:
 
 ```cs
 [Descriptor ("Alan Smithee", "Example Plugin")]
@@ -80,7 +80,7 @@ Familiarity with delegates and lambda expressions in C# is recommended, but not 
 
 As may be noticed here, calling a registered action/function requires specifiying the target plugin as well. Additionally, an alternative `RegisterMessageFunction` method may be used instead, which, unlike the previously mentioned, returns a value when the registered function is called.
  
- * PluginManager: Handles the plugins enabled on the server, and contains methods for adding and removing modules from the list of active modules. There is little reason to worry about this, unless you wish to create your own plugin management plugin to replace the standard one.
+ * PluginManager: Handles the plugins enabled on the server, and contains methods for adding and removing plugins from the list of active plugins. There is little reason to worry about this, unless you wish to create your own plugin management plugin to replace the standard one.
  
  * PluginConfig: Handles plugin configuration by maintaining and exposing a list of config options, which are registered by individual plugins. Any outside functionality may access this list of config options and implement ways for users to configure plugins through it. By default, this is done by the standard Configuration plugin, however I wish to provide a web-based alternative later down the line.
  
@@ -105,13 +105,13 @@ Initialize and Shutdown must be implemented in your plugin class.
 
 You're going to want to build your plugins into .dll files for the core to load up and. The simple way to do this is just to build the project as with any other, and moving the primary output file into the build cores Plugins folder. This should be fairly straightforward for anyone who've used Visual Studio in the past, albiet a bit of a trivial hassle after a few times.
 
-The slightly more advanced but easier once set up method is by using post-build commands. Right-click on your project in the solution explorer, click to "Properties", and go to the Build Events tab. To automatically copy the build module .dll, add this line to post-build event: `xcopy "$(TargetPath)" "$(SolutionDir)Core\bin\Debug\netcoreapp2.1\Plugins\" /y`
+The slightly more advanced but easier once set up method is by using post-build commands. Right-click on your project in the solution explorer, click to "Properties", and go to the Build Events tab. To automatically copy the build plugin .dll, add this line to post-build event: `xcopy "$(TargetPath)" "$(SolutionDir)Core\bin\Debug\netcoreapp2.1\Plugins\" /y`
 
-This will automatically copy the plugin into the given folder, which in this case is the default folder that VS builds to when you run the core project in the default Debug configuration. You can change the output path to whatever you want, but this should make it easier to test since you don't have to manually drag files around. Additionally, you can add more lines if you need it copied to different places or you perhaps need some additional files from the build, such as required assemblies or prerequisite modules.
+This will automatically copy the plugin into the given folder, which in this case is the default folder that VS builds to when you run the core project in the default Debug configuration. You can change the output path to whatever you want, but this should make it easier to test since you don't have to manually drag files around. Additionally, you can add more lines if you need it copied to different places or you perhaps need some additional files from the build, such as required assemblies or prerequisite plugins.
 
 You can also add another xcopy line that copies the symbol files from compilation, which will make it much easier to debug your plugins. They must be placed in the bots root folder, so a command line for this would look something like
 `xcopy "$(TargetDir)$(TargetFileName).pdb" "$(SolutionDir)Core\bin\Debug\netcoreapp2.1\" /y`
 
 ### Loading your plugins
 
-When the bot framework launches, it loads all .dll files within the ./Data/Modules folder and caches all IPlugin based types found within. These are then stored as plugins available for servers to enable.
+When the bot framework launches, it loads all .dll files within the ./Data/Plugins folder and caches all IPlugin based types found within. These are then stored as plugins available for servers to enable.
