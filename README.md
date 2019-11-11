@@ -4,7 +4,7 @@ Introducing Moduthulhu 2.0! The all new slightly more thought out, slightly less
 
 The 'Moduthulhu - Modular Discord Bot' is a Discord bot core framework build on the [Discord.NET API Wrapper by RougeException](https://github.com/RogueException/Discord.Net). This project intends to create a foundation framework on which more front-end bot functionality can be added through the runtime loading of functionality-containing Plugins. While there exists a few standard plugins which are enabled by default, they provide no real functionality. These standard plugins will be further outlined later.
 
-This bot is written in C# and targets the .NET Core 2.1 LTS framework, and is fully dockerizable and may be pulled from [Docker Hub](https://hub.docker.com/repository/docker/lomztein/moduthulhu) with the command `docker pull lomztein/moduthulhu:latest`, however do notice that it cannot just run out of the box, as it additionally needs a PostgreSQL database to store information on, as well as a mounted volume to read client configuration data as well as store error logs on. Basic familiarity with Docker is recommended, as that's about what I had when I dockerized it. C:
+This bot is written in C# and targets the .NET Core 2.1 LTS framework, and is fully dockerizable and may be pulled from [Docker Hub](https://hub.docker.com/repository/docker/lomztein/moduthulhu), however do notice that it cannot just run out of the box, as it additionally needs a PostgreSQL database to store information on, as well as a mounted volume to read client configuration data as well as store error logs on. Basic familiarity with Docker is recommended, as that's about what I had when I dockerized it. C:
 
 I personally run the bot on a Ubuntu 16.04 server using Docker, and it works perfectly well!
 
@@ -22,7 +22,7 @@ While the core framework is fully functional and unlikely to see breaking change
  * Easy-to-use build-in configuration system that allows for the registration of configuration options, which may then be exposed through any means imaginable.
  * On-the-fly error handling that catches anything that goes wrong in a plugin and prints the full stacktrace to a file, while the bot keeps living.
  * PostgreSQL database support used for both data and config storage, as well as whatever you may need.
- * Consent Assertion that keeps track of whether or not users all the storage of personal data in the bots database.
+ * Consent Assertion that keeps track of whether or not users consent to the storage of personal data in the bots database.
     
 That, and more is included in the core framework, with more features coming!
 
@@ -44,7 +44,7 @@ If you desire to contribute to the bots available functionality by creating your
 
 * An IDE, such as Microsoft Visual Studio or Visual Studio Code. Anything should do as long as it can compile .NET Core.
 * The .NET Core 2.1 LTS framework SDK, which is required for any .NET Core based applications to be compiled.
-* Either a copy of the source code from here, or the assemblies downloaded through NuGet for reference.
+* Either a copy of the source code from here, or the [assemblies downloaded through NuGet](https://www.nuget.org/packages/Lomztein.Moduthulhu.Core.Assemblies) for reference.
 
 That should be the basics. Now to create an actual plugin.
 
@@ -94,7 +94,7 @@ Do note that the methods examplified here are shortcut methods from PluginBase.
 
 There are in total four methods defined by IPlugin, all of which are called by PluginManager.
 
-* `PreInitialize ()` - Executed before anything else is done. It is recommended that messages and config options are registered here, as well as any setup that may be neccesary for other plugins to this one.
+* `PreInitialize (GuildHandler handler)` - Executed before anything else is done. It is recommended that messages and config options are registered here, as well as any setup that may be neccesary for other plugins to this one. Additionally it takes in the plugins GuildHandler to be assigned.
 * `Initialize ()` - The "Default" initialize function, as well as the only one neccesary to worry about if you don't need to interact with other plugins at all.
 * `PostInitialize ()` - Executed lastly. It is recommended to use this to process data given by other plugins.
 * `Shutdown ()` - Executed when the plugin must shutdown, perhaps to be disabled or reloaded. Use this to revert any changes done to other plugins or the core.
@@ -105,11 +105,11 @@ Initialize and Shutdown must be implemented in your plugin class.
 
 You're going to want to build your plugins into .dll files for the core to load up and. The simple way to do this is just to build the project as with any other, and moving the primary output file into the build cores Plugins folder. This should be fairly straightforward for anyone who've used Visual Studio in the past, albiet a bit of a trivial hassle after a few times.
 
-The slightly more advanced but easier once set up method is by using post-build commands. Right-click on your project in the solution explorer, click to "Properties", and go to the Build Events tab. To automatically copy the build module .dll, add this line to post-build event: `xcopy "$(TargetPath)" "$(SolutionDir)Core\bin\Debug\netcoreapp2.1\Podules\" /y`
+The slightly more advanced but easier once set up method is by using post-build commands. Right-click on your project in the solution explorer, click to "Properties", and go to the Build Events tab. To automatically copy the build module .dll, add this line to post-build event: `xcopy "$(TargetPath)" "$(SolutionDir)Core\bin\Debug\netcoreapp2.1\Plugins\" /y`
 
 This will automatically copy the plugin into the given folder, which in this case is the default folder that VS builds to when you run the core project in the default Debug configuration. You can change the output path to whatever you want, but this should make it easier to test since you don't have to manually drag files around. Additionally, you can add more lines if you need it copied to different places or you perhaps need some additional files from the build, such as required assemblies or prerequisite modules.
 
-You can also add another xcopy line that copies the symbol files from compilation, which will make it much easier to debug your modules. They must be placed in the bots root folder, so a command line for this would look something like
+You can also add another xcopy line that copies the symbol files from compilation, which will make it much easier to debug your plugins. They must be placed in the bots root folder, so a command line for this would look something like
 `xcopy "$(TargetDir)$(TargetFileName).pdb" "$(SolutionDir)Core\bin\Debug\netcoreapp2.1\" /y`
 
 ### Loading your plugins
