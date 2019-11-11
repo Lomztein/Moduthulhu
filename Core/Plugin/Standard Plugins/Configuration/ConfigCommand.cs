@@ -15,6 +15,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
             Name = "config";
             Description = "Configure bot.";
             Category = AdditionalCategories.Management;
+            RequiredPermissions.Add(Discord.GuildPermission.ManageGuild);
         }
     }
 
@@ -30,6 +31,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
             Name = Regex.Replace(first.Name.ToLowerInvariant(), "\\s", "");
             Description = first.Desc;
             Category = new Category (categoryName, categoryDesc);
+            RequiredPermissions.Add(Discord.GuildPermission.ManageGuild);
         }
 
         public override CommandOverload[] GetOverloads()

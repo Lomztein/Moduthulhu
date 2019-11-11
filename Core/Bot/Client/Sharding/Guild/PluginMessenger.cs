@@ -71,8 +71,8 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
                 _function = (x) => { action(x); return null; };
             }
 
-            public bool Matches(string name) => _name == name;
-            public bool Matches (string target, string name) => Matches(name) && _target == target;
+            public bool Matches(string target) => _target == target;
+            public bool Matches (string target, string name) => Matches(target) && _name == name;
 
             public object Execute(object value) => _function(value);
         }

@@ -37,6 +37,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
                 Name = "enable";
                 Description = "Add a plugin.";
                 Category = AdditionalCategories.Management;
+                RequiredPermissions.Add(Discord.GuildPermission.ManageGuild);
             }
 
             [Overload(typeof(void), "Add a new plugin from the list of available plugins.")]
@@ -54,6 +55,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
                 Name = "disable";
                 Description = "Remove a plugin.";
                 Category = AdditionalCategories.Management;
+                RequiredPermissions.Add(Discord.GuildPermission.ManageGuild);
             }
 
             [Overload(typeof(void), "Remove a plugin from currently active plugins.")]
