@@ -175,7 +175,8 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
                     throw new ArgumentException($"Plugin {fullName} cannot be unloaded as it has active dependancies: {string.Join(",", active.Select(x => Plugin.GetFullName(x)))}");
                 }
 
-                _enabledPlugins.GetValue().Remove(fullName);
+                string storedName = _enabledPlugins.GetValue().Find(x => x.StartsWith(fullName, StringComparison.Ordinal));
+                _enabledPlugins.GetValue().Remove(storedName);
                 _enabledPlugins.Store();
                 return true;
             }
