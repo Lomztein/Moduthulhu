@@ -43,7 +43,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
                 overloads[i] = new CommandOverload(
                     typeof(void),
                     source.GetParameters().Select(x => new CommandOverload.Parameter(x.Name, x.Type, Array.Empty<Attribute>())).ToArray(),
-                    source.Name,
+                    source.Desc,
                     new CommandOverload.ExampleInfo (null, null, null),
                     x =>
                     {
@@ -51,7 +51,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
                         args.RemoveAt(0); // Remove command metadata.
 
                         source.Action.DynamicInvoke (args.ToArray ());
-                        return TaskResult(null, $"Succesfully altered configuration.");
+                        return TaskResult(null, source.Message ());
                     });
             }
             return overloads;

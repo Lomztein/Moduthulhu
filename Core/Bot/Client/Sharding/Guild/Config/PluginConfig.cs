@@ -13,10 +13,10 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild.Config
         public ConfigFunctionInfo[] GetConfigInfo(string identifier) => _configInfos.Where (x => x.Matches (identifier)).ToArray();
         public ConfigFunctionInfo[] GetConfigInfo() => _configInfos.ToArray();
 
-        public void Add (string name, string description, string identifier, Delegate action, params string[] paramNames)
+        public void Add (string name, string description, string identifier, Delegate action, Func<string> message, params string[] paramNames)
         {
             Log.Write(Log.Type.PLUGIN, "Adding new configuration info for " + identifier + ".");
-            _configInfos.Add(new ConfigFunctionInfo(name, description, identifier, action, paramNames));
+            _configInfos.Add(new ConfigFunctionInfo(name, description, identifier, action, message, paramNames));
         }
 
         /// <summary>
@@ -26,10 +26,10 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild.Config
         /// <param name="identifier"></param>
         /// <param name="delegate"></param>
         /// <param name="parameters"></param>
-        public void Add(string name, string description, string identifier, Delegate @delegate, params ConfigFunctionParam[] parameters)
+        public void Add(string name, string description, string identifier, Delegate @delegate, Func<string> message, params ConfigFunctionParam[] parameters)
         {
             Log.Write(Log.Type.PLUGIN, "Adding new configuration info for " + identifier + ".");
-            _configInfos.Add(new ConfigFunctionInfo(name, description, identifier, @delegate, parameters));
+            _configInfos.Add(new ConfigFunctionInfo(name, description, identifier, @delegate, message, parameters));
         }
 
         public void Remove (string name, string identifier)
