@@ -92,7 +92,12 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
         public void LoadPlugins ()
         {
             Log.Write(Log.Type.PLUGIN, "Reloading plugins for guild " + _parentHandler.GetGuild().Name);
-            string[] toLoad = _enabledPlugins.GetValue().ToArray ();
+
+            Filter<string> filter = new Filter<string>(x => _enabledPlugins.GetValue().Any (y => NameMatches (x, y)));
+            string[] toLoad = PluginLoader.GetPlugins ().Select (x => Plugin.GetFullName (x)).ToArray ();
+            toLoad = filter.FilterModules(toLoad).ToArray ();
+
+            Log.Write(Log.Type.PLUGIN, "Loading plugins: " + string.Join(',', toLoad));
 
             foreach (string name in toLoad)
             {
@@ -125,6 +130,11 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
                 Log.Write(Log.Type.PLUGIN, "Post-initializing plugin " + Plugin.GetVersionedFullName(plugin.GetType()));
                 plugin.PostInitialize ();
             }
+        }
+
+        private static bool NameMatches (string shortName, string longName)
+        {
+            return longName.StartsWith(shortName, StringComparison.Ordinal);
         }
 
         public void ReloadPlugins ()
