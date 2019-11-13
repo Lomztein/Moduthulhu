@@ -4,7 +4,7 @@ Introducing Moduthulhu 2.0! The all new slightly more thought out, slightly less
 
 The 'Moduthulhu - Modular Discord Bot' is a Discord bot core framework build on the [Discord.NET API Wrapper by RougeException](https://github.com/RogueException/Discord.Net). This project intends to create a foundation framework on which more front-end bot functionality can be added through the runtime loading of functionality-containing Plugins. While there exists a few standard plugins which are enabled by default, they provide no real functionality. These standard plugins will be further outlined later.
 
-This bot is written in C# and targets the .NET Core 2.1 LTS framework, and is fully dockerizable and may be pulled from [Docker Hub](https://hub.docker.com/repository/docker/lomztein/moduthulhu), however do notice that it cannot just run out of the box, as it additionally needs a PostgreSQL database to store information on, as well as a mounted volume to read client configuration data as well as store error logs on. Basic familiarity with Docker is recommended, as that's about what I had when I dockerized it. C:
+This bot is written in C#, targets the .NET Core 2.1 LTS framework, and is fully dockerizable and may be pulled from [Docker Hub](https://hub.docker.com/repository/docker/lomztein/moduthulhu), however do notice that it cannot just run out of the box, as it additionally needs a PostgreSQL database to store information on, as well as a mounted volume to read client configuration data as well as store error logs on. Basic familiarity with Docker is recommended, as that's about what I had when I dockerized it. C:
 
 I personally run the bot on a Ubuntu 16.04 server using Docker, and it works perfectly well!
 
@@ -16,7 +16,7 @@ Currently I run the container with following command: `sudo docker run --env 'Po
 
 Any vulnurable information has been omitted, of course. DB is short for database, and you must fill out those slots with the connection information for your own database.
 
-I intend to replace this with a Docker-compose file later on, however this works for the time being. Additionally, I run [Watchtower](https://github.com/containrrr/watchtower) to automatically the bot when a new build is build though Docker Hub Automated Builds. Very convenient and easy to set up Continuous Deployment solution that I can heartedly recommend you try. If you believe you know a better alternative solution, feel free to let me know! :D
+I intend to replace this with a Docker-compose file later on, however this works for the time being. Additionally, I run [Watchtower](https://github.com/containrrr/watchtower) to automatically the bot when a new build is build though Docker Hub Automated Builds. It is a very convenient and easy to set up Continuous Deployment solution that I can heartedly recommend you try. If you believe you know a better alternative solution, feel free to let me know! :D
 
 ## Disclaimer: Currently in development:
 
