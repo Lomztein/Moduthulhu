@@ -30,8 +30,8 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client
 
         private readonly Clock _statusClock = new Clock(1, "StatusClock");
         private UserList _botAdministrators;
-        private int _consecutiveOfflineMinutes;
-        private int _automaticOfflineMinutesTreshold;
+        private int _consecutiveOfflineMinutes = 0;
+        private int _automaticOfflineMinutesTreshold = 10;
 
         public event Func<Exception, Task> ExceptionCaught;
 
@@ -84,15 +84,21 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client
         {
             if (_shards.Any (x => x.IsConnected == false)) {
                 _consecutiveOfflineMinutes++;
+                Log.Write(Log.Type.WARNING, $"Disconnected shard detected, commencing auto-shutdown in {_consecutiveOfflineMinutes}/{_automaticOfflineMinutesTreshold} minutes..");
             }
             else
             {
+                if (_consecutiveOfflineMinutes > 0)
+                {
+                    Log.Write(Log.Type.CONFIRM, $"All connections reestablished, auto-shutdown cancelled.");
+                }
+
                 _consecutiveOfflineMinutes = 0;
             }
 
-            if (_consecutiveOfflineMinutes > _automaticOfflineMinutesTreshold)
+            if (_consecutiveOfflineMinutes >= _automaticOfflineMinutesTreshold)
             {
-                Log.Write(Log.Type.CRITICAL, "At least one shard has been offline for the past 10 minutes, shutting down automatically..");
+                Log.Write(Log.Type.CRITICAL, $"Commencing automatic shutdown due to disconnected shard. :(");
                 Shutdown();
             }
             return Task.CompletedTask;
