@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Lomztein.Moduthulhu.Core.IO.Encryption
+namespace Lomztein.Moduthulhu.Core.IO
 {
     public class ZeroEncryptor : IEncryptor {
 

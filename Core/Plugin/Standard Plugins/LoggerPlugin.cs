@@ -81,6 +81,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
                     Core.Log.Write (Core.Log.Type.USER, $"{user.GetShownName ()} had supressed toggled: {after.IsSuppressed}.");
 
             }
+
             return Task.CompletedTask;
         }
 

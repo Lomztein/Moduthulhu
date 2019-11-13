@@ -10,12 +10,13 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild.Config
         private ConfigFunctionParam[] _parameters;
         public ConfigFunctionParam[] GetParameters () => _parameters;
         public Delegate Action { get; private set; }
+        public Func<string> Message { get; private set; }
 
         public string Name { get; private set; }
         public string Desc { get; private set; }
         public string Identifier { get; private set; }
 
-        public ConfigFunctionInfo(string name, string description, string identifier, Delegate action, params string[] paramNames)
+        public ConfigFunctionInfo(string name, string description, string identifier, Delegate action, Func<string> message, params string[] paramNames)
         {
             Action = action;
 
@@ -35,14 +36,16 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild.Config
             Name = name;
             Desc = description;
             Identifier = identifier;
+            Message = message;
         }
 
-        public ConfigFunctionInfo(string name, string description, string identifier, Delegate @delegate, params ConfigFunctionParam[] parameters)
+        public ConfigFunctionInfo(string name, string description, string identifier, Delegate @delegate, Func<string> message, params ConfigFunctionParam[] parameters)
         {
             Action = @delegate;
             Name = name;
             Desc = description;
             Identifier = identifier;
+            Message = message;
             _parameters = parameters;
         }
 

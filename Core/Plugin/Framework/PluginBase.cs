@@ -47,7 +47,9 @@ namespace Lomztein.Moduthulhu.Core.Plugins.Framework
         protected void UnregisterMessageDelegate(string identifier) => GuildHandler.Messenger.Unregister(Plugin.GetFullName(GetType()), identifier);
         protected void ClearMessageDelegates() => GuildHandler.Messenger.Clear(Plugin.GetFullName(GetType ()));
 
-        protected void AddConfigInfo(string name, string description, Delegate @delegate, params string[] paramNames) => GuildHandler.Config.Add(name, description, Plugin.GetFullName(GetType()), @delegate, paramNames);
+        protected void AddConfigInfo(string name, string description, Delegate @delegate, params string[] paramNames) => GuildHandler.Config.Add(name, description, Plugin.GetFullName(GetType()), @delegate, () => "Succesfully altered configuration.", paramNames);
+        protected void AddConfigInfo(string name, string description, Delegate @delegate, Func<string> message, params string[] paramNames) => GuildHandler.Config.Add(name, description, Plugin.GetFullName(GetType()), @delegate, message, paramNames);
+        protected void AddConfigInfo(string name, string description, Func<string> message) => GuildHandler.Config.Add(name, description, Plugin.GetFullName(GetType()), new Action(() => { }), message, Array.Empty<string> ());
         protected void ClearConfigInfos() => GuildHandler.Config.Clear(Plugin.GetFullName(GetType()));
 
         protected void SendMessage(string target, string identifier, object value = null) => GuildHandler.Messenger.SendMessage(target, identifier, value);

@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Core", "Core\Core.csproj", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Compiler", "Compiler\Compiler.csproj", "{F13EDD34-53AB-4C4B-8752-14ED1C6C3B1E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Modules", "Modules\Modules.csproj", "{F1BCC3C4-0182-47CC-8271-999C694C0D5E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Plugins", "Modules\Plugins.csproj", "{F1BCC3C4-0182-47CC-8271-999C694C0D5E}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Webserver", "Webserver\Webserver.csproj", "{DA60A2C2-1ABD-4AD7-9E54-C98619DDFC14}"
 EndProject
