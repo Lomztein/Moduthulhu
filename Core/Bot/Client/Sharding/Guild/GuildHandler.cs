@@ -2,9 +2,10 @@
 using Discord.WebSocket;
 using Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild.Config;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
+using System.Linq;
+using System.Globalization;
+using Lomztein.Moduthulhu.Core.IO.Database.Repositories;
 
 namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
 {
@@ -20,6 +21,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
         public PluginManager Plugins { get; private set; }
         public PluginMessenger Messenger { get; private set; }
         public PluginConfig Config { get; private set; }
+        public CachedValue<CultureInfo> Culture { get; private set; }
 
         public GuildHandler (BotShard shard, ulong guildId)
         {
@@ -29,6 +31,8 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
             Messenger = new PluginMessenger();
             Config = new PluginConfig();
             Name = GetGuild().Name;
+
+            Culture = new CachedValue<CultureInfo>(new IdentityKeyJsonRepository("pluginconfig"), GuildId, "Culture", () => new CultureInfo("en-US"));
         }
 
         public bool IsBotAdministrator(ulong userId) => _shard.BotClient.IsBotAdministrator(userId);
@@ -152,11 +156,22 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
 
         public SocketGuild GetGuild() => _shard.GetGuild(GuildId);
         public SocketGuildUser GetUser(ulong userId) => GetGuild().GetUser(userId);
+        public SocketGuildUser FindUser(string name) => GetGuild().Users.FirstOrDefault(x => NameMatches(name, string.IsNullOrWhiteSpace (x.Nickname) ? x.Username : x.Nickname));
         public SocketGuildChannel GetChannel(ulong channelId) => GetGuild().GetChannel(channelId);
+        public SocketGuildChannel FindChannel(string name) => GetGuild().Channels.FirstOrDefault(x => NameMatches(name, x.Name));
         public SocketTextChannel GetTextChannel(ulong channelId) => GetChannel(channelId) as SocketTextChannel;
+        public SocketTextChannel FindTextChannel(string name) => GetGuild().TextChannels.FirstOrDefault(x => NameMatches(name, x.Name));
         public SocketVoiceChannel GetVoiceChannel(ulong channelId) => GetChannel(channelId) as SocketVoiceChannel;
+        public SocketVoiceChannel FindVoiceChannel(string name) => GetGuild().VoiceChannels.FirstOrDefault(x => NameMatches(name, x.Name));
         public SocketCategoryChannel GetCategoryChannel(ulong channelId) => GetChannel(channelId) as SocketCategoryChannel;
+        public SocketCategoryChannel FindCategoryChannel(string name) => GetGuild().CategoryChannels.FirstOrDefault(x => NameMatches(name, x.Name));
         public SocketRole GetRole(ulong roleId) => GetGuild().GetRole(roleId);
+        public SocketRole FindRole(string name) => GetGuild().Roles.FirstOrDefault(x => NameMatches(name, x.Name));
+
+        private bool NameMatches (string search, string name)
+        {
+            return name.ToUpperInvariant ().Contains(search.ToUpperInvariant (), StringComparison.Ordinal);
+        }
 
     }
 }

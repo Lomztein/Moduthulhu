@@ -9,12 +9,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="OpenCover" Version="4.7.922" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Core\Core.csproj" />
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="xcopy &quot;$(TargetPath)&quot; &quot;$(SolutionDir)Core\bin\Debug\netcoreapp2.0\Modules\&quot; /y" Condition=" '$(OS)' == 'Windows_NT' "/>
-    <Exec Command="rsync -av --delete &quot;$(TargetPath)&quot; &quot;$(SolutionDir)Core/bin/Debug/netcoreapp2.0/Modules/&quot;" Condition=" '$(OS)' == 'Unix' "/>
+    <Exec Command="xcopy &quot;$(TargetPath)&quot; &quot;$(SolutionDir)Core\bin\Debug\netcoreapp2.1\Modules\&quot; /y" Condition=" '$(OS)' == 'Windows_NT' " />
+    <Exec Command="rsync -av --delete &quot;$(TargetPath)&quot; &quot;$(SolutionDir)Core/bin/Debug/netcoreapp2.1/Modules/&quot;" Condition=" '$(OS)' == 'Unix' " />
   </Target>
 
 </Project>

@@ -9,9 +9,11 @@ using System.Linq;
 using System.Collections.Generic;
 using Lomztein.Moduthulhu.Core.Bot.Client;
 using System.Reflection;
+using System.Globalization;
 
 namespace Lomztein.Moduthulhu.Core.Bot {
-    public class BotCore {
+    public class BotCore : IDisposable
+    {
         public DateTime BootDate { get; private set; }
         public TimeSpan Uptime { get => DateTime.Now - BootDate; }
 
@@ -37,10 +39,16 @@ namespace Lomztein.Moduthulhu.Core.Bot {
             _client.Initialize();
 
             Consent.Init();
+            Localization.Init(new CultureInfo("en-US"));
 
             // Keep the core alive.
-            await Task.Delay (-1, _shutdownToken.Token);
-            Log.Write (Log.Type.BOT, "Shutting down..");
+            try
+            {
+                await Task.Delay(-1, _shutdownToken.Token);
+            } catch (TaskCanceledException exc)
+            {
+                Log.Write(Log.Type.BOT, $"Shutting down: {exc.Message}");
+            }
         }
 
         public void Shutdown ()
@@ -54,5 +62,19 @@ namespace Lomztein.Moduthulhu.Core.Bot {
         }
 
         public string GetStatusString() => $"Core uptime: {Uptime}";
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool managed)
+        {
+            if (managed)
+            {
+                _shutdownToken.Dispose();
+            }
+        }
     }
 }

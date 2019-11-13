@@ -28,7 +28,6 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
 
         private void MakeSuperSureCriticalPluginsAreEnabled ()
         {
-
             bool changed = false;
             foreach (Type pluginType in PluginLoader.GetPlugins())
             {
@@ -84,6 +83,8 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
             foreach (IPlugin plugin in _activePlugins)
             {
                 Log.Write(Log.Type.PLUGIN, "Shutting down plugin " + Plugin.GetVersionedFullName(plugin.GetType()));
+                _parentHandler.Messenger.Clear(Plugin.GetFullName(plugin.GetType())); // TODO: Create OnPluginLoaded and OnPluginUnloaded events and have the GuildHandler do this instead as to reduce coupling.
+                _parentHandler.Config.Clear(Plugin.GetFullName(plugin.GetType()));
                 plugin.Shutdown();
             }
             _activePlugins.Clear();
