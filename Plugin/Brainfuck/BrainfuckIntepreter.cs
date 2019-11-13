@@ -17,7 +17,7 @@ namespace Lomztein.ModularDiscordBot.Modules.Misc.Brainfuck
         private int counter = 0;
         private int pointer = 0;
 
-        private Byte [ ] memory = new byte [ 30000 ];
+        private byte[ ] memory = new byte [ 30000 ];
         public Func<Task<byte>> getInput;
 
         public async Task<string> Interpret(string _program) {

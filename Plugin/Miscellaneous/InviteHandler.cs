@@ -3,29 +3,24 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Discord.Rest;
-using Discord;
 using Discord.WebSocket;
-using Lomztein.Moduthulhu.Core.Bot;
-using Lomztein.Moduthulhu.Cross;
-using Lomztein.Moduthulhu.Core.Bot.Client.Sharding;
+using Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild;
+using Lomztein.Moduthulhu.Core;
 
 namespace Lomztein.Moduthulhu.Modules.ServerMessages
 {
     public class InviteHandler
     {
         public static Dictionary<ulong, Dictionary<string, RestInviteMetadata>> savedInvites = new Dictionary<ulong, Dictionary<string, RestInviteMetadata>> ();
-        public Shard ParentShard;
+        public GuildHandler _guildHandler;
 
-        public InviteHandler (Shard shard) {
-            ParentShard = shard;
+        public InviteHandler (GuildHandler guildHandler) {
+            _guildHandler = guildHandler;
         }
 
         public async Task Intialize()
         {
-            foreach (SocketGuild guild in ParentShard.Guilds)
-            {
-                await UpdateData(null, guild);
-            }
+            await UpdateData(null, _guildHandler.GetGuild ());
         }
 
         public async Task UpdateData(IReadOnlyCollection<RestInviteMetadata> readOnly, SocketGuild guild) {

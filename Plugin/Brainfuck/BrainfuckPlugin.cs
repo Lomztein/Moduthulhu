@@ -1,33 +1,28 @@
 ﻿using Lomztein.AdvDiscordCommands.Framework;
 using Lomztein.AdvDiscordCommands.Framework.Categories;
-using Lomztein.Moduthulhu.Core.Plugin.Framework;
-using Lomztein.Moduthulhu.Modules.Command;
+using Lomztein.Moduthulhu.Core.Plugins.Framework;
+using Lomztein.Moduthulhu.Plugins.Standard;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Lomztein.ModularDiscordBot.Modules.Misc.Brainfuck
 {
-    public class BrainfuckModule : PluginBase {
-
-        public override string Name => "Brainfuck";
-        public override string Description => "why does this exist";
-        public override string Author => "I don't want my name on this.";
-
-        public override bool Multiserver => true;
+    [Descriptor ("Lozmtein", "Brainfuck", "Plugin with a command that can interpret and execute Brainfuck programs.")]
+    [Source ("https://github.com/Lomztein", "https://github.com/Lomztein/Moduthulhu/blob/master/Plugins/Brainfuck/BrainfuckPlugin.cs")]
+    public class BrainfuckPlugin : PluginBase {
 
         private BrainfuckCommand command;
 
         private Dictionary<ulong, char?> input = new Dictionary<ulong, char?> ();
 
         public override void Initialize() {
-            command = new BrainfuckCommand () { ParentModule = this };
-            ParentContainer.GetCommandRoot ().AddCommands (command);
+            command = new BrainfuckCommand () { ParentPlugin = this };
+            SendMessage("Lomztein-Command Root", "AddCommand", command);
         }
 
         public override void Shutdown() {
-            ParentContainer.GetCommandRoot ().RemoveCommands (command);
+            SendMessage("Lomztein-Command Root", "RemoveCommand", command);
         }
 
         private async Task<string> Run (string program, ulong channelID) {
@@ -52,7 +47,7 @@ namespace Lomztein.ModularDiscordBot.Modules.Misc.Brainfuck
             throw new ArgumentException ("There is no current program in channel " + channelID + ".");
         }
 
-        public class BrainfuckCommand : ModuleCommand<BrainfuckModule> {
+        public class BrainfuckCommand : PluginCommand<BrainfuckPlugin> {
 
             public BrainfuckCommand () {
                 Name = "brainfuck";
@@ -62,7 +57,7 @@ namespace Lomztein.ModularDiscordBot.Modules.Misc.Brainfuck
 
             [Overload (typeof (string), "Brainfuck.")]
             public async Task<Result> Execute (CommandMetadata metadata, string program) {
-                string result = await ParentModule.Run (program, metadata.Message.Channel.Id);
+                string result = await ParentPlugin.Run (program, metadata.Message.Channel.Id);
                 return new Result (result, result);
             }
 
