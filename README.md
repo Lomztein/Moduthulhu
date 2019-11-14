@@ -4,9 +4,19 @@ Introducing Moduthulhu 2.0! The all new slightly more thought out, slightly less
 
 The 'Moduthulhu - Modular Discord Bot' is a Discord bot core framework build on the [Discord.NET API Wrapper by RougeException](https://github.com/RogueException/Discord.Net). This project intends to create a foundation framework on which more front-end bot functionality can be added through the runtime loading of functionality-containing Plugins. While there exists a few standard plugins which are enabled by default, they provide no real functionality. These standard plugins will be further outlined later.
 
-This bot is written in C# and targets the .NET Core 2.1 LTS framework, and is fully dockerizable and may be pulled from [Docker Hub](https://hub.docker.com/repository/docker/lomztein/moduthulhu), however do notice that it cannot just run out of the box, as it additionally needs a PostgreSQL database to store information on, as well as a mounted volume to read client configuration data as well as store error logs on. Basic familiarity with Docker is recommended, as that's about what I had when I dockerized it. C:
+This bot is written in C#, targets the .NET Core 2.1 LTS framework, and is fully dockerizable and may be pulled from [Docker Hub](https://hub.docker.com/repository/docker/lomztein/moduthulhu), however do notice that it cannot just run out of the box, as it additionally needs a PostgreSQL database to store information on, as well as a mounted volume to read client configuration data as well as store error logs on. Basic familiarity with Docker is recommended, as that's about what I had when I dockerized it. C:
 
 I personally run the bot on a Ubuntu 16.04 server using Docker, and it works perfectly well!
+
+To fully run it using Docker, you need to take into account the following:
+ * You must supply it with a connection string for PostgreSQL database, through environment variable 'PostgreSQLConnectionString'
+ * To configure the core, you must be able to edit the Data folder, such as through mounting a volume.
+ 
+Currently I run the container with following command: `sudo docker run --env 'PostgreSQLConnectionString=Server=<DBAddress>;Port=5432;Username=<DBUsername>;Password=<DBPassword>;Database=<Database>;' --name moduthulhu --mount 'src=moduthulhu_data,dst=/build/Data' --restart on-failure lomztein/moduthulhu:latest`
+
+Any vulnurable information has been omitted, of course. DB is short for database, and you must fill out those slots with the connection information for your own database.
+
+I intend to replace this with a Docker-compose file later on, however this works for the time being. Additionally, I run [Watchtower](https://github.com/containrrr/watchtower) to automatically the bot when a new build is build though Docker Hub Automated Builds. It is a very convenient and easy to set up Continuous Deployment solution that I can heartedly recommend you try. If you believe you know a better alternative solution, feel free to let me know! :D
 
 ## Disclaimer: Currently in development:
 
@@ -103,14 +113,16 @@ Initialize and Shutdown must be implemented in your plugin class.
 
 ### Building your plugins
 
-You're going to want to build your plugins into .dll files for the core to load up and. The simple way to do this is just to build the project as with any other, and moving the primary output file into the build cores Plugins folder. This should be fairly straightforward for anyone who've used Visual Studio in the past, albiet a bit of a trivial hassle after a few times.
+You're going to want to build your plugins into .dll files for the core to load up and provide. The simple way to do this is just to build the project as with any other, and moving the primary output file into your running cores ./Data/Plugins folder. This should be fairly straightforward for anyone who've used Visual Studio in the past, albiet a bit of a trivial hassle after a few times.
 
-The slightly more advanced but easier once set up method is by using post-build commands. Right-click on your project in the solution explorer, click to "Properties", and go to the Build Events tab. To automatically copy the build plugin .dll, add this line to post-build event: `xcopy "$(TargetPath)" "$(SolutionDir)Core\bin\Debug\netcoreapp2.1\Plugins\" /y`
+The slightly more advanced but easier once set up method is by using post-build commands. Right-click on your project in the solution explorer, click to "Properties", and go to the Build Events tab. To automatically copy the build plugin .dll, add this line to post-build event: `xcopy "$(TargetPath)" "$(SolutionDir)Core\bin\Debug\netcoreapp2.1\Data\Plugins\" /y`
 
-This will automatically copy the plugin into the given folder, which in this case is the default folder that VS builds to when you run the core project in the default Debug configuration. You can change the output path to whatever you want, but this should make it easier to test since you don't have to manually drag files around. Additionally, you can add more lines if you need it copied to different places or you perhaps need some additional files from the build, such as required assemblies or prerequisite plugins.
+This will only be benificial if you have downloaded this entire solution, and have your plugin project as a project within the solution. In case you are running an instance of the bot via the assemblies provided via NuGet, you naturally need the xcopy command to copy your plugin files into whereever the /Data/Plugins folder is found in this case. 
 
 You can also add another xcopy line that copies the symbol files from compilation, which will make it much easier to debug your plugins. They must be placed in the bots root folder, so a command line for this would look something like
 `xcopy "$(TargetDir)$(TargetFileName).pdb" "$(SolutionDir)Core\bin\Debug\netcoreapp2.1\" /y`
+
+In a future version I will provide an entrypoint for running a debug bot instance with specific plugins, instead of you having to move the plugin files around yourself.
 
 ### Loading your plugins
 
