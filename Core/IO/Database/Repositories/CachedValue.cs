@@ -36,6 +36,12 @@ namespace Lomztein.Moduthulhu.Core.IO.Database.Repositories
             Store();
         }
 
+        public void MutateValue(Action<T> action)
+        {
+            action(_value);
+            Store();
+        }
+
         public void Cache ()
         {
             _value = _repo.Get<T>(_identity, _key);

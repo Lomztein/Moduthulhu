@@ -88,6 +88,13 @@ namespace Lomztein.Moduthulhu.Modules.Colour
 
                 return new Result(null, role == null ? "Failed to colour you, colour not found." : $"You've been succesfully coloured **{name}**!");
             }
+
+            [Overload (typeof (SocketRole[]), "Return a list of all available colours.")]
+            public Task<Result> Execute (CommandMetadata _)
+            {
+                string colours = string.Join(", ", ParentPlugin.GetRoles().Select(x => x.Name.Substring (ParentPlugin._colourRolePrefix.GetValue ().Length)));
+                return TaskResult(ParentPlugin.GetRoles(), "These colours are available: " + colours);
+            }
         }
     }
 }
