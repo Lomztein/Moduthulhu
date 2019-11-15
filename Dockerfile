@@ -9,6 +9,6 @@ RUN dotnet publish ./Plugins/Plugins.csproj -c Release -o /plugins/
 RUN mkdir /build/Data/
 RUN mkdir /build/Data/Plugins/
 
-RUN cp /plugins/Plugins.dll /build/Data/Plugins/
+RUN cp /plugins/Plugins.dll /build/Data/Plugins/Plugins.dll
 
 ENTRYPOINT dotnet /build/Core.dll

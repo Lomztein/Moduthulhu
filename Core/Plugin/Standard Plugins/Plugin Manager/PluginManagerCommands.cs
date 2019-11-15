@@ -26,6 +26,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
                 new RemoveCommand (),
                 new ActiveCommand (),
                 new AvailableCommand (),
+                new AllCommand (),
                 new InfoCommand (),
             };
         }
@@ -94,7 +95,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
             [Overload(typeof(Embed), "Display all available plugins.")]
             public Task<Result> Execute(CommandMetadata metadata)
             {
-                return TaskResult(GetModuleListEmbed(ParentPlugin.GetAvailablePlugins().Where (x => !ParentPlugin.GetActivePlugins ().Any (y => Plugin.GetVersionedFullName (x) == Plugin.GetVersionedFullName(y.GetType ()))), "All available plugins.", "A list of all currently available, but not enabled plugins on this server."), null);
+                return TaskResult(GetModuleListEmbed(ParentPlugin.GetAvailablePlugins().Where (x => !ParentPlugin.GetActivePlugins ().Any (y => y.GetType () == x)), "All available plugins.", "A list of all currently available, but not enabled plugins on this server."), null);
             }
         }
 
