@@ -1,3 +1,5 @@
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/9107d84996d94ad388733b47047f5c7d)](https://www.codacy.com/manual/Lomztein/Moduthulhu?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Lomztein/Moduthulhu&amp;utm_campaign=Badge_Grade)
+
 # Moduthulhu - Modular Discord Bot
 
 Introducing Moduthulhu 2.0! The all new slightly more thought out, slightly less overly complicated bot core!
