@@ -96,12 +96,13 @@ namespace Lomztein.Moduthulhu.Modules.Voice
             if (channel is SocketVoiceChannel) {
                 SocketVoiceChannel voiceChannel = channel as SocketVoiceChannel;
 
-                if (_temporaryChannels.Contains (channel.Id)) {
-                    _temporaryChannels.Remove (channel.Id);
-                }
-
                 if (!_temporaryChannels.Contains (channel.Id)) {
                     _defaultChannels.MutateValue (x => x.Remove (channel.Id));
+                }
+
+                if (_temporaryChannels.Contains(channel.Id))
+                {
+                    _temporaryChannels.Remove(channel.Id);
                 }
             }
 

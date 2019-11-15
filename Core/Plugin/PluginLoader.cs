@@ -33,7 +33,7 @@ namespace Lomztein.Moduthulhu.Core.Plugins
                 }
                 else
                 {
-                    all[i] = _loadedPlugins[i - (_standardPlugins.Length - 1)];
+                    all[i] = _loadedPlugins[i - (_standardPlugins.Length)];
                 }
             }
             return all;

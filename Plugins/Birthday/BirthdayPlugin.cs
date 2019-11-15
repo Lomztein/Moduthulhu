@@ -22,9 +22,8 @@ namespace Lomztein.Moduthulhu.Plugins.Birthday {
         private CachedValue<string> _announcementMessage;
         private CachedValue<ulong> _announcementChannel;
 
-        private Dictionary<ulong, BirthdayDate> _allBirthdays;
+        private CachedValue<Dictionary<ulong, BirthdayDate>> _allBirthdays;
 
-        private BirthdayRepository _repo;
         private BirthdayCommand _command;
 
         public override void Initialize()
@@ -42,11 +41,16 @@ namespace Lomztein.Moduthulhu.Plugins.Birthday {
             AddConfigInfo("Set Birthday Message", "Get birthday message.", () => $"Current announcement message: '{_announcementMessage.GetValue()}'.");
 
             _command = new BirthdayCommand() { ParentPlugin = this };
-            _repo = new BirthdayRepository("birthdays");
+            _allBirthdays = GetDataCache("Birthdays", x => new Dictionary<ulong, BirthdayDate>());
+
+            GuildHandler.Clock.OnHourPassed += Clock_OnHourPassed;
 
             SendMessage("Lomztein-CommandRoot", "AddCommand", _command);
+        }
 
-            CacheBirthdays();
+        private async Task Clock_OnHourPassed(DateTime currentTick, DateTime lastTick)
+        {
+            await TestBirthdays(currentTick);
         }
 
         public void SetBirthday(ulong userID, DateTime date) {
@@ -60,26 +64,13 @@ namespace Lomztein.Moduthulhu.Plugins.Birthday {
                 lastPassedYear = now.Year;
             }
 
-            if (!_allBirthdays.ContainsKey(userID))
+            if (!_allBirthdays.GetValue ().ContainsKey(userID))
             {
-                _allBirthdays.Add (userID, new BirthdayDate (date, lastPassedYear));
-                _repo.InsertBirthdate(GuildHandler.GuildId, userID, date, lastPassedYear);
+                _allBirthdays.MutateValue (x => x.Add (userID, new BirthdayDate (date, lastPassedYear)));
             }
             else
             {
-                _allBirthdays[userID] = new BirthdayDate(date, lastPassedYear);
-                _repo.UpdateBirthdate(GuildHandler.GuildId, userID, date, lastPassedYear);
-            }
-        }
-
-        public void CacheBirthdays ()
-        {
-            var data = _repo.GetBirthdates(GuildHandler.GuildId);
-
-            foreach (var entry in data)
-            {
-                BirthdayDate date = new BirthdayDate((DateTime)entry["date"], (int)entry["lastpassedyear"]);
-                _allBirthdays.Add((ulong)entry["userid"], date);
+                _allBirthdays.MutateValue (x => x[userID] = new BirthdayDate(date, lastPassedYear));
             }
         }
 
@@ -90,7 +81,7 @@ namespace Lomztein.Moduthulhu.Plugins.Birthday {
 
         private async Task TestBirthdays(DateTime now) {
 
-            foreach (var user in _allBirthdays)
+            foreach (var user in _allBirthdays.GetValue ())
             {
                 if (user.Value.IsNow())
                 {

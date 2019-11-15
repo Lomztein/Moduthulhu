@@ -1,19 +1,17 @@
 ﻿using Discord.WebSocket;
 using Lomztein.AdvDiscordCommands.Extensions;
 using Lomztein.AdvDiscordCommands.Framework;
-using Lomztein.Moduthulhu.Modules.Command;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
-using Lomztein.Moduthulhu.Modules.Misc.Karma;
-using Lomztein.Moduthulhu.Modules.Misc.Karma.Extensions;
 using Discord;
 using Lomztein.AdvDiscordCommands.Framework.Categories;
+using Lomztein.Moduthulhu.Plugins.Standard;
+using System.Linq;
 
 namespace Lomztein.Moduthulhu.Modules.Misc.Karma.Commands
 {
-    public class KarmaCommand : ModuleCommand<KarmaModule> {
+    public class KarmaCommand : PluginCommand<KarmaPlugin> {
 
         public KarmaCommand() {
             Name = "karma";
@@ -28,13 +26,13 @@ namespace Lomztein.Moduthulhu.Modules.Misc.Karma.Commands
 
         [Overload (typeof (int), "Returns karma of a given user.")]
         public Task<Result> Execute (CommandMetadata data, IUser user) {
-            KarmaModule.Selfworth karma = ParentModule.GetKarma (user.Id);
+            KarmaPlugin.Selfworth karma = ParentPlugin.GetKarma (user.Id);
             return TaskResult (karma.Total, $"User {user.GetShownName ()} has {karma.Total} karma! (+{karma.upvotes} / -{karma.downvotes})");
         }
 
         [Overload (typeof (SocketGuildUser[]), "Returns karma of a given user.")]
         public Task<Result> Execute (CommandMetadata data, int amount) {
-            var allKarma = ParentModule.GetKarmaDictionary ();
+            var allKarma = ParentPlugin.GetKarmaDictionary ();
             List<SocketGuildUser> inGuild = new List<SocketGuildUser> ();
 
             foreach (var entry in allKarma) { // Man I'm getting lazy with dictionary type naming. All those generic parameters yo.
@@ -44,12 +42,12 @@ namespace Lomztein.Moduthulhu.Modules.Misc.Karma.Commands
                 inGuild.Add (user);
             }
 
-            inGuild.Sort (new KarmaComparator (ParentModule));
+            inGuild.OrderByDescending(x => ParentPlugin.GetKarma (x.Id).Total);
             inGuild = inGuild.GetRange (0, Math.Min (amount, inGuild.Count));
 
             string result = "```";
             foreach (SocketGuildUser user in inGuild) {
-                result += StringExtensions.UniformStrings (user.GetShownName (), ParentModule.GetKarma (user.Id).ToString ()) + "\n";
+                result += StringExtensions.UniformStrings (user.GetShownName (), ParentPlugin.GetKarma (user.Id).ToString ()) + "\n";
             }
             result += "```";
 

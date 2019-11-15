@@ -15,7 +15,7 @@ using Lomztein.Moduthulhu.Core.IO.Database.Repositories;
 namespace Lomztein.Moduthulhu.Modules.Colour
 {
     [Descriptor ("Lomztein", "COLOURS!", "Plugin scientifically proven to increase funkyness by between negative thirty two, to about four percent.")]
-    [Dependency ("Lomztein-CommandRoot")]
+    [Dependency ("Lomztein-Command Root")]
     public class ColourPlugin : PluginBase {
 
         private SetColour _command;
@@ -71,7 +71,6 @@ namespace Lomztein.Moduthulhu.Modules.Colour
                 IEnumerable<SocketRole> currentRoles = guildUser.Roles.Where(x => ParentPlugin.GetRoles().Any(y => x.Id == y.Id));
 
                 SocketRole role = null;
-                string name = "";
 
                 foreach (var entry in ParentPlugin.GetRoles ()) {
 
@@ -84,9 +83,9 @@ namespace Lomztein.Moduthulhu.Modules.Colour
 
                 await guildUser.RemoveRolesAsync(currentRoles);
                 if (role != null)
-                    await guildUser.AsyncSecureAddRole(role);
+                    await guildUser.AddRoleAsync(role);
 
-                return new Result(null, role == null ? "Failed to colour you, colour not found." : $"You've been succesfully coloured **{name}**!");
+                return new Result(null, role == null ? "Failed to colour you, colour not found." : $"You've been succesfully coloured **{colorName}**!");
             }
 
             [Overload (typeof (SocketRole[]), "Return a list of all available colours.")]

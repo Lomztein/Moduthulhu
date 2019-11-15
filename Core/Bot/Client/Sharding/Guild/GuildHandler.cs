@@ -22,6 +22,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
         public PluginMessenger Messenger { get; private set; }
         public PluginConfig Config { get; private set; }
         public CachedValue<CultureInfo> Culture { get; private set; }
+        public Clock Clock { get; private set; }
 
         public GuildHandler (BotShard shard, ulong guildId)
         {
@@ -30,6 +31,9 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
             Plugins = new PluginManager(this);
             Messenger = new PluginMessenger();
             Config = new PluginConfig();
+            Clock = new Clock(1, Name);
+            Clock.Start();
+
             Name = GetGuild().Name;
 
             Culture = new CachedValue<CultureInfo>(new IdentityKeyJsonRepository("pluginconfig"), GuildId, "Culture", () => new CultureInfo("en-US"));

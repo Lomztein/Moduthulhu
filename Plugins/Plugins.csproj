@@ -5,7 +5,7 @@
     <TargetFramework>netcoreapp2.1</TargetFramework>
     <ApplicationIcon />
     <StartupObject />
-    <RunPostBuildEvent>Always</RunPostBuildEvent>
+    <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
   </PropertyGroup>
 
   <ItemGroup>
@@ -17,7 +17,7 @@
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="xcopy &quot;$(TargetPath)&quot; &quot;$(SolutionDir)Core\bin\Debug\netcoreapp2.1\Modules\&quot; /y" Condition=" '$(OS)' == 'Windows_NT' " />
+    <Exec Command="xcopy &quot;$(TargetPath)&quot; &quot;$(SolutionDir)Core\bin\Debug\netcoreapp2.1\Data\Plugins\&quot; /y" Condition=" '$(OS)' == 'Windows_NT' " />
     <Exec Command="rsync -av --delete &quot;$(TargetPath)&quot; &quot;$(SolutionDir)Core/bin/Debug/netcoreapp2.1/Modules/&quot;" Condition=" '$(OS)' == 'Unix' " />
   </Target>
 

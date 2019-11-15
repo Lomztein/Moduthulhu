@@ -20,8 +20,9 @@ namespace Lomztein.Moduthulhu.Modules.Phrases
             GuildHandler.MessageReceived += OnMessageRecieved;
             _phrases = GetConfigCache("Phrases", x => new List<Phrase>());
 
-            AddConfigInfo("Add Phrase", "Add empty phrase.", new Action(() => { _phrases.GetValue().Add(new Phrase()); _phrases.Store(); }), () => "Added new empty phrase. You must edit it using the other config options available here.");
-            AddConfigInfo("Add Phrase", "List current phrases.", () => "Current phrases:\n" + string.Join('\n', _phrases.GetValue().Select(x => _phrases.GetValue ().IndexOf (x) + ": " + x.ToString())));
+            AddConfigInfo("Add Phrase", "Add empty phrase.", new Action(() => { _phrases.GetValue().Add(new Phrase()); _phrases.Store(); }), () => $"Added new empty response phrase at index {_phrases.GetValue ().Count - 1}. You must edit it using the other config options available here.");
+            AddConfigInfo("Remove Phrase", "Remove phrase.", new Action<int>((x) => { _phrases.GetValue().RemoveAt(x); _phrases.Store(); }), () => $"Removed response phrase at the given index.", "Index");
+            AddConfigInfo("List Phrases", "List current phrases.", () => "Current phrases:\n" + string.Join('\n', _phrases.GetValue().Select(x => _phrases.GetValue ().IndexOf (x) + " -> " + PhraseToString (x))));
             AddConfigInfo("Set Phrase Trigger", "Set trigger", new Action<int, string>((x, y) => { _phrases.GetValue()[x].triggerPhrase = y; _phrases.Store(); }), () => $"Phrase trigger updated.", "Index", "Trigger");
 
             AddConfigInfo("Set Phrase User", "Set user", new Action<int, SocketGuildUser>((x, y) => { _phrases.GetValue()[x].userID = y.Id; _phrases.Store(); }), () => $"Phrase user updated.", "Index", "User");
@@ -63,6 +64,14 @@ namespace Lomztein.Moduthulhu.Modules.Phrases
             GuildHandler.MessageReceived -= OnMessageRecieved;
         }
 
+        private string PhraseToString (Phrase phrase)
+        {
+            return $"Trigger: {phrase.triggerPhrase}, " +
+                "User: " + (GuildHandler.GetUser (phrase.userID) == null ? "Unspecific, " : GuildHandler.GetUser (phrase.userID).GetShownName ()) +
+                "Channel: " + (GuildHandler.GetUser(phrase.userID) == null ? "Unspecific, " : GuildHandler.GetUser(phrase.userID).GetShownName()) + "" +
+                $"Chance: {Math.Round (phrase.chance, 2)}%, Response: {phrase.response}, Emoji: {phrase.emoji}";
+        }
+
         public class Phrase {
 
             public string triggerPhrase = "";
@@ -85,10 +94,6 @@ namespace Lomztein.Moduthulhu.Modules.Phrases
                 }
 
                 return (null, null);
-            }
-
-            public override string ToString() {
-                return $"TRIGGER: {triggerPhrase}, USERID: {userID}, CHANNELID: {channelID}, CHANCE: {chance}, RESPONSE: {response}, EMOJI: {emoji}";
             }
         }
     }

@@ -44,7 +44,13 @@ namespace Lomztein.Moduthulhu.Modules.ServerMessages {
             _onUserUnbannedFromGuild = GetConfigCache("OnJoinedNewGuild", x => new List<string> { "**[USERNAME]** has been unbanned from this server!" });
             _onUserNameChanged = GetConfigCache("OnJoinedNewGuild", x => new List<string> { "**[USERNAME] changed their name to **[NEWNAME]**!" });
 
-            AddConfigInfoForMessage(_onJoinedNewGuild, "On New Member");
+            AddConfigInfoForMessage(_onJoinedNewGuild, "On Bot Joined");
+            AddConfigInfoForMessage(_onUserJoinedGuild, "On New Member");
+            AddConfigInfoForMessage(_onUserJoinedGuildByInvite, "On New Member Inviteds");
+            AddConfigInfoForMessage(_onUserLeftGuild, "On Member Left");
+            AddConfigInfoForMessage(_onUserBannedFromGuild, "On Member Banned");
+            AddConfigInfoForMessage(_onUserUnbannedFromGuild, "On Member Unbanned");
+            AddConfigInfoForMessage(_onUserNameChanged, "On Name Changed");
 
             AddConfigInfo("Set Message Channel", "Set channel", new Action<int, SocketTextChannel>((x, y) => _channelId.SetValue (y.Id)), () => $"Message channel set to {GuildHandler.GetTextChannel(_channelId.GetValue ()).Name}", "Index", "Channel");
             AddConfigInfo("Set Message Channel", "Set channel", new Action<int, string>((x, y) => _channelId.SetValue (GuildHandler.FindTextChannel (y).Id)), () => $"Message channel set to {GuildHandler.GetTextChannel(_channelId.GetValue()).Name}", "Index", "Channel");
@@ -56,8 +62,8 @@ namespace Lomztein.Moduthulhu.Modules.ServerMessages {
 
         private void AddConfigInfoForMessage (CachedValue<List<string>> message, string name)
         {
-            AddConfigInfo(name, "Add a message", new Action<string>(x => { message.GetValue().Add(x); message.Store(); }), () => $"Added new {name} message.");
-            AddConfigInfo(name, "Remove a message", new Action<int>(x => { message.GetValue().RemoveAt (x); message.Store(); }), () => $"Removed {name} message.");
+            AddConfigInfo(name, "Add a message", new Action<int>(x => { message.GetValue().RemoveAt (x); message.Store(); }), () => $"Removed {name} message.", "Index");
+            AddConfigInfo(name, "The above one actually removes lol will fix later", new Action<string>(x => { message.GetValue().Add(x); message.Store(); }), () => $"Added new {name} message.", "Message");
             AddConfigInfo(name, "Display messages", () => $"Current '{name}' messages:\n{string.Join('\n', message.GetValue().ToArray ())}");
         }
 

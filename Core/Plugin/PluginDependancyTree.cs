@@ -39,15 +39,17 @@ namespace Lomztein.Moduthulhu.Core.Plugins
                     {
                         Log.Write(Log.Type.CRITICAL, $"Missing dependancy {dependancyAttribute.DependencyName} for plugin {branchName}!");
                     }
-
-                    string dependancyVersion = Framework.Plugin.GetVersion(dependancyBranch.Plugin);
-                    dependancyBranches.Add(dependancyBranch);
-
-                    Log.Write(Log.Type.PLUGIN, $"Plugin {branchName} linked to dependancy {Framework.Plugin.GetVersionedFullName (dependancyBranch.Plugin)}.");
-                    if (dependancyAttribute.DesiredVersion != dependancyVersion)
+                    else
                     {
-                        string targetVersion = dependancyAttribute.DesiredVersion;
-                        Log.Write(Log.Type.WARNING, $"Plugin {branchName} targets version {targetVersion} of {dependancyBranch.Plugin.Name}, but version {dependancyVersion} is installed instead. This may cause issues.");
+                        string dependancyVersion = Framework.Plugin.GetVersion(dependancyBranch.Plugin);
+                        dependancyBranches.Add(dependancyBranch);
+
+                        Log.Write(Log.Type.PLUGIN, $"Plugin {branchName} linked to dependancy {Framework.Plugin.GetVersionedFullName(dependancyBranch.Plugin)}.");
+                        if (dependancyAttribute.DesiredVersion != dependancyVersion)
+                        {
+                            string targetVersion = dependancyAttribute.DesiredVersion;
+                            Log.Write(Log.Type.WARNING, $"Plugin {branchName} targets version {targetVersion} of {dependancyBranch.Plugin.Name}, but version {dependancyVersion} is installed instead. This may cause issues.");
+                        }
                     }
                 }
 

@@ -18,7 +18,11 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
         public override void Initialize()
         {
             _configCommands = new ConfigCommandSet();
+            SendMessage("Lomztein-Command Root", "AddCommand", _configCommands);
+        }
 
+        public override void PostInitialize()
+        {
             var configInfos = GuildHandler.Config.GetConfigInfo();
             var grouped = configInfos.GroupBy(x => x.Identifier);
 
@@ -40,9 +44,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
 
                 _configCommands.AddCommands(commands.ToArray());
             }
-
-            SendMessage("Lomztein-Command Root", "AddCommand", _configCommands);
-
+            _configCommands.InitCommands();
         }
 
         public override void Shutdown()

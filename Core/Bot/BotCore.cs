@@ -25,7 +25,8 @@ namespace Lomztein.Moduthulhu.Core.Bot {
 
         private CancellationTokenSource _shutdownToken = new CancellationTokenSource();
 
-        internal async Task InitializeCore () {
+        internal async Task InitializeCore()
+        {
 
             // Set up core
             BootDate = DateTime.Now;
@@ -42,13 +43,9 @@ namespace Lomztein.Moduthulhu.Core.Bot {
             Localization.Init(new CultureInfo("en-US"));
 
             // Keep the core alive.
-            try
-            {
-                await Task.Delay(-1, _shutdownToken.Token);
-            } catch (TaskCanceledException exc)
-            {
-                Log.Write(Log.Type.BOT, $"Shutting down: {exc.Message}");
-            }
+            await Task.Delay(-1, _shutdownToken.Token);
+            Log.Write(Log.Type.BOT, $"Shutting down..");
+            Environment.Exit(0);
         }
 
         public void Shutdown ()

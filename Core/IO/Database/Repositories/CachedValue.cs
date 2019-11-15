@@ -13,6 +13,7 @@ namespace Lomztein.Moduthulhu.Core.IO.Database.Repositories
         private Func<T> _defaultValue;
 
         private T _value;
+        private bool _dirty = true;
 
         public CachedValue (IdentityKeyJsonRepository repo, ulong identity, string key, Func<T> defaultValue)
         {
@@ -23,7 +24,7 @@ namespace Lomztein.Moduthulhu.Core.IO.Database.Repositories
         }
 
         public T GetValue () {
-            if (_value == null || _value.Equals (default(T)))
+            if (_dirty)
             {
                 Cache();
             }
@@ -45,16 +46,19 @@ namespace Lomztein.Moduthulhu.Core.IO.Database.Repositories
         public void Cache ()
         {
             _value = _repo.Get<T>(_identity, _key);
-            if (_value.Equals(default(T)))
+            if (Equals (_value, default(T)))
             {
                 _value = _defaultValue();
                 Store();
             }
+            _dirty = false;
         }
         public void Store ()
         {
             _repo.Set(_identity, _key, _value);
         }
+
+        public void SetDirty() => _dirty = true;
 
         public void Reset ()
         {
