@@ -48,14 +48,33 @@ namespace Lomztein.Moduthulhu.Core.Plugins
 
         public static Type GetPlugin(string name) => Plugin.Find(GetAllPlugins (), name);
 
-        public static string AssemblyPath => BotCore.DataDirectory + "/Plugins";
+        private static string IncludedPath => BotCore.BaseDirectory + "/IncludedPlugins.dll"; // Included plugins points to a specific files with plugins that aren't standard, but are a part of the basic version of the bot.
+        // IncludedPath is temporary untill a more robust plugin build pipeline can be figured out. Until then, this is specifically designed to allow for the plugins included in this project to be included in the Docker Image as well.
+        public static string ThirdPartyPath => BotCore.DataDirectory + "/Plugins"; // AssemblyPath points to a directory that contains all any and all potential third-party plugins.
 
         public static PluginDependancyTree DependancyTree { get; private set; }
 
         public static void ReloadPluginAssemblies()
         {
-            if (!Directory.Exists(AssemblyPath)) Directory.CreateDirectory(AssemblyPath);
-            _loadedPlugins = AssemblyLoader.LoadAndExtractTypes<IPlugin>(AssemblyPath);
+            if (!Directory.Exists(ThirdPartyPath)) Directory.CreateDirectory(ThirdPartyPath);
+            var firstParty = Array.Empty<Type>();
+            
+            if (File.Exists (IncludedPath))
+            {
+                AssemblyLoader.ExtractTypes<IPlugin>(AssemblyLoader.LoadAssembly(IncludedPath));
+            }
+            else
+            {
+                Log.Write(Log.Type.PLUGIN, "Loading first party plugins..");
+            }
+
+            var thirdParty = AssemblyLoader.LoadAndExtractTypes<IPlugin>(ThirdPartyPath);
+
+            List<Type> allParties = new List<Type>();
+            allParties.AddRange(firstParty);
+            allParties.AddRange(thirdParty);
+            _loadedPlugins = allParties.ToArray();
+
             DependancyTree = new PluginDependancyTree(GetAllPlugins ());
             _orderedPlugins = DependancyTree.Order(GetAllPlugins ()).ToArray();
         }
