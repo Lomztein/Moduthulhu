@@ -95,8 +95,8 @@ namespace Lomztein.Moduthulhu.Modules.Phrases
         private string PhraseToString (Phrase phrase)
         {
             return $"Trigger: {phrase.triggerPhrase}, " +
-                "User: " + (GuildHandler.GetUser (phrase.userID) == null ? "Any, " : GuildHandler.GetUser (phrase.userID).GetShownName ()) + ", " +
-                "Channel: " + (GuildHandler.GetChannel(phrase.channelID) == null ? "Any, " : GuildHandler.GetChannel(phrase.channelID).Name) + ", " +
+                "User: " + (GuildHandler.GetUser (phrase.userID) == null ? "Any" : GuildHandler.GetUser (phrase.userID).GetShownName ()) + ", " +
+                "Channel: " + (GuildHandler.GetChannel(phrase.channelID) == null ? "Any" : GuildHandler.GetChannel(phrase.channelID).Name) + ", " +
                 $"Chance: {Math.Round (phrase.chance, 2)}%, Response: {phrase.response}, Emote: {phrase.emoji}";
         }
 
