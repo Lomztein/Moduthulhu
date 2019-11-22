@@ -78,15 +78,16 @@ namespace Lomztein.Moduthulhu.Modules.Phrases
             foreach (Phrase phrase in _phrases.GetValue ())
             {
                 (response, emote) = phrase.CheckAndReturnResponse(message as SocketUserMessage);
-                if (string.IsNullOrWhiteSpace(response) || string.IsNullOrWhiteSpace (emote))
+                if (string.IsNullOrWhiteSpace(response) && string.IsNullOrWhiteSpace(emote))
                 {
-                    break;
+                    continue;
                 }
+                break;
             }
 
-            
 
-            if (!string.IsNullOrEmpty(response))
+
+            if (!string.IsNullOrWhiteSpace(response))
             {
                 await MessageControl.SendMessage(message.Channel as ITextChannel, response);
             }
