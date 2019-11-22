@@ -30,10 +30,10 @@ namespace Lomztein.Moduthulhu.Modules.Phrases
             AddConfigInfo("Set Phrase Trigger", "Set trigger", new Action<int>((x) => { _phrases.GetValue()[x].triggerPhrase = string.Empty; _phrases.Store(); }), () => $"Phrase trigger reset.", "Index");
             AddConfigInfo("Set Phrase Trigger", "Set trigger", new Action<int, string>((x, y) => { _phrases.GetValue()[x].triggerPhrase = y; _phrases.Store(); }), () => $"Phrase trigger updated.", "Index", "Trigger");
 
-            AddConfigInfo("Set Phrase User", "Set user", new Action(() => { _phrases.GetValue().LastOrDefault ().userID = 0; _phrases.Store(); }), () => $"Phrase user reset.", "Index", "User");
-            AddConfigInfo("Set Phrase User", "Set user", new Action<SocketGuildUser>((y) => { _phrases.GetValue().LastOrDefault ().userID = y.Id; _phrases.Store(); }), () => $"Phrase user updated.", "Index", "User");
-            AddConfigInfo("Set Phrase User", "Set user", new Action<string>((y) => { _phrases.GetValue().LastOrDefault ().userID = GuildHandler.FindUser(y).Id; _phrases.Store(); }), () => $"Phrase user updated.", "Index", "Username");
-            AddConfigInfo("Set Phrase User", "Set user", new Action<ulong>((y) => { _phrases.GetValue().LastOrDefault ().userID = y; _phrases.Store(); }), () => $"Phrase user updated.", "Index", "User ID");
+            AddConfigInfo("Set Phrase User", "Set user", new Action(() => { _phrases.GetValue().LastOrDefault ().userID = 0; _phrases.Store(); }), () => $"Phrase user reset.");
+            AddConfigInfo("Set Phrase User", "Set user", new Action<SocketGuildUser>((y) => { _phrases.GetValue().LastOrDefault ().userID = y.Id; _phrases.Store(); }), () => $"Phrase user updated.", "User");
+            AddConfigInfo("Set Phrase User", "Set user", new Action<string>((y) => { _phrases.GetValue().LastOrDefault ().userID = GuildHandler.FindUser(y).Id; _phrases.Store(); }), () => $"Phrase user updated.", "Username");
+            AddConfigInfo("Set Phrase User", "Set user", new Action<ulong>((y) => { _phrases.GetValue().LastOrDefault ().userID = y; _phrases.Store(); }), () => $"Phrase user updated.", "User ID");
 
             AddConfigInfo("Set Phrase User", "Set user", new Action<int>((x) => { _phrases.GetValue()[x].userID = 0; _phrases.Store(); }), () => $"Phrase user reset.", "Index");
             AddConfigInfo("Set Phrase User", "Set user", new Action<int, SocketGuildUser>((x, y) => { _phrases.GetValue()[x].userID = y.Id; _phrases.Store(); }), () => $"Phrase user updated.", "Index", "User");

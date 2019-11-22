@@ -17,7 +17,7 @@
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="xcopy &quot;$(TargetPath)&quot; &quot;$(SolutionDir)Core\bin\Debug\netcoreapp2.1\Data\Plugins\&quot; /y" Condition=" '$(OS)' == 'Windows_NT' " />
+    <Exec Command="xcopy &quot;$(TargetPath)&quot; &quot;$(SolutionDir)Core\bin\Debug\netcoreapp2.1\IncludedPlugins.dll&quot; /y" Condition=" '$(OS)' == 'Windows_NT' " />
   </Target>
 
 </Project>

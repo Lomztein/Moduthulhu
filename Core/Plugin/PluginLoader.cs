@@ -41,12 +41,10 @@ namespace Lomztein.Moduthulhu.Core.Plugins
 
         private static Type[] _orderedPlugins;
         public static Type[] GetPlugins() => _orderedPlugins;
-        public static Type GetPlugin(int id) => GetPlugins()[id];
-        public static int GetID(Type plugin) => GetPlugins().ToList().IndexOf(plugin); 
 
         public static bool IsStandard(Type pluginType) => _standardPlugins.Contains(pluginType);
 
-        public static Type GetPlugin(string name) => Plugin.Find(GetAllPlugins (), name);
+        public static Type GetPlugin(string name) => Plugin.Find(GetPlugins (), name);
 
         private static string IncludedPath => BotCore.BaseDirectory + "/IncludedPlugins.dll"; // Included plugins points to a specific files with plugins that aren't standard, but are a part of the basic version of the bot.
         // IncludedPath is temporary untill a more robust plugin build pipeline can be figured out. Until then, this is specifically designed to allow for the plugins included in this project to be included in the Docker Image as well.
@@ -61,8 +59,8 @@ namespace Lomztein.Moduthulhu.Core.Plugins
             
             if (File.Exists (IncludedPath))
             {
-                firstParty = AssemblyLoader.ExtractTypes<IPlugin>(AssemblyLoader.LoadAssembly(IncludedPath));
                 Log.Write(Log.Type.PLUGIN, "Loading first party plugins..");
+                firstParty = AssemblyLoader.ExtractTypes<IPlugin>(AssemblyLoader.LoadAssembly(IncludedPath));
             }
             else
             {
