@@ -91,7 +91,7 @@ namespace Lomztein.Moduthulhu.Modules.Phrases
                 await MessageControl.SendMessage(message.Channel as ITextChannel, response);
             }
 
-            if (Emote.TryParse(emote, out Emote parsedEmote))
+            if (!string.IsNullOrWhiteSpace (emote) && Emote.TryParse(emote, out Emote parsedEmote))
             {
                 await (message as SocketUserMessage).AddReactionAsync(parsedEmote);
             }
