@@ -73,19 +73,28 @@ namespace Lomztein.Moduthulhu.Modules.Phrases
         private async Task CheckAndRespond(SocketMessage message)
         {
             string response = null;
-            IEmote emote = null;
+            string emote = null;
 
             foreach (Phrase phrase in _phrases.GetValue ())
             {
                 (response, emote) = phrase.CheckAndReturnResponse(message as SocketUserMessage);
-                if (response != null || emote?.Name != null)
+                if (string.IsNullOrWhiteSpace(response) || string.IsNullOrWhiteSpace (emote))
+                {
                     break;
+                }
             }
 
+            
+
             if (!string.IsNullOrEmpty(response))
+            {
                 await MessageControl.SendMessage(message.Channel as ITextChannel, response);
-            if (!string.IsNullOrEmpty(emote?.Name))
-                await (message as SocketUserMessage).AddReactionAsync(emote);
+            }
+
+            if (Emote.TryParse(emote, out Emote parsedEmote))
+            {
+                await (message as SocketUserMessage).AddReactionAsync(parsedEmote);
+            }
         }
 
         public override void Shutdown() {
@@ -110,12 +119,12 @@ namespace Lomztein.Moduthulhu.Modules.Phrases
             public string response = string.Empty;
             public string emoji = string.Empty;
 
-            public (string res, IEmote emo) CheckAndReturnResponse (SocketUserMessage message) {
+            public (string res, string emo) CheckAndReturnResponse (SocketUserMessage message) {
                 if (string.IsNullOrEmpty (triggerPhrase) || message.Content.StartsWith (triggerPhrase)) { // Check if the message content fits the trigger, or if there is no trigger.
                     if (userID == 0 || userID == message.Author.Id) { // Check if there is a required user, and if it is the correct user.
                         if (channelID == 0 || channelID == message.Channel.Id) { // Ditto, but for channels.
                             if (new Random ().NextDouble () * 100d < chance) {
-                                return (response, Emote.Parse (emoji));
+                                return (response, emoji);
                             }
                         }
                     }
