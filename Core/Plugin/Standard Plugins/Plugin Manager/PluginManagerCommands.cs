@@ -39,13 +39,22 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
                 Description = "Add a plugin.";
                 Category = AdditionalCategories.Management;
                 RequiredPermissions.Add(Discord.GuildPermission.ManageGuild);
+
+                Aliases = new string[] { "add" };
             }
 
             [Overload(typeof(void), "Add a new plugin from the list of available plugins.")]
             public Task<Result> Execute(CommandMetadata metadata, string pluginName)
             {
                 ParentPlugin.AddPlugin(pluginName);
-                return TaskResult(null, $"Added plugin {Plugin.GetFullName(PluginLoader.GetPlugin(pluginName))}.");
+                if (ParentPlugin.GuildHandler.Plugins.IsPluginActive (pluginName))
+                {
+                    return TaskResult(null, $"Succesfully enabled plugin '{Plugin.GetFullName(PluginLoader.GetPlugin(pluginName))}' in this server.");
+                }
+                else
+                {
+                    return TaskResult(null, $"Failed to add plugin '{pluginName}'. An error may have occured in its initialization.");
+                }
             }
         }
 
@@ -57,13 +66,15 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
                 Description = "Remove a plugin.";
                 Category = AdditionalCategories.Management;
                 RequiredPermissions.Add(Discord.GuildPermission.ManageGuild);
+            
+                Aliases = new string[] { "remove" };
             }
 
             [Overload(typeof(void), "Remove a plugin from currently active plugins.")]
             public Task<Result> Execute(CommandMetadata metadata, string pluginName)
             {
                 ParentPlugin.RemovePlugin(pluginName);
-                return TaskResult(null, $"Removed plugin {Plugin.GetFullName(PluginLoader.GetPlugin(pluginName))}.");
+                return TaskResult(null, $"Sucessfully disabled plugin '{Plugin.GetFullName(PluginLoader.GetPlugin(pluginName))}' in this server.");
             }
         }
 

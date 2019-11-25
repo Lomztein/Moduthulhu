@@ -114,22 +114,57 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
                 }
             }
 
+            bool initError = false;
             foreach (IPlugin plugin in _activePlugins)
             {
-                Log.Write(Log.Type.PLUGIN, "Pre-initializing plugin " + Plugin.GetVersionedFullName(plugin.GetType()));
-                plugin.PreInitialize(_parentHandler);
+                try
+                {
+                    Log.Write(Log.Type.PLUGIN, "Pre-initializing plugin " + Plugin.GetVersionedFullName(plugin.GetType()));
+                    plugin.PreInitialize(_parentHandler);
+                } catch (Exception exc)
+                {
+                    Log.Write(Log.Type.WARNING, $"Something went wrong during plugin pre-initialization of plugin '{Plugin.GetName (plugin.GetType ())}'. The plugin has been disabled and plugin initialization scheduled to be restarted.");
+                    Log.Write(exc);
+                    RemovePlugin(Plugin.GetFullName(plugin.GetType()));
+                    initError = true;
+                }
             }
 
             foreach (IPlugin plugin in _activePlugins)
             {
-                Log.Write(Log.Type.PLUGIN, "Initializing plugin " + Plugin.GetVersionedFullName(plugin.GetType()));
-                plugin.Initialize ();
+                try
+                {
+                    Log.Write(Log.Type.PLUGIN, "Initializing plugin " + Plugin.GetVersionedFullName(plugin.GetType()));
+                    plugin.Initialize();
+                }
+                catch (Exception exc)
+                {
+                    Log.Write(Log.Type.WARNING, $"Something went wrong during plugin initialization of plugin '{Plugin.GetName(plugin.GetType())}'. The plugin has been disabled and plugin initialization scheduled to be restarted.");
+                    Log.Write(exc);
+                    RemovePlugin(Plugin.GetFullName(plugin.GetType()));
+                    initError = true;
+                }
             }
 
             foreach (IPlugin plugin in _activePlugins)
             {
-                Log.Write(Log.Type.PLUGIN, "Post-initializing plugin " + Plugin.GetVersionedFullName(plugin.GetType()));
-                plugin.PostInitialize ();
+                try
+                {
+                    Log.Write(Log.Type.PLUGIN, "Post-initializing plugin " + Plugin.GetVersionedFullName(plugin.GetType()));
+                    plugin.PostInitialize();
+                }
+                catch (Exception exc)
+                {
+                    Log.Write(Log.Type.WARNING, $"Something went wrong during plugin post-initialization of plugin '{Plugin.GetName(plugin.GetType())}'. The plugin has been disabled and plugin initialization scheduled to be restarted.");
+                    Log.Write(exc);
+                    RemovePlugin(Plugin.GetFullName(plugin.GetType()));
+                    initError = true;
+                }
+            }
+
+            if (initError)
+            {
+                ReloadPlugins();
             }
         }
 
