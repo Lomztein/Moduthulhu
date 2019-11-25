@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
+using Discord;
 using Lomztein.Moduthulhu.Core.Bot;
 using Lomztein.Moduthulhu.Core.Bot.Client.Sharding;
 using Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild;

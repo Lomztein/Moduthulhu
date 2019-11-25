@@ -28,6 +28,10 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client
         private IEnumerable<SocketGuild> AllGuilds { get => _shards.SelectMany (x => x.Guilds); }
         private DiscordSocketClient FirstClient { get => _shards.First ().Client; }
 
+        private Dictionary<string, StatusMessage> _statusMessages = new Dictionary<string, StatusMessage>();
+        private int _statusMessageIndex = -1;
+        private const int _statusChangeChance = 10;
+
         private readonly Clock _statusClock = new Clock(1, "StatusClock");
         private UserList _botAdministrators;
         private int _consecutiveOfflineMinutes = 0;
@@ -43,6 +47,22 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client
             _configuration = LoadConfiguration(DataDirectory + "/Configuration");
 
             Log.Write (Log.Type.BOT, "Creating bot client with token " + _configuration.Token);
+        }
+
+        internal async void Initialize()
+        {
+            PluginLoader.ReloadPluginAssemblies();
+            _botAdministrators = new UserList(Path.Combine(DataDirectory, "/Administrators"));
+
+            InitializeShards();
+            await AwaitAllConnected();
+
+            InitStatusMessages();
+            _statusClock.OnMinutePassed += StatusClock_OnMinutePassed;
+            _statusClock.OnMinutePassed += RotateStatus;
+            _statusClock.Start();
+
+            _statusMessages.First().Value.ApplyTo(FirstClient);
         }
 
         private ClientConfiguration LoadConfiguration (string path)
@@ -61,23 +81,39 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client
             return _configuration;
         }
 
-        private Task UpdateStatus (DateTime currentTick, DateTime lastTick) {
-            FirstClient.SetActivityAsync (new Game ($"on {AllGuilds.Count ()} servers with {AllGuilds.Sum (x => x.MemberCount)} users for  {(int)Uptime.TotalDays} days."));
+        private Task RotateStatus(DateTime previous, DateTime now)
+        {
+            if (new Random().Next(0, _statusChangeChance) == 0)
+            {
+                _statusMessageIndex++;
+                _statusMessageIndex %= _statusMessages.Count;
+                _statusMessages.ElementAt(_statusMessageIndex).Value.ApplyTo(FirstClient);
+            }
             return Task.CompletedTask;
         }
 
-        public async void Initialize ()
+        public void AddStatusMessage (string identifier, ActivityType activityType, Func<string> message)
         {
-            PluginLoader.ReloadPluginAssemblies();
-            _botAdministrators = new UserList(Path.Combine(DataDirectory, "/Administrators"));
+            if (_statusMessages.ContainsKey (identifier))
+            {
+                throw new ArgumentException($"Cannot add message with identifier '{identifier}' since one such already exists.");
+            }
+            else
+            {
+                _statusMessages.Add(identifier, new StatusMessage(activityType, message));
+            }
+        }
 
-            InitializeShards();
-            await AwaitAllConnected();
-            await UpdateStatus(DateTime.Now, DateTime.Now);
+        public void RemoveStatusMessage(string identifier) => _statusMessages.Remove(identifier);
 
-            _statusClock.OnDayPassed += UpdateStatus;
-            _statusClock.OnMinutePassed += StatusClock_OnMinutePassed;
-            _statusClock.Start();
+
+
+        private void InitStatusMessages ()
+        {
+            AddStatusMessage("UsersServed", ActivityType.Watching, () => new Random().Next(0, 100) == 0 ? $"{AllGuilds.SelectMany(x => x.Users).Count()} puny mortals waste away their hilariously short lives." : $"{AllGuilds.SelectMany(x => x.Users).Count()} users in {AllGuilds.Count()} servers.");
+            AddStatusMessage("Help", ActivityType.Listening, () => new Random().Next(0, 100) == 0 ? "the sweet cries of the fresh virgin sacrifices." : "!help commands! Prefix may vary between servers.");
+            AddStatusMessage("AvailablePlugins", ActivityType.Playing, () => new Random().Next(0, 100) == 0 ? "the dice of the vast cosmos." : $"with the {PluginLoader.GetPlugins().Length} plugins available. Try '!plugins ?'!");
+            AddStatusMessage("Uptime", ActivityType.Streaming, () => new Random().Next(0, 100) == 0 ? "V̌̾͒̓͏̸̼͔̘͎̳̦̮̰̹̥Ǫ̪͎̜̝͙̅ͫ͊̃͗̾̍ͣ̔̾͊͆ͭ͗̏͆̀͘͟͠I̴͛͌ͦ͊̇̾ͮ͂̈̌͏̪̜̳͙̰̝̺̱͈̗̥D̡̳͈̠͔̲̳̤̱͚̤ͥͮͤͪ̄ͤ͐̆̿ͩ͐ͭ̋̂͗̔ͬͦ͊" : $"for {Uptime.Days} days of uninterrupted service!");
         }
 
         private Task StatusClock_OnMinutePassed(DateTime currentTick, DateTime lastTick)
