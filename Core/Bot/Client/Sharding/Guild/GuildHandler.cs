@@ -12,9 +12,10 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
     public class GuildHandler
     {
         public string Name { get; private set; }
-        private readonly BotShard _shard;
-        public SocketSelfUser BotUser => _shard.Client.CurrentUser;
-        public BotCore Core => _shard.BotClient.Core;
+        public readonly BotShard Shard;
+        public BotClient Client => Shard.BotClient;
+        public BotCore Core => Client.Core;
+        public SocketSelfUser BotUser => Shard.Client.CurrentUser;
 
         public ulong GuildId { get; private set; }
 
@@ -26,7 +27,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
 
         public GuildHandler (BotShard shard, ulong guildId)
         {
-            _shard = shard;
+            Shard = shard;
             GuildId = guildId;
             Plugins = new PluginManager(this);
             Messenger = new PluginMessenger();
@@ -39,7 +40,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
             Culture = new CachedValue<CultureInfo>(new IdentityKeyJsonRepository("pluginconfig"), GuildId, "Culture", () => new CultureInfo("en-US"));
         }
 
-        public bool IsBotAdministrator(ulong userId) => _shard.BotClient.IsBotAdministrator(userId);
+        public bool IsBotAdministrator(ulong userId) => Shard.BotClient.IsBotAdministrator(userId);
 
         public void Initialize ()
         {
@@ -158,7 +159,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
         // ROUTED DISCORD EVENTS //
         #endregion
 
-        public SocketGuild GetGuild() => _shard.GetGuild(GuildId);
+        public SocketGuild GetGuild() => Shard.GetGuild(GuildId);
         public SocketGuildUser GetUser(ulong userId) => GetGuild().GetUser(userId);
         public SocketGuildUser FindUser(string name) => GetGuild().Users.FirstOrDefault(x => NameMatches(name, string.IsNullOrWhiteSpace (x.Nickname) ? x.Username : x.Nickname));
         public SocketGuildChannel GetChannel(ulong channelId) => GetGuild().GetChannel(channelId);
