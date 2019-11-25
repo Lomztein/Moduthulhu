@@ -22,9 +22,9 @@ namespace Lomztein.Moduthulhu.Modules.Clock.ActivityMonitor
             GuildHandler.UserVoiceStateUpdated += DiscordClient_UserVoiceStateUpdated;
             GuildHandler.UserJoined += DiscordClient_UserJoined;
 
-            AddConfigInfo("Add Activity Role", "Add new role.", new Action<SocketRole, uint>((x, y) => _activityRoles.MutateValue(z => z.Add(new ActivityRole(x.Id, y)))), () => "Added new activity role", "Role", "Treshold (days)");
-            AddConfigInfo("Add Activity Role", "Add new role.", new Action<string, uint>((x, y) => _activityRoles.MutateValue(z => z.Add(new ActivityRole(GuildHandler.FindRole (x).Id, y)))), () => "Added new activity role", "Role", "Treshold (days)");
-            AddConfigInfo("Add Activity Role", "Add new role.", new Action<ulong, uint>((x, y) => _activityRoles.MutateValue(z => z.Add(new ActivityRole(x, y)))), () => "Added new activity role", "Role", "Treshold (days)");
+            AddConfigInfo("Add Activity Role", "Add new role.", new Action<SocketRole, uint>((x, y) => _activityRoles.MutateValue(z => AddRole(new ActivityRole((x?.Id).GetValueOrDefault (), y)))), () => "Added new activity role", "Role", "Treshold (days)");
+            AddConfigInfo("Add Activity Role", "Add new role.", new Action<ulong, uint>((x, y) => _activityRoles.MutateValue(z => AddRole(new ActivityRole(x, y)))), () => "Added new activity role", "Role", "Treshold (days)");
+            AddConfigInfo("Add Activity Role", "Add new role.", new Action<string, uint>((x, y) => _activityRoles.MutateValue(z => AddRole(new ActivityRole((GuildHandler.FindRole (x)?.Id).GetValueOrDefault (), y)))), () => "Added new activity role", "Role", "Treshold (days)");
             AddConfigInfo("Add Activity Role", "Display roles", () => "Current activity roles:\n" + string.Join("\n", _activityRoles.GetValue().Select(x => x.ToString(GuildHandler)).ToArray()));
 
             AddConfigInfo("Remove Activity Role", "Remove role.", new Action<SocketRole>((x) => _activityRoles.MutateValue(z => z.RemoveAll(w => w.id == x.Id))), () => "Removed activity role", "Role");
@@ -43,6 +43,15 @@ namespace Lomztein.Moduthulhu.Modules.Clock.ActivityMonitor
             GuildHandler.UserJoined -= DiscordClient_UserJoined;
 
             GuildHandler.Clock.OnDayPassed -= CheckAll;
+        }
+
+        private void AddRole (ActivityRole newRole)
+        {
+            if (GuildHandler.GetRole (newRole.id) == null)
+            {
+                throw new InvalidOperationException("No such role exists.");
+            }
+            _activityRoles.MutateValue (x => x.Add (newRole));
         }
 
         private async Task DiscordClient_UserJoined(SocketGuildUser arg) {
@@ -79,14 +88,15 @@ namespace Lomztein.Moduthulhu.Modules.Clock.ActivityMonitor
             DateTime activity = GetLastActivity (user);
             DateTime now = DateTime.Now;
 
-            ActivityRole[] activityStates = _activityRoles.GetValue ().ToArray ();
+            List<ActivityRole> activityStates = _activityRoles.GetValue ();
+            activityStates.Sort(Comparer<ActivityRole>.Create((x, y) => (int)x.threshold - (int)y.threshold));
             SocketRole[] roles = activityStates.Select (x => user.Guild.GetRole (x.id)).ToArray ();
 
             SocketRole finalRole = roles[0];
 
             DateTime lastDate = now.AddDays (1);
 
-            for (int i = 0; i < activityStates.Length; i++) {
+            for (int i = 0; i < activityStates.Count; i++) {
                 DateTime thisDate = now.AddDays (-activityStates[i].threshold);
 
                 if (activity < lastDate && activity > thisDate) {
@@ -116,10 +126,12 @@ namespace Lomztein.Moduthulhu.Modules.Clock.ActivityMonitor
 
             foreach (SocketGuildUser u in users) {
                 if (!_userActivity.GetValue().ContainsKey (u.Id)) {
-                    await RecordActivity (u, DateTime.Now);
+                    await RecordActivity (u, GetDefaultDate ());
                 }
             }
         }
+
+        private DateTime GetDefaultDate () => DateTime.Now.AddYears (-1);
 
         private void StoreData() => _userActivity.Store();
 
