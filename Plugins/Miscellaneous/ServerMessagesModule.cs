@@ -36,13 +36,13 @@ namespace Lomztein.Moduthulhu.Modules.ServerMessages {
             GuildHandler.GuildMemberUpdated += OnGuildMemberUpdated;
 
             _channelId = GetConfigCache("MessageChannelID", x => x.GetGuild().TextChannels.FirstOrDefault().ZeroIfNull());
-            _onJoinedNewGuild = GetConfigCache("OnJoinedNewGuild", x => new List<string> { "**[BOTNAME]** hwere, arrived ready and primed to crash at inoppertune times!" });
+            _onJoinedNewGuild = GetConfigCache("OnJoinedNewGuild", x => new List<string> { "**[BOTNAME]** here, arrived ready and primed to crash at inoppertune times!" });
             _onUserJoinedGuild = GetConfigCache("OnUserJoinedGuild", x => new List<string> { "**[USERNAME]** has joined this server!" });
-            _onUserJoinedGuildByInvite = GetConfigCache("OnJoinedNewGuild", x => new List<string> { "**[USERNAME]** has joined this server through the help of **[INVITERNAME]**!" });
-            _onUserLeftGuild = GetConfigCache("OnJoinedNewGuild", x => new List<string> { "**[USERNAME]** has left this server. :C" });
-            _onUserBannedFromGuild = GetConfigCache("OnJoinedNewGuild", x => new List<string> { "**[USERNAME]** has been banned from this server." });
-            _onUserUnbannedFromGuild = GetConfigCache("OnJoinedNewGuild", x => new List<string> { "**[USERNAME]** has been unbanned from this server!" });
-            _onUserNameChanged = GetConfigCache("OnJoinedNewGuild", x => new List<string> { "**[USERNAME] changed their name to **[NEWNAME]**!" });
+            _onUserJoinedGuildByInvite = GetConfigCache("OnUserJoinedNewGuildByInvite", x => new List<string> { "**[USERNAME]** has joined this server through the help of **[INVITERNAME]**!" });
+            _onUserLeftGuild = GetConfigCache("OnUserLeftGuild", x => new List<string> { "**[USERNAME]** has left this server. :C" });
+            _onUserBannedFromGuild = GetConfigCache("OnUserBannedFromGuild", x => new List<string> { "**[USERNAME]** has been banned from this server." });
+            _onUserUnbannedFromGuild = GetConfigCache("OnUserUnbannedFromGuild", x => new List<string> { "**[USERNAME]** has been unbanned from this server!" });
+            _onUserNameChanged = GetConfigCache("OnUserNameChanged", x => new List<string> { "**[USERNAME] changed their name to **[NEWNAME]**!" });
 
             AddConfigInfoForMessage(_onJoinedNewGuild, "On Bot Joined");
             AddConfigInfoForMessage(_onUserJoinedGuild, "On New Member");
@@ -53,11 +53,11 @@ namespace Lomztein.Moduthulhu.Modules.ServerMessages {
             AddConfigInfoForMessage(_onUserNameChanged, "On Name Changed");
 
             AddConfigInfo("Set Message Channel", "Set channel", new Action<int, SocketTextChannel>((x, y) => _channelId.SetValue (y.Id)), () => $"Message channel set to {GuildHandler.GetTextChannel(_channelId.GetValue ()).Name}", "Index", "Channel");
-            AddConfigInfo("Set Message Channel", "Set channel", new Action<int, string>((x, y) => _channelId.SetValue (GuildHandler.FindTextChannel (y).Id)), () => $"Message channel set to {GuildHandler.GetTextChannel(_channelId.GetValue()).Name}", "Index", "Channel");
             AddConfigInfo("Set Message Channel", "Set channel", new Action<int, ulong>((x, y) => _channelId.SetValue (y)), () => $"Message channel set to {GuildHandler.GetTextChannel(_channelId.GetValue()).Name}", "Index", "Channel");
+            AddConfigInfo("Set Message Channel", "Set channel", new Action<int, string>((x, y) => _channelId.SetValue (GuildHandler.FindTextChannel (y).Id)), () => $"Message channel set to {GuildHandler.GetTextChannel(_channelId.GetValue()).Name}", "Index", "Channel");
 
             _inviteHandler = new InviteHandler (GuildHandler);
-            _ = _inviteHandler.Intialize();
+            _ = _inviteHandler.Intialize().ConfigureAwait (false);
         }
 
         private void AddConfigInfoForMessage (CachedValue<List<string>> message, string name)
