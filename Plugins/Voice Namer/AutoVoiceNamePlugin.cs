@@ -130,7 +130,7 @@ namespace Lomztein.Moduthulhu.Modules.Voice {
                     }
                 }
 
-                string [ ] splitVoice = name.Split (';');
+                string [ ] splitVoice = name.Split (':');
                 string possibleShorten = splitVoice.Length > 1 ? splitVoice [ 1 ] : splitVoice [ 0 ];
 
                 string tags = GetTags (channel);
