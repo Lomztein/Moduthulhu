@@ -15,18 +15,18 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client
     public class BotClient
     {
         public DateTime BootDate { get; private set; }
-        public TimeSpan Uptime { get => DateTime.Now - BootDate; }
+        public TimeSpan Uptime => DateTime.Now - BootDate;
 
         //internal const int GUILDS_PER_SHARD = 2000;
         public BotCore Core { get; private set; }
 
         private ClientConfiguration _configuration;
 
-        public static string DataDirectory { get => BotCore.DataDirectory; }
+        public static string DataDirectory => BotCore.DataDirectory;
 
         private BotShard[] _shards;
-        private IEnumerable<SocketGuild> AllGuilds { get => _shards.SelectMany (x => x.Guilds); }
-        private DiscordSocketClient FirstClient { get => _shards.First ().Client; }
+        private IEnumerable<SocketGuild> AllGuilds => _shards.SelectMany (x => x.Guilds);
+        private DiscordSocketClient FirstClient => _shards.First ().Client;
 
         private Dictionary<string, StatusMessage> _statusMessages = new Dictionary<string, StatusMessage>();
         private int _statusMessageIndex = -1;
@@ -96,7 +96,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client
         {
             if (_statusMessages.ContainsKey (identifier))
             {
-                throw new ArgumentException($"Cannot add message with identifier '{identifier}' since one such already exists.");
+                throw new InvalidOperationException($"Cannot add message with identifier '{identifier}' since one such already exists.");
             }
             else
             {
@@ -175,6 +175,6 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client
         }
 
         public string GetStatusString() => $"Shards: {_shards.Sum (x => x == null ? 0 : 1)} / {_configuration.TotalShards}";
-        public string GetShardsStatus() => _shards.Select (x => x == null ? "Dead shard; please restart client." : x.GetStatusString ()).Singlify ("\n");
+        public string GetShardsStatus() => string.Join("\n", _shards.Select (x => x == null ? "Dead shard; please restart client." : x.GetStatusString ()));
     }
 }

@@ -8,7 +8,7 @@ namespace Lomztein.Moduthulhu.Core.Plugins.Framework
     public static class Plugin
     {
         private static T GetAttribute<T>(Type plugin) where T : class => plugin.GetCustomAttributes(typeof(T), false).FirstOrDefault() as T;
-        private static DependencyAttribute[] GetDependancyAttributes(Type plugin) => plugin.GetType().GetCustomAttributes(typeof(DependencyAttribute), false).Cast<DependencyAttribute>().ToArray();
+        private static DependencyAttribute[] GetDependancyAttributes(Type plugin) => plugin.GetCustomAttributes(typeof(DependencyAttribute), false).Cast<DependencyAttribute>().ToArray();
         private static DescriptorAttribute GetDescriptorAttribute(Type plugin) => GetAttribute<DescriptorAttribute>(plugin);
         private static SourceAttribute GetSourceAttribute(Type plugin) => GetAttribute<SourceAttribute>(plugin);
 
@@ -32,7 +32,7 @@ namespace Lomztein.Moduthulhu.Core.Plugins.Framework
 
         public static Type Find (IEnumerable<Type> plugins, string search)
         {
-            List<Type> applicable = new List<Type>();
+            List<Type> applicable;
 
             // Find by name. Return if only one is found.
             applicable = plugins.Where(x => GetName(x).ToUpperInvariant () == search.ToUpperInvariant()).ToList ();

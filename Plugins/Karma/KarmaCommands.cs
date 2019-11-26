@@ -27,7 +27,7 @@ namespace Lomztein.Moduthulhu.Modules.Misc.Karma.Commands
         [Overload (typeof (int), "Returns karma of a given user.")]
         public Task<Result> Execute (CommandMetadata data, IUser user) {
             KarmaPlugin.Selfworth karma = ParentPlugin.GetKarma (user.Id);
-            return TaskResult (karma.Total, $"User {user.GetShownName ()} has {karma.Total} karma! (+{karma.upvotes} / -{karma.downvotes})");
+            return TaskResult (karma.Total, $"User {user.GetShownName ()} has {karma.Total} karma! (+{karma.Upvotes} / -{karma.Downvotes})");
         }
 
         [Overload (typeof (SocketGuildUser[]), "Returns karma of a given user.")]

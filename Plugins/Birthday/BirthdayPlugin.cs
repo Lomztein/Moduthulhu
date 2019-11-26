@@ -94,8 +94,6 @@ namespace Lomztein.Moduthulhu.Plugins.Birthday {
                     user.Value.SetLastPassedToNow();
                 }
             }
-
-            return;
         }
 
         public async Task AnnounceBirthday(ITextChannel channel, SocketGuildUser user, BirthdayDate date) {
@@ -111,10 +109,8 @@ namespace Lomztein.Moduthulhu.Plugins.Birthday {
 
             public BirthdayDate(DateTime _date, long lastPassedYear)
             {
-
                 this._date = _date;
                 _lastPassedYear = lastPassedYear;
-
             }
 
             public int GetAge() {
@@ -175,7 +171,7 @@ namespace Lomztein.Moduthulhu.Plugins.Birthday {
 
             [Overload (typeof (void), "Set your birthday to a specific date.")]
             public Task<Result> Execute (CommandMetadata data, int day, int month, int year) {
-                Consent.AssertConsent((data.Author as SocketGuildUser).Guild.Id, data.AuthorID); ;
+                Consent.AssertConsent((data.Author as SocketGuildUser).Guild.Id, data.AuthorID);
                 DateTime date = new DateTime (year, month, day, 12, 0, 0);
                 ParentPlugin.SetBirthday (data.Message.Author.Id, date);
                 return TaskResult (null, $"Succesfully set birthday date to **{date.ToShortDateString ()}**.");

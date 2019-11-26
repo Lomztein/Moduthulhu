@@ -26,7 +26,7 @@ namespace Lomztein.Moduthulhu.Core.IO.Database.Repositories
         {
             Log.Write(Log.Type.DATA, $"Querying database table {_tableName} for identifier {identifier} and key {key}.");
             IDatabaseConnector db = GetConnector();
-            var res = db.ReadQuery($"SELECT value FROM {_tableName} WHERE identifier = @identifier AND key = @key", new Dictionary<string, object>() { { "@identifier", identifier }, { "@key", key } });
+            var res = db.ReadQuery($"SELECT value FROM {_tableName} WHERE identifier = @identifier AND key = @key", new Dictionary<string, object> { { "@identifier", identifier }, { "@key", key } });
             return res.Length == 0 ? default : (TValue)res.Single ().FirstOrDefault ().Value;
         }
 

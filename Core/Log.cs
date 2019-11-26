@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text;
 
 namespace Lomztein.Moduthulhu.Core
@@ -27,7 +28,7 @@ namespace Lomztein.Moduthulhu.Core
 
         public static void Write(ConsoleColor color, string prefix, string text) {
             Console.ForegroundColor = color;
-            Console.WriteLine ($"[{prefix}] - [{DateTime.Now.ToString ()}] {text}");
+            Console.WriteLine ($"[{prefix}] - [{DateTime.Now.ToString ("dd/MM/yyyy HH:mm:ss", CultureInfo.InvariantCulture)}] {text}");
         }
 
         public static void Write (Type type, string text) {

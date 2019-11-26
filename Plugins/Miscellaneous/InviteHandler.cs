@@ -25,13 +25,18 @@ namespace Lomztein.Moduthulhu.Modules.ServerMessages
 
         public async Task UpdateData(IReadOnlyCollection<RestInviteMetadata> readOnly, SocketGuild guild) {
             try {
+                IReadOnlyCollection<RestInviteMetadata> invites = null;
                 if (readOnly == null)
-                    readOnly = await guild.GetInvitesAsync ();
+                {
+                    invites = await guild.GetInvitesAsync();
+                }
 
                 if (!savedInvites.ContainsKey (guild.Id))
-                    savedInvites.Add (guild.Id, new Dictionary<string, RestInviteMetadata> ());
+                {
+                    savedInvites.Add(guild.Id, new Dictionary<string, RestInviteMetadata>());
+                }
 
-                savedInvites[guild.Id] = readOnly.ToDictionary (x => x.Code);
+                savedInvites[guild.Id] = invites.ToDictionary (x => x.Code);
             } catch (Exception e) {
                 Log.Write (e);
             }
@@ -53,7 +58,9 @@ namespace Lomztein.Moduthulhu.Modules.ServerMessages
                         }
                     } else {
                         if (key.Value.Uses == 1)
+                        {
                             result = key.Value;
+                        }
                     }
                 }
 

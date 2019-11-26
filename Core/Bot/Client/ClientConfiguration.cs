@@ -20,16 +20,24 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client
         public void CheckValidity ()
         {
             if (!ShardRange.IsValid())
+            {
                 throw new InvalidConfigurationException("Shard range is invalid.");
+            }
 
             if (ShardRange.Min < 0)
+            {
                 throw new InvalidConfigurationException("Shard range minimum is below zero.");
+            }
 
             if (ShardRange.Max > TotalShards)
+            {
                 throw new InvalidConfigurationException("Shard range max is above total shard count.");
+            }
 
             if (string.IsNullOrWhiteSpace(Token))
+            {
                 throw new InvalidConfigurationException("Configuration contains no token.");
+            }
         }
 
         public static ClientConfiguration Load (string path)

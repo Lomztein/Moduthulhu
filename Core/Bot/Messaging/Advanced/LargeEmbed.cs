@@ -32,6 +32,12 @@ namespace Lomztein.Moduthulhu.Core.Bot.Messaging.Advanced {
 
             embedFields.Add (new List<EmbedFieldBuilder> (source.Fields));
 
+            if (embedFields.Count == 0)
+            {
+                header = new EmbedBuilder ();
+                footer = new EmbedBuilder ();
+            }
+
             for (int i = 0; i < embedFields.Count; i++) {
                 EmbedBuilder field = new EmbedBuilder ();
 
@@ -40,9 +46,14 @@ namespace Lomztein.Moduthulhu.Core.Bot.Messaging.Advanced {
                 }
 
                 if (i == 0)
+                {
                     header = field;
+                }
+
                 if (i == embedFields.Count - 1)
+                {
                     footer = field;
+                }
 
                 fields.Add (field);
             }

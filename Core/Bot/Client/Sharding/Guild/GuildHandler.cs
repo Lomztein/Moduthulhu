@@ -95,6 +95,8 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
 
         internal async Task OnJoinedGuild() => await (JoinedGuild?.Invoke(GetGuild()) ?? Task.CompletedTask);
         public event Func<SocketGuild, Task> JoinedGuild;
+        internal async Task OnLeftGuild() => await (LeftGuild?.Invoke(GetGuild()) ?? Task.CompletedTask);
+        public event Func<SocketGuild, Task> LeftGuild;
 
         internal async Task OnGuildMembersDownloaded() => await (GuildMembersDownloaded?.Invoke(GetGuild()) ?? Task.CompletedTask);
         public event Func<SocketGuild, Task> GuildMembersDownloaded;

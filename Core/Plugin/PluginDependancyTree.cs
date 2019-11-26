@@ -67,7 +67,7 @@ namespace Lomztein.Moduthulhu.Core.Plugins
             while (toOrder.Count != 0) {
 
                 if (currentIndex > toOrder.Count - 1) {
-                    Log.Write (Log.Type.CRITICAL, $"Plugins {toOrder.Select (x => x.Name).Singlify ()} are missing dependencies, they have been excluded in the sort.");
+                    Log.Write (Log.Type.CRITICAL, $"Plugins {string.Join (", ", toOrder.Select (x => x.Name))} are missing dependencies, they have been excluded in the sort.");
                     break;
                 }
 
@@ -104,7 +104,7 @@ namespace Lomztein.Moduthulhu.Core.Plugins
             return branch;
         }
 
-        public bool Matches (string pluginName, string pluginVersion, string dependancyName, string dependancyVersion)
+        public static bool Matches (string pluginName, string pluginVersion, string dependancyName, string dependancyVersion)
         {
             if (pluginName == dependancyName)
             {

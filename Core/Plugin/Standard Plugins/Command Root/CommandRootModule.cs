@@ -25,8 +25,8 @@ namespace Lomztein.Moduthulhu.Plugins.Standard {
         private CachedValue<char> _trigger;
         private CachedValue<char> _hiddenTrigger;
 
-        string INamed.Name { get => Name; set => throw new InvalidOperationException(); }
-        string INamed.Description { get => Description; set => throw new InvalidOperationException(); }
+        string INamed.Name { get => Plugin.GetName (GetType ()); set => throw new InvalidOperationException(); }
+        string INamed.Description { get => Plugin.GetDescription (GetType ()); set => throw new InvalidOperationException(); }
 
         private CommandRoot _commandRoot;
 
@@ -98,12 +98,12 @@ namespace Lomztein.Moduthulhu.Plugins.Standard {
         }
 
         public void AddCommands(params ICommand [ ] newCommands) {
-            Log ($"Adding commands: {newCommands.Select (x => x.Name).ToArray ().Singlify ()}");
+            Log ($"Adding commands: {string.Join (", ", newCommands.Select (x => x.Name).ToArray ())}");
             ((ICommandSet)_commandRoot).AddCommands (newCommands);
         }
 
         public void RemoveCommands(params ICommand [ ] commands) {
-            Log ($"Removing commands: {commands.Select (x => x.Name).ToArray ().Singlify ()}");
+            Log ($"Removing commands: {string.Join (", ", commands.Select (x => x.Name).ToArray ())}");
             ((ICommandSet)_commandRoot).RemoveCommands (commands);
         }
     }

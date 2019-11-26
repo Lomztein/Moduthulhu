@@ -12,12 +12,15 @@ namespace Lomztein.Moduthulhu.Core.Plugins.Framework
         public string Version { get; private set; }
         public string Description { get; private set; }
 
-        public DescriptorAttribute (string author, string name, string description = "", string version = "1.0.0")
+        public DescriptorAttribute (string author, string name, string description, string version)
         {
             Author = author;
             Name = name;
             Version = version;
             Description = description;
         }
+
+        public DescriptorAttribute (string author, string name, string description) : this (author, name, description, "1.0.0") { }
+        public DescriptorAttribute (string author, string name) : this (author, name, "", "1.0.0") { }
     }
 }

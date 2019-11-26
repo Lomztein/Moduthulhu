@@ -8,8 +8,8 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client
 {
     public class StatusMessage
     {
-        private ActivityType _type;
-        private Func<string> _message;
+        private readonly ActivityType _type;
+        private readonly Func<string> _message;
 
         public StatusMessage (ActivityType type, Func<string> message)
         {

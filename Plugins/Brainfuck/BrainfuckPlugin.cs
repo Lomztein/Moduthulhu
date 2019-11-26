@@ -12,37 +12,37 @@ namespace Lomztein.ModularDiscordBot.Modules.Misc.Brainfuck
     [Source ("https://github.com/Lomztein", "https://github.com/Lomztein/Moduthulhu/blob/master/Plugins/Brainfuck/BrainfuckPlugin.cs")]
     public class BrainfuckPlugin : PluginBase {
 
-        private BrainfuckCommand command;
+        private BrainfuckCommand _command;
 
-        private Dictionary<ulong, char?> input = new Dictionary<ulong, char?> ();
+        private readonly Dictionary<ulong, char?> _input = new Dictionary<ulong, char?> ();
 
         public override void Initialize() {
-            command = new BrainfuckCommand () { ParentPlugin = this };
-            SendMessage("Lomztein-Command Root", "AddCommand", command);
+            _command = new BrainfuckCommand () { ParentPlugin = this };
+            SendMessage("Lomztein-Command Root", "AddCommand", _command);
         }
 
         public override void Shutdown() {
-            SendMessage("Lomztein-Command Root", "RemoveCommand", command);
+            SendMessage("Lomztein-Command Root", "RemoveCommand", _command);
         }
 
         private async Task<string> Run (string program, ulong channelID) {
-            if (input.ContainsKey (channelID))
+            if (_input.ContainsKey (channelID))
                 throw new Exception ("A Brainfuck program is already running in this channel.");
 
-            input.Add (channelID, null);
+            _input.Add (channelID, null);
             BrainfuckIntepreter intepreter = new BrainfuckIntepreter (new Func<Task<byte>> (async () => await AwaitInputAsync (channelID)));
             var result = await intepreter.Interpret (program);
-            input.Remove (channelID);
+            _input.Remove (channelID);
             return result;
         }
 
         private async Task<byte> AwaitInputAsync(ulong channelID) {
-            if (input.ContainsKey (channelID)) {
-                while (input [ channelID ] == null) {
+            if (_input.ContainsKey (channelID)) {
+                while (_input [ channelID ] == null) {
                     await Task.Delay (1000);
                 }
 
-                return (byte)input [ channelID ];
+                return (byte)_input [ channelID ];
             }
             throw new ArgumentException ("There is no current program in channel " + channelID + ".");
         }

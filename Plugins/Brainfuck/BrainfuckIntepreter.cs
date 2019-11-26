@@ -7,54 +7,54 @@ namespace Lomztein.ModularDiscordBot.Modules.Misc.Brainfuck
 {
     public class BrainfuckIntepreter {
 
-        public BrainfuckIntepreter (Func<Task<byte>> _getInput) {
-            getInput = _getInput;
+        public BrainfuckIntepreter (Func<Task<byte>> getInput) {
+            _getInput = getInput;
         }
 
-        public string program;
-        public string result;
+        private string _program;
+        public string Result;
 
-        private int counter = 0;
-        private int pointer = 0;
+        private int _counter = 0;
+        private int _pointer = 0;
 
-        private byte[ ] memory = new byte [ 30000 ];
-        public Func<Task<byte>> getInput;
+        private readonly byte[ ] _memory = new byte [ 30000 ];
+        private readonly Func<Task<byte>> _getInput;
 
-        public async Task<string> Interpret(string _program) {
+        public async Task<string> Interpret(string program) {
 
-            program = _program;
+            _program = program;
             string printout = string.Empty;
 
             try {
-                for (counter = 0; counter < program.Length; counter++) {
-                    switch (program [ counter ]) {
+                for (_counter = 0; _counter < this._program.Length; _counter++) {
+                    switch (this._program [_counter]) {
                         case '>':
-                            MovePointer (1);
+                            MovePointer(1);
                             break;
 
                         case '<':
-                            MovePointer (-1);
+                            MovePointer(-1);
                             break;
 
                         case '+':
-                            ChangeMemoryAtPointer (1);
+                            ChangeMemoryAtPointer(1);
                             break;
 
                         case '-':
-                            ChangeMemoryAtPointer (-1);
+                            ChangeMemoryAtPointer(-1);
                             break;
 
                         case '[':
                         case ']':
-                            counter = LoopCounter (counter);
+                            _counter = LoopCounter(_counter);
                             break;
 
                         case '.':
-                            Printout (ref printout);
+                            Printout(ref printout);
                             break;
 
                         case ',':
-                            SetMemoryAtPointer (await getInput ());
+                            SetMemoryAtPointer(await _getInput());
                             break;
                     }
                 }
@@ -62,58 +62,62 @@ namespace Lomztein.ModularDiscordBot.Modules.Misc.Brainfuck
                 return e.Message;
             }
 
-            result = printout;
+            Result = printout;
             return printout;
         }
 
         // The > and < chars, changes memory pointer.
         private void MovePointer(int movement) {
-            pointer += movement;
+            _pointer += movement;
         }
 
         // The + and - chars, changes memory at pointer.
         private void ChangeMemoryAtPointer(int movement) {
-            int curAsInt = memory [ pointer ];
-            memory [ pointer ] = (byte)(curAsInt + movement);
+            int curAsInt = _memory [ _pointer ];
+            _memory [ _pointer ] = (byte)(curAsInt + movement);
         }
 
         // The , char, not sure how this is used.
         private void SetMemoryAtPointer (byte value) {
-            memory [ pointer ] = value;
+            _memory [ _pointer ] = value;
         }
 
         // The . char, prints out bytes.
         private void Printout(ref string printout) {
-            printout += (char)memory[pointer];
+            printout += (char)_memory[_pointer];
         }
 
         // The [ and ] chars, functions as loops/pathers.
         private int LoopCounter(int position) {
 
-            char starting = program [ position ];
-            int movement = BracketToMovement (program [ position]);
+            char starting = _program [ position ];
+            int movement = BracketToMovement (_program [ position]);
             int balance = movement;
 
             int fit = position;
 
             while (true) {
                 position += movement;
-                balance += BracketToMovement (program [ position]);
+                balance += BracketToMovement (_program [ position]);
 
-                if (IsBracket (program[position])) {
-                    bool isOpposite = program [ position ] == OppositeBracket (starting);
+                if (IsBracket (_program[position])) {
+                    bool isOpposite = _program [ position ] == OppositeBracket (starting);
 
                     // Move forward if zero.
                     if (starting == '[' && isOpposite && balance == 0) {
-                        if (memory [ pointer ] == 0)
+                        if (_memory [ _pointer ] == 0)
+                        {
                             fit = position;
+                        }
                         break;
                     }
 
                     // Move backwards if non-zero.
                     if (starting == ']' && isOpposite && balance == 0) {
-                        if (memory [ pointer ] != 0)
+                        if (_memory [ _pointer ] != 0)
+                        {
                             fit = position;
+                        }
                         break;
                     }
                 }

@@ -1,6 +1,7 @@
 ﻿using Lomztein.Moduthulhu.Core.IO.Database;
 using System;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 using System.Text;
 
 namespace Lomztein.Moduthulhu.Core.Bot
@@ -52,7 +53,7 @@ namespace Lomztein.Moduthulhu.Core.Bot
         }
     }
 
-    public class ConsentException : Exception
+    public class ConsentException : Exception, ISerializable
     {
         public ConsentException(string message) : base(message)
         {

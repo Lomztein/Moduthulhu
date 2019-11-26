@@ -3,6 +3,7 @@ using Lomztein.AdvDiscordCommands.Framework.Categories;
 using Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild.Config;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 
@@ -21,14 +22,15 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
 
     public class ConfigCommand : Command
     {
-        private ConfigFunctionInfo[] _sources;
+        private readonly ConfigFunctionInfo[] _sources;
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1308:Normalize strings to uppercase", Justification = "This is ToLowered to fit command conventions of only lowercase command names.")]
         public ConfigCommand (ConfigFunctionInfo[] sources, string categoryName, string categoryDesc)
         {
             _sources = sources;
             var first = sources.First();
 
-            Name = Regex.Replace(first.Name.ToLowerInvariant(), "\\s", "");
+            Name = Regex.Replace(first.Name.ToLower (CultureInfo.InvariantCulture), "\\s", "");
             Description = first.Desc;
             Category = new Category (categoryName, categoryDesc);
             RequiredPermissions.Add(Discord.GuildPermission.ManageGuild);
@@ -55,11 +57,6 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
                     });
             }
             return overloads;
-        }
-
-        private void ExecuteSource (int index, object[] args)
-        {
-            _sources[index].Action.DynamicInvoke(args);
         }
     }
 }

@@ -55,20 +55,33 @@ namespace Lomztein.Moduthulhu.Core
         }
 
         private void Tick (DateTime curTick, DateTime lTick) {
-            try {
+            try
+            {
                 OnSecondPassed?.Invoke(curTick, lTick);
-                if (MinutePassed (curTick, lTick))
-                    OnMinutePassed?.Invoke (curTick, lTick);
-                if (HourPassed (curTick, lTick))
-                    OnHourPassed?.Invoke (curTick, lTick);
-                if (DayPassed (curTick, lTick))
-                    OnDayPassed?.Invoke (curTick, lTick);
-                if (MonthPassed (curTick, lTick))
-                    OnMonthPassed?.Invoke (curTick, lTick);
-                if (YearPassed (curTick, lTick))
-                    OnYearPassed?.Invoke (curTick, lTick);
-            } catch (Exception exc) {
-                ExceptionCaught?.Invoke (exc);
+                if (MinutePassed(curTick, lTick))
+                {
+                    OnMinutePassed?.Invoke(curTick, lTick);
+                }
+                if (HourPassed(curTick, lTick))
+                {
+                    OnHourPassed?.Invoke(curTick, lTick);
+                }
+                if (DayPassed(curTick, lTick))
+                {
+                    OnDayPassed?.Invoke(curTick, lTick);
+                }
+                if (MonthPassed(curTick, lTick))
+                {
+                    OnMonthPassed?.Invoke(curTick, lTick);
+                }
+                if (YearPassed(curTick, lTick))
+                {
+                    OnYearPassed?.Invoke(curTick, lTick);
+                }
+            }
+            catch (Exception exc)
+            {
+                ExceptionCaught?.Invoke(exc);
             }
         }
 

@@ -13,14 +13,14 @@ namespace Lomztein.Moduthulhu.Modules.Shipping {
     [Descriptor ("Lomztein", "Shipping Simulator 2018", "At the core of all this lies Guffe.")]
     public class ShippingPlugin : PluginBase {
 
-        public CachedValue<List<Ship>> _ships;
-        public CachedValue<List<ShipName>> _shipNames;
+        private CachedValue<List<Ship>> _ships;
+        private CachedValue<List<ShipName>> _shipNames;
 
-        private ShippingCommands commands;
+        private ShippingCommands _commands;
 
         public override void Initialize() {
-            commands = new ShippingCommands () { ParentPlugin = this };
-            SendMessage("Lomztein-Command Root", "AddCommand", commands);
+            _commands = new ShippingCommands () { ParentPlugin = this };
+            SendMessage("Lomztein-Command Root", "AddCommand", _commands);
 
             _ships = GetDataCache("Ships", x => new List<Ship>());
             _shipNames = GetDataCache("ShipNames", x => new List<ShipName>());
@@ -99,7 +99,9 @@ namespace Lomztein.Moduthulhu.Modules.Shipping {
         public bool ContainsShip(Ship ship)
         {
             if (_ships.GetValue().Contains(ship))
+            {
                 return true;
+            }
             return false;
         }
 
@@ -131,7 +133,7 @@ namespace Lomztein.Moduthulhu.Modules.Shipping {
         }
 
         public ShipName GetCustomShipName (ulong shippieOne, ulong shippieTwo) {
-            return _shipNames.GetValue().Find (x => x.shippieOne == shippieOne && x.shippieTwo == shippieTwo);
+            return _shipNames.GetValue().Find (x => x.ShippieOne == shippieOne && x.ShippieTwo == shippieTwo);
         }
 
         public string GetShipName(Ship ship)
@@ -139,7 +141,7 @@ namespace Lomztein.Moduthulhu.Modules.Shipping {
             ShipName name = GetCustomShipName(ship.ShippieOne, ship.ShippieTwo);
             if (name == null)
                 return ship.GenerateContractedName(GuildHandler);
-            return name.shipName;
+            return name.Name;
         }
 
         public string ShipToString(Ship ship)
@@ -151,7 +153,7 @@ namespace Lomztein.Moduthulhu.Modules.Shipping {
         }
 
         public override void Shutdown() {
-            SendMessage("Lomztein-Command Root", "RemoveCommand", commands);
+            SendMessage("Lomztein-Command Root", "RemoveCommand", _commands);
         }
 
     }
@@ -249,22 +251,22 @@ namespace Lomztein.Moduthulhu.Modules.Shipping {
 
     public class ShipName {
 
-        public ulong shippieOne;
-        public ulong shippieTwo;
+        public ulong ShippieOne { get; private set; }
+        public ulong ShippieTwo { get; private set; }
 
-        public string shipName;
+        public string Name { get; private set; }
 
         public ShipName (ulong _shippieOne, ulong _shippieTwo, string _shipName) {
 
-            shippieOne = Math.Min (_shippieOne, _shippieTwo);
-            shippieTwo = Math.Max (_shippieOne, _shippieTwo);
+            ShippieOne = Math.Min (_shippieOne, _shippieTwo);
+            ShippieTwo = Math.Max (_shippieOne, _shippieTwo);
 
-            shipName = _shipName;
+            Name = _shipName;
         }
 
         public override bool Equals(object obj) {
             if (obj is ShipName shipName) {
-                return shippieOne == shipName.shippieOne && shippieTwo == shipName.shippieTwo;
+                return ShippieOne == shipName.ShippieOne && ShippieTwo == shipName.ShippieTwo;
             }
             return false;
         }

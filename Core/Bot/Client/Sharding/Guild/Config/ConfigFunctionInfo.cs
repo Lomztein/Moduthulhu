@@ -7,7 +7,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild.Config
 {
     public class ConfigFunctionInfo
     {
-        private ConfigFunctionParam[] _parameters;
+        private readonly ConfigFunctionParam[] _parameters;
         public ConfigFunctionParam[] GetParameters () => _parameters;
         public Delegate Action { get; private set; }
         public Func<string> Message { get; private set; }

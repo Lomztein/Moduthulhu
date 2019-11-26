@@ -18,7 +18,7 @@ namespace Lomztein.Moduthulhu.Modules.Shipping {
             Description = "Most important commands.";
             Category = StandardCategories.Fun;
 
-            commandsInSet = new List<ICommand> () {
+            commandsInSet = new List<ICommand> {
                 new Ship (), new Sink (),
                 new Shipname (), new List (),
                 new OTPs (), new ATPs (),

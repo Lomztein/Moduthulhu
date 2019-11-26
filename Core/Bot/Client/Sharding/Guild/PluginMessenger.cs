@@ -21,7 +21,8 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
             return null;
         }
 
-        public T SendMessage<T>(string target, string name, object value = null) => (T)SendMessage(target, name, value);
+        public T SendMessage<T>(string target, string name, object value) => (T)SendMessage(target, name, value);
+        public T SendMessage<T>(string target, string name) => (T)SendMessage(target, name, null);
 
         public void Register(string target, string name, Func<object, object> function) => Register(target, name, new MessageInfo (target, name, function));
         public void Register(string target, string name, Action<object> action) => Register (target, name, new MessageInfo (target, name, action));

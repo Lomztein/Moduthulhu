@@ -14,29 +14,41 @@ namespace Lomztein.Moduthulhu.Core.Extensions
         public static string GetPath (this IChannel channel) {
 
             if (channel == null)
+            {
                 return "null";
+            }
 
             if (channel is SocketGuildChannel guildChannel) {
                 return $"{guildChannel.Guild.Name} / {guildChannel.Name}";
             }
 
             if (channel is SocketDMChannel dmChannel)
+            {
                 return $"{dmChannel.Recipient.Username}";
+            }
 
             return "";
         }
 
         public static string GetPath (this IMessage message) {
             if (message is SocketUserMessage userMessage)
-                return userMessage.Channel.GetPath () + " / " + userMessage.Author.Username;
+            {
+                return userMessage.Channel.GetPath() + " / " + userMessage.Author.Username;
+            }
+
             if (message is SocketSystemMessage systemMessage)
-                return systemMessage.Source.ToString ();
+            {
+                return systemMessage.Source.ToString();
+            }
+
             return "";
         }
         
         public static string GetPath (this SocketGuildUser guildUser) {
             if (guildUser == null)
+            {
                 return "null";
+            }
 
             return guildUser.Guild.Name + " / " + (string.IsNullOrEmpty (guildUser.Nickname) ? guildUser.Username : guildUser.Nickname);
         }
@@ -44,7 +56,9 @@ namespace Lomztein.Moduthulhu.Core.Extensions
         public static string GetPath (this IRole role) {
 
             if (role == null)
+            {
                 return "null";
+            }
 
             return role.Guild + " / " + role.Name;
 
@@ -52,7 +66,10 @@ namespace Lomztein.Moduthulhu.Core.Extensions
 
         public static ulong ZeroIfNull (this IEntity<ulong> entity) {
             if (entity == null)
+            {
                 return 0;
+            }
+
             return entity.Id;
         }
 

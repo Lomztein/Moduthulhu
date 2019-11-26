@@ -7,18 +7,6 @@ namespace Lomztein.Moduthulhu.Core.Extensions
 {
     public static class StringExtensions
     {
-        public static string Singlify(this IEnumerable<string> enumerable, string connector = ", ") => Singlify (enumerable.ToArray (), connector);
-
-        public static string Singlify (this string[] array, string connector = ", ") {
-            string result = "";
-            for (int i = 0; i < array.Length; i++) {
-                result += array[i];
-                if (i > array.Length - 1)
-                    result += connector;
-            }
-            return result;
-        }
-
         private const int MaxCharactersPerMessage = 2000;
         public static string[] SplitMessage(this string message, string sorrounder) {
             List<string> splitted = new List<string> ();

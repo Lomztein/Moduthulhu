@@ -11,11 +11,15 @@ namespace Lomztein.Moduthulhu.Core.Plugins.Framework
         public string ProjectURI { get; private set; }
         public string PatchURI { get; private set; }
 
-        public SourceAttribute (string author = null, string project = null, string patch = null)
+        public SourceAttribute (string author, string project, string patch)
         {
             AuthorURI = author;
             ProjectURI = project;
             PatchURI = patch;
         }
+
+        public SourceAttribute (string author, string project) : this (author, project, null) { }
+        public SourceAttribute (string author) : this (author, null, null) { }
+        public SourceAttribute () : this (null, null, null) { }
     }
 }

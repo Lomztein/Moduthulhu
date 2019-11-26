@@ -17,8 +17,8 @@ namespace Lomztein.Moduthulhu.Modules.Misc.Karma
     [Descriptor ("Lomztein", "Karma", "Keep track of an accurate representation of peoples self-worth.")]
     public class KarmaPlugin : PluginBase {
 
-        private CachedValue<ulong> _upvoteEmoteId;// = new MultiEntry<ulong, SocketGuild> (x => x.Emotes.FirstOrDefault (y => y.Name == "upvote").ZeroIfNull (), "UpvoteEmoteID", true);
-        private CachedValue<ulong> _downvoteEmoteId;// = new MultiEntry<ulong, SocketGuild> (x => x.Emotes.FirstOrDefault (y => y.Name == "downvote").ZeroIfNull (), "DownvoteEmoteID", true);
+        private CachedValue<ulong> _upvoteEmoteId;
+        private CachedValue<ulong> _downvoteEmoteId;
 
         private CachedValue<Dictionary<ulong, Selfworth>> _karma;
 
@@ -100,16 +100,16 @@ namespace Lomztein.Moduthulhu.Modules.Misc.Karma
 
         public class Selfworth {
 
-            public int upvotes;
-            public int downvotes;
+            public int Upvotes;
+            public int Downvotes;
 
             [JsonIgnore]
-            public int Total { get =>  upvotes - downvotes; }
+            public int Total { get =>  Upvotes - Downvotes; }
 
-            public void Upvote() => upvotes++;
-            public void Downvote() => downvotes++;
+            public void Upvote() => Upvotes++;
+            public void Downvote() => Downvotes++;
 
-            public override string ToString() => $"{Total} (+{upvotes} / -{downvotes})";
+            public override string ToString() => $"{Total} (+{Upvotes} / -{Downvotes})";
 
         }
     }
