@@ -14,7 +14,11 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
 
         private GuildHandler _parentHandler;
 
-        private CachedValue<List<string>> _enabledPlugins; // TODO: _enabledPlugins currently store full name including version, but it shouldn't include version since that would disable the plugin if the plugin was updated.
+        private CachedValue<List<string>> _enabledPlugins;
+        private List<Exception> _initializationExceptions = new List<Exception>();
+
+        public event Action<IPlugin> OnPluginLoaded;
+        public event Action<IPlugin> OnPluginUnloaded;
 
         public PluginManager (GuildHandler parent)
         {
@@ -75,6 +79,15 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
             }
         }
 
+        public Exception[] GetInitializationExceptions()
+        {
+            var cur = _initializationExceptions.ToArray();
+            ClearInitializationExceptions();
+            return cur;
+        }
+
+        private void ClearInitializationExceptions() => _initializationExceptions.Clear();
+
         public IPlugin[] GetActivePlugins() => _activePlugins.ToArray();
 
         public void ShutdownPlugins ()
@@ -83,18 +96,24 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
             foreach (IPlugin plugin in _activePlugins)
             {
                 Log.Write(Log.Type.PLUGIN, "Shutting down plugin " + Plugin.GetVersionedFullName(plugin.GetType()));
-                _parentHandler.Messenger.Clear(Plugin.GetFullName(plugin.GetType())); // TODO: Create OnPluginLoaded and OnPluginUnloaded events and have the GuildHandler do this instead as to reduce coupling.
-                _parentHandler.Config.Clear(Plugin.GetFullName(plugin.GetType()));
                 plugin.Shutdown();
+                OnPluginUnloaded?.Invoke(plugin);
             }
             _activePlugins.Clear();
+        }
+
+        private static bool ContainsDependancies (IEnumerable<string> enabledList, string pluginName)
+        {
+            var dependancies = PluginLoader.DependancyTree.GetDependencies(pluginName);
+            bool containsDependancies = dependancies.All(x => enabledList.Any(y => y.StartsWith(Plugin.GetFullName(x), StringComparison.Ordinal)));
+            return containsDependancies;
         }
 
         public void LoadPlugins ()
         {
             Log.Write(Log.Type.PLUGIN, "Reloading plugins for guild " + _parentHandler.GetGuild().Name);
 
-            Filter<string> filter = new Filter<string>(x => _enabledPlugins.GetValue().Any (y => NameMatches (x, y)));
+            Filter<string> filter = new Filter<string>(x => _enabledPlugins.GetValue().Any (y => NameMatches (x, y)), x => ContainsDependancies (_enabledPlugins.GetValue (), x));
             string[] toLoad = PluginLoader.GetPlugins ().Select (x => Plugin.GetFullName (x)).ToArray ();
             toLoad = filter.FilterModules(toLoad).ToArray ();
 
@@ -125,6 +144,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
                 {
                     Log.Write(Log.Type.WARNING, $"Something went wrong during plugin pre-initialization of plugin '{Plugin.GetName (plugin.GetType ())}'. The plugin has been disabled and plugin initialization scheduled to be restarted.");
                     Log.Write(exc);
+                    _initializationExceptions.Add(exc);
                     RemovePlugin(Plugin.GetFullName(plugin.GetType()));
                     initError = true;
                 }
@@ -141,6 +161,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
                 {
                     Log.Write(Log.Type.WARNING, $"Something went wrong during plugin initialization of plugin '{Plugin.GetName(plugin.GetType())}'. The plugin has been disabled and plugin initialization scheduled to be restarted.");
                     Log.Write(exc);
+                    _initializationExceptions.Add(exc);
                     RemovePlugin(Plugin.GetFullName(plugin.GetType()));
                     initError = true;
                 }
@@ -157,9 +178,12 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
                 {
                     Log.Write(Log.Type.WARNING, $"Something went wrong during plugin post-initialization of plugin '{Plugin.GetName(plugin.GetType())}'. The plugin has been disabled and plugin initialization scheduled to be restarted.");
                     Log.Write(exc);
+                    _initializationExceptions.Add(exc);
                     RemovePlugin(Plugin.GetFullName(plugin.GetType()));
                     initError = true;
                 }
+
+                OnPluginLoaded?.Invoke(plugin);
             }
 
             if (initError)

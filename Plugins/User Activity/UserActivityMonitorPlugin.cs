@@ -18,6 +18,8 @@ namespace Lomztein.Moduthulhu.Modules.Clock.ActivityMonitor
         private CachedValue<List<ActivityRole>> _activityRoles;
 
         public override void Initialize () {
+            AssertPermission(Discord.GuildPermission.ManageRoles);
+
             GuildHandler.MessageReceived += DiscordClient_MessageReceived;
             GuildHandler.UserVoiceStateUpdated += DiscordClient_UserVoiceStateUpdated;
             GuildHandler.UserJoined += DiscordClient_UserJoined;

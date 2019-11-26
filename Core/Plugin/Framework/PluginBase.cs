@@ -55,5 +55,10 @@ namespace Lomztein.Moduthulhu.Core.Plugins.Framework
 
         protected void SendMessage(string target, string identifier, object value = null) => GuildHandler.Messenger.SendMessage(target, identifier, value);
         protected T SendMessage<T>(string target, string identifier, object value = null) => GuildHandler.Messenger.SendMessage<T>(target, identifier, value);
+
+        protected void AssertPermission(GuildPermission perm) => GuildHandler.AssertPermission(perm);
+        protected void AssertChannelPermission(ChannelPermission perm, ulong channelId) => GuildHandler.AssertChannelPermission(perm, channelId);
+        protected bool HasPermission(GuildPermission perm) => GuildHandler.HasPermission(perm);
+        protected void HasChannelPermission(ChannelPermission perm, ulong channelId) => GuildHandler.HasChannelPermission(perm, channelId);
     }
 }

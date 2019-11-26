@@ -53,7 +53,8 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
                 }
                 else
                 {
-                    return TaskResult(null, $"Failed to add plugin '{pluginName}'. An error may have occured in its initialization.");
+                    IEnumerable<string> exceptions = ParentPlugin.GuildHandler.Plugins.GetInitializationExceptions().Select(x => x.Message);
+                    return TaskResult(null, $"Failed to add plugin '{pluginName}'. Issues occured during initialization:\n\t{string.Join ("\n\t", exceptions)}");
                 }
             }
         }

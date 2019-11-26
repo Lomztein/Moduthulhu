@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Linq;
 using System.Globalization;
 using Lomztein.Moduthulhu.Core.IO.Database.Repositories;
+using Lomztein.Moduthulhu.Core.Plugins.Framework;
 
 namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
 {
@@ -36,8 +37,15 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
             Clock.Start();
 
             Name = GetGuild().Name;
+            Plugins.OnPluginUnloaded += Plugins_OnPluginUnloaded;
 
             Culture = new CachedValue<CultureInfo>(new IdentityKeyJsonRepository("pluginconfig"), GuildId, "Culture", () => new CultureInfo("en-US"));
+        }
+
+        private void Plugins_OnPluginUnloaded(IPlugin plugin)
+        {
+            Messenger.Clear(Plugin.GetFullName(plugin.GetType ()));
+            Config.Clear(Plugin.GetFullName(plugin.GetType ()));
         }
 
         public bool IsBotAdministrator(ulong userId) => Shard.BotClient.IsBotAdministrator(userId);
@@ -161,21 +169,41 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
 
         public SocketGuild GetGuild() => Shard.GetGuild(GuildId);
         public SocketGuildUser GetUser(ulong userId) => GetGuild().GetUser(userId);
-        public SocketGuildUser FindUser(string name) => GetGuild().Users.FirstOrDefault(x => NameMatches(name, string.IsNullOrWhiteSpace (x.Nickname) ? x.Username : x.Nickname));
+        public SocketGuildUser FindUser(string name) => GetGuild().Users.FirstOrDefault(x => ObjectNameMatches(name, string.IsNullOrWhiteSpace (x.Nickname) ? x.Username : x.Nickname));
         public SocketGuildChannel GetChannel(ulong channelId) => GetGuild().GetChannel(channelId);
-        public SocketGuildChannel FindChannel(string name) => GetGuild().Channels.FirstOrDefault(x => NameMatches(name, x.Name));
+        public SocketGuildChannel FindChannel(string name) => GetGuild().Channels.FirstOrDefault(x => ObjectNameMatches(name, x.Name));
         public SocketTextChannel GetTextChannel(ulong channelId) => GetChannel(channelId) as SocketTextChannel;
-        public SocketTextChannel FindTextChannel(string name) => GetGuild().TextChannels.FirstOrDefault(x => NameMatches(name, x.Name));
+        public SocketTextChannel FindTextChannel(string name) => GetGuild().TextChannels.FirstOrDefault(x => ObjectNameMatches(name, x.Name));
         public SocketVoiceChannel GetVoiceChannel(ulong channelId) => GetChannel(channelId) as SocketVoiceChannel;
-        public SocketVoiceChannel FindVoiceChannel(string name) => GetGuild().VoiceChannels.FirstOrDefault(x => NameMatches(name, x.Name));
+        public SocketVoiceChannel FindVoiceChannel(string name) => GetGuild().VoiceChannels.FirstOrDefault(x => ObjectNameMatches(name, x.Name));
         public SocketCategoryChannel GetCategoryChannel(ulong channelId) => GetChannel(channelId) as SocketCategoryChannel;
-        public SocketCategoryChannel FindCategoryChannel(string name) => GetGuild().CategoryChannels.FirstOrDefault(x => NameMatches(name, x.Name));
+        public SocketCategoryChannel FindCategoryChannel(string name) => GetGuild().CategoryChannels.FirstOrDefault(x => ObjectNameMatches(name, x.Name));
         public SocketRole GetRole(ulong roleId) => GetGuild().GetRole(roleId);
-        public SocketRole FindRole(string name) => GetGuild().Roles.FirstOrDefault(x => NameMatches(name, x.Name));
+        public SocketRole FindRole(string name) => GetGuild().Roles.FirstOrDefault(x => ObjectNameMatches(name, x.Name));
 
-        private bool NameMatches (string search, string name)
+        private static bool ObjectNameMatches (string search, string name)
         {
             return name.ToUpperInvariant ().Contains(search.ToUpperInvariant (), StringComparison.Ordinal);
+        }
+
+        public bool HasPermission(GuildPermission permission) => GetUser(BotUser.Id).GuildPermissions.Has(permission);
+        public void AssertPermission (GuildPermission permission)
+        {
+            if (!HasPermission (permission))
+            {
+                throw new MissingPermissionException($"Bot does not have permission '{permission}'.");
+            }
+        }
+
+
+        public bool HasChannelPermission(ChannelPermission perm, ulong channelId) => GetUser(BotUser.Id).GetPermissions(GetChannel(channelId)).Has(perm);
+        public void AssertChannelPermission (ChannelPermission perm, ulong channelId)
+        {
+            IGuildChannel channel = GetChannel(channelId);
+            if (!HasChannelPermission (perm, channelId))
+            {
+                throw new MissingPermissionException($"Bot does not have channel permission '{perm} in channel '{channel.Name}'");
+            }
         }
 
     }

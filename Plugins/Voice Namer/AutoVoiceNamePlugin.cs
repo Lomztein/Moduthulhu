@@ -28,6 +28,8 @@ namespace Lomztein.Moduthulhu.Modules.Voice {
         private VoiceNameSet commandSet;
 
         public override void Initialize() {
+            AssertPermission(GuildPermission.ManageChannels);
+
             commandSet = new VoiceNameSet() { ParentPlugin = this };
             GuildHandler.ChannelCreated += OnChannelCreated;
             GuildHandler.ChannelDestroyed += OnChannelDestroyed;

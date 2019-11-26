@@ -25,6 +25,8 @@ namespace Lomztein.Moduthulhu.Modules.Voice
         private List<ulong> _temporaryChannels; // This isn't for config, but instead for keeping track of the active channels.
 
         public override void Initialize() {
+            AssertPermission(Discord.GuildPermission.ManageChannels);
+
             GuildHandler.UserVoiceStateUpdated += UserVoiceStateUpdated;
             GuildHandler.ChannelCreated += OnChannelCreated;
             GuildHandler.ChannelDestroyed += OnChannelDeleted;

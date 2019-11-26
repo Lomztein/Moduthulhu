@@ -46,18 +46,21 @@ namespace Lomztein.Moduthulhu.Modules.ServerMessages {
 
             AddConfigInfoForMessage(_onJoinedNewGuild, "On Bot Joined");
             AddConfigInfoForMessage(_onUserJoinedGuild, "On New Member");
-            AddConfigInfoForMessage(_onUserJoinedGuildByInvite, "On New Member Inviteds");
             AddConfigInfoForMessage(_onUserLeftGuild, "On Member Left");
             AddConfigInfoForMessage(_onUserBannedFromGuild, "On Member Banned");
             AddConfigInfoForMessage(_onUserUnbannedFromGuild, "On Member Unbanned");
             AddConfigInfoForMessage(_onUserNameChanged, "On Name Changed");
+            AddConfigInfoForMessage(_onUserJoinedGuildByInvite, "On New Member Invited");
 
             AddConfigInfo("Set Message Channel", "Set channel", new Action<int, SocketTextChannel>((x, y) => _channelId.SetValue (y.Id)), () => $"Message channel set to {GuildHandler.GetTextChannel(_channelId.GetValue ()).Name}", "Index", "Channel");
             AddConfigInfo("Set Message Channel", "Set channel", new Action<int, ulong>((x, y) => _channelId.SetValue (y)), () => $"Message channel set to {GuildHandler.GetTextChannel(_channelId.GetValue()).Name}", "Index", "Channel");
             AddConfigInfo("Set Message Channel", "Set channel", new Action<int, string>((x, y) => _channelId.SetValue (GuildHandler.FindTextChannel (y).Id)), () => $"Message channel set to {GuildHandler.GetTextChannel(_channelId.GetValue()).Name}", "Index", "Channel");
 
-            _inviteHandler = new InviteHandler (GuildHandler);
-            _ = _inviteHandler.Intialize().ConfigureAwait (false);
+            if (HasPermission (GuildPermission.ManageGuild))
+            {
+                _inviteHandler = new InviteHandler(GuildHandler);
+                _ = _inviteHandler.Intialize().ConfigureAwait(false);
+            }
         }
 
         private void AddConfigInfoForMessage (CachedValue<List<string>> message, string name)
@@ -99,7 +102,7 @@ namespace Lomztein.Moduthulhu.Modules.ServerMessages {
 
         private async Task OnUserJoinedGuildAsync (SocketGuildUser user) {
             RestInviteMetadata invite = await _inviteHandler.FindInviter (user.Guild);
-            if (invite == null)
+            if (invite == null || !HasPermission (GuildPermission.ManageGuild))
                 await SendMessage (user.Guild, _onUserJoinedGuild, "[USERNAME]", user.GetShownName ());
             else
                 await SendMessage (user.Guild, _onUserJoinedGuildByInvite, "[USERNAME]", user.GetShownName (), "[INVITERNAME]", invite.Inviter.GetShownName ());
