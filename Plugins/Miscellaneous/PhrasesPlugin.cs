@@ -76,6 +76,11 @@ namespace Lomztein.Moduthulhu.Modules.Phrases
             string response = null;
             string emote = null;
 
+            if (message.Author.Id == GuildHandler.BotUser.Id)
+            {
+                return;
+            }
+
             foreach (Phrase phrase in _phrases.GetValue ())
             {
                 (response, emote) = phrase.CheckAndReturnResponse(message as SocketUserMessage);
