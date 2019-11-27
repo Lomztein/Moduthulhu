@@ -27,8 +27,8 @@ namespace Lomztein.Moduthulhu.Modules.Misc.Karma
         public override void Initialize() {
             GuildHandler.ReactionAdded += OnReactionAdded;
             GuildHandler.ReactionRemoved += OnReactionRemoved;
-            SendMessage("Lomztein-Command Root", "AddCommand", _karmaCommand);
             _karmaCommand = new KarmaCommand { ParentPlugin = this };
+            SendMessage("Lomztein-Command Root", "AddCommand", _karmaCommand);
 
             _upvoteEmoteId = GetConfigCache("UpvoteEmoteId", x => x.GetGuild ().Emotes.Where (y => y.Name == "upvote").FirstOrDefault ().ZeroIfNull ());
             _downvoteEmoteId = GetConfigCache("DownvoteEmoteId", x => x.GetGuild ().Emotes.Where (y => y.Name == "downvote").FirstOrDefault ().ZeroIfNull ());
