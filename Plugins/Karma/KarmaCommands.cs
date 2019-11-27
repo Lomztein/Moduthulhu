@@ -45,11 +45,11 @@ namespace Lomztein.Moduthulhu.Modules.Misc.Karma.Commands
                 inGuild.Add (user);
             }
 
-            inGuild.OrderByDescending(x => ParentPlugin.GetKarma (x.Id).Total);
-            inGuild = inGuild.GetRange (0, Math.Min (amount, inGuild.Count));
+            var ordered = inGuild.OrderByDescending(x => ParentPlugin.GetKarma (x.Id).Total).ToList ();
+            var inRange = ordered.GetRange (0, Math.Min (amount, inGuild.Count));
 
             StringBuilder result = new StringBuilder ("```");
-            foreach (SocketGuildUser user in inGuild) {
+            foreach (SocketGuildUser user in inRange) {
                 result.Append (StringExtensions.UniformStrings (user.GetShownName (), ParentPlugin.GetKarma (user.Id).ToString ()) + "\n");
             }
             result.Append ("```");

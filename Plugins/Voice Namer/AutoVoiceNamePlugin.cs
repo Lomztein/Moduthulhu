@@ -240,7 +240,7 @@ namespace Lomztein.Moduthulhu.Modules.Voice {
 
         public class Tag {
 
-            public string Emoji { get; private set; } = ""; // The "graphical" representation of the tag.
+            public string Emoji { get; private set; } = string.Empty; // The "graphical" representation of the tag.
             public Func<SocketVoiceChannel, bool> IsActive { get; private set; } // Should return true if the tag is active.
 
             public Tag (string emoji, Func<SocketVoiceChannel, bool> isActive) {

@@ -6,7 +6,7 @@ using Xunit;
 
 namespace Tests
 {
-    class GuildHandlerTests
+    public class GuildHandlerTests
     {
         private GuildHandler CreateGuildHandler ()
         {

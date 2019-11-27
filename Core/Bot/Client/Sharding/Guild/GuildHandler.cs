@@ -16,7 +16,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
         public BotShard Shard { get; private set; }
         public BotClient Client => Shard.BotClient;
         public BotCore Core => Client.Core;
-        public SocketSelfUser BotUser => Shard.Client.CurrentUser;
+        public ISelfUser BotUser => Shard.Client.CurrentUser;
 
         public ulong GuildId { get; private set; }
 
