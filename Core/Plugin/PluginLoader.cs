@@ -54,7 +54,11 @@ namespace Lomztein.Moduthulhu.Core.Plugins
 
         public static void ReloadPluginAssemblies()
         {
-            if (!Directory.Exists(ThirdPartyPath)) Directory.CreateDirectory(ThirdPartyPath);
+            if (!Directory.Exists(ThirdPartyPath))
+            {
+                Directory.CreateDirectory(ThirdPartyPath);
+            }
+
             var firstParty = Array.Empty<Type>();
             
             if (File.Exists (IncludedPath))

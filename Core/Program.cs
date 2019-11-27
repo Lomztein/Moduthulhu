@@ -3,8 +3,8 @@ using System;
 
 namespace Lomztein.Moduthulhu.Core
 {
-    class Program
+    public static class Program
     {
-        static void Main(string [ ] args) => new Bot.BotCore ().InitializeCore ().GetAwaiter ().GetResult ();
+        static void Main(string [ ] args) => new Bot.BotCore ().InitializeCore (args).GetAwaiter ().GetResult ();
     }
 }

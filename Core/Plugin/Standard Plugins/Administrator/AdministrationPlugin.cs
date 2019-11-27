@@ -13,7 +13,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
         private CoreAdminCommands CoreCommands { get; set; }
 
         public override void Initialize() {
-            CoreCommands = new CoreAdminCommands () { ParentPlugin = this };
+            CoreCommands = new CoreAdminCommands { ParentPlugin = this };
             SendMessage("Lomztein-Command Root", "AddCommand", CoreCommands);
         }
 

@@ -44,7 +44,9 @@ namespace Lomztein.Moduthulhu.Core.IO
             File.WriteAllText (path, obj.ToString ());
         }
 
-        public static void SerializeObject(object obj, string path, bool format = false) {
+        public static void SerializeObject(object obj, string path) => SerializeObject(obj, path, false);
+
+        public static void SerializeObject(object obj, string path, bool format) {
             path = Path.ChangeExtension (path, jsonExtension);
             Directory.CreateDirectory (Path.GetDirectoryName (path));
 
@@ -77,7 +79,7 @@ namespace Lomztein.Moduthulhu.Core.IO
         public static object ConvertObject (object input, Type toType) {
             MethodInfo info = typeof (JSONSerialization).GetMethod ("ConvertObject", new [] { typeof (object) }); // Should return the first one in the class, I hope.
             info = info.MakeGenericMethod (toType);
-            return info.Invoke (null, new object[] { input });
+            return info.Invoke (null, new [] { input });
         }
     }
 }

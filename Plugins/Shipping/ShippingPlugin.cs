@@ -49,7 +49,7 @@ namespace Lomztein.Moduthulhu.Modules.Shipping {
             return false;
         }
 
-        public List<Ship> GetAllShipperShips(SocketGuildUser shipper)
+        public IList<Ship> GetAllShipperShips(SocketGuildUser shipper)
         {
             return _ships.GetValue().Where(x => x.Shipper == shipper.Id).ToList();
         }
@@ -64,7 +64,9 @@ namespace Lomztein.Moduthulhu.Modules.Shipping {
                 if (leaderboard.ContainsKey(ship.ShippieOne))
                 {
                     if (!leaderboard[ship.ShippieOne].Exists(x => x.IsShippiesIdentical(ship)))
+                    {
                         leaderboard[ship.ShippieOne].Add(ship);
+                    }
                 }
                 else
                 {
@@ -74,11 +76,13 @@ namespace Lomztein.Moduthulhu.Modules.Shipping {
                 if (leaderboard.ContainsKey(ship.ShippieTwo))
                 {
                     if (!leaderboard[ship.ShippieTwo].Exists(x => x.IsShippiesIdentical(ship)))
+                    {
                         leaderboard[ship.ShippieTwo].Add(ship);
+                    }
                 }
                 else
                 {
-                    leaderboard.Add(ship.ShippieTwo, new List<Ship>() { ship });
+                    leaderboard.Add(ship.ShippieTwo, new List<Ship> { ship });
                 }
             }
 
@@ -90,7 +94,7 @@ namespace Lomztein.Moduthulhu.Modules.Shipping {
         }
        
 
-        public List<Ship> GetShippieShips(SocketGuildUser shippie) {
+        public IList<Ship> GetShippieShips(SocketGuildUser shippie) {
                 return _ships.GetValue().Where (x => x.ShippieOne == shippie.Id || x.ShippieTwo == shippie.Id).ToList ();
         }
 
@@ -237,7 +241,7 @@ namespace Lomztein.Moduthulhu.Modules.Shipping {
 
 
 
-        private string GetPartName(string fullName, bool firstHalf, int maxLength)
+        private static string GetPartName(string fullName, bool firstHalf, int maxLength)
         {
             if (fullName.Length <= maxLength / 2)
             {
@@ -248,11 +252,9 @@ namespace Lomztein.Moduthulhu.Modules.Shipping {
             {
                 return fullName.Substring(0, fullName.Length / 2);
             }
-            if (!firstHalf)
-            {
+            else {
                 return fullName.Substring(fullName.Length / 2);
             }
-            return fullName;
         }
     }
 

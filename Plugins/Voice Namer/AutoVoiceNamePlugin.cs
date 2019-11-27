@@ -18,7 +18,7 @@ namespace Lomztein.Moduthulhu.Modules.Voice {
 
         private CachedValue<Dictionary<ulong, string>> _channelNames;
         private CachedValue<List<ulong>> _toIgnore;
-        //private CachedValue<string> _nameFormat; Implement this another time.
+        // TODO: Implement option to change name format.
 
         private CachedValue<ulong> _musicBotId;
         private CachedValue<ulong> _internationalRoleId;
@@ -40,7 +40,6 @@ namespace Lomztein.Moduthulhu.Modules.Voice {
 
             _channelNames = GetConfigCache("ChannelNames", x => x.GetGuild().VoiceChannels.ToDictionary(y => y.Id, z => z.Name));
             _toIgnore = GetConfigCache("ToIgnore", x => new List<ulong> { (x.GetGuild().AFKChannel?.Id).GetValueOrDefault() });
-            //_nameFormat = GetConfigCache("NameFormat", x => "[TAGS][NAME] - [GAME]");
             _musicBotId = GetConfigCache("MusicBotId", x => (ulong)0);
             _internationalRoleId = GetConfigCache("MusicBotId", x => (ulong)0);
 

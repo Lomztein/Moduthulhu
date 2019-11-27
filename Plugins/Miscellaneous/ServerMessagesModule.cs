@@ -82,20 +82,20 @@ namespace Lomztein.Moduthulhu.Modules.ServerMessages {
             }
 
             if (before.GetShownName () != after.GetShownName ()) {
-                await SendMessage (after.Guild, _onUserNameChanged, "[USERNAME]", before.GetShownName (), "[NEWNAME]", after.GetShownName ());
+                await SendMessage (_onUserNameChanged, "[USERNAME]", before.GetShownName (), "[NEWNAME]", after.GetShownName ());
             }
         }
 
         private async Task OnUserUnbannedFromGuild(SocketUser user, SocketGuild guild) {
-            await SendMessage (guild, _onUserUnbannedFromGuild, "[USERNAME]", user.GetShownName ());
+            await SendMessage (_onUserUnbannedFromGuild, "[USERNAME]", user.GetShownName ());
         }
 
         private async Task OnUserLeftGuild(SocketGuildUser user) {
-            await SendMessage (user.Guild, _onUserLeftGuild, "[USERNAME]", user.GetShownName ());
+            await SendMessage (_onUserLeftGuild, "[USERNAME]", user.GetShownName ());
         }
 
         private async Task OnUserBannedFromGuild(SocketUser user, SocketGuild guild) {
-            await SendMessage (guild, _onUserBannedFromGuild, "[USERNAME]", user.GetShownName ());
+            await SendMessage (_onUserBannedFromGuild, "[USERNAME]", user.GetShownName ());
         }
 
         private async Task OnUserJoinedGuild(SocketGuildUser user) {
@@ -106,23 +106,23 @@ namespace Lomztein.Moduthulhu.Modules.ServerMessages {
             RestInviteMetadata invite = await _inviteHandler.FindInviter (user.Guild);
             if (invite == null || !HasPermission (GuildPermission.ManageGuild))
             {
-                await SendMessage(user.Guild, _onUserJoinedGuild, "[USERNAME]", user.GetShownName());
+                await SendMessage(_onUserJoinedGuild, "[USERNAME]", user.GetShownName());
             }
             else
             {
-                await SendMessage(user.Guild, _onUserJoinedGuildByInvite, "[USERNAME]", user.GetShownName(), "[INVITERNAME]", invite.Inviter.GetShownName());
+                await SendMessage(_onUserJoinedGuildByInvite, "[USERNAME]", user.GetShownName(), "[INVITERNAME]", invite.Inviter.GetShownName());
             }
         }
 
         private async Task OnJoinedNewGuild(SocketGuild guild) {
-            await SendMessage (guild, _onJoinedNewGuild, "[BOTNAME]", GuildHandler.BotUser.GetShownName ());
+            await SendMessage (_onJoinedNewGuild, "[BOTNAME]", GuildHandler.BotUser.GetShownName ());
             if (HasPermission (GuildPermission.ManageGuild))
             {
                 await _inviteHandler.UpdateData(guild);
             }
         }
 
-        private async Task SendMessage (SocketGuild guild, CachedValue<List<string>> messages, params string[] findAndReplace) {
+        private async Task SendMessage (CachedValue<List<string>> messages, params string[] findAndReplace) {
             SocketTextChannel channel = GuildHandler.GetChannel (_channelId.GetValue ()) as SocketTextChannel;
             string [ ] guildMessages = messages.GetValue ().ToArray ();
             string message = guildMessages [ new Random ().Next (0, guildMessages.Length) ];

@@ -22,7 +22,7 @@ namespace Lomztein.ModularDiscordBot.Modules.Misc.Brainfuck
         public async Task<string> Interpret(string program) {
 
             _program = program;
-            string printout = string.Empty;
+            string output = string.Empty;
 
             try {
                 while (_counter < _program.Length) {
@@ -49,7 +49,7 @@ namespace Lomztein.ModularDiscordBot.Modules.Misc.Brainfuck
                             break;
 
                         case '.':
-                            Printout(ref printout);
+                            Printout(ref output);
                             break;
 
                         case ',':
@@ -66,7 +66,7 @@ namespace Lomztein.ModularDiscordBot.Modules.Misc.Brainfuck
                 return e.Message;
             }
 
-            return printout;
+            return output;
         }
 
         // The > and < chars, changes memory pointer.

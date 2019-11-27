@@ -9,6 +9,7 @@ using Lomztein.AdvDiscordCommands.Framework.Categories;
 using Lomztein.AdvDiscordCommands.Framework.Interfaces;
 using Lomztein.Moduthulhu.Core.Bot.Messaging.Advanced;
 using Lomztein.Moduthulhu.Plugins.Standard;
+using System.Text;
 
 namespace Lomztein.Moduthulhu.Modules.Shipping {
     public class ShippingCommands : PluginCommandSet<ShippingPlugin> {
@@ -60,7 +61,6 @@ namespace Lomztein.Moduthulhu.Modules.Shipping {
 
             [Overload (typeof (bool), "Sink one of your ships, in case the imaginative spark is gone.")]
             public Task<Result> Execute(CommandMetadata data, SocketGuildUser shippieOne, SocketGuildUser shippieTwo) {
-                Ship ship = new Ship();
                 var succesful = ParentPlugin.Sink (data.Message.Author as SocketGuildUser, shippieOne, shippieTwo);
                 if (succesful) {
                     return TaskResult (true, "Succesfully sunk " + ParentPlugin.GetShipName (ParentPlugin.GetShipByShippies (shippieOne, shippieTwo)) + ", at least for you.");
@@ -142,12 +142,12 @@ namespace Lomztein.Moduthulhu.Modules.Shipping {
             [Overload (typeof (string), "Show every single ship the given person has shipped.")]
             public Task<Result> Execute(CommandMetadata data, SocketGuildUser user) {
                 var allShips = ParentPlugin.GetAllShipperShips (user);
-                string result = $"{user.GetShownName ()} has shipped the following ships:```\n";
+                StringBuilder result = new StringBuilder ($"{user.GetShownName ()} has shipped the following ships:```\n");
                 foreach (Shipping.Ship ship in allShips) {
-                    result += ParentPlugin.ShipToString (ship) + "\n";
+                    result.Append (ParentPlugin.ShipToString (ship) + "\n");
                 }
-                result += "```";
-                return TaskResult (result, result);
+                result.Append ("```");
+                return TaskResult (result, result.ToString ());
             }
         }
 

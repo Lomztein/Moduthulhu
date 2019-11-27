@@ -1,15 +1,20 @@
 ﻿using Lomztein.Moduthulhu.Core.IO;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 using System.Text;
 
 namespace Lomztein.Moduthulhu.Core.Bot.Client
 {
     public class ClientConfiguration
     {
-        public struct IntRange
+        public struct IntRange : IEquatable<IntRange>
         {
-            public int Min, Max;
+            [JsonProperty]
+            public int Min { get; private set; }
+            [JsonProperty]
+            public int Max { get; private set; }
 
             public bool IsValid() => Min < Max;
 
@@ -24,7 +29,12 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client
 
             public override int GetHashCode()
             {
-                return Min + Max;
+                return 0;
+            }
+
+            public bool Equals(IntRange other)
+            {
+                return Equals((object)other);
             }
 
             public static bool operator ==(IntRange left, IntRange right)
@@ -38,9 +48,12 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client
             }
         }
 
-        public IntRange ShardRange;
-        public int TotalShards;
-        public string Token;
+            [JsonProperty]
+        public IntRange ShardRange { get; private set; }
+            [JsonProperty]
+        public int TotalShards { get; private set; }
+            [JsonProperty]
+        public string Token { get; private set; }
 
         public void CheckValidity ()
         {
@@ -76,7 +89,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client
         }
     }
 
-    public class InvalidConfigurationException : Exception
+    public class InvalidConfigurationException : Exception, ISerializable
     {
         public InvalidConfigurationException(string message) : base(message)
         {

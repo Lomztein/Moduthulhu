@@ -17,7 +17,7 @@ namespace Lomztein.ModularDiscordBot.Modules.Misc.Brainfuck
         private readonly Dictionary<ulong, char?> _input = new Dictionary<ulong, char?> ();
 
         public override void Initialize() {
-            _command = new BrainfuckCommand () { ParentPlugin = this };
+            _command = new BrainfuckCommand { ParentPlugin = this };
             SendMessage("Lomztein-Command Root", "AddCommand", _command);
         }
 
@@ -28,7 +28,7 @@ namespace Lomztein.ModularDiscordBot.Modules.Misc.Brainfuck
         private async Task<string> Run (string program, ulong channelID) {
             if (_input.ContainsKey (channelID))
             {
-                throw new Exception($"A Brainfuck {nameof(program)} is already running in this channel.");
+                throw new InvalidOperationException($"A Brainfuck {nameof(program)} is already running in this channel.");
             }
 
             _input.Add (channelID, null);

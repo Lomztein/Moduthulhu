@@ -140,7 +140,7 @@ namespace Lomztein.Moduthulhu.Modules.Clock.ActivityMonitor
             }
         }
 
-        private DateTime GetDefaultDate () => DateTime.Now.AddYears (-1);
+        private static DateTime GetDefaultDate () => DateTime.Now.AddYears (-1);
 
         private void StoreData() => _userActivity.Store();
 

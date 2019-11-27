@@ -9,7 +9,7 @@ namespace Lomztein.Moduthulhu.Core.Bot
 {
     public class UserList
     {
-        public List<ulong> Users { get; private set; }
+        public IList<ulong> Users { get; private set; }
         private string FilePath { get; set; }
 
         public UserList (string filePath) {

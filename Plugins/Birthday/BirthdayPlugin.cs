@@ -46,7 +46,7 @@ namespace Lomztein.Moduthulhu.Plugins.Birthday {
 
             GuildHandler.Clock.OnHourPassed += Clock_OnHourPassed;
 
-            SendMessage("Lomztein-CommandRoot", "AddCommand", _command);
+            SendMessage("Lomztein-Command Root", "AddCommand", _command);
         }
 
         private async Task Clock_OnHourPassed(DateTime currentTick, DateTime lastTick)
@@ -88,7 +88,9 @@ namespace Lomztein.Moduthulhu.Plugins.Birthday {
                 {
                     SocketGuildUser guildUser = GuildHandler.GetUser(user.Key);
                     if (guildUser == null)
+                    {
                         return; // User doesn't exist anymore, may have left the server.
+                    }
 
                     SocketTextChannel guildChannel = GuildHandler.GetTextChannel(_announcementChannel.GetValue());
                     await AnnounceBirthday(guildChannel, guildUser, user.Value);
@@ -140,11 +142,9 @@ namespace Lomztein.Moduthulhu.Plugins.Birthday {
                     case '3':
                         ageSuffix = "'rd";
                         break;
-                }
-
-                if (age % 10 == 0 || age % 10 > 4)
-                {
-                    ageSuffix = "'th";
+                    default:
+                        ageSuffix = "'th";
+                        break;
                 }
 
                 return ageSuffix;

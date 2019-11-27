@@ -40,7 +40,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
                 Category = AdditionalCategories.Management;
                 RequiredPermissions.Add(Discord.GuildPermission.ManageGuild);
 
-                Aliases = new string[] { "add" };
+                Aliases = new [] { "add" };
             }
 
             [Overload(typeof(void), "Add a new plugin from the list of available plugins.")]
@@ -68,7 +68,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
                 Category = AdditionalCategories.Management;
                 RequiredPermissions.Add(Discord.GuildPermission.ManageGuild);
             
-                Aliases = new string[] { "remove" };
+                Aliases = new [] { "remove" };
             }
 
             [Overload(typeof(void), "Remove a plugin from currently active plugins.")]

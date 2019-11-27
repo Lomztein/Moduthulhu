@@ -19,7 +19,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
 
         public override void Initialize()
         {
-            _consentCommand = new ConsentCommand() { ParentPlugin = this };
+            _consentCommand = new ConsentCommand { ParentPlugin = this };
             SendMessage("Lomztein-Command Root", "AddCommand", _consentCommand);
         }
 

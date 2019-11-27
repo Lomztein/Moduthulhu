@@ -48,7 +48,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding
         internal async void Initialize () {
 
             BootDate = DateTime.Now;
-            DiscordSocketConfig config = new DiscordSocketConfig () {
+            DiscordSocketConfig config = new DiscordSocketConfig {
                 ShardId = _shardId,
                 TotalShards = _totalShards,
                 DefaultRetryMode = RetryMode.AlwaysRetry,
@@ -57,8 +57,8 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding
             Client = new DiscordSocketClient (config);
 
             Client.Ready += Client_Ready;
-            Client.JoinedGuild += InitGuildHandler;
-            Client.LeftGuild += KillGuildHandler;
+            Client.JoinedGuild += Client_JoinedGuild;
+            Client.LeftGuild += Client_LeftGuild;
             Client.Disconnected += Client_Disconnected;
 
             await Start ();
@@ -68,6 +68,18 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding
             RouteEvents();
 
             InitInitialHandlers();
+        }
+
+        private async Task Client_LeftGuild(SocketGuild arg)
+        {
+            await _guildHandlers.Find(x => x.GuildId == arg.Id).OnLeftGuild();
+            KillGuildHandler(arg);
+        }
+
+        private async Task Client_JoinedGuild(SocketGuild arg)
+        {
+            var handler = InitGuildHandler(arg);
+            await handler.OnJoinedGuild();
         }
 
         private Task Client_Disconnected(Exception arg)
@@ -85,20 +97,19 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding
             }
         }
 
-        private Task InitGuildHandler (SocketGuild guild)
+        private GuildHandler InitGuildHandler (SocketGuild guild)
         {
             GuildHandler handler = new GuildHandler(this, guild.Id);
             handler.Initialize();
             _guildHandlers.Add(handler);
-            return Task.CompletedTask;
+            return handler;
         }
 
-        private Task KillGuildHandler (SocketGuild guild)
+        private void KillGuildHandler (SocketGuild guild)
         {
             GuildHandler handler = _guildHandlers.Find(x => x.GuildId == guild.Id);
             handler.Kill();
             _guildHandlers.Remove(handler);
-            return Task.CompletedTask;
         }
 
         private Task Client_Ready() {
@@ -167,16 +178,17 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding
             Client.GuildUnavailable         += async (x) =>         { try { await ForGuild (x, g => g.OnGuildUnavailable ());                                           } catch (Exception exc) { OnExceptionCaught (exc); } };
             Client.GuildUpdated             += async (x, y) =>      { try { await ForGuild (x, g => g.OnGuildUpdated (x, y));                                           } catch (Exception exc) { OnExceptionCaught (exc); } };
             Client.JoinedGuild              += async (x) =>         { try { await ForGuild (x, g => g.OnJoinedGuild ());                                                } catch (Exception exc) { OnExceptionCaught (exc); } };
-            Client.LeftGuild                += async (x) =>         { try { await ForGuild(x, g => g.OnLeftGuild());                                                    } catch (Exception exc) { OnExceptionCaught (exc); } };
+            Client.LeftGuild                += async (x) =>         { try { await ForGuild (x, g => g.OnLeftGuild());                                                   } catch (Exception exc) { OnExceptionCaught (exc); } };
             Client.UserBanned               += async (x, y) =>      { try { await ForGuild (y, g => g.OnUserBanned (x));                                                } catch (Exception exc) { OnExceptionCaught (exc); } };
             Client.UserUnbanned             += async (x, y) =>      { try { await ForGuild (y, g => g.OnUserUnbanned (x));                                              } catch (Exception exc) { OnExceptionCaught (exc); } };
-            //Client.UserUpdated              += async (x, y) =>      { try { await ForGuild ((x as SocketGuildUser)?.Guild, g => g.OnMem (UserUpdated,x, y);           } catch (Exception exc) { OnExceptionCaught (exc); } };
         }
 
         private async Task ForGuild (ulong? guildId, Func<GuildHandler, Task> func)
         {
             if (!guildId.HasValue)
+            {
                 return;
+            }
 
             GuildHandler handler = _guildHandlers.Find(x => x.GuildId == guildId.Value);
             await func(handler);

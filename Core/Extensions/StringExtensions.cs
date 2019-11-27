@@ -31,7 +31,9 @@ namespace Lomztein.Moduthulhu.Core.Extensions
                     }
 
                     if (spaceSearch == 0) // No spaces found? Jeez, just cut of as late as possible then.
+                    { 
                         spaceSearch = counted;
+                    }
 
                     string substring = message.Substring (0, spaceSearch);
                     splitted.Add (sorrounder + substring + sorrounder);

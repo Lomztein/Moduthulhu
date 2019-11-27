@@ -25,7 +25,7 @@ namespace Lomztein.Moduthulhu.Core.Bot {
 
         private readonly CancellationTokenSource _shutdownToken = new CancellationTokenSource();
 
-        internal async Task InitializeCore()
+        internal async Task InitializeCore(string[] args)
         {
 
             // Set up core
@@ -34,7 +34,7 @@ namespace Lomztein.Moduthulhu.Core.Bot {
             // Set up client manager
             Client = new BotClient(this);
             Client.ExceptionCaught += OnExceptionCaught;
-            Client.Initialize();
+            Client.Initialize().GetAwaiter().GetResult();
 
             Consent.Init();
             Localization.Init(new CultureInfo("en-US"));

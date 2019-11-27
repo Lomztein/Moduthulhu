@@ -36,17 +36,26 @@ namespace Lomztein.Moduthulhu.Core.Plugins.Framework
 
             // Find by name. Return if only one is found.
             applicable = plugins.Where(x => GetName(x).ToUpperInvariant () == search.ToUpperInvariant()).ToList ();
-            if (applicable.Count == 1) return applicable.First();
+            if (applicable.Count == 1)
+            {
+                return applicable.First();
+            }
             applicable.Clear();
 
             // Find by full name. Return if only one is found.
             applicable = plugins.Where(x => GetFullName(x).ToUpperInvariant() == search.ToUpperInvariant()).ToList();
-            if (applicable.Count == 1) return applicable.First();
+            if (applicable.Count == 1)
+            {
+                return applicable.First();
+            }
             applicable.Clear();
 
             // Find by versioned full name. Return if only one is found.
             applicable = plugins.Where(x => GetVersionedFullName(x).ToUpperInvariant() == search.ToUpperInvariant()).ToList();
-            if (applicable.Count == 1) return applicable.First();
+            if (applicable.Count == 1)
+            {
+                return applicable.First();
+            }
             applicable.Clear();
 
             return null;

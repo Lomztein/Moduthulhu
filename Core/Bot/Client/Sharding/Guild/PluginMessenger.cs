@@ -7,7 +7,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
 {
     public class PluginMessenger
     {
-        private List<MessageInfo> _messageRegister = new List<MessageInfo>();
+        private readonly List<MessageInfo> _messageRegister = new List<MessageInfo>();
 
         public object SendMessage (string target, string name, object value)
         {
@@ -17,7 +17,10 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
             {
                 return single.Execute(value);
             }
-            else Log.Write(Log.Type.WARNING, $"No actions/functions registered in PluginMessenger that matched target = '{target}' and name = '{name}'. Messsage not sent.");
+            else
+            {
+                Log.Write(Log.Type.WARNING, $"No actions/functions registered in PluginMessenger that matched target = '{target}' and name = '{name}'. Messsage not sent.");
+            }
             return null;
         }
 
@@ -44,7 +47,11 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
             if (info == null)
             {
                 Log.Write(Log.Type.WARNING, $"Attempted to remove action/function with target = '{target}' and name = {name}, but none such exists.");
-            }else _messageRegister.Remove(info);
+            }
+            else
+            {
+                _messageRegister.Remove(info);
+            }
         }
 
         public void Clear (string target)

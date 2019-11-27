@@ -12,12 +12,11 @@ using Lomztein.Moduthulhu.Core.Plugins;
 
 namespace Lomztein.Moduthulhu.Core.Bot.Client
 {
-    public class BotClient
+    public class BotClient // TODO: Figure out how to implement horizontal scaleability, as in multiple shards over different processes.
     {
         public DateTime BootDate { get; private set; }
         public TimeSpan Uptime => DateTime.Now - BootDate;
 
-        //internal const int GUILDS_PER_SHARD = 2000;
         public BotCore Core { get; private set; }
 
         private ClientConfiguration _configuration;
@@ -28,13 +27,14 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client
         private IEnumerable<SocketGuild> AllGuilds => _shards.SelectMany (x => x.Guilds);
         private DiscordSocketClient FirstClient => _shards.First ().Client;
 
-        private Dictionary<string, StatusMessage> _statusMessages = new Dictionary<string, StatusMessage>();
+        // TODO: Consider splitting status rotation into a seperate class.
+        private readonly Dictionary<string, StatusMessage> _statusMessages = new Dictionary<string, StatusMessage>();
         private int _statusMessageIndex = -1;
         private const int _statusChangeChance = 10;
 
         private readonly Clock _statusClock = new Clock(1, "StatusClock");
         private UserList _botAdministrators;
-        private int _consecutiveOfflineMinutes = 0;
+        private int _consecutiveOfflineMinutes;
         private int _automaticOfflineMinutesTreshold = 10;
 
         public event Func<Exception, Task> ExceptionCaught;
@@ -49,13 +49,13 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client
             Log.Write (Log.Type.BOT, "Creating bot client with token " + _configuration.Token);
         }
 
-        internal async void Initialize()
+        internal async Task Initialize()
         {
             PluginLoader.ReloadPluginAssemblies();
             _botAdministrators = new UserList(Path.Combine(DataDirectory, "/Administrators"));
 
             InitializeShards();
-            await AwaitAllConnected();
+            await AwaitAllConnected().ConfigureAwait (false);
 
             InitStatusMessages();
             _statusClock.OnMinutePassed += StatusClock_OnMinutePassed;

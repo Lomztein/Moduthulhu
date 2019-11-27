@@ -9,7 +9,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
     [Source("https://github.com/Lomztein", "https://github.com/Lomztein/Moduthulhu")]
     public class StandardCommandsPlugin : PluginBase {
 
-        private ICommand [ ] _commands = new ICommand[ ] {
+        private readonly ICommand [ ] _commands = new ICommand[] {
                 new DiscordCommandSet (),
                 new FlowCommandSet (),
                 new MathCommandSet (),

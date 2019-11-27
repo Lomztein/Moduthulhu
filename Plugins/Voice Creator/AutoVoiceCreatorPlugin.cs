@@ -96,8 +96,6 @@ namespace Lomztein.Moduthulhu.Modules.Voice
 
         private Task OnChannelDeleted (SocketChannel channel) {
             if (channel is SocketVoiceChannel) {
-                SocketVoiceChannel voiceChannel = channel as SocketVoiceChannel;
-
                 if (!_temporaryChannels.Contains (channel.Id)) {
                     _defaultChannels.MutateValue (x => x.Remove (channel.Id));
                 }

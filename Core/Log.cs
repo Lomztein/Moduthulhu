@@ -35,8 +35,8 @@ namespace Lomztein.Moduthulhu.Core
             Write (_typeColor[(int)type], type.ToString (), text);
         }
 
-        public static void Exception (Exception exception) {
-            Write (Type.EXCEPTION, exception.Message + " - " + exception.StackTrace);
+        public static void Exception (Exception exc) {
+            Write (Type.EXCEPTION, exc.Message + " - " + exc.StackTrace);
         }
 
         public static void Write(string text) {

@@ -11,7 +11,7 @@ namespace Lomztein.Moduthulhu.Core.Bot
 {
     internal class ErrorReporter
     {
-        private IDatabaseConnector GetConnector () => new PostgreSQLDatabaseConnector();
+        private static IDatabaseConnector GetConnector () => new PostgreSQLDatabaseConnector();
 
         internal ErrorReporter ()
         {
@@ -19,9 +19,8 @@ namespace Lomztein.Moduthulhu.Core.Bot
         }
 
         internal Task ReportError (Exception exception) {
-            string message = (exception.Message + " - " + exception.StackTrace) + "\n";
             Log.Exception (exception);
-            GetConnector().UpdateQuery("INSERT INTO errors VALUES (@type, @date, @target, @message, @stacktrace)", new Dictionary<string, object>() { { "@type", exception.GetType().Name }, { "@date", DateTime.Now }, { "@target", exception.TargetSite.ToString () }, { "@message", exception.Message }, { "@stacktrace", exception.StackTrace } });
+            GetConnector().UpdateQuery("INSERT INTO errors VALUES (@type, @date, @target, @message, @stacktrace)", new Dictionary<string, object> { { "@type", exception.GetType().Name }, { "@date", DateTime.Now }, { "@target", exception.TargetSite.ToString () }, { "@message", exception.Message }, { "@stacktrace", exception.StackTrace } });
             return Task.CompletedTask;
         }
     }
