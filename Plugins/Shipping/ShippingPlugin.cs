@@ -158,12 +158,12 @@ namespace Lomztein.Moduthulhu.Modules.Shipping {
 
     public class Ship
     {
-            [JsonProperty]
+            [JsonProperty ("Shipper")]
         public ulong Shipper { get; set; }
 
-        [JsonProperty]
+        [JsonProperty ("ShippieOne")]
         public ulong ShippieOne { get; set; }
-        [JsonProperty]
+        [JsonProperty ("ShippieTwo")]
         public ulong ShippieTwo { get; set; }
 
         public Ship(ShippingPlugin _parentModule, ulong _guildId, ulong _shipper, ulong _shippieOne, ulong _shippieTwo)
@@ -258,12 +258,12 @@ namespace Lomztein.Moduthulhu.Modules.Shipping {
 
     public class ShipName {
 
-            [JsonProperty]
+            [JsonProperty ("ShippieOne")]
         public ulong ShippieOne { get; private set; }
-        [JsonProperty]
+        [JsonProperty ("ShippieTwo")]
         public ulong ShippieTwo { get; private set; }
 
-            [JsonProperty]
+            [JsonProperty ("Name")]
         public string Name { get; private set; }
 
         public ShipName(ulong _shippieOne, ulong _shippieTwo, string _shipName)

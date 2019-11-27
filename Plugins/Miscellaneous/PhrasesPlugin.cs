@@ -111,18 +111,18 @@ namespace Lomztein.Moduthulhu.Modules.Phrases
 
         public class Phrase {
 
-            [JsonProperty]
+            [JsonProperty ("Trigger")]
             public string Trigger { get; set; } = string.Empty;
-            [JsonProperty]
+            [JsonProperty ("UserId")]
             public ulong UserId { get; set; }
-            [JsonProperty]
+            [JsonProperty ("ChannelId")]
             public ulong ChannelId { get; set; }
-            [JsonProperty]
+            [JsonProperty ("Chance")]
             public double Chance { get; set; } = 100d;
 
-            [JsonProperty]
+            [JsonProperty ("Response")]
             public string Response { get; set; } = string.Empty;
-            [JsonProperty]
+            [JsonProperty ("Emoji")]
             public string Emoji { get; set; } = string.Empty;
 
             public (string res, string emo) CheckAndReturnResponse (SocketUserMessage message) {

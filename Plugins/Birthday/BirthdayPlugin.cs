@@ -13,6 +13,7 @@ using Lomztein.Moduthulhu.Core.Plugins.Framework;
 using Lomztein.Moduthulhu.Core.IO.Database.Repositories;
 using Lomztein.Moduthulhu.Plugins.Standard;
 using Lomztein.Moduthulhu.Core.Bot;
+using Newtonsoft.Json;
 
 namespace Lomztein.Moduthulhu.Plugins.Birthday {
 
@@ -104,7 +105,9 @@ namespace Lomztein.Moduthulhu.Plugins.Birthday {
 
         public class BirthdayDate {
 
+            [JsonProperty ("Date")]
             private readonly DateTime _date;
+            [JsonProperty ("LastPassedYear")]
             private long _lastPassedYear;
 
             public BirthdayDate(DateTime _date, long lastPassedYear)

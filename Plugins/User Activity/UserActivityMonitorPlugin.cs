@@ -145,9 +145,9 @@ namespace Lomztein.Moduthulhu.Modules.Clock.ActivityMonitor
         private void StoreData() => _userActivity.Store();
 
         public class ActivityRole {
-            [JsonProperty]
+            [JsonProperty ("Id")]
             public ulong Id { get; private set; }
-            [JsonProperty]
+            [JsonProperty ("Treshold")]
             public uint Treshold { get; private set; }
 
             public ActivityRole (ulong _id, uint _threshold) {
