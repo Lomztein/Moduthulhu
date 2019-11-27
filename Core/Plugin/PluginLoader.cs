@@ -12,7 +12,7 @@ namespace Lomztein.Moduthulhu.Core.Plugins
     internal static class PluginLoader
     {
         private static Type[] _loadedPlugins;
-        private static Type[] _standardPlugins = new Type[] { 
+        private static Type[] _standardPlugins = new [] { 
             typeof (PluginManagerPlugin),
             typeof (LoggerPlugin),
             typeof (StandardCommandsPlugin),

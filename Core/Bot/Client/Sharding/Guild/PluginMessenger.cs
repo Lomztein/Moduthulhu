@@ -9,7 +9,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
     {
         private List<MessageInfo> _messageRegister = new List<MessageInfo>();
 
-        public object SendMessage (string target, string name, object value = null)
+        public object SendMessage (string target, string name, object value)
         {
             List<MessageInfo> infos = _messageRegister.Where(x => x.Matches(target, name)).ToList ();
             MessageInfo single = infos.SingleOrDefault();
@@ -20,6 +20,8 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
             else Log.Write(Log.Type.WARNING, $"No actions/functions registered in PluginMessenger that matched target = '{target}' and name = '{name}'. Messsage not sent.");
             return null;
         }
+
+        public object SendMessage(string target, string name) => SendMessage(target, name, null);
 
         public T SendMessage<T>(string target, string name, object value) => (T)SendMessage(target, name, value);
         public T SendMessage<T>(string target, string name) => (T)SendMessage(target, name, null);
@@ -53,10 +55,10 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
 
         private class MessageInfo
         {
-            private string _target;
-            private string _name;
+            private readonly string _target;
+            private readonly string _name;
 
-            private Func<object, object> _function;
+            private readonly Func<object, object> _function;
 
             public MessageInfo (string target, string name, Func<object, object> function)
             {

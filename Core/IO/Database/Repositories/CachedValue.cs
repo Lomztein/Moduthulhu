@@ -7,10 +7,10 @@ namespace Lomztein.Moduthulhu.Core.IO.Database.Repositories
 {
     public class CachedValue<T> : IValueRepository<T>
     {
-        private IdentityKeyJsonRepository _repo;
-        private ulong _identity;
-        private string _key;
-        private Func<T> _defaultValue;
+        private readonly IdentityKeyJsonRepository _repo;
+        private readonly ulong _identity;
+        private readonly string _key;
+        private readonly Func<T> _defaultValue;
 
         private T _value;
         private bool _dirty = true;

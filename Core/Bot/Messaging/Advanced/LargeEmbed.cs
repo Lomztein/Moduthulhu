@@ -75,11 +75,13 @@ namespace Lomztein.Moduthulhu.Core.Bot.Messaging.Advanced {
             Intermediate = result.ToArray ();
         }
 
-        public async Task DeleteAsync(RequestOptions options = null) {
+        public async Task DeleteAsync(RequestOptions options) {
             foreach (var message in Message) {
                 await message.DeleteAsync (options);
             }
         }
+
+        public async Task DeleteAsync() => DeleteAsync(null);
 
         public async Task SendAsync(IMessageChannel channel) {
             List<IMessage> messages = new List<IMessage> ();

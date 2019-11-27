@@ -8,8 +8,8 @@ namespace Lomztein.Moduthulhu.Core.Bot.Messaging.Advanced
 {
     public class QuestionMessage : ICustomMessage<string, string, IMessage> {
 
-        public IMessage Message { get => throw new NotImplementedException (); set => throw new NotImplementedException (); }
-        public string Intermediate { get => throw new NotImplementedException (); set => throw new NotImplementedException (); }
+        public IMessage Message { get; set; }
+        public string Intermediate { get; set; }
 
         public void CreateFrom(string source) {
             throw new NotImplementedException ();

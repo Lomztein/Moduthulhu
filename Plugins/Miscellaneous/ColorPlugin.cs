@@ -24,7 +24,7 @@ namespace Lomztein.Moduthulhu.Modules.Colour
         private CachedValue<bool> _colourOnJoin;
 
         public override void Initialize() {
-            _command = new SetColour() { ParentPlugin = this };
+            _command = new SetColour { ParentPlugin = this };
 
             GuildHandler.UserJoined += OnUserJoined;
             SendMessage("Lomztein-Command Root", "AddCommand", _command);
@@ -83,7 +83,9 @@ namespace Lomztein.Moduthulhu.Modules.Colour
 
                 await guildUser.RemoveRolesAsync(currentRoles);
                 if (role != null)
+                {
                     await guildUser.AddRoleAsync(role);
+                }
 
                 return new Result(null, role == null ? "Failed to colour you, colour not found." : $"You've been succesfully coloured **{colorName}**!");
             }

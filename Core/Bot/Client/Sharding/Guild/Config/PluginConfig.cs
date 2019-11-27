@@ -7,7 +7,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild.Config
 {
     public class PluginConfig
     {
-        private List<ConfigFunctionInfo> _configInfos = new List<ConfigFunctionInfo>();
+        private readonly List<ConfigFunctionInfo> _configInfos = new List<ConfigFunctionInfo>();
 
         public ConfigFunctionInfo[] GetConfigInfo(string name, string identifier) => _configInfos.Where (x => x.Matches (name, identifier)).ToArray ();
         public ConfigFunctionInfo[] GetConfigInfo(string identifier) => _configInfos.Where (x => x.Matches (identifier)).ToArray();

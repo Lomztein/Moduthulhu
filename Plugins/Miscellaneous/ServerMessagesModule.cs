@@ -77,7 +77,9 @@ namespace Lomztein.Moduthulhu.Modules.ServerMessages {
         private async Task CheckAndAnnounceNameChange(SocketGuildUser before, SocketGuildUser after) {
 
             if (before == null || after == null)
+            {
                 return;
+            }
 
             if (before.GetShownName () != after.GetShownName ()) {
                 await SendMessage (after.Guild, _onUserNameChanged, "[USERNAME]", before.GetShownName (), "[NEWNAME]", after.GetShownName ());
@@ -103,14 +105,21 @@ namespace Lomztein.Moduthulhu.Modules.ServerMessages {
         private async Task OnUserJoinedGuildAsync (SocketGuildUser user) {
             RestInviteMetadata invite = await _inviteHandler.FindInviter (user.Guild);
             if (invite == null || !HasPermission (GuildPermission.ManageGuild))
-                await SendMessage (user.Guild, _onUserJoinedGuild, "[USERNAME]", user.GetShownName ());
+            {
+                await SendMessage(user.Guild, _onUserJoinedGuild, "[USERNAME]", user.GetShownName());
+            }
             else
-                await SendMessage (user.Guild, _onUserJoinedGuildByInvite, "[USERNAME]", user.GetShownName (), "[INVITERNAME]", invite.Inviter.GetShownName ());
+            {
+                await SendMessage(user.Guild, _onUserJoinedGuildByInvite, "[USERNAME]", user.GetShownName(), "[INVITERNAME]", invite.Inviter.GetShownName());
+            }
         }
 
         private async Task OnJoinedNewGuild(SocketGuild guild) {
             await SendMessage (guild, _onJoinedNewGuild, "[BOTNAME]", GuildHandler.BotUser.GetShownName ());
-            await _inviteHandler.UpdateData (null, guild);
+            if (HasPermission (GuildPermission.ManageGuild))
+            {
+                await _inviteHandler.UpdateData(guild);
+            }
         }
 
         private async Task SendMessage (SocketGuild guild, CachedValue<List<string>> messages, params string[] findAndReplace) {
@@ -119,7 +128,9 @@ namespace Lomztein.Moduthulhu.Modules.ServerMessages {
             string message = guildMessages [ new Random ().Next (0, guildMessages.Length) ];
 
             for (int i = 0; i < findAndReplace.Length; i += 2)
-                message = message.Replace (findAndReplace[i], findAndReplace[i+1]);
+            {
+                message = message.Replace(findAndReplace[i], findAndReplace[i + 1]);
+            }
 
             await MessageControl.SendMessage (channel, message);
         }

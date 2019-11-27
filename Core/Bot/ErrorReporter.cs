@@ -20,7 +20,7 @@ namespace Lomztein.Moduthulhu.Core.Bot
 
         internal Task ReportError (Exception exception) {
             string message = (exception.Message + " - " + exception.StackTrace) + "\n";
-            Log.Write (exception);
+            Log.Exception (exception);
             GetConnector().UpdateQuery("INSERT INTO errors VALUES (@type, @date, @target, @message, @stacktrace)", new Dictionary<string, object>() { { "@type", exception.GetType().Name }, { "@date", DateTime.Now }, { "@target", exception.TargetSite.ToString () }, { "@message", exception.Message }, { "@stacktrace", exception.StackTrace } });
             return Task.CompletedTask;
         }

@@ -20,12 +20,16 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild.Config
         {
             Action = action;
 
-            if (Action.Method.ReturnType != typeof(void)) // I couldn't find any non-generic Action object to use, best I got is a Delegate type.
+            if (Action.Method.ReturnType != typeof(void))
+            { // I couldn't find any non-generic Action object to use, best I got is a Delegate type.
                 throw new ArgumentException("Delegate must be without a return type, use of System.Action type required.");
+            }
 
             Type[] generics = Action.GetType().GetGenericArguments();
             if (generics.Length != paramNames.Length)
+            {
                 throw new ArgumentException("A differing amount of parameter names was given in comparison to the actions generic arguments. Lengths need to be identical.");
+            }
 
             _parameters = new ConfigFunctionParam[generics.Length];
             for (int i = 0; i < generics.Length; i++)

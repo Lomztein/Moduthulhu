@@ -37,7 +37,7 @@ namespace Lomztein.Moduthulhu.Core.Bot
         private void Load () {
             Users = JSONSerialization.DeserializeFile<List<ulong>> (FilePath);
             if (Users == null) {
-                Users = new List<ulong> () { 0 };
+                Users = new List<ulong> { 0 };
                 Save ();
             }
         }

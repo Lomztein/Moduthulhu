@@ -17,7 +17,7 @@ namespace Lomztein.Moduthulhu.Modules.Voice.Commands
             Category = AdditionalCategories.Voice;
             Flatname = "vname";
 
-            commandsInSet = new List<ICommand> () {
+            commandsInSet = new List<ICommand> {
                 new CustomName (),
             };
         }

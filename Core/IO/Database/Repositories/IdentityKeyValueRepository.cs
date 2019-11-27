@@ -35,7 +35,7 @@ namespace Lomztein.Moduthulhu.Core.IO.Database.Repositories
             Log.Write(Log.Type.DATA, $"Querying database table {_tableName} to set value at identifier {identifier} and key {key} to {value}.");
             IDatabaseConnector db = GetConnector();
             string query = $"INSERT INTO {_tableName} VALUES (@identifier, @key, @value) ON CONFLICT ON CONSTRAINT {_tableName}identkey DO UPDATE SET value = @value WHERE {_tableName}.identifier = @identifier AND {_tableName}.key = @key";
-            db.UpdateQuery(query, new Dictionary<string, object>() { { "@identifier", identifier }, { "@key", key }, { "@value", value } });
+            db.UpdateQuery(query, new Dictionary<string, object> { { "@identifier", identifier }, { "@key", key }, { "@value", value } });
         }
     }
 }

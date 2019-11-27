@@ -8,6 +8,7 @@ using Discord;
 using Lomztein.AdvDiscordCommands.Framework.Categories;
 using Lomztein.Moduthulhu.Plugins.Standard;
 using System.Linq;
+using System.Text;
 
 namespace Lomztein.Moduthulhu.Modules.Misc.Karma.Commands
 {
@@ -38,20 +39,22 @@ namespace Lomztein.Moduthulhu.Modules.Misc.Karma.Commands
             foreach (var entry in allKarma) { // Man I'm getting lazy with dictionary type naming. All those generic parameters yo.
                 SocketGuildUser user = data.Message.GetGuild ()?.GetUser (entry.Key);
                 if (user == null)
+                {
                     continue;
+                }
                 inGuild.Add (user);
             }
 
             inGuild.OrderByDescending(x => ParentPlugin.GetKarma (x.Id).Total);
             inGuild = inGuild.GetRange (0, Math.Min (amount, inGuild.Count));
 
-            string result = "```";
+            StringBuilder result = new StringBuilder ("```");
             foreach (SocketGuildUser user in inGuild) {
-                result += StringExtensions.UniformStrings (user.GetShownName (), ParentPlugin.GetKarma (user.Id).ToString ()) + "\n";
+                result.Append (StringExtensions.UniformStrings (user.GetShownName (), ParentPlugin.GetKarma (user.Id).ToString ()) + "\n");
             }
-            result += "```";
+            result.Append ("```");
 
-            return TaskResult (inGuild, result);
+            return TaskResult (inGuild, result.ToString ());
         }
     }
 }

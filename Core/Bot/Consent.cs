@@ -1,6 +1,7 @@
 ﻿using Lomztein.Moduthulhu.Core.IO.Database;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Runtime.Serialization;
 using System.Text;
 
@@ -17,7 +18,7 @@ namespace Lomztein.Moduthulhu.Core.Bot
 
         public static void AssertConsent(ulong guild, ulong user)
         {
-            var queryRes = GetConnector().ReadQuery("SELECT value FROM consent WHERE guild = @guild AND userid = @userid", new Dictionary<string, object>() { { "@guild", guild.ToString() }, { "@userid", user.ToString() } });
+            var queryRes = GetConnector().ReadQuery("SELECT value FROM consent WHERE guild = @guild AND userid = @userid", new Dictionary<string, object> { { "@guild", guild.ToString(CultureInfo.InvariantCulture) }, { "@userid", user.ToString(CultureInfo.InvariantCulture) } });
             if (queryRes.Length == 0)
             {
                 throw new ConsentException("User has not yet decided on consent to storage of personal data.");
@@ -36,7 +37,7 @@ namespace Lomztein.Moduthulhu.Core.Bot
         public static void SetConsent (ulong guild, ulong user, bool value)
         {
             string query = $"INSERT INTO consent VALUES (@guild, @userid, @value) ON CONFLICT ON CONSTRAINT consentguilduser DO UPDATE SET value = @value WHERE consent.guild = @guild AND consent.userid = @userid";
-            GetConnector().UpdateQuery(query, new Dictionary<string, object>() { { "@guild", guild.ToString() }, { "@userid", user.ToString () }, { "@value", value } });
+            GetConnector().UpdateQuery(query, new Dictionary<string, object> { { "@guild", guild.ToString(CultureInfo.InvariantCulture) }, { "@userid", user.ToString (CultureInfo.InvariantCulture) }, { "@value", value } });
         }
 
         public static bool TryAssertConsent(ulong guild, ulong user)

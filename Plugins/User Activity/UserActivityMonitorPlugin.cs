@@ -29,9 +29,9 @@ namespace Lomztein.Moduthulhu.Modules.Clock.ActivityMonitor
             AddConfigInfo("Add Activity Role", "Add new role.", new Action<string, uint>((x, y) => _activityRoles.MutateValue(z => AddRole(new ActivityRole((GuildHandler.FindRole (x)?.Id).GetValueOrDefault (), y)))), () => "Added new activity role", "Role", "Treshold (days)");
             AddConfigInfo("Add Activity Role", "Display roles", () => "Current activity roles:\n" + string.Join("\n", _activityRoles.GetValue().Select(x => x.ToString(GuildHandler)).ToArray()));
 
-            AddConfigInfo("Remove Activity Role", "Remove role.", new Action<SocketRole>((x) => _activityRoles.MutateValue(z => z.RemoveAll(w => w.id == x.Id))), () => "Removed activity role", "Role");
-            AddConfigInfo("Remove Activity Role", "Remove role.", new Action<string>((x) => _activityRoles.MutateValue(z => z.RemoveAll(w => w.id == GuildHandler.FindRole (x).Id))), () => "Removed activity role", "Role");
-            AddConfigInfo("Remove Activity Role", "Remove role.", new Action<uint>((x) => _activityRoles.MutateValue(z => z.RemoveAll(w => w.id == x))), () => "Removed activity role", "Role");
+            AddConfigInfo("Remove Activity Role", "Remove role.", new Action<SocketRole>((x) => _activityRoles.MutateValue(z => z.RemoveAll(w => w.Id == x.Id))), () => "Removed activity role", "Role");
+            AddConfigInfo("Remove Activity Role", "Remove role.", new Action<string>((x) => _activityRoles.MutateValue(z => z.RemoveAll(w => w.Id == GuildHandler.FindRole (x).Id))), () => "Removed activity role", "Role");
+            AddConfigInfo("Remove Activity Role", "Remove role.", new Action<uint>((x) => _activityRoles.MutateValue(z => z.RemoveAll(w => w.Id == x))), () => "Removed activity role", "Role");
 
             _userActivity = GetDataCache("UserActivity", x => new Dictionary<ulong, DateTime>());
             _activityRoles = GetConfigCache("ActivityRoles", x => new List<ActivityRole>());
@@ -49,7 +49,7 @@ namespace Lomztein.Moduthulhu.Modules.Clock.ActivityMonitor
 
         private void AddRole (ActivityRole newRole)
         {
-            if (GuildHandler.GetRole (newRole.id) == null)
+            if (GuildHandler.GetRole (newRole.Id) == null)
             {
                 throw new InvalidOperationException("No such role exists.");
             }
@@ -74,9 +74,13 @@ namespace Lomztein.Moduthulhu.Modules.Clock.ActivityMonitor
         public async Task RecordActivity(SocketGuildUser user, DateTime time) {
             
             if (!_userActivity.GetValue ().ContainsKey (user.Id))
-                _userActivity.GetValue().Add (user.Id, time);
+            {
+                _userActivity.GetValue().Add(user.Id, time);
+            }
             else
+            {
                 _userActivity.GetValue()[user.Id] = time;
+            }
 
             await UpdateUser (user);
         }
@@ -91,15 +95,15 @@ namespace Lomztein.Moduthulhu.Modules.Clock.ActivityMonitor
             DateTime now = DateTime.Now;
 
             List<ActivityRole> activityStates = _activityRoles.GetValue ();
-            activityStates.Sort(Comparer<ActivityRole>.Create((x, y) => (int)x.threshold - (int)y.threshold));
-            SocketRole[] roles = activityStates.Select (x => user.Guild.GetRole (x.id)).ToArray ();
+            activityStates.Sort(Comparer<ActivityRole>.Create((x, y) => (int)x.Treshold - (int)y.Treshold));
+            SocketRole[] roles = activityStates.Select (x => user.Guild.GetRole (x.Id)).ToArray ();
 
             SocketRole finalRole = roles[0];
 
             DateTime lastDate = now.AddDays (1);
 
             for (int i = 0; i < activityStates.Count; i++) {
-                DateTime thisDate = now.AddDays (-activityStates[i].threshold);
+                DateTime thisDate = now.AddDays (-activityStates[i].Treshold);
 
                 if (activity < lastDate && activity > thisDate) {
                     finalRole = roles[i];
@@ -107,8 +111,10 @@ namespace Lomztein.Moduthulhu.Modules.Clock.ActivityMonitor
                 }
             }
 
-            if (activity < now.AddDays (-activityStates.Last ().threshold))
-                finalRole = roles.Last ();
+            if (activity < now.AddDays (-activityStates.Last ().Treshold))
+            {
+                finalRole = roles.Last();
+            }
 
             List<SocketRole> toRemove = roles.ToList ();
             toRemove.Remove (finalRole);
@@ -138,18 +144,18 @@ namespace Lomztein.Moduthulhu.Modules.Clock.ActivityMonitor
         private void StoreData() => _userActivity.Store();
 
         public class ActivityRole {
-            public ulong id;
-            public uint threshold;
+            public ulong Id { get; private set; }
+            public uint Treshold { get; private set; }
 
             public ActivityRole (ulong _id, uint _threshold) {
-                id = _id;
-                threshold = _threshold;
+                Id = _id;
+                Treshold = _threshold;
             }
 
             public string ToString (GuildHandler roleSource)
             {
-                SocketRole role = roleSource.GetRole(id);
-                return $"Role: {role.Name}, treshold: {threshold} days.";
+                SocketRole role = roleSource.GetRole(Id);
+                return $"Role: {role.Name}, treshold: {Treshold} days.";
             }
         }
     }       

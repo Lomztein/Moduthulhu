@@ -40,7 +40,7 @@ namespace Lomztein.Moduthulhu.Plugins.Birthday {
             AddConfigInfo("Set Birthday Message", "Set birthday message.", new Action<string>(x => _announcementMessage.SetValue(x)), () => $"New announcement message: '{_announcementMessage.GetValue()}'.", "Message");
             AddConfigInfo("Set Birthday Message", "Get birthday message.", () => $"Current announcement message: '{_announcementMessage.GetValue()}'.");
 
-            _command = new BirthdayCommand() { ParentPlugin = this };
+            _command = new BirthdayCommand { ParentPlugin = this };
             _allBirthdays = GetDataCache("Birthdays", x => new Dictionary<ulong, BirthdayDate>());
 
             GuildHandler.Clock.OnHourPassed += Clock_OnHourPassed;
@@ -50,7 +50,7 @@ namespace Lomztein.Moduthulhu.Plugins.Birthday {
 
         private async Task Clock_OnHourPassed(DateTime currentTick, DateTime lastTick)
         {
-            await TestBirthdays(currentTick);
+            await TestBirthdays();
         }
 
         public void SetBirthday(ulong userID, DateTime date) {
@@ -79,7 +79,7 @@ namespace Lomztein.Moduthulhu.Plugins.Birthday {
             ClearConfigInfos();
         }
 
-        private async Task TestBirthdays(DateTime now) {
+        private async Task TestBirthdays() {
 
             foreach (var user in _allBirthdays.GetValue ())
             {
@@ -104,8 +104,8 @@ namespace Lomztein.Moduthulhu.Plugins.Birthday {
 
         public class BirthdayDate {
 
-            public DateTime _date;
-            public long _lastPassedYear;
+            private readonly DateTime _date;
+            private long _lastPassedYear;
 
             public BirthdayDate(DateTime _date, long lastPassedYear)
             {
@@ -117,14 +117,14 @@ namespace Lomztein.Moduthulhu.Plugins.Birthday {
                 try {
                     return DateTime.MinValue.Add (GetNow () - new DateTime (_date.Year, _date.Month, _date.Day)).Year - DateTime.MinValue.Year;
                 } catch (IndexOutOfRangeException exc) {
-                    Core.Log.Write (exc);
+                    Core.Log.Exception (exc);
                     return 0;
                 }
             }
 
             public string GetAgeSuffix() => GetAgeSuffix (GetAge ());
 
-            public string GetAgeSuffix(int age) {
+            public static string GetAgeSuffix(int age) {
 
                 string ageSuffix = "'th";
                 switch (age.ToString ().Last ()) {
@@ -140,7 +140,9 @@ namespace Lomztein.Moduthulhu.Plugins.Birthday {
                 }
 
                 if (age % 10 == 0 || age % 10 > 4)
+                {
                     ageSuffix = "'th";
+                }
 
                 return ageSuffix;
             }

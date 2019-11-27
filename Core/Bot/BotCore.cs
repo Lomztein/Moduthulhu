@@ -17,13 +17,13 @@ namespace Lomztein.Moduthulhu.Core.Bot {
         public DateTime BootDate { get; private set; }
         public TimeSpan Uptime { get => DateTime.Now - BootDate; }
 
-        private BotClient _client;
-        private ErrorReporter _errorReporter;
+        public BotClient Client { get; private set; }
+        private readonly ErrorReporter _errorReporter = new ErrorReporter ();
 
         internal static string BaseDirectory { get => AppContext.BaseDirectory; }
         internal static string DataDirectory { get => AppContext.BaseDirectory + "/Data"; }
 
-        private CancellationTokenSource _shutdownToken = new CancellationTokenSource();
+        private readonly CancellationTokenSource _shutdownToken = new CancellationTokenSource();
 
         internal async Task InitializeCore()
         {
@@ -31,13 +31,10 @@ namespace Lomztein.Moduthulhu.Core.Bot {
             // Set up core
             BootDate = DateTime.Now;
 
-            // Set up exception handler.
-            _errorReporter = new ErrorReporter();
-
             // Set up client manager
-            _client = new BotClient(this);
-            _client.ExceptionCaught += OnExceptionCaught;
-            _client.Initialize();
+            Client = new BotClient(this);
+            Client.ExceptionCaught += OnExceptionCaught;
+            Client.Initialize();
 
             Consent.Init();
             Localization.Init(new CultureInfo("en-US"));

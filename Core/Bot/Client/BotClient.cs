@@ -96,7 +96,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client
         {
             if (_statusMessages.ContainsKey (identifier))
             {
-                throw new InvalidOperationException($"Cannot add message with identifier '{identifier}' since one such already exists.");
+                throw new InvalidOperationException($"Cannot add message with {nameof(identifier)} '{identifier}' since one such already exists.");
             }
             else
             {

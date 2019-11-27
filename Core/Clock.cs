@@ -52,6 +52,8 @@ namespace Lomztein.Moduthulhu.Core
                 Tick (DateTime.Now, _lastTick);
                 _lastTick = DateTime.Now;
             }
+
+            _clockThread.Abort();
         }
 
         private void Tick (DateTime curTick, DateTime lTick) {

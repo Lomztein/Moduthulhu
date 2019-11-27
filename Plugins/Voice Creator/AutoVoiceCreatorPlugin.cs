@@ -32,9 +32,9 @@ namespace Lomztein.Moduthulhu.Modules.Voice
             GuildHandler.ChannelDestroyed += OnChannelDeleted;
 
             _defaultChannels = GetConfigCache("DefaultVoiceChannels", x => x.GetGuild().VoiceChannels.Select(y => y.Id).ToList ());
-            _newVoiceNames = GetConfigCache("NewVoiceNames", x => new List<string>() { "Extra Voice 1", "Extra Voice 2" });
+            _newVoiceNames = GetConfigCache("NewVoiceNames", x => new List<string> { "Extra Voice 1", "Extra Voice 2" });
             _desiredFreeChannels = GetConfigCache("DesiredFreeChannels", x => 1);
-            _ignoreChannels = GetConfigCache("IgnoreChannels", x => new List<ulong>() { x.GetGuild().AFKChannel.ZeroIfNull () });
+            _ignoreChannels = GetConfigCache("IgnoreChannels", x => new List<ulong> { x.GetGuild().AFKChannel.ZeroIfNull () });
             _newChannelCategory = GetConfigCache("NewChannelCategory", x => (ulong)x.GetGuild().VoiceChannels.FirstOrDefault()?.CategoryId.GetValueOrDefault ());
 
             AddConfigInfo("Add Default Channel", "Add default channel", new Action<SocketVoiceChannel>((x) => _defaultChannels.MutateValue(y => y.Add(x.Id))), () => "Added channel to list of default.", "Channel");
@@ -114,10 +114,11 @@ namespace Lomztein.Moduthulhu.Modules.Voice
         private async Task UserVoiceStateUpdated (SocketUser user, SocketVoiceState prevState, SocketVoiceState curState) {
             SocketGuildUser guildUser = user as SocketGuildUser;
             if (guildUser == null)
+            {
                 return; // Break off instantly if this is in a private DM. Can you even call bots directly?
+            }
 
             await CheckAndModifyChannelCount (guildUser);
-            return;
         }
 
         // Have to put it in a seperate async void function, so it doesn't block the event. Async root?
@@ -133,7 +134,9 @@ namespace Lomztein.Moduthulhu.Modules.Voice
 
             foreach (SocketVoiceChannel channel in voiceChannels) {
                 if (!toIgnore.Contains (channel.Id) && channel.Users.Count == 0)
+                {
                     freeChannels++;
+                }
             }
 
             if (freeChannels < desiredFree) {
@@ -144,7 +147,9 @@ namespace Lomztein.Moduthulhu.Modules.Voice
                 await CreateNewChannel (user.Guild, selectedName);
             } else if (freeChannels > desiredFree) {
                 if (FindEmptyTemporaryChannel () is SocketVoiceChannel toDelete)
-                    await DeleteChannel (toDelete); // Man, pattern matching seems to be able to do anything.
+                {
+                    await DeleteChannel(toDelete); // Man, pattern matching seems to be able to do anything.
+                }
             }
         }
 
@@ -165,7 +170,7 @@ namespace Lomztein.Moduthulhu.Modules.Voice
             return channel;
         }
 
-        private async Task DeleteChannel (SocketVoiceChannel channel) {
+        private static async Task DeleteChannel (SocketVoiceChannel channel) {
             await channel.DeleteAsync ();
         }
 

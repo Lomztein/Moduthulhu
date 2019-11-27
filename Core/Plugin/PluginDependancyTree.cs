@@ -29,7 +29,7 @@ namespace Lomztein.Moduthulhu.Core.Plugins
         private void ConnectBranches (Branch[] branches) {
             foreach (Branch branch in branches) {
                 DependencyAttribute[] dependancyAttributes = branch.Plugin.GetCustomAttributes (typeof (DependencyAttribute), false).Cast<DependencyAttribute>().ToArray ();
-                string branchName = Framework.Plugin.GetVersionedFullName(branch.Plugin);
+                string branchName = Plugin.GetVersionedFullName(branch.Plugin);
                 List<Branch> dependancyBranches = new List<Branch>();
 
                 foreach (DependencyAttribute dependancyAttribute in dependancyAttributes)
@@ -37,18 +37,18 @@ namespace Lomztein.Moduthulhu.Core.Plugins
                     Branch dependancyBranch = GetBranch(dependancyAttribute.DependencyName);
                     if (dependancyBranch == null)
                     {
-                        Log.Write(Log.Type.CRITICAL, $"Missing dependancy {dependancyAttribute.DependencyName} for plugin {branchName}!");
+                        Log.Critical($"Missing dependancy {dependancyAttribute.DependencyName} for plugin {branchName}!");
                     }
                     else
                     {
-                        string dependancyVersion = Framework.Plugin.GetVersion(dependancyBranch.Plugin);
+                        string dependancyVersion = Plugin.GetVersion(dependancyBranch.Plugin);
                         dependancyBranches.Add(dependancyBranch);
 
-                        Log.Write(Log.Type.PLUGIN, $"Plugin {branchName} linked to dependancy {Framework.Plugin.GetVersionedFullName(dependancyBranch.Plugin)}.");
+                        Log.Plugin($"Plugin {branchName} linked to dependancy {Plugin.GetVersionedFullName(dependancyBranch.Plugin)}.");
                         if (dependancyAttribute.DesiredVersion != dependancyVersion)
                         {
                             string targetVersion = dependancyAttribute.DesiredVersion;
-                            Log.Write(Log.Type.WARNING, $"Plugin {branchName} targets version {targetVersion} of {dependancyBranch.Plugin.Name}, but version {dependancyVersion} is installed instead. This may cause issues.");
+                            Log.Warning($"Plugin {branchName} targets version {targetVersion} of {dependancyBranch.Plugin.Name}, but version {dependancyVersion} is installed instead. This may cause issues.");
                         }
                     }
                 }
@@ -67,12 +67,12 @@ namespace Lomztein.Moduthulhu.Core.Plugins
             while (toOrder.Count != 0) {
 
                 if (currentIndex > toOrder.Count - 1) {
-                    Log.Write (Log.Type.CRITICAL, $"Plugins {string.Join (", ", toOrder.Select (x => x.Name))} are missing dependencies, they have been excluded in the sort.");
+                    Log.Critical ($"Plugins {string.Join (", ", toOrder.Select (x => x.Name))} are missing dependencies, they have been excluded in the sort.");
                     break;
                 }
 
                 Type currentType = toOrder[currentIndex];
-                Branch currentBranch = GetBranch (Framework.Plugin.GetVersionedFullName (currentType));
+                Branch currentBranch = GetBranch (Plugin.GetVersionedFullName (currentType));
                 
                 if (currentBranch.Dependencies.Length == 0 || currentBranch.Dependencies.All (x => x != null && allSoFar.Contains (x.Plugin))) {
                     allSoFar.Add (currentType);
@@ -92,7 +92,7 @@ namespace Lomztein.Moduthulhu.Core.Plugins
             
             foreach (Branch other in _branches)
             {
-                string oName = Framework.Plugin.GetVersionedFullName(other.Plugin);
+                string oName = Plugin.GetVersionedFullName(other.Plugin);
                 if (oName.StartsWith(pluginName, StringComparison.Ordinal))
                 {
                     branch = other;
@@ -100,7 +100,9 @@ namespace Lomztein.Moduthulhu.Core.Plugins
                 }
             }
             if (branch == null)
-                Log.Write (Log.Type.CRITICAL, $"Plugins type {pluginName} cannot be found, perhaps it is missing in the Modules folder.");
+            {
+                Log.Critical($"Plugins type {pluginName} cannot be found, perhaps it is missing in the Modules folder.");
+            }
             return branch;
         }
 
@@ -110,12 +112,15 @@ namespace Lomztein.Moduthulhu.Core.Plugins
             {
                 if (pluginVersion != dependancyVersion)
                 {
-                    Log.Write(Log.Type.WARNING, $"Dependancy plugin {dependancyName} is loaded, but it is a different version than the targeted version. This may cause issues.");
+                    Log.Warning($"Dependancy plugin {dependancyName} is loaded, but it is a different version than the targeted version. This may cause issues.");
                 }
 
                 return true;
             }
-            else return false;
+            else
+            {
+                return false;
+            }
         }
 
         public Type[] GetDependencies (string pluginName) {

@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using System.IO;
 using System.Reflection;
 using Newtonsoft.Json.Linq;
+using System.Globalization;
 
 namespace Lomztein.Moduthulhu.Core.IO
 {
@@ -23,7 +24,7 @@ namespace Lomztein.Moduthulhu.Core.IO
                     string content = File.ReadAllText (path);
                     return JsonConvert.DeserializeObject<T> (content, serializerSettings);
                 } catch (Exception exc) {
-                    Log.Write (exc);
+                    Log.Exception (exc);
                 }
             }
 
@@ -53,7 +54,7 @@ namespace Lomztein.Moduthulhu.Core.IO
                 string json = JsonConvert.SerializeObject (obj, format ? Formatting.Indented : Formatting.None);
                 File.WriteAllText (path, json);
             } catch (Exception exc) {
-                Log.Write (exc);
+                Log.Exception (exc);
             }
         }
 
@@ -61,7 +62,7 @@ namespace Lomztein.Moduthulhu.Core.IO
             object obj;
             try {
                 try {
-                    obj = (T)Convert.ChangeType (input, typeof (T));
+                    obj = (T)Convert.ChangeType (input, typeof (T), CultureInfo.InvariantCulture);
                 } catch {
                     obj = (T)input;
                 }
@@ -74,7 +75,7 @@ namespace Lomztein.Moduthulhu.Core.IO
         }
 
         public static object ConvertObject (object input, Type toType) {
-            MethodInfo info = typeof (JSONSerialization).GetMethod ("ConvertObject", new Type[] { typeof (object) }); // Should return the first one in the class, I hope.
+            MethodInfo info = typeof (JSONSerialization).GetMethod ("ConvertObject", new [] { typeof (object) }); // Should return the first one in the class, I hope.
             info = info.MakeGenericMethod (toType);
             return info.Invoke (null, new object[] { input });
         }

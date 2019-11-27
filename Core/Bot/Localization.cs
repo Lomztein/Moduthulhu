@@ -42,10 +42,14 @@ namespace Lomztein.Moduthulhu.Core.Bot
                 Dictionary<string, string> dict = JSONSerialization.DeserializeFile<Dictionary<string, string>>(file);
 
                 if (!_translationTable.ContainsKey(culture))
+                {
                     _translationTable.Add(culture, new Dictionary<string, Dictionary<string, string>>());
+                }
 
                 if (!_translationTable[culture].ContainsKey(identifier))
+                {
                     _translationTable[culture].Add(identifier, null);
+                }
 
                 _translationTable[culture][identifier] = dict;
             }
@@ -55,7 +59,7 @@ namespace Lomztein.Moduthulhu.Core.Bot
 
         public static string GetF (CultureInfo culture, string identifier, string key, params object[] objects)
         {
-            string missing = culture == DefaultCulture ? key : Get(DefaultCulture, identifier, key);
+            string missing = culture.Equals (DefaultCulture) ? key : GetF(DefaultCulture, identifier, key, objects);
             bool changed = TrySetMissingEntry(culture, identifier, key, missing); // Set missing entry to either default cultures value, or the identifier if default cultures value is the one that's missing.
 
             string value = _translationTable[culture][identifier][key];
@@ -64,7 +68,10 @@ namespace Lomztein.Moduthulhu.Core.Bot
                 value = value.Replace($"{{{i}}}", objects[i].ToString (), StringComparison.Ordinal);
             }
 
-            if (changed) StoreTranslationTable(culture, identifier);
+            if (changed)
+            {
+                StoreTranslationTable(culture, identifier);
+            }
 
             return value;
         }

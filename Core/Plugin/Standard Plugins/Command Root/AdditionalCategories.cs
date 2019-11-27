@@ -8,8 +8,8 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
 {
     public static class AdditionalCategories
     {
-        public static Category Management = new Category ("Management", "Commands for managing the bot and its features, such as configuration and modules.");
+        public static readonly Category Management = new Category ("Management", "Commands for managing the bot and its features, such as configuration and modules.");
 
-        public static Category Voice = new Category ("Voice", "Commands revolving the interaction and expansion of Discords voice channels.");
+        public static readonly Category Voice = new Category ("Voice", "Commands revolving the interaction and expansion of Discords voice channels.");
     }
 }

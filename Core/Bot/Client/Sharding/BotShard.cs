@@ -38,7 +38,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding
         }
 
         internal void Run () {
-            ThreadStart init = new ThreadStart (Initialize);
+            ThreadStart init = Initialize;
             _thread = new Thread (init) {
                 Name = ToString (),
             };
@@ -72,7 +72,8 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding
 
         private Task Client_Disconnected(Exception arg)
         {
-            Log.Write(arg);
+            Log.Exception(arg);
+            OnExceptionCaught(arg);
             return Task.CompletedTask;
         }
 
@@ -130,6 +131,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding
             await Logout ();
             await Stop ();
             Client.Dispose ();
+            _thread.Abort();
         }
 
         public override string ToString() => $"{BotClient} - S{_shardId}/{_totalShards}";
@@ -165,7 +167,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding
             Client.GuildUnavailable         += async (x) =>         { try { await ForGuild (x, g => g.OnGuildUnavailable ());                                           } catch (Exception exc) { OnExceptionCaught (exc); } };
             Client.GuildUpdated             += async (x, y) =>      { try { await ForGuild (x, g => g.OnGuildUpdated (x, y));                                           } catch (Exception exc) { OnExceptionCaught (exc); } };
             Client.JoinedGuild              += async (x) =>         { try { await ForGuild (x, g => g.OnJoinedGuild ());                                                } catch (Exception exc) { OnExceptionCaught (exc); } };
-            Client.LeftGuild                += async (x) =>         { try { await ForGuild(x, g => g.OnLeftGuild());                                                    } catch (Exception exc) { OnExceptionCaught(exc); } };
+            Client.LeftGuild                += async (x) =>         { try { await ForGuild(x, g => g.OnLeftGuild());                                                    } catch (Exception exc) { OnExceptionCaught (exc); } };
             Client.UserBanned               += async (x, y) =>      { try { await ForGuild (y, g => g.OnUserBanned (x));                                                } catch (Exception exc) { OnExceptionCaught (exc); } };
             Client.UserUnbanned             += async (x, y) =>      { try { await ForGuild (y, g => g.OnUserUnbanned (x));                                              } catch (Exception exc) { OnExceptionCaught (exc); } };
             //Client.UserUpdated              += async (x, y) =>      { try { await ForGuild ((x as SocketGuildUser)?.Guild, g => g.OnMem (UserUpdated,x, y);           } catch (Exception exc) { OnExceptionCaught (exc); } };
@@ -192,8 +194,8 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding
             await Task.WhenAll(tasks);
         }
 
-        private async void OnExceptionCaught(Exception exception) {
-            await ExceptionCaught?.Invoke (exception.InnerException ?? exception);
+        private void OnExceptionCaught(Exception exception) {
+            _ = ExceptionCaught?.Invoke (exception.InnerException ?? exception).ConfigureAwait (false);
         }
 
         // Status related stuff

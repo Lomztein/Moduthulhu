@@ -27,7 +27,9 @@ namespace Lomztein.ModularDiscordBot.Modules.Misc.Brainfuck
 
         private async Task<string> Run (string program, ulong channelID) {
             if (_input.ContainsKey (channelID))
-                throw new Exception ("A Brainfuck program is already running in this channel.");
+            {
+                throw new Exception($"A Brainfuck {nameof(program)} is already running in this channel.");
+            }
 
             _input.Add (channelID, null);
             BrainfuckIntepreter intepreter = new BrainfuckIntepreter (new Func<Task<byte>> (async () => await AwaitInputAsync (channelID)));

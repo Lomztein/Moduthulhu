@@ -22,13 +22,13 @@ namespace Lomztein.Moduthulhu.Modules.Misc.Karma
 
         private CachedValue<Dictionary<ulong, Selfworth>> _karma;
 
-        private KarmaCommand karmaCommand = new KarmaCommand ();
+        private KarmaCommand _karmaCommand;
 
         public override void Initialize() {
             GuildHandler.ReactionAdded += OnReactionAdded;
             GuildHandler.ReactionRemoved += OnReactionRemoved;
-            SendMessage("Lomztein-Command Root", "AddCommand", karmaCommand);
-            karmaCommand.ParentPlugin = this;
+            SendMessage("Lomztein-Command Root", "AddCommand", _karmaCommand);
+            _karmaCommand = new KarmaCommand { ParentPlugin = this };
 
             _upvoteEmoteId = GetConfigCache("UpvoteEmoteId", x => x.GetGuild ().Emotes.Where (y => y.Name == "upvote").FirstOrDefault ().ZeroIfNull ());
             _downvoteEmoteId = GetConfigCache("DownvoteEmoteId", x => x.GetGuild ().Emotes.Where (y => y.Name == "downvote").FirstOrDefault ().ZeroIfNull ());
@@ -55,7 +55,9 @@ namespace Lomztein.Moduthulhu.Modules.Misc.Karma
             IUserMessage message = await cache.DownloadAsync ();
             
             if (message == null)
+            {
                 return;
+            }
 
             if (reaction.Channel is SocketGuildChannel guildChannel && reaction.Emote is Emote emote) {
 
@@ -72,21 +74,29 @@ namespace Lomztein.Moduthulhu.Modules.Misc.Karma
         public override void Shutdown() {
             GuildHandler.ReactionAdded -= OnReactionAdded;
             GuildHandler.ReactionRemoved -= OnReactionRemoved;
-            SendMessage("Lomztein-Command Root", "RemoveCommand", karmaCommand);
+            SendMessage("Lomztein-Command Root", "RemoveCommand", _karmaCommand);
         }
 
         public Dictionary<ulong, Selfworth> GetKarmaDictionary () => _karma.GetValue();
 
         private void ChangeKarma (IUser giver, IUser receiver, int direction) {
             if (giver.Id == receiver.Id)
+            {
                 return; // Can't go around giving yourself karma, ye twat.
+            }
             if (!_karma.GetValue ().ContainsKey (receiver.Id))
-                _karma.GetValue ().Add (receiver.Id, new Selfworth ());
+            {
+                _karma.GetValue().Add(receiver.Id, new Selfworth());
+            }
 
             if (direction > 0)
-                _karma.GetValue ()[ receiver.Id ].Upvote ();
+            {
+                _karma.GetValue()[receiver.Id].Upvote();
+            }
             else if (direction < 0)
-                _karma.GetValue ()[ receiver.Id ].Downvote ();
+            {
+                _karma.GetValue()[receiver.Id].Downvote();
+            }
 
             _karma.Store();
         }
@@ -94,14 +104,16 @@ namespace Lomztein.Moduthulhu.Modules.Misc.Karma
         public Selfworth GetKarma (ulong userID) {
             Selfworth result = _karma.GetValue ().GetValueOrDefault (userID);
             if (result == null)
-                result = new Selfworth ();
+            {
+                result = new Selfworth();
+            }
             return result;
         }
 
         public class Selfworth {
 
-            public int Upvotes;
-            public int Downvotes;
+            public int Upvotes { get; private set; }
+            public int Downvotes { get; private set; }
 
             [JsonIgnore]
             public int Total { get =>  Upvotes - Downvotes; }

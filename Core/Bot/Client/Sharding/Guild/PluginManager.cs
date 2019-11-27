@@ -12,10 +12,10 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
     {
         private readonly List<IPlugin> _activePlugins = new List<IPlugin>();
 
-        private GuildHandler _parentHandler;
+        private readonly GuildHandler _parentHandler;
 
-        private CachedValue<List<string>> _enabledPlugins;
-        private List<Exception> _initializationExceptions = new List<Exception>();
+        private readonly CachedValue<List<string>> _enabledPlugins;
+        private readonly List<Exception> _initializationExceptions = new List<Exception>();
 
         public event Action<IPlugin> OnPluginLoaded;
         public event Action<IPlugin> OnPluginUnloaded;
@@ -39,15 +39,25 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
                 {
                     try // One day I promise to stop abusing throw statements, so that we can avoid this.
                     {
-                        AddPlugin(Plugin.GetFullName(pluginType));
-                        Log.Write(Log.Type.PLUGIN, $"Added missing critical {Plugin.GetVersionedFullName (pluginType)} plugin to enabled list.");
-                        changed = true;
+                        if (IsPluginActive(Plugin.GetName(pluginType)))
+                        {
+                            AddPlugin(Plugin.GetFullName(pluginType));
+                            Log.Write(Log.Type.PLUGIN, $"Added missing critical {Plugin.GetVersionedFullName(pluginType)} plugin to enabled list.");
+                            changed = true;
+                        }
                     }
-                    catch (ArgumentException) { }
+                    catch (ArgumentException exc)
+                    {
+                        Log.Warning("Tried to add an already enabled plugin to while making super sure critical plugins were enabled.");
+                        Log.Exception(exc);
+                    }
                 }
             }
 
-            if (changed) _enabledPlugins.Store();
+            if (changed)
+            {
+                _enabledPlugins.Store();
+            }
         }
 
         private void PurgeDuplicateEnabledPlugins ()
@@ -58,7 +68,10 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
             {
                 for (int y = 0; y < value.Count; y++)
                 {
-                    if (x == y) continue;
+                    if (x == y)
+                    {
+                        continue;
+                    }
 
                     string xx = value[x];
                     string yy = value[y];
@@ -142,11 +155,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
                     plugin.PreInitialize(_parentHandler);
                 } catch (Exception exc)
                 {
-                    Log.Write(Log.Type.WARNING, $"Something went wrong during plugin pre-initialization of plugin '{Plugin.GetName (plugin.GetType ())}'. The plugin has been disabled and plugin initialization scheduled to be restarted.");
-                    Log.Write(exc);
-                    _initializationExceptions.Add(exc);
-                    RemovePlugin(Plugin.GetFullName(plugin.GetType()));
-                    initError = true;
+                    ReportInitError("pre-initialization", exc, plugin, ref initError);
                 }
             }
 
@@ -159,11 +168,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
                 }
                 catch (Exception exc)
                 {
-                    Log.Write(Log.Type.WARNING, $"Something went wrong during plugin initialization of plugin '{Plugin.GetName(plugin.GetType())}'. The plugin has been disabled and plugin initialization scheduled to be restarted.");
-                    Log.Write(exc);
-                    _initializationExceptions.Add(exc);
-                    RemovePlugin(Plugin.GetFullName(plugin.GetType()));
-                    initError = true;
+                    ReportInitError("initialization", exc, plugin, ref initError);
                 }
             }
 
@@ -176,11 +181,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
                 }
                 catch (Exception exc)
                 {
-                    Log.Write(Log.Type.WARNING, $"Something went wrong during plugin post-initialization of plugin '{Plugin.GetName(plugin.GetType())}'. The plugin has been disabled and plugin initialization scheduled to be restarted.");
-                    Log.Write(exc);
-                    _initializationExceptions.Add(exc);
-                    RemovePlugin(Plugin.GetFullName(plugin.GetType()));
-                    initError = true;
+                    ReportInitError("post-initialization", exc, plugin, ref initError);
                 }
 
                 OnPluginLoaded?.Invoke(plugin);
@@ -190,6 +191,15 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
             {
                 ReloadPlugins();
             }
+        }
+
+        private void ReportInitError (string step, Exception exc, IPlugin plugin, ref bool initErrorFlag)
+        {
+            Log.Write(Log.Type.WARNING, $"Something went wrong during plugin {step} of plugin '{Plugin.GetName(plugin.GetType())}'. The plugin has been disabled and plugin initialization scheduled to be restarted.");
+            Log.Exception(exc);
+            _initializationExceptions.Add(exc);
+            RemovePlugin(Plugin.GetFullName(plugin.GetType()));
+            initErrorFlag = true;
         }
 
         private static bool NameMatches (string shortName, string longName)

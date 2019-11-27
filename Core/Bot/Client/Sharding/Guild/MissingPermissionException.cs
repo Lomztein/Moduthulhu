@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
 {
-    public class MissingPermissionException : Exception
+    public class MissingPermissionException : Exception, ISerializable
     {
         public MissingPermissionException(string message) : base(message)
         {

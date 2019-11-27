@@ -11,22 +11,16 @@ namespace Lomztein.Moduthulhu.Core.IO.Database
 {
     public class PostgreSQLDatabaseConnector : IDatabaseConnector
     {
-        private string GetConnectionString() => Environment.GetEnvironmentVariable("PostgreSQLConnectionString");
+        private static string GetConnectionString() => Environment.GetEnvironmentVariable("PostgreSQLConnectionString");
 
-        private NpgsqlConnection GetConnection (string connstring)
+        private static NpgsqlConnection GetConnection (string connstring)
         {
             NpgsqlConnection conn = new NpgsqlConnection(connstring);
             conn.Open();
             return conn;
         }
-        private async Task<NpgsqlConnection> GetConnectionAsync(string connstring)
-        {
-            NpgsqlConnection conn = new NpgsqlConnection(connstring);
-            await conn.OpenAsync();
-            return conn;
-        }
 
-        private NpgsqlCommand PrepareQuery (string query, Dictionary<string, object> parameters) 
+        private static NpgsqlCommand PrepareQuery (string query, Dictionary<string, object> parameters) 
         {
             NpgsqlCommand cmd = new NpgsqlCommand(query);
             foreach (var param in parameters)
@@ -69,7 +63,7 @@ namespace Lomztein.Moduthulhu.Core.IO.Database
             }
         }
 
-        private Dictionary<string, object>[] ConvertDataSetToTableDictionary (DataSet dataSet) 
+        private static Dictionary<string, object>[] ConvertDataSetToTableDictionary (DataSet dataSet) 
         {
             if (dataSet.Tables.Count > 1) 
             {
@@ -102,7 +96,7 @@ namespace Lomztein.Moduthulhu.Core.IO.Database
 
         public void CreateTable(string tableName, string createQuery)
         {
-            var res = ReadQuery("SELECT 1 FROM information_schema.tables WHERE table_name = @table", new Dictionary<string, object>() { { "@table", tableName } });
+            var res = ReadQuery("SELECT 1 FROM information_schema.tables WHERE table_name = @table", new Dictionary<string, object> { { "@table", tableName } });
 
             try
             {
@@ -114,7 +108,7 @@ namespace Lomztein.Moduthulhu.Core.IO.Database
             }
             catch (NpgsqlException e)
             {
-                Log.Write(e);
+                Log.Exception(e);
             }
         }
     }

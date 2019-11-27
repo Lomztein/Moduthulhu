@@ -80,7 +80,9 @@ namespace Lomztein.Moduthulhu.Plugins.Standard {
                 }
 
                 if (result.Value is ISendable sendable)
-                    await sendable.SendAsync (arg.Channel);
+                {
+                    await sendable.SendAsync(arg.Channel);
+                }
 
                 await MessageControl.SendMessage (arg.Channel as ITextChannel, result?.GetMessage (), false, result?.Value as Embed);
             }

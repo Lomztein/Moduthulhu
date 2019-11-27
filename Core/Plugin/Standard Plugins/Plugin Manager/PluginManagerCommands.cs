@@ -20,7 +20,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
             Description = "Manage active plugins.";
             Category = AdditionalCategories.Management;
 
-            commandsInSet = new List<ICommand>()
+            commandsInSet = new List<ICommand>
             {
                 new AddCommand (),
                 new RemoveCommand (),
@@ -159,11 +159,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
 
                 if (dependancies.Length > 0)
                 {
-
-                    string content = "";
-                    foreach (string dep in dependancies)
-                        content += dep + "\n";
-
+                    string content = string.Join(", ", dependancies);
                     builder.AddField(header, content);
                 }
 

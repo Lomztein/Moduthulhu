@@ -12,7 +12,32 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client
             public int Min, Max;
 
             public bool IsValid() => Min < Max;
+
+            public override bool Equals(object obj)
+            {
+                if (obj is IntRange other)
+                {
+                    return Max == other.Max && Min == other.Min;
+                }
+                return false;
+            }
+
+            public override int GetHashCode()
+            {
+                return Min + Max;
+            }
+
+            public static bool operator ==(IntRange left, IntRange right)
+            {
+                return left.Equals(right);
+            }
+
+            public static bool operator !=(IntRange left, IntRange right)
+            {
+                return !(left == right);
+            }
         }
+
         public IntRange ShardRange;
         public int TotalShards;
         public string Token;

@@ -7,6 +7,7 @@ using Lomztein.Moduthulhu.Modules.Voice.Commands;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Lomztein.Moduthulhu.Modules.Voice {
@@ -22,15 +23,15 @@ namespace Lomztein.Moduthulhu.Modules.Voice {
         private CachedValue<ulong> _musicBotId;
         private CachedValue<ulong> _internationalRoleId;
 
-        private Dictionary<ulong, string> _customNames = new Dictionary<ulong, string> ();
-        private Dictionary<string, Tag> _tags = new Dictionary<string, Tag> (); // This is a dictionary purely for easier identification of tags.
+        private readonly Dictionary<ulong, string> _customNames = new Dictionary<ulong, string> ();
+        private readonly Dictionary<string, Tag> _tags = new Dictionary<string, Tag> (); // This is a dictionary purely for easier identification of tags.
 
-        private VoiceNameSet commandSet;
+        private VoiceNameSet _commandSet;
 
         public override void Initialize() {
             AssertPermission(GuildPermission.ManageChannels);
 
-            commandSet = new VoiceNameSet() { ParentPlugin = this };
+            _commandSet = new VoiceNameSet { ParentPlugin = this };
             GuildHandler.ChannelCreated += OnChannelCreated;
             GuildHandler.ChannelDestroyed += OnChannelDestroyed;
             GuildHandler.UserVoiceStateUpdated += OnVoiceStateUpdated;
@@ -38,7 +39,7 @@ namespace Lomztein.Moduthulhu.Modules.Voice {
             InitDefaultTags();
 
             _channelNames = GetConfigCache("ChannelNames", x => x.GetGuild().VoiceChannels.ToDictionary(y => y.Id, z => z.Name));
-            _toIgnore = GetConfigCache("ToIgnore", x => new List<ulong>() { (x.GetGuild().AFKChannel?.Id).GetValueOrDefault() });
+            _toIgnore = GetConfigCache("ToIgnore", x => new List<ulong> { (x.GetGuild().AFKChannel?.Id).GetValueOrDefault() });
             //_nameFormat = GetConfigCache("NameFormat", x => "[TAGS][NAME] - [GAME]");
             _musicBotId = GetConfigCache("MusicBotId", x => (ulong)0);
             _internationalRoleId = GetConfigCache("MusicBotId", x => (ulong)0);
@@ -63,7 +64,7 @@ namespace Lomztein.Moduthulhu.Modules.Voice {
             AddConfigInfo("Set International Role", "Set role.", new Action<string>((x) => _internationalRoleId.SetValue(GuildHandler.FindRole(x).Id)), () => $"Set international role to be {GuildHandler.GetRole(_internationalRoleId.GetValue()).Name}.", "Role Name");
             AddConfigInfo("Set International Role", "Show role.", () => GuildHandler.GetRole(_internationalRoleId.GetValue()) == null ? "Current international role doesn't exist :(" : "Current international role is " + GuildHandler.GetRole(_internationalRoleId.GetValue()).Name);
 
-            SendMessage("Lomztein-Command Root", "AddCommand", commandSet);
+            SendMessage("Lomztein-Command Root", "AddCommand", _commandSet);
         }
 
         void InitDefaultTags () {
@@ -73,16 +74,22 @@ namespace Lomztein.Moduthulhu.Modules.Voice {
             AddTag (new Tag ("🌎", x => x.Users.Any (y => y.Roles.Any (z => z.Id == _internationalRoleId.GetValue ()))));
         }
 
-        private async Task OnGuildMemberUpdated(SocketGuildUser prev, SocketGuildUser cur) {
+        private async Task OnGuildMemberUpdated(SocketGuildUser user, SocketGuildUser cur) {
             if (cur.VoiceChannel != null)
-                await UpdateChannel (cur.VoiceChannel);
+            {
+                await UpdateChannel(cur.VoiceChannel);
+            }
         }
 
         private async Task OnVoiceStateUpdated(SocketUser user, SocketVoiceState prev, SocketVoiceState cur) {
             if (prev.VoiceChannel != null)
-                await UpdateChannel (prev.VoiceChannel);
+            {
+                await UpdateChannel(prev.VoiceChannel);
+            }
             if (cur.VoiceChannel != null)
-                await UpdateChannel (cur.VoiceChannel);
+            {
+                await UpdateChannel(cur.VoiceChannel);
+            }
         }
 
         public async Task UpdateChannel(SocketVoiceChannel channel) {
@@ -93,10 +100,14 @@ namespace Lomztein.Moduthulhu.Modules.Voice {
                 string name = _channelNames.GetValue ().GetValueOrDefault (channel.Id);
 
                 if (GuildHandler.GetChannel (channel.Id) == null)
+                {
                     return;
+                }
 
                 if (_toIgnore.GetValue ().Contains (channel.Id))
+                {
                     return;
+                }
 
                 if (string.IsNullOrEmpty (name)) { // If the channel is unknown, then add it and retry through OnChannelCreated.
                     await OnChannelCreated (channel);
@@ -109,7 +120,9 @@ namespace Lomztein.Moduthulhu.Modules.Voice {
                 foreach (SocketGuildUser user in users) {
 
                     if (user.Activity == null)
+                    {
                         continue;
+                    }
 
                     if (user.Activity.Type == ActivityType.Playing && user.IsBot == false) {
                         if (numPlayers.ContainsKey (user.Activity.Name)) {
@@ -140,16 +153,20 @@ namespace Lomztein.Moduthulhu.Modules.Voice {
                 newName = tags + " " + newName;
 
                 if (channel.Users.Count == 0)
-                    _customNames.Remove (channel.Id);
+                {
+                    _customNames.Remove(channel.Id);
+                }
                 if (_customNames.ContainsKey (channel.Id))
-                    newName = possibleShorten + " - " + _customNames [ channel.Id ];
+                {
+                    newName = possibleShorten + " - " + _customNames[channel.Id];
+                }
 
                 // Trying to optimize API calls here, just to spare those poor souls at the Discord API HQ stuff
                 if (channel.Name != newName) {
                     try {
                         await channel.ModifyAsync (x => x.Name = newName);
                     }catch (Exception e) {
-                        Core.Log.Write (e);
+                        Core.Log.Exception (e);
                     }
                 }
             }
@@ -174,17 +191,19 @@ namespace Lomztein.Moduthulhu.Modules.Voice {
             GuildHandler.ChannelDestroyed -= OnChannelDestroyed;
             GuildHandler.UserVoiceStateUpdated -= OnVoiceStateUpdated;
             GuildHandler.GuildMemberUpdated -= OnGuildMemberUpdated;
-            SendMessage("Lomztein-Command Root", "RemoveCommand", commandSet);
+            SendMessage("Lomztein-Command Root", "RemoveCommand", _commandSet);
         }
 
         public void AddTag (Tag newTag) {
-            _tags.Add (newTag.emoji, newTag);
+            _tags.Add (newTag.Emoji, newTag);
         }
 
         public void RemoveTag (Tag tag) {
             if (tag == null)
+            {
                 return;
-            _tags.Remove (tag.emoji);
+            }
+            _tags.Remove (tag.Emoji);
         }
 
         public void RemoveTag (string emoji) {
@@ -192,21 +211,25 @@ namespace Lomztein.Moduthulhu.Modules.Voice {
         }
 
         public string GetTags (SocketVoiceChannel channel) {
-            string tagString = "";
+            StringBuilder tagString = new StringBuilder ();
             foreach (var tag in _tags) {
-                if (tag.Value.isActive (channel)) {
-                    tagString += tag.Value.emoji;
+                if (tag.Value.IsActive (channel)) {
+                    tagString.Append (tag.Value.Emoji);
                 }
             }
 
-            return tagString;
+            return tagString.ToString ();
         }
 
         public async Task SetCustomName (SocketVoiceChannel channel, string name) {
             if (!_customNames.ContainsKey (channel.Id))
-                _customNames.Add (channel.Id, name);
+            {
+                _customNames.Add(channel.Id, name);
+            }
             else
-                _customNames [ channel.Id ] = name;
+            {
+                _customNames[channel.Id] = name;
+            }
             await UpdateChannel (channel);
         }
 
@@ -217,12 +240,12 @@ namespace Lomztein.Moduthulhu.Modules.Voice {
 
         public class Tag {
 
-            public string emoji = ""; // The "graphical" representation of the tag.
-            public Func<SocketVoiceChannel, bool> isActive; // Should return true if the tag is active.
+            public string Emoji { get; private set; } = ""; // The "graphical" representation of the tag.
+            public Func<SocketVoiceChannel, bool> IsActive { get; private set; } // Should return true if the tag is active.
 
-            public Tag (string _emoji, Func<SocketVoiceChannel, bool> _isActive) {
-                emoji = _emoji;
-                isActive = _isActive;
+            public Tag (string emoji, Func<SocketVoiceChannel, bool> isActive) {
+                Emoji = emoji;
+                IsActive = isActive;
             }
 
         }

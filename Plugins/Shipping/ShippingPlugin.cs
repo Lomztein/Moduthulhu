@@ -19,36 +19,34 @@ namespace Lomztein.Moduthulhu.Modules.Shipping {
         private ShippingCommands _commands;
 
         public override void Initialize() {
-            _commands = new ShippingCommands () { ParentPlugin = this };
+            _commands = new ShippingCommands { ParentPlugin = this };
             SendMessage("Lomztein-Command Root", "AddCommand", _commands);
 
             _ships = GetDataCache("Ships", x => new List<Ship>());
             _shipNames = GetDataCache("ShipNames", x => new List<ShipName>());
         }
 
-        public Ship Ship (SocketGuildUser shipper, SocketGuildUser shippieOne, SocketGuildUser shippieTwo, out bool succesful) {
+        public bool Ship (SocketGuildUser shipper, SocketGuildUser shippieOne, SocketGuildUser shippieTwo) {
 
             Ship ship = new Ship (this, shipper.Guild.Id, shipper.Id, shippieOne.Id, shippieTwo.Id);
-            succesful = false;
 
             if (!ContainsShip (ship)) {
                 AddShip (shipper.Guild.Id, ship);
-                succesful = true;
+                return true;
             }
 
-            return ship;
+            return false;
         }
 
-        public Ship Sink(SocketGuildUser shipper, SocketGuildUser shippieOne, SocketGuildUser shippieTwo, out bool succesful) {
+        public bool Sink(SocketGuildUser shipper, SocketGuildUser shippieOne, SocketGuildUser shippieTwo) {
             Ship ship = new Ship (this, shipper.Guild.Id, shipper.Id, shippieOne.Id, shippieTwo.Id);
-            succesful = false;
 
             if (ContainsShip (ship)) {
                 RemoveShip (shipper.Guild.Id, ship);
-                succesful = true;
+                return true;
             }
 
-            return ship;
+            return false;
         }
 
         public List<Ship> GetAllShipperShips(SocketGuildUser shipper)
@@ -70,7 +68,7 @@ namespace Lomztein.Moduthulhu.Modules.Shipping {
                 }
                 else
                 {
-                    leaderboard.Add(ship.ShippieOne, new List<Ship>() { ship });
+                    leaderboard.Add(ship.ShippieOne, new List<Ship> { ship });
                 }
 
                 if (leaderboard.ContainsKey(ship.ShippieTwo))
@@ -206,16 +204,18 @@ namespace Lomztein.Moduthulhu.Modules.Shipping {
             return (ShippieOne == _shippieOne && ShippieTwo == _shippieTwo);
         }
 
-        public override int GetHashCode() => 0;
-
-
+        public override int GetHashCode() => (int)(ShippieOne - ShippieTwo);
 
         public ulong GetCompanionTo(ulong user)
         {
             if (user == ShippieOne)
+            {
                 return ShippieTwo;
+            }
             if (user == ShippieTwo)
+            {
                 return ShippieOne;
+            }
             throw new ArgumentException("Given user is not a shippie in this ship.");
         }
 
@@ -242,9 +242,13 @@ namespace Lomztein.Moduthulhu.Modules.Shipping {
             }
 
             if (firstHalf)
+            {
                 return fullName.Substring(0, fullName.Length / 2);
+            }
             if (!firstHalf)
+            {
                 return fullName.Substring(fullName.Length / 2);
+            }
             return fullName;
         }
     }

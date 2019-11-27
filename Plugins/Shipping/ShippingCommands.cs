@@ -33,13 +33,13 @@ namespace Lomztein.Moduthulhu.Modules.Shipping {
                 Category = StandardCategories.Fun;
             }
 
-            [Overload (typeof (Ship), "Ship two people so that they'll be together forever, at least in your headcanon.")]
+            [Overload (typeof (bool), "Ship two people so that they'll be together forever, at least in your headcanon.")]
             public Task<Result> Execute(CommandMetadata data, SocketGuildUser shippieOne, SocketGuildUser shippieTwo) {
-                Shipping.Ship ship = ParentPlugin.Ship (data.Message.Author as SocketGuildUser, shippieOne, shippieTwo, out bool succesful);
+                var succesful = ParentPlugin.Ship (data.Message.Author as SocketGuildUser, shippieOne, shippieTwo);
                 if (succesful) {
-                    return TaskResult (ship, "Succesfully shipped " + shippieOne.GetShownName () + " and " + shippieTwo.GetShownName () + ", now known as " + ParentPlugin.GetShipName (ship) + ".");
+                    return TaskResult (succesful, "Succesfully shipped " + shippieOne.GetShownName () + " and " + shippieTwo.GetShownName () + ", now known as " + ParentPlugin.GetShipName (ParentPlugin.GetShipByShippies (shippieOne, shippieTwo)) + ".");
                 }
-                return TaskResult (ship, $"Failed to ship {shippieOne.GetShownName ()} x {shippieTwo.GetShownName ()} - You've already shipped them.");
+                return TaskResult (succesful, $"Failed to ship {shippieOne.GetShownName ()} x {shippieTwo.GetShownName ()} - You've already shipped them.");
             }
 
             [Overload (typeof (Ship), "Ship two people so that they'll be together forever, with a given custom name.")]
@@ -58,13 +58,14 @@ namespace Lomztein.Moduthulhu.Modules.Shipping {
                 Category = StandardCategories.Fun;
             }
 
-            [Overload (typeof (void), "Sink one of your ships, in case the imaginative spark is gone.")]
+            [Overload (typeof (bool), "Sink one of your ships, in case the imaginative spark is gone.")]
             public Task<Result> Execute(CommandMetadata data, SocketGuildUser shippieOne, SocketGuildUser shippieTwo) {
-                Shipping.Ship ship = ParentPlugin.Sink (data.Message.Author as SocketGuildUser, shippieOne, shippieTwo, out bool succesful);
+                Ship ship = new Ship();
+                var succesful = ParentPlugin.Sink (data.Message.Author as SocketGuildUser, shippieOne, shippieTwo);
                 if (succesful) {
-                    return TaskResult (null, "Succesfully sunk " + ParentPlugin.GetShipName (ship) + ", at least for you.");
+                    return TaskResult (true, "Succesfully sunk " + ParentPlugin.GetShipName (ParentPlugin.GetShipByShippies (shippieOne, shippieTwo)) + ", at least for you.");
                 }
-                return TaskResult (null, $"Failed to sink {ParentPlugin.GetShipName (ship)} - You have not shipped them yet.");
+                return TaskResult (false, $"Failed to sink that ship, as you have not shipped them yet.");
             }
         }
 
@@ -167,14 +168,9 @@ namespace Lomztein.Moduthulhu.Modules.Shipping {
                     WithTitle ("All ships on " + data.Message.GetGuild ().Name + ".");
 
                 foreach (var pair in leaderboard) {
-                    SocketGuildUser shippie = ParentPlugin.GuildHandler.GetUser (pair.Key);
-                    string ships = "";
-
-                    foreach (Shipping.Ship ship in pair.Value) {
-                        ships += $"{ParentPlugin.ShipToString (ship)}\n";
-                    }
-
-                    builder.AddField ($"{shippie.GetShownName ()} has been shipped {pair.Value.Count} times in the following ships:", ships);
+                    SocketGuildUser shippie = ParentPlugin.GuildHandler.GetUser(pair.Key);
+                    var ships = string.Join("\n", ParentPlugin.GetShippieShips(shippie).Select(x => ParentPlugin.ShipToString(x)));
+                    builder.AddField ($"{shippie.GetShownName ()} has been shipped {pair.Value.Count} times in the following ships:\n", ships);
                 }
 
                 LargeEmbed largeEmbed = new LargeEmbed ();

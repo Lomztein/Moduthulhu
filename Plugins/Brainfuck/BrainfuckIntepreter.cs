@@ -12,10 +12,9 @@ namespace Lomztein.ModularDiscordBot.Modules.Misc.Brainfuck
         }
 
         private string _program;
-        public string Result;
 
-        private int _counter = 0;
-        private int _pointer = 0;
+        private int _counter;
+        private int _pointer;
 
         private readonly byte[ ] _memory = new byte [ 30000 ];
         private readonly Func<Task<byte>> _getInput;
@@ -26,8 +25,8 @@ namespace Lomztein.ModularDiscordBot.Modules.Misc.Brainfuck
             string printout = string.Empty;
 
             try {
-                for (_counter = 0; _counter < this._program.Length; _counter++) {
-                    switch (this._program [_counter]) {
+                while (_counter < _program.Length) {
+                    switch (_program [_counter]) {
                         case '>':
                             MovePointer(1);
                             break;
@@ -56,13 +55,17 @@ namespace Lomztein.ModularDiscordBot.Modules.Misc.Brainfuck
                         case ',':
                             SetMemoryAtPointer(await _getInput());
                             break;
+
+                        default:
+                            break;
                     }
+
+                    _counter++;
                 }
             }catch (Exception e) {
                 return e.Message;
             }
 
-            Result = printout;
             return printout;
         }
 
