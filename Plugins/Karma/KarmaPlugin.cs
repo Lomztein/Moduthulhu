@@ -112,7 +112,9 @@ namespace Lomztein.Moduthulhu.Modules.Misc.Karma
 
         public class Selfworth {
 
+            [JsonProperty]
             public int Upvotes { get; private set; }
+            [JsonProperty]
             public int Downvotes { get; private set; }
 
             [JsonIgnore]

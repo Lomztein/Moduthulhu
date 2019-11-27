@@ -9,6 +9,7 @@ using Lomztein.Moduthulhu.Core.Plugins.Framework;
 using Lomztein.Moduthulhu.Core.IO.Database.Repositories;
 using System.Linq;
 using Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild;
+using Newtonsoft.Json;
 
 namespace Lomztein.Moduthulhu.Modules.Phrases
 {
@@ -110,12 +111,18 @@ namespace Lomztein.Moduthulhu.Modules.Phrases
 
         public class Phrase {
 
+            [JsonProperty]
             public string Trigger { get; set; } = string.Empty;
+            [JsonProperty]
             public ulong UserId { get; set; }
+            [JsonProperty]
             public ulong ChannelId { get; set; }
+            [JsonProperty]
             public double Chance { get; set; } = 100d;
 
+            [JsonProperty]
             public string Response { get; set; } = string.Empty;
+            [JsonProperty]
             public string Emoji { get; set; } = string.Empty;
 
             public (string res, string emo) CheckAndReturnResponse (SocketUserMessage message) {

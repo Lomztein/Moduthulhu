@@ -8,6 +8,7 @@ using Lomztein.AdvDiscordCommands.Extensions;
 using Lomztein.Moduthulhu.Core.Plugins.Framework;
 using Lomztein.Moduthulhu.Core.IO.Database.Repositories;
 using Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild;
+using Newtonsoft.Json;
 
 namespace Lomztein.Moduthulhu.Modules.Clock.ActivityMonitor
 {
@@ -144,7 +145,9 @@ namespace Lomztein.Moduthulhu.Modules.Clock.ActivityMonitor
         private void StoreData() => _userActivity.Store();
 
         public class ActivityRole {
+            [JsonProperty]
             public ulong Id { get; private set; }
+            [JsonProperty]
             public uint Treshold { get; private set; }
 
             public ActivityRole (ulong _id, uint _threshold) {
