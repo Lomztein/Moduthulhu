@@ -35,7 +35,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client
         private readonly Clock _statusClock = new Clock(1, "StatusClock");
         private UserList _botAdministrators;
         private int _consecutiveOfflineMinutes;
-        private int _automaticOfflineMinutesTreshold = 10;
+        private readonly int _automaticOfflineMinutesTreshold = 10;
 
         public event Func<Exception, Task> ExceptionCaught;
 
@@ -92,7 +92,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client
             return Task.CompletedTask;
         }
 
-        public void AddStatusMessage (string identifier, ActivityType activityType, Func<string> message)
+        public void AddStatusMessage (string identifier, ActivityType activityType, Func<string> function)
         {
             if (_statusMessages.ContainsKey (identifier))
             {
@@ -100,7 +100,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client
             }
             else
             {
-                _statusMessages.Add(identifier, new StatusMessage(activityType, message));
+                _statusMessages.Add(identifier, new StatusMessage(activityType, function));
             }
         }
 

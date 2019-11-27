@@ -38,14 +38,14 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding
         }
 
         internal void Run () {
-            ThreadStart init = Initialize;
+            void init() => Initialize().GetAwaiter().GetResult();
             _thread = new Thread (init) {
                 Name = ToString (),
             };
             _thread.Start ();
         }
 
-        internal async void Initialize () {
+        internal async Task Initialize () {
 
             BootDate = DateTime.Now;
             DiscordSocketConfig config = new DiscordSocketConfig {
@@ -61,9 +61,9 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding
             Client.LeftGuild += Client_LeftGuild;
             Client.Disconnected += Client_Disconnected;
 
-            await Start ();
-            await Login ();
-            await AwaitConnected ();
+            await Start ().ConfigureAwait (false);
+            await Login ().ConfigureAwait(false);
+            await AwaitConnected ().ConfigureAwait(false);
 
             RouteEvents();
 

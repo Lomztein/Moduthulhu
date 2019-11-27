@@ -18,7 +18,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
 
         public override void Initialize()
         {
-            _commandSet = new PluginManagerCommands() { ParentPlugin = this };
+            _commandSet = new PluginManagerCommands { ParentPlugin = this };
             SendMessage("Lomztein-Command Root", "AddCommand", _commandSet);
         }
 

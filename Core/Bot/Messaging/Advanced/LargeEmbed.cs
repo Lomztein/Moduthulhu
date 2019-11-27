@@ -21,13 +21,17 @@ namespace Lomztein.Moduthulhu.Core.Bot.Messaging.Advanced {
             List<EmbedBuilder> fields = new List<EmbedBuilder> ();
 
             List<List<EmbedFieldBuilder>> embedFields = new List<List<EmbedFieldBuilder>> ();
-            for (int i = 0; i < source.Fields.Count; i++) {
-
-                if (i > FieldsPerEmbed) { // This goes a bit against the typical for-loop conventions, but it should work rather simply. Please don't scream at me.
-                    embedFields.Add (new List<EmbedFieldBuilder> (source.Fields.GetRange (0, FieldsPerEmbed)));
-                    source.Fields.RemoveRange (0, FieldsPerEmbed);
-                    i = 0;
+            int index = 0;
+            while (source.Fields.Count != 0)
+            {
+                int amount = Math.Min(FieldsPerEmbed, embedFields.Count);
+                if (index > amount)
+                { // This goes a bit against the typical for-loop conventions, but it should work rather simply. Please don't scream at me.
+                    embedFields.Add(new List<EmbedFieldBuilder>(source.Fields.GetRange(0, amount)));
+                    source.Fields.RemoveRange(0, amount);
+                    index = -1;
                 }
+                index++;
             }
 
             embedFields.Add (new List<EmbedFieldBuilder> (source.Fields));

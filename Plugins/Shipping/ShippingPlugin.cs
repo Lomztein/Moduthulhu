@@ -142,7 +142,9 @@ namespace Lomztein.Moduthulhu.Modules.Shipping {
         {
             ShipName name = GetCustomShipName(ship.ShippieOne, ship.ShippieTwo);
             if (name == null)
+            {
                 return ship.GenerateContractedName(GuildHandler);
+            }
             return name.Name;
         }
 
