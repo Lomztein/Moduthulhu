@@ -32,9 +32,8 @@ namespace Lomztein.Moduthulhu.Plugins.Birthday {
             _announcementChannel = GetConfigCache("AnnouncementChannel", x => x.GetGuild().TextChannels.FirstOrDefault(y => y.Name == "general" || y.Name == "main" || y.Name == "chat").ZeroIfNull());
             _announcementMessage = GetConfigCache("AnnouncementMessage", x => "Congratulations to **[USERNAME]** as today they celebrate their [AGE] birthday!");
 
-            // TODO: Implement some basic error handling, such as what happens if you provide it with a non-existing channel.
-            AddConfigInfo("Set Birthday Channel", "Set announcement channel.", new Action<string>(x => _announcementChannel.SetValue(GuildHandler.FindTextChannel(x).Id)), () => $"Channel channel set to {GuildHandler.GetTextChannel(_announcementChannel.GetValue()).Mention}.", "Channel Name");
-            AddConfigInfo("Set Birthday Channel", "Set announcement channel.", new Action<ulong>(x => _announcementChannel.SetValue(x)), () => $"Channel channel set to {GuildHandler.GetTextChannel(_announcementChannel.GetValue()).Mention}.", "Channel Id");
+            AddConfigInfo("Set Birthday Channel", "Set announcement channel.", new Action<string>(x => _announcementChannel.SetValue(GuildHandler.GetVoiceChannel (x).Id)), () => $"Channel channel set to {GuildHandler.GetTextChannel(_announcementChannel.GetValue()).Mention}.", "Channel Name");
+            AddConfigInfo("Set Birthday Channel", "Set announcement channel.", new Action<ulong>(x => _announcementChannel.SetValue(GuildHandler.GetVoiceChannel (x).Id)), () => $"Channel channel set to {GuildHandler.GetTextChannel(_announcementChannel.GetValue()).Mention}.", "Channel Id");
             AddConfigInfo("Set Birthday Channel", "Set announcement channel.", new Action<SocketTextChannel>(x => _announcementChannel.SetValue(x.Id)), () => $"Channel channel set to {GuildHandler.GetTextChannel(_announcementChannel.GetValue()).Mention}.", "Channel");
             AddConfigInfo("Set Birthday Channel", "Get announcement channel.", () => $"Current announcement channel is {GuildHandler.GetTextChannel(_announcementChannel.GetValue()).Mention}.");
 

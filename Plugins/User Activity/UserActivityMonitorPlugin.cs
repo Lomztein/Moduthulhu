@@ -24,37 +24,67 @@ namespace Lomztein.Moduthulhu.Modules.Clock.ActivityMonitor
             GuildHandler.MessageReceived += DiscordClient_MessageReceived;
             GuildHandler.UserVoiceStateUpdated += DiscordClient_UserVoiceStateUpdated;
             GuildHandler.UserJoined += DiscordClient_UserJoined;
+            GuildHandler.RoleDeleted += GuildHandler_RoleDeleted;
 
-            AddConfigInfo("Add Activity Role", "Add new role.", new Action<SocketRole, uint>((x, y) => _activityRoles.MutateValue(z => AddRole(new ActivityRole((x?.Id).GetValueOrDefault (), y)))), () => "Added new activity role", "Role", "Treshold (days)");
-            AddConfigInfo("Add Activity Role", "Add new role.", new Action<ulong, uint>((x, y) => _activityRoles.MutateValue(z => AddRole(new ActivityRole(x, y)))), () => "Added new activity role", "Role", "Treshold (days)");
-            AddConfigInfo("Add Activity Role", "Add new role.", new Action<string, uint>((x, y) => _activityRoles.MutateValue(z => AddRole(new ActivityRole((GuildHandler.FindRole (x)?.Id).GetValueOrDefault (), y)))), () => "Added new activity role", "Role", "Treshold (days)");
+            AddConfigInfo("Add Activity Role", "Add new role.", new Action<SocketRole, uint>((x, y) => _activityRoles.MutateValue(z => AddRole(new ActivityRole(x.Id, y)))), () => "Added new activity role", "Role", "Treshold (days)");
+            AddConfigInfo("Add Activity Role", "Add new role.", new Action<ulong, uint>((x, y) => _activityRoles.MutateValue(z => AddRole(new ActivityRole(GuildHandler.GetRole (x).Id, y)))), () => "Added new activity role", "Role", "Treshold (days)");
+            AddConfigInfo("Add Activity Role", "Add new role.", new Action<string, uint>((x, y) => _activityRoles.MutateValue(z => AddRole(new ActivityRole(GuildHandler.GetRole (x).Id, y)))), () => "Added new activity role", "Role", "Treshold (days)");
             AddConfigInfo("Add Activity Role", "Display roles", () => "Current activity roles:\n" + string.Join("\n", _activityRoles.GetValue().Select(x => x.ToString(GuildHandler)).ToArray()));
 
-            AddConfigInfo("Remove Activity Role", "Remove role.", new Action<SocketRole>((x) => _activityRoles.MutateValue(z => z.RemoveAll(w => w.Id == x.Id))), () => "Removed activity role", "Role");
-            AddConfigInfo("Remove Activity Role", "Remove role.", new Action<string>((x) => _activityRoles.MutateValue(z => z.RemoveAll(w => w.Id == GuildHandler.FindRole (x).Id))), () => "Removed activity role", "Role");
-            AddConfigInfo("Remove Activity Role", "Remove role.", new Action<uint>((x) => _activityRoles.MutateValue(z => z.RemoveAll(w => w.Id == x))), () => "Removed activity role", "Role");
+            AddConfigInfo("Remove Activity Role", "Remove role.", new Action<SocketRole>(x => _activityRoles.MutateValue(y => y.Remove(AssertActivityRoleExists (z => z.Id == x.Id)))), () => "Removed activity role", "Role");
+            AddConfigInfo("Remove Activity Role", "Remove role.", new Action<string>(x => _activityRoles.MutateValue(y => y.Remove(AssertActivityRoleExists(z => z.Id == GuildHandler.GetRole (x).Id)))), () => "Removed activity role", "Role");
+            AddConfigInfo("Remove Activity Role", "Remove role.", new Action<uint>(x => _activityRoles.MutateValue(y => y.Remove(AssertActivityRoleExists(z => z.Id == GuildHandler.GetRole (x).Id)))), () => "Removed activity role", "Role");
 
             _userActivity = GetDataCache("UserActivity", x => new Dictionary<ulong, DateTime>());
             _activityRoles = GetConfigCache("ActivityRoles", x => new List<ActivityRole>());
 
             GuildHandler.Clock.OnDayPassed += CheckAll;
+            PerformFilterMissing();
+        }
+
+        private Task GuildHandler_RoleDeleted(SocketRole arg)
+        {
+            PerformFilterMissing();
+            return Task.CompletedTask;
         }
 
         public override void Shutdown() {
             GuildHandler.MessageReceived -= DiscordClient_MessageReceived;
             GuildHandler.UserVoiceStateUpdated -= DiscordClient_UserVoiceStateUpdated;
             GuildHandler.UserJoined -= DiscordClient_UserJoined;
+            GuildHandler.RoleDeleted -= GuildHandler_RoleDeleted;
 
             GuildHandler.Clock.OnDayPassed -= CheckAll;
         }
 
         private void AddRole (ActivityRole newRole)
         {
-            if (GuildHandler.GetRole (newRole.Id) == null)
-            {
-                throw new InvalidOperationException("No such role exists.");
-            }
             _activityRoles.MutateValue (x => x.Add (newRole));
+        }
+
+        private List<ActivityRole> FilterMissing(List<ActivityRole> current) => current.Where(x => GuildHandler.FindRole(x.Id) != null).ToList();
+        private void PerformFilterMissing ()
+        {
+            var current = _activityRoles.GetValue();
+            var filtered = FilterMissing(current);
+
+            if (current.Count != filtered.Count)
+            {
+                _activityRoles.SetValue(filtered);
+            }
+        }
+
+        private ActivityRole AssertActivityRoleExists (Predicate<ActivityRole> predicate)
+        {
+            var role = _activityRoles.GetValue().FirstOrDefault(x => predicate (x));
+            if (role == null)
+            {
+                throw new InvalidOperationException("No such activity role is currently registered.");
+            }
+            else
+            {
+                return role;
+            }
         }
 
         private async Task DiscordClient_UserJoined(SocketGuildUser arg) {

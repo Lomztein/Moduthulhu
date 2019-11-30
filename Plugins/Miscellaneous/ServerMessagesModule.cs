@@ -53,8 +53,8 @@ namespace Lomztein.Moduthulhu.Modules.ServerMessages {
             AddConfigInfoForMessage(_onUserJoinedGuildByInvite, "On New Member Invited");
 
             AddConfigInfo("Set Message Channel", "Set channel", new Action<int, SocketTextChannel>((x, y) => _channelId.SetValue (y.Id)), () => $"Message channel set to {GuildHandler.GetTextChannel(_channelId.GetValue ()).Name}", "Index", "Channel");
-            AddConfigInfo("Set Message Channel", "Set channel", new Action<int, ulong>((x, y) => _channelId.SetValue (y)), () => $"Message channel set to {GuildHandler.GetTextChannel(_channelId.GetValue()).Name}", "Index", "Channel");
-            AddConfigInfo("Set Message Channel", "Set channel", new Action<int, string>((x, y) => _channelId.SetValue (GuildHandler.FindTextChannel (y).Id)), () => $"Message channel set to {GuildHandler.GetTextChannel(_channelId.GetValue()).Name}", "Index", "Channel");
+            AddConfigInfo("Set Message Channel", "Set channel", new Action<int, ulong>((x, y) => _channelId.SetValue (GuildHandler.GetTextChannel (y).Id)), () => $"Message channel set to {GuildHandler.GetTextChannel(_channelId.GetValue()).Name}", "Index", "Channel");
+            AddConfigInfo("Set Message Channel", "Set channel", new Action<int, string>((x, y) => _channelId.SetValue (GuildHandler.GetTextChannel (y).Id)), () => $"Message channel set to {GuildHandler.GetTextChannel(_channelId.GetValue()).Name}", "Index", "Channel");
 
             if (HasPermission (GuildPermission.ManageGuild))
             {

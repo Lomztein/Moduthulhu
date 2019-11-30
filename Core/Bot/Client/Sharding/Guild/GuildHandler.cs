@@ -7,6 +7,7 @@ using System.Linq;
 using System.Globalization;
 using Lomztein.Moduthulhu.Core.IO.Database.Repositories;
 using Lomztein.Moduthulhu.Core.Plugins.Framework;
+using System.Collections.Generic;
 
 namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
 {
@@ -169,23 +170,78 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
         // ROUTED DISCORD EVENTS //
         #endregion
 
+        // DISCORD GETTERS / FINDERS
+        #region
         public SocketGuild GetGuild() => Shard.GetGuild(GuildId);
-        public SocketGuildUser GetUser(ulong userId) => GetGuild().GetUser(userId);
-        public SocketGuildUser FindUser(string name) => GetGuild().Users.FirstOrDefault(x => ObjectNameMatches(name, string.IsNullOrWhiteSpace (x.Nickname) ? x.Username : x.Nickname));
-        public SocketGuildChannel GetChannel(ulong channelId) => GetGuild().GetChannel(channelId);
-        public SocketGuildChannel FindChannel(string name) => GetGuild().Channels.FirstOrDefault(x => ObjectNameMatches(name, x.Name));
-        public SocketTextChannel GetTextChannel(ulong channelId) => GetChannel(channelId) as SocketTextChannel;
-        public SocketTextChannel FindTextChannel(string name) => GetGuild().TextChannels.FirstOrDefault(x => ObjectNameMatches(name, x.Name));
-        public SocketVoiceChannel GetVoiceChannel(ulong channelId) => GetChannel(channelId) as SocketVoiceChannel;
+
+        public SocketGuildUser FindUser(ulong userId) => GetGuild().GetUser(userId);
+        public SocketGuildUser FindUser(Predicate<SocketGuildUser> predicate) => GetGuild().Users.FirstOrDefault(x => predicate(x));
+        public SocketGuildUser FindUser(string name) => FindUser (x => ObjectNameMatches(name, string.IsNullOrWhiteSpace (x.Nickname) ? x.Username : x.Nickname));
+
+        public SocketGuildChannel FindChannel(ulong channelId) => GetGuild().GetChannel(channelId);
+        public SocketGuildChannel FindChannel(Predicate<SocketGuildChannel> predicate) => GetGuild().Channels.FirstOrDefault(x => predicate(x));
+        public SocketGuildChannel FindChannel(string name) => FindChannel(x => ObjectNameMatches(name, x.Name));
+
+        public SocketTextChannel FindTextChannel(ulong channelId) => FindChannel(channelId) as SocketTextChannel;
+        public SocketTextChannel FindTextChannel(Predicate<SocketTextChannel> predicate) => GetGuild().TextChannels.FirstOrDefault(x => predicate(x));
+        public SocketTextChannel FindTextChannel(string name) => FindTextChannel(x => ObjectNameMatches(name, x.Name));
+
+        public SocketVoiceChannel FindVoiceChannel(ulong channelId) => FindChannel(channelId) as SocketVoiceChannel;
+        public SocketVoiceChannel FindVoiceChannel(Predicate<SocketVoiceChannel> predicate) => GetGuild().VoiceChannels.FirstOrDefault(x => predicate(x));
         public SocketVoiceChannel FindVoiceChannel(string name) => GetGuild().VoiceChannels.FirstOrDefault(x => ObjectNameMatches(name, x.Name));
-        public SocketCategoryChannel GetCategoryChannel(ulong channelId) => GetChannel(channelId) as SocketCategoryChannel;
-        public SocketCategoryChannel FindCategoryChannel(string name) => GetGuild().CategoryChannels.FirstOrDefault(x => ObjectNameMatches(name, x.Name));
-        public SocketRole GetRole(ulong roleId) => GetGuild().GetRole(roleId);
-        public SocketRole FindRole(string name) => GetGuild().Roles.FirstOrDefault(x => ObjectNameMatches(name, x.Name));
+
+        public SocketCategoryChannel FindCategoryChannel(ulong channelId) => FindChannel(channelId) as SocketCategoryChannel;
+        public SocketCategoryChannel FindCategoryChannel(Predicate<SocketCategoryChannel> predicate) => GetGuild().CategoryChannels.FirstOrDefault(x => predicate(x));
+        public SocketCategoryChannel FindCategoryChannel(string name) => FindCategoryChannel(x => ObjectNameMatches(name, x.Name));
+
+        public SocketRole FindRole(ulong roleId) => GetGuild().GetRole(roleId);
+        public SocketRole FindRole(Predicate<SocketRole> predicate) => GetGuild().Roles.FirstOrDefault(x => predicate(x));
+        public SocketRole FindRole(string name) => FindRole(x => ObjectNameMatches(name, x.Name));
+
+        public SocketGuildUser GetUser(ulong userId) => ThrowIfNull(FindUser(userId), "That user does not exist on this server.");
+        public SocketGuildUser GetUser(Predicate<SocketGuildUser> predicate) => ThrowIfNull(FindUser (predicate), "No matching user could be found on this server.");
+        public SocketGuildUser GetUser(string name) => ThrowIfNull(FindUser(name), $"User '{name}' could not be found on this server.");
+
+        public SocketGuildChannel GetChannel(ulong channelId) => ThrowIfNull(FindChannel(channelId), "That channel does not exist on this server.");
+        public SocketGuildChannel GetChannel(Predicate<SocketGuildChannel> predicate) => ThrowIfNull(FindChannel(predicate), "No matching channel could be found on this server.");
+        public SocketGuildChannel GetChannel(string name) => ThrowIfNull(FindChannel(name), $"Channel '{name}' could not be found on this server.");
+
+        public SocketTextChannel GetTextChannel(ulong channelId) => ThrowIfNull(FindTextChannel(channelId), "That text channel does not exist on this server.");
+        public SocketTextChannel GetTextChannel(Predicate<SocketTextChannel> predicate) => ThrowIfNull(FindTextChannel(predicate), "No matching text channel could be found on this server.");
+        public SocketTextChannel GetTextChannel(string name) => ThrowIfNull(FindTextChannel(name), $"Text channel '{name}' could not be found on this server.");
+
+        public SocketVoiceChannel GetVoiceChannel(ulong channelId) => ThrowIfNull(FindVoiceChannel(channelId), "That voice channel does not exist on this server.");
+        public SocketVoiceChannel GetVoiceChannel(Predicate<SocketVoiceChannel> predicate) => ThrowIfNull(FindVoiceChannel(predicate), "No matching voice channel could be found on this server.");
+        public SocketVoiceChannel GetVoiceChannel(string name) => ThrowIfNull(FindVoiceChannel(name), $"Voice channel '{name}' could not be found on this server.");
+
+        public SocketCategoryChannel GetCategoryChannel(ulong channelId) => ThrowIfNull(FindCategoryChannel(channelId), "That category does not exist on this server.");
+        public SocketCategoryChannel GetCategoryChannel(Predicate<SocketCategoryChannel> predicate) => ThrowIfNull(FindCategoryChannel(predicate), "No matching categories could be found on this server.");
+        public SocketCategoryChannel GetCategoryChannel(string name) => ThrowIfNull(FindCategoryChannel(name), $"Category '{name}' could not be found on this server.");
+
+        public SocketRole GetRole(ulong roleId) => ThrowIfNull(FindRole(roleId), "That role does not exist on this server.");
+        public SocketRole GetRole(Predicate<SocketRole> predicate) => ThrowIfNull(FindRole(predicate), $"No matching role could be found on this server.");
+        public SocketRole GetRole(string name) => ThrowIfNull(FindRole(name), $"Role '{name}' could not be found on this server.");
+        #endregion
+
+        public IEnumerable<ulong> FilterMissingUsers(IEnumerable<ulong> enumerable) => enumerable.Where(x => FindUser(x) != null);
+        public IEnumerable<string> FilterMissingUsers(IEnumerable<string> enumerable) => enumerable.Where(x => FindUser(x) != null);
+        public IEnumerable<ulong> FilterMissingChannels(IEnumerable<ulong> enumerable) => enumerable.Where(x => FindChannel(x) != null);
+        public IEnumerable<string> FilterMissingChannels(IEnumerable<string> enumerable) => enumerable.Where(x => FindChannel(x) != null);
+        public IEnumerable<ulong> FilterMissingRoles(IEnumerable<ulong> enumerable) => enumerable.Where(x => FindRole(x) != null);
+        public IEnumerable<string> FilterMissingRoles(IEnumerable<string> enumerable) => enumerable.Where(x => FindRole(x) != null);
 
         private static bool ObjectNameMatches (string search, string name)
         {
             return name.ToUpperInvariant ().Contains(search.ToUpperInvariant (), StringComparison.Ordinal);
+        }
+
+        private T ThrowIfNull<T> (T value, string message)
+        {
+            if (value == null)
+            {
+                throw new ArgumentException(message);
+            }
+            return value;
         }
 
         public bool HasPermission(GuildPermission permission) => GetUser(BotUser.Id).GuildPermissions.Has(permission);

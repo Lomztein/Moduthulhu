@@ -26,7 +26,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Messaging.Advanced {
             {
                 int amount = Math.Min(FieldsPerEmbed, embedFields.Count);
                 if (index > amount)
-                { // This goes a bit against the typical for-loop conventions, but it should work rather simply. Please don't scream at me.
+                { // This goes a bit against the typical for-loop conventions, but it should work rather simply. Please don't scream at me. // nvm i changed it after a website screamed at me.
                     embedFields.Add(new List<EmbedFieldBuilder>(source.Fields.GetRange(0, amount)));
                     source.Fields.RemoveRange(0, amount);
                     index = -1;
@@ -85,7 +85,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Messaging.Advanced {
             }
         }
 
-        public async Task DeleteAsync() => DeleteAsync(null);
+        public async Task DeleteAsync() => await DeleteAsync(null);
 
         public async Task SendAsync(IMessageChannel channel) {
             List<IMessage> messages = new List<IMessage> ();

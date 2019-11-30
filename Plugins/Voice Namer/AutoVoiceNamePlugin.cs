@@ -45,30 +45,30 @@ namespace Lomztein.Moduthulhu.Modules.Voice {
 
             AddConfigInfo("Set Channel Name", "Display channel names", () => "Current channel names:\n" + string.Join('\n', _channelNames.GetValue().Select(x => x.Value).ToArray()));
             AddConfigInfo("Set Channel Name", "Set channel name", new Action<SocketVoiceChannel, string>((x, y) => _channelNames.MutateValue(z => z[x.Id] = y)), () => "Succesfully set channel names.", "Channel", "New name");
-            AddConfigInfo("Set Channel Name", "Set channel name", new Action<string, string>((x, y) => _channelNames.MutateValue(z => z[GuildHandler.FindVoiceChannel (x).Id] =  y)), () => "Succesfully set channel names.", "Channel", "New name");
+            AddConfigInfo("Set Channel Name", "Set channel name", new Action<string, string>((x, y) => _channelNames.MutateValue(z => z[GuildHandler.GetVoiceChannel(x).Id] =  y)), () => "Succesfully set channel names.", "Channel", "New name");
 
             AddConfigInfo("Dont Name Channel", "Ignore channel", new Action<SocketVoiceChannel>((x) => _toIgnore.MutateValue(y => y.Add(x.Id))), () => "Added channel to list of ignored.", "Channel");
-            AddConfigInfo("Dont Name Channel", "Ignore channel", new Action<ulong>((x) => _toIgnore.MutateValue(y => y.Add(x))), () => "Added channel to list of default.", "ignored");
-            AddConfigInfo("Dont Name Channel", "Ignore channel", new Action<string>((x) => _toIgnore.MutateValue(y => y.Add(GuildHandler.FindVoiceChannel(x).Id))), () => "Added channel to list of ignored.", "Channel");
+            AddConfigInfo("Dont Name Channel", "Ignore channel", new Action<ulong>((x) => _toIgnore.MutateValue(y => y.Add(GuildHandler.GetVoiceChannel (x).Id))), () => "Added channel to list of default.", "ignored");
+            AddConfigInfo("Dont Name Channel", "Ignore channel", new Action<string>((x) => _toIgnore.MutateValue(y => y.Add(GuildHandler.GetVoiceChannel(x).Id))), () => "Added channel to list of ignored.", "Channel");
 
             AddConfigInfo("Do Name Channel", "Unignore channel", new Action<SocketVoiceChannel>((x) => _toIgnore.MutateValue(y => y.Remove(x.Id))), () => "Removed channel from list of ignored.", "Channel");
-            AddConfigInfo("Do Name Channel", "Unignore channel", new Action<ulong>((x) => _toIgnore.MutateValue(y => y.Remove(x))), () => "Removed channel from list of ignored.", "Channel");
-            AddConfigInfo("Do Name Channel", "Unignore channel", new Action<string>((x) => _toIgnore.MutateValue(y => y.Remove(GuildHandler.FindVoiceChannel(x).Id))), () => "Removed channel from list of ignored.", "Channel");
+            AddConfigInfo("Do Name Channel", "Unignore channel", new Action<ulong>((x) => _toIgnore.MutateValue(y => y.Remove(GuildHandler.GetVoiceChannel (x).Id))), () => "Removed channel from list of ignored.", "Channel");
+            AddConfigInfo("Do Name Channel", "Unignore channel", new Action<string>((x) => _toIgnore.MutateValue(y => y.Remove(GuildHandler.GetVoiceChannel(x).Id))), () => "Removed channel from list of ignored.", "Channel");
 
             AddConfigInfo("Set Music Bot", "Set music bot.", new Action<SocketGuildUser>((x) => _musicBotId.SetValue(x.Id)), () => $"Set music bot to be {GuildHandler.GetUser(_musicBotId.GetValue()).GetShownName()}.", "Music Bot");
-            AddConfigInfo("Set Music Bot", "Set music bot.", new Action<string>((x) => _musicBotId.SetValue(GuildHandler.FindUser (x).Id)), () => $"Set music bot to be {GuildHandler.GetUser(_musicBotId.GetValue()).GetShownName()}.", "Music Bot");
-            AddConfigInfo("Set Music Bot", "Show music bot.", () => GuildHandler.GetUser(_musicBotId.GetValue()) == null ? "Current music bot doesn't exist :(" : "Current music bot is " + GuildHandler.GetUser(_musicBotId.GetValue()).GetShownName());
+            AddConfigInfo("Set Music Bot", "Set music bot.", new Action<string>((x) => _musicBotId.SetValue(GuildHandler.GetUser(x).Id)), () => $"Set music bot to be {GuildHandler.GetUser(_musicBotId.GetValue()).GetShownName()}.", "Music Bot");
+            AddConfigInfo("Set Music Bot", "Show music bot.", () => GuildHandler.FindUser(_musicBotId.GetValue()) == null ? "Current music bot doesn't exist :(" : "Current music bot is " + GuildHandler.GetUser(_musicBotId.GetValue()).GetShownName());
 
             AddConfigInfo("Set International Role", "Set role.", new Action<SocketRole>((x) => _internationalRoleId.SetValue(x.Id)), () => $"Set international role to be {GuildHandler.GetRole(_internationalRoleId.GetValue()).Name}.", "Role");
-            AddConfigInfo("Set International Role", "Set role.", new Action<string>((x) => _internationalRoleId.SetValue(GuildHandler.FindRole(x).Id)), () => $"Set international role to be {GuildHandler.GetRole(_internationalRoleId.GetValue()).Name}.", "Role Name");
-            AddConfigInfo("Set International Role", "Show role.", () => GuildHandler.GetRole(_internationalRoleId.GetValue()) == null ? "Current international role doesn't exist :(" : "Current international role is " + GuildHandler.GetRole(_internationalRoleId.GetValue()).Name);
+            AddConfigInfo("Set International Role", "Set role.", new Action<string>((x) => _internationalRoleId.SetValue(GuildHandler.GetRole(x).Id)), () => $"Set international role to be {GuildHandler.GetRole(_internationalRoleId.GetValue()).Name}.", "Role Name");
+            AddConfigInfo("Set International Role", "Show role.", () => GuildHandler.FindRole(_internationalRoleId.GetValue()) == null ? "Current international role doesn't exist :(" : "Current international role is " + GuildHandler.GetRole(_internationalRoleId.GetValue()).Name);
 
             SendMessage("Lomztein-Command Root", "AddCommand", _commandSet);
         }
 
         void InitDefaultTags () {
             AddTag (new Tag ("🎵", x => x.Users.Any (y => y.Id == _musicBotId.GetValue ())));
-            AddTag (new Tag ("🔥", x => x.Users.Count (y => y.GuildPermissions.Administrator) >= 3)); // Three is the magic number. *snickers*
+            AddTag (new Tag ("🔥", x => x.Users.Count (y => y.GuildPermissions.Administrator) >= 3));
             AddTag (new Tag ("📹", x => x.Users.Any (y => y.Activity?.Type == ActivityType.Streaming)));
             AddTag (new Tag ("🌎", x => x.Users.Any (y => y.Roles.Any (z => z.Id == _internationalRoleId.GetValue ()))));
         }
