@@ -28,7 +28,7 @@ namespace Lomztein.Moduthulhu.Core.Plugins
             foreach (Type type in allTypes) {
 
                 if (type.GetInterfaces().Contains(typeof (T))) {
-                    Log.Write (Log.Type.PLUGIN, $"{typeof(T).Name} type \"{type.Name}\" loaded.");
+                    Log.Write (Log.Type.SYSTEM, $"{typeof(T).Name} type \"{type.Name}\" loaded.");
                     exportedTypes.Add (type);
                 }
             }
