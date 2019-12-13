@@ -12,16 +12,16 @@ namespace Lomztein.Moduthulhu.Core.Plugins.Framework
         private static DescriptorAttribute GetDescriptorAttribute(Type plugin) => GetAttribute<DescriptorAttribute>(plugin);
         private static SourceAttribute GetSourceAttribute(Type plugin) => GetAttribute<SourceAttribute>(plugin);
 
-        public static string[] GetDependancy(Type plugin) => GetDependancyAttributes(plugin).Select(x => x.DependencyName).ToArray ();
+        public static string[] GetDependancy(Type plugin) => GetDependancyAttributes(plugin).Select(x => x.DependencyName).ToArray();
         public static string GetName(Type plugin) => GetDescriptorAttribute(plugin)?.Name;
         public static string GetAuthor(Type plugin) => GetDescriptorAttribute(plugin)?.Author;
         public static string GetVersion(Type plugin) => GetDescriptorAttribute(plugin)?.Version;
         public static string GetDescription(Type plugin) => GetDescriptorAttribute(plugin)?.Description;
         public static bool IsCritical(Type plugin) => GetAttribute<CriticalAttribute>(plugin) != null;
 
-        public static Uri GetAuthorURI(Type plugin) => new Uri (GetSourceAttribute(plugin)?.AuthorURI);
-        public static Uri GetPatchURI(Type plugin) => new Uri (GetSourceAttribute(plugin)?.PatchURI);
-        public static Uri GetProjectURI(Type plugin) => new Uri (GetSourceAttribute(plugin)?.ProjectURI);
+        public static Uri GetAuthorURI(Type plugin) => Uri.TryCreate(GetSourceAttribute(plugin)?.AuthorURI, UriKind.Absolute, out Uri uri) ? uri : null;
+        public static Uri GetPatchURI(Type plugin) => Uri.TryCreate(GetSourceAttribute(plugin)?.PatchURI, UriKind.Absolute, out Uri uri) ? uri : null;
+        public static Uri GetProjectURI(Type plugin) => Uri.TryCreate(GetSourceAttribute(plugin)?.ProjectURI, UriKind.Absolute, out Uri uri) ? uri : null;
 
         public static string GetVersionedFullName (string author, string name, string version) => $"{author}-{name}-{version}";
         public static string GetVersionedFullName (Type plugin) => $"{GetAuthor (plugin)}-{GetName (plugin)}-{GetVersion (plugin)}";

@@ -150,9 +150,9 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
                 .WithTitle(Plugin.GetName(moduleType))
                 .WithDescription(Plugin.GetDescription(moduleType))
                 .WithAuthor("Plugin Information")
-                .WithFooter("Created by " + Plugin.GetAuthor(moduleType) + " - " + Plugin.GetAuthorURI(moduleType));
+                .WithFooter("Created by " + Plugin.GetAuthor(moduleType) + (Plugin.GetAuthorURI(moduleType) != null ? " - " + Plugin.GetAuthorURI(moduleType) : ""));
 
-            AddDependanciesInline("Prerequisite Plugin", PluginLoader.DependancyTree.GetDependencies(Plugin.GetVersionedFullName(moduleType)).Select(x => Plugin.GetVersionedFullName(x)).ToArray());
+            AddDependanciesInline("Prerequisite Plugins", PluginLoader.DependancyTree.GetDependencies(Plugin.GetVersionedFullName(moduleType)).Select(x => Plugin.GetVersionedFullName(x)).ToArray());
 
             void AddDependanciesInline(string header, string[] dependancies)
             { // Never did I ever say I knew how to spell.
