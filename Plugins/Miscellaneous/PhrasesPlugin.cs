@@ -142,8 +142,8 @@ namespace Lomztein.Moduthulhu.Modules.Phrases
             public string ToString (GuildHandler guildHandler)
             {
                 return $"Trigger: {Trigger}, " +
-                    "User: " + (guildHandler.GetUser(UserId) == null ? "Any" : guildHandler.GetUser(UserId).GetShownName()) + ", " +
-                    "Channel: " + (guildHandler.GetChannel(ChannelId) == null ? "Any" : guildHandler.GetChannel(ChannelId).Name) + ", " +
+                    "User: " + (guildHandler.FindUser(UserId) == null ? "Any" : guildHandler.GetUser(UserId).GetShownName()) + ", " +
+                    "Channel: " + (guildHandler.FindTextChannel(ChannelId) == null ? "Any" : guildHandler.FindTextChannel(ChannelId).Name) + ", " +
                     $"Chance: {Math.Round(Chance, 2)}%, Response: {Response}, Emote: {Emoji}";
             }
         }
