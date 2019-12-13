@@ -80,7 +80,7 @@ namespace Lomztein.Moduthulhu.Plugins.Birthday {
         }
 
         private async Task TestBirthdays() {
-
+            bool hasChanged = false;
             foreach (var user in _allBirthdays.GetValue ())
             {
                 if (user.Value.IsNow())
@@ -94,7 +94,12 @@ namespace Lomztein.Moduthulhu.Plugins.Birthday {
                     SocketTextChannel guildChannel = GuildHandler.GetTextChannel(_announcementChannel.GetValue());
                     await AnnounceBirthday(guildChannel, guildUser, user.Value);
                     user.Value.SetLastPassedToNow();
+                    hasChanged = true;
                 }
+            }
+            if (hasChanged)
+            {
+                _allBirthdays.Store();
             }
         }
 
