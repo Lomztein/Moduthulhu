@@ -22,12 +22,5 @@ namespace Lomztein.Moduthulhu.Core.Bot.Messaging
 
         public static async Task<IUserMessage> SendMessage(ITextChannel channel, string text, bool isTTS) => await SendMessage(channel, text, isTTS, null);
         public static async Task<IUserMessage> SendMessage(ITextChannel channel, string text) => await SendMessage(channel, text, false, null);
-
-        public static async Task<IMessage[]> SendLargeEmbed (ITextChannel channel, EmbedBuilder sourceBuilder) {
-            LargeEmbed largeEmbed = new LargeEmbed ();
-            largeEmbed.CreateFrom (sourceBuilder);
-            await largeEmbed.SendAsync (channel);
-            return largeEmbed.Message;
-        }
     }
 }

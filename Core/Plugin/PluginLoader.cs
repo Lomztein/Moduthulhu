@@ -49,7 +49,7 @@ namespace Lomztein.Moduthulhu.Core.Plugins
         // IncludedPath is temporary untill a more robust plugin build pipeline can be figured out. Until then, this is specifically designed to allow for the plugins included in this project to be included in the Docker Image as well.
         public static string ThirdPartyPath => BotCore.DataDirectory + "/Plugins"; // AssemblyPath points to a directory that contains all any and all potential third-party plugins.
 
-        public static PluginDependancyTree DependancyTree { get; private set; }
+        public static PluginDependencyTree DependencyTree { get; private set; }
 
         public static void ReloadPluginAssemblies()
         {
@@ -77,8 +77,8 @@ namespace Lomztein.Moduthulhu.Core.Plugins
             allParties.AddRange(thirdParty);
             _loadedPlugins = allParties.ToArray();
 
-            DependancyTree = new PluginDependancyTree(GetAllPlugins ());
-            _orderedPlugins = DependancyTree.Order(GetAllPlugins ()).ToArray();
+            DependencyTree = new PluginDependencyTree(GetAllPlugins ());
+            _orderedPlugins = DependencyTree.Order(GetAllPlugins ()).ToArray();
         }
     }
 }

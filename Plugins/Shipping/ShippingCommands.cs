@@ -121,8 +121,7 @@ namespace Lomztein.Moduthulhu.Modules.Shipping {
                     builder.AddField ("Shipped with " + companion.GetShownName () + " as " + ParentPlugin.GetShipName (ship.FirstOrDefault()) + " " + ship.Count () + " times by:", string.Join (", ", shippers));
                 }
 
-                LargeEmbed largeEmbed = new LargeEmbed ();
-                largeEmbed.CreateFrom (builder);
+                LargeEmbed largeEmbed = new LargeEmbed (builder);
                 return TaskResult(largeEmbed, null);
             }
 
@@ -173,8 +172,7 @@ namespace Lomztein.Moduthulhu.Modules.Shipping {
                     builder.AddField ($"{shippie.GetShownName ()} has been shipped {pair.Value.Count} times in the following ships:\n", ships);
                 }
 
-                LargeEmbed largeEmbed = new LargeEmbed ();
-                largeEmbed.CreateFrom (builder);
+                LargeEmbed largeEmbed = new LargeEmbed (builder);
                 return TaskResult(largeEmbed, null);
             }
         }

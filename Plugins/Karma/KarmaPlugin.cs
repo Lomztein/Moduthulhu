@@ -16,6 +16,7 @@ namespace Lomztein.Moduthulhu.Modules.Misc.Karma
 {
     [Dependency ("Lomztein-Command Root")]
     [Descriptor ("Lomztein", "Karma", "Keep track of an accurate representation of peoples self-worth.")]
+    [Source ("https://github.com/Lomztein", "https://github.com/Lomztein/Moduthulhu/tree/master/Plugins/Karma")]
     [GDPR(GDPRCompliance.Partial, "Stores user ID automatically to keep track of user score.")]
     public class KarmaPlugin : PluginBase {
 

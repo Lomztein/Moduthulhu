@@ -15,6 +15,7 @@ using Lomztein.Moduthulhu.Core.IO.Database.Repositories;
 namespace Lomztein.Moduthulhu.Modules.Colour
 {
     [Descriptor ("Lomztein", "COLOURS!", "Plugin scientifically proven to increase funkyness by between negative thirty two, to about four percent.")]
+    [Source ("https://github.com/Lomztein", "https://github.com/Lomztein/Moduthulhu/blob/master/Plugins/Miscellaneous/ColorPlugin.cs")]
     [Dependency ("Lomztein-Command Root")]
     public class ColourPlugin : PluginBase {
 

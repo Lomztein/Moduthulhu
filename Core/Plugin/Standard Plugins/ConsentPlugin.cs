@@ -2,6 +2,7 @@
 using Discord.WebSocket;
 using Lomztein.AdvDiscordCommands.Framework;
 using Lomztein.Moduthulhu.Core.Bot;
+using Lomztein.Moduthulhu.Core.Bot.Messaging.Advanced;
 using Lomztein.Moduthulhu.Core.Plugins.Framework;
 using Newtonsoft.Json.Linq;
 using System;
@@ -14,7 +15,7 @@ using System.Threading.Tasks;
 namespace Lomztein.Moduthulhu.Plugins.Standard
 {
     [Descriptor("Lomztein", "Consent", "Plugin that allows users to toggle whether or not they consent to personal data storage. Whether or not it is respected is dependant on individual plugins. Use '!plugin info <plugin>' on a plugin to view compliance.", "1.0.0")]
-    [Source("https://github.com/Lomztein", "https://github.com/Lomztein/Moduthulhu")]
+    [Source("https://github.com/Lomztein", "https://github.com/Lomztein/Moduthulhu/blob/master/Core/Plugin/Standard%20Plugins/ConsentPlugin.cs")]
     [Dependency("Lomztein-Command Root")]
     [GDPR(GDPRCompliance.Full)]
     [Critical]
@@ -111,7 +112,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
                 try
                 {
                     var dm = await metadata.Author.GetOrCreateDMChannelAsync();
-                    await dm.SendFileAsync(stream, metadata.AuthorID.ToString(CultureInfo.InvariantCulture) + ".json", "Your personal data, as requested. You may delete all of this using the `!deletedata` command in the same server as you requested the data. If we share multiple servers, you must do this for each server.");
+                    await dm.SendFileAsync(stream, metadata.AuthorID.ToString(CultureInfo.InvariantCulture) + ".json", "Your personal data, as requested. You may delete all of this using the `!deletedata` command in the same server as you requested the data. If we share multiple servers, you must do this for each server. The file may be opened as a text file in something like Notepad. Additionally, a website like http://jsonviewer.stack.hu/ may make reading it easier.");
                 }
                 catch (HttpException)
                 {
@@ -135,8 +136,11 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
         [Overload (typeof (void), "Delete any permanently stored plugin data that is linked to your Discord ID in this server.")]
         public Task<Result> Execute (CommandMetadata metadata)
         {
-            ParentPlugin.GuildHandler.Plugins.DeleteUserData(metadata.AuthorID);
-            return TaskResult(null, "Stored data linked to your ID has succesfully been deleted. Keep in mind some plugins may require to keep track of your ID to function, so they may immidiately store your ID again.");
+            QuestionMessage message = new QuestionMessage("Are you sure you wish to delete personal data? This is a permanent action and cannot be undone.", async () => { 
+                ParentPlugin.GuildHandler.Plugins.DeleteUserData(metadata.AuthorID);
+                await metadata.Message.Channel.SendMessageAsync ("Stored data linked to your ID has succesfully been deleted. Keep in mind some plugins may require to keep track of your ID to function, so they may immidiately store your ID again.");
+                }, async () => await metadata.Message.Channel.SendMessageAsync ("Data deletion cancelled."));
+            return TaskResult(message, string.Empty);
         }
     }
 }

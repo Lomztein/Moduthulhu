@@ -12,7 +12,7 @@ using Lomztein.Moduthulhu.Core.IO.Database.Repositories;
 namespace Lomztein.Moduthulhu.Modules.Voice
 {
     [Descriptor ("Lomztein", "Auto Voice Creator", "Makes sure there are always available voice channels by automatically creating new ones.")]
-    [Source ("https://github.com/Lomztein", "https://github.com/Lomztein/Moduthulhu")]
+    [Source ("https://github.com/Lomztein", "https://github.com/Lomztein/Moduthulhu/blob/master/Plugins/Voice%20Creator/AutoVoiceCreatorPlugin.cs")]
     public class AutoVoiceCreatorPlugin : PluginBase {
 
         private CachedValue<List<ulong>> _defaultChannels;

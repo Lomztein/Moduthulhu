@@ -19,7 +19,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard {
 
     [Critical]
     [Descriptor ("Lomztein", "Command Root", "Default container and manager of bot commands.")]
-    [Source ("https://github.com/Lomztein", "https://github.com/Lomztein/Moduthulhu")]
+    [Source ("https://github.com/Lomztein", "https://github.com/Lomztein/Moduthulhu/tree/master/Core/Plugin/Standard%20Plugins/Command%20Root")]
     public class CommandPlugin : PluginBase, ICommandSet {
 
         private CachedValue<char> _trigger;
@@ -82,6 +82,11 @@ namespace Lomztein.Moduthulhu.Plugins.Standard {
                 if (result.Value is ISendable sendable)
                 {
                     await sendable.SendAsync(arg.Channel);
+                }
+
+                if (result.Value is IAttachable attachable)
+                {
+                    attachable.Attach(GuildHandler);
                 }
 
                 await MessageControl.SendMessage (arg.Channel as ITextChannel, result?.GetMessage (), false, result?.Value as Embed);

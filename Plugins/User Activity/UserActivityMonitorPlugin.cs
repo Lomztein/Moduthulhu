@@ -14,6 +14,7 @@ using Newtonsoft.Json.Linq;
 namespace Lomztein.Moduthulhu.Modules.Clock.ActivityMonitor
 {
     [Descriptor ("Lomztein", "User Activity Monitor", "Positively sinister sounding plugin that applies roles to people based on last date of activity.")]
+    [Source ("https://github.com/Lomztein", "https://github.com/Lomztein/Moduthulhu/blob/master/Plugins/User%20Activity/UserActivityMonitorPlugin.cs")]
     [GDPR (GDPRCompliance.Partial, "User IDs are automatically stored on any user activty, in order to keep track of last user activity.")]
     public class UserActivityMonitorPlugin : PluginBase {
 

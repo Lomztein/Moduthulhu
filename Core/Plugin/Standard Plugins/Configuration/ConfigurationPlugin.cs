@@ -8,7 +8,7 @@ using System.Text;
 namespace Lomztein.Moduthulhu.Plugins.Standard 
 {
     [Descriptor("Lomztein", "Configuration", "Plugin that exposes plugin configuration functions as commands.")]
-    [Source("https://github.com/Lomztein", "https://github.com/Lomztein/Moduthulhu")]
+    [Source("https://github.com/Lomztein", "https://github.com/Lomztein/Moduthulhu/tree/master/Core/Plugin/Standard%20Plugins/Configuration")]
     [Dependency ("Lomztein-Command Root")]
     [Critical]
     public class ConfigurationPlugin : PluginBase

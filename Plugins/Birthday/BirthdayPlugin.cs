@@ -19,6 +19,7 @@ using Newtonsoft.Json.Linq;
 namespace Lomztein.Moduthulhu.Plugins.Birthday {
 
     [Descriptor ("Lomztein", "Birthdays", "Plugin that allows people to enter in their birthdays and have it announced when the date arrives!")]
+    [Source ("https://github.com/Lomztein", "https://github.com/Lomztein/Moduthulhu/blob/master/Plugins/Birthday/BirthdayPlugin.cs")]
     [GDPR (GDPRCompliance.Full)]
     public class BirthdayPlugin : PluginBase {
 

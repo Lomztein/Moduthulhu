@@ -8,12 +8,12 @@ namespace Lomztein.Moduthulhu.Core.Plugins.Framework
     public static class Plugin
     {
         private static T GetAttribute<T>(Type plugin) where T : class => plugin.GetCustomAttributes(typeof(T), false).FirstOrDefault() as T;
-        private static DependencyAttribute[] GetDependancyAttributes(Type plugin) => plugin.GetCustomAttributes(typeof(DependencyAttribute), false).Cast<DependencyAttribute>().ToArray();
+        private static DependencyAttribute[] GetDependencyAttributes(Type plugin) => plugin.GetCustomAttributes(typeof(DependencyAttribute), false).Cast<DependencyAttribute>().ToArray();
         private static DescriptorAttribute GetDescriptorAttribute(Type plugin) => GetAttribute<DescriptorAttribute>(plugin);
         private static SourceAttribute GetSourceAttribute(Type plugin) => GetAttribute<SourceAttribute>(plugin);
         private static GDPRAttribute GetGDPRAttribute(Type plugin) => GetAttribute<GDPRAttribute>(plugin);
 
-        public static string[] GetDependancy(Type plugin) => GetDependancyAttributes(plugin).Select(x => x.DependencyName).ToArray();
+        public static string[] GetDependency(Type plugin) => GetDependencyAttributes(plugin).Select(x => x.DependencyName).ToArray();
         public static string GetName(Type plugin) => GetDescriptorAttribute(plugin)?.Name;
         public static string GetAuthor(Type plugin) => GetDescriptorAttribute(plugin)?.Author;
         public static string GetVersion(Type plugin) => GetDescriptorAttribute(plugin)?.Version;
@@ -32,7 +32,7 @@ namespace Lomztein.Moduthulhu.Core.Plugins.Framework
         public static string GetFullName (string author, string name) => $"{author}-{name}";
         public static string GetFullName (Type plugin) => $"{GetAuthor(plugin)}-{GetName (plugin)}";
 
-        public static void Log(IPlugin plugin, string text) => Core.Log.Plugin($"[{GetVersionedFullName (plugin.GetType ())} - { plugin.GuildHandler.Name}] {text}");
+        public static void Log(IPlugin plugin, string text) => Core.Log.Plugin($"[{GetVersionedFullName (plugin.GetType ())} - {plugin.GuildHandler.Name}] {text}");
 
         public static Type Find (IEnumerable<Type> plugins, string search)
         {

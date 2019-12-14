@@ -1,6 +1,7 @@
 using Discord;
 using Lomztein.AdvDiscordCommands.Framework;
 using Lomztein.AdvDiscordCommands.Framework.Interfaces;
+using Lomztein.Moduthulhu.Core.Bot.Messaging.Advanced;
 using Lomztein.Moduthulhu.Core.Plugins;
 using Lomztein.Moduthulhu.Core.Plugins.Framework;
 using Lomztein.Moduthulhu.Plugins.Standard;
@@ -43,18 +44,39 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
                 Aliases = new [] { "add" };
             }
 
-            [Overload(typeof(void), "Add a new plugin from the list of available plugins.")]
-            public Task<Result> Execute(CommandMetadata metadata, string pluginName)
+            [Overload(typeof(Embed), "Add a new plugin from the list of available plugins.")]
+            public async Task<Result> Execute(CommandMetadata metadata, string pluginName)
             {
-                ParentPlugin.AddPlugin(pluginName);
-                if (ParentPlugin.GuildHandler.Plugins.IsPluginActive (pluginName))
+                Type plugin = PluginLoader.GetPlugin(pluginName);
+                if (plugin != null)
                 {
-                    return TaskResult(null, $"Succesfully enabled plugin '{Plugin.GetFullName(PluginLoader.GetPlugin(pluginName))}' in this server.");
+                    string name = Plugin.GetName(plugin);
+                    if (!ParentPlugin.GuildHandler.Plugins.IsPluginActive(pluginName))
+                    {
+                        QuestionMessage question = new QuestionMessage($"Are you sure you wish to enable plugin '{name}'?", async () =>
+                        {
+                            ParentPlugin.AddPlugin(pluginName);
+                            if (ParentPlugin.GuildHandler.Plugins.IsPluginActive(pluginName))
+                            {
+                                await metadata.Message.Channel.SendMessageAsync($"Succesfully enabled plugin '{name}' in this server.");
+                            }
+                            else
+                            {
+                                IEnumerable<string> exceptions = ParentPlugin.GuildHandler.Plugins.GetInitializationExceptions().Select(x => x.Message);
+                                await metadata.Message.Channel.SendMessageAsync($"Failed to add plugin '{name}'. Issues occured during initialization:\n\t{string.Join("\n\t", exceptions)}");
+                            }
+                        }, async () => await metadata.Message.Channel.SendMessageAsync($"Cancelled enabled plugin '{name}'."));
+                        await metadata.Message.Channel.SendMessageAsync(null, false, GetModuleEmbed(PluginLoader.GetPlugin(pluginName)));
+                        return new Result (question, string.Empty);
+                    }
+                    else
+                    {
+                        return new Result(null, $"Failed to enable plugin: '{name}' is already enabled.");
+                    }
                 }
                 else
                 {
-                    IEnumerable<string> exceptions = ParentPlugin.GuildHandler.Plugins.GetInitializationExceptions().Select(x => x.Message);
-                    return TaskResult(null, $"Failed to add plugin '{pluginName}'. Issues occured during initialization:\n\t{string.Join ("\n\t", exceptions)}");
+                    return new Result(null, $"Failed to enable plugin: No available plugins matches '{pluginName}' Check `!plugin available` to get a list of available plugins.");
                 }
             }
         }
@@ -66,7 +88,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
                 Name = "disable";
                 Description = "Remove a plugin.";
                 Category = AdditionalCategories.Management;
-                RequiredPermissions.Add(Discord.GuildPermission.ManageGuild);
+                RequiredPermissions.Add(GuildPermission.ManageGuild);
             
                 Aliases = new [] { "remove" };
             }
@@ -164,11 +186,11 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
                 builder.AddField("Notice: ", "This plugin is critical and cannot be disabled.", true);
             }
 
-            string[] dependancies = PluginLoader.DependancyTree.GetDependencies(Plugin.GetVersionedFullName(moduleType)).Select(x => Plugin.GetVersionedFullName(x)).ToArray();
-            if (dependancies.Length > 0)
+            string[] dependencies = PluginLoader.DependencyTree.GetDependencies(Plugin.GetVersionedFullName(moduleType)).Select(x => Plugin.GetVersionedFullName(x)).ToArray();
+            if (dependencies.Length > 0)
             {
-                string content = $"```{string.Join('\n', dependancies)}```";
-                builder.AddField("Dependancies", content);
+                string content = $"```{string.Join('\n', dependencies)}```";
+                builder.AddField("Dependencies", content);
             }
 
             if (Plugin.GetAuthorURI (moduleType) != null)

@@ -10,7 +10,7 @@ using Lomztein.AdvDiscordCommands.Extensions;
 namespace Lomztein.Moduthulhu.Plugins.Standard
 {
     [Descriptor ("Lomztein", "Logger", "Simple plugin that logs whatever is going on for debugging purposes. Planned to be queryable to get all logs relating to an individual user or server.", "1.0.0")]
-    [Source ("https://github.com/Lomztein", "https://github.com/Lomztein/Moduthulhu")]
+    [Source ("https://github.com/Lomztein", "https://github.com/Lomztein/Moduthulhu/blob/master/Plugins/Logger/LoggerPlugin.cs")]
     [GDPR(GDPRCompliance.None, "Logs may be stored in temporary files for inspection, but are not stored in a permanent database.", "Logs include user names, user messages, server names, channel names, role names, and more.")]
     public class LoggerPlugin : PluginBase {
 

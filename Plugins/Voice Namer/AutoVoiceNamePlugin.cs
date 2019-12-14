@@ -14,7 +14,9 @@ namespace Lomztein.Moduthulhu.Modules.Voice {
 
     [Dependency ("Lomztein-Command Root")]
     [Descriptor ("Lomztein", "Auto Voice Names", "Automatically renames voice channels to reflect the games played within.")]
-    public class AutoVoiceNamePlugin : PluginBase {
+    [Source ("https://github.com/Lomztein", "https://github.com/Lomztein/Moduthulhu/tree/master/Plugins/Voice%20Namer")]
+    public class AutoVoiceNamePlugin : PluginBase
+    {
 
         private CachedValue<Dictionary<ulong, string>> _channelNames;
         private CachedValue<List<ulong>> _toIgnore;

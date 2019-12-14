@@ -6,14 +6,14 @@ using System.Threading.Tasks;
 
 namespace Lomztein.Moduthulhu.Core.Bot.Messaging.Advanced {
 
-    public class LargeEmbed : ICustomMessage<EmbedBuilder, EmbedBuilder[], IMessage[]> {
+    public class LargeEmbed : ISendable<IMessage[]>, IDeletable {
 
         public const int FieldsPerEmbed = 25;
+        private EmbedBuilder[] _builders;
 
-        public IMessage[] Message { get; set; }
-        public EmbedBuilder[] Intermediate { get; set; }
+        public IMessage[] Result { get; private set; }
 
-        public void CreateFrom(EmbedBuilder source) {
+        public LargeEmbed(EmbedBuilder source) {
 
             EmbedBuilder header = null;
             EmbedBuilder footer = null;
@@ -76,11 +76,11 @@ namespace Lomztein.Moduthulhu.Core.Bot.Messaging.Advanced {
             List<EmbedBuilder> result = new List<EmbedBuilder> ();
             result.AddRange (fields);
 
-            Intermediate = result.ToArray ();
+            _builders = result.ToArray ();
         }
 
         public async Task DeleteAsync(RequestOptions options) {
-            foreach (var message in Message) {
+            foreach (var message in Result) {
                 await message.DeleteAsync (options);
             }
         }
@@ -90,12 +90,12 @@ namespace Lomztein.Moduthulhu.Core.Bot.Messaging.Advanced {
         public async Task SendAsync(IMessageChannel channel) {
             List<IMessage> messages = new List<IMessage> ();
 
-            foreach (EmbedBuilder builder in Intermediate) {
+            foreach (EmbedBuilder builder in _builders) {
                 var message = await channel.SendMessageAsync ("", false, builder.Build ());
                 messages.Add (message);
             }
 
-            Message = messages.ToArray ();
+            Result = messages.ToArray ();
         }
     }
 }

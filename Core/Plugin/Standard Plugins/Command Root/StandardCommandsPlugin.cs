@@ -6,7 +6,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
 {
     [Dependency ("Lomztein-Command Root")]
     [Descriptor("Lomztein", "Standard Commands", "Implements all the default commands from the command framework.")]
-    [Source("https://github.com/Lomztein", "https://github.com/Lomztein/Moduthulhu")]
+    [Source("https://github.com/Lomztein", "https://github.com/Lomztein/Moduthulhu/blob/master/Core/Plugin/Standard%20Plugins/Command%20Root/StandardCommandsPlugin.cs")]
     public class StandardCommandsPlugin : PluginBase {
 
         private readonly ICommand [ ] _commands = new ICommand[] {

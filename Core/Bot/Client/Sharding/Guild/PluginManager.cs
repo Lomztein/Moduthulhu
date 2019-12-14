@@ -116,18 +116,18 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
             _activePlugins.Clear();
         }
 
-        private static bool ContainsDependancies (IEnumerable<string> enabledList, string pluginName)
+        private static bool ContainsDependencies (IEnumerable<string> enabledList, string pluginName)
         {
-            var dependancies = PluginLoader.DependancyTree.GetDependencies(pluginName);
-            bool containsDependancies = dependancies.All(x => enabledList.Any(y => y.StartsWith(Plugin.GetFullName(x), StringComparison.Ordinal)));
-            return containsDependancies;
+            var dependencies = PluginLoader.DependencyTree.GetDependencies(pluginName);
+            bool containsDependencies = dependencies.All(x => enabledList.Any(y => y.StartsWith(Plugin.GetFullName(x), StringComparison.Ordinal)));
+            return containsDependencies;
         }
 
         public void LoadPlugins ()
         {
             Log.Write(Log.Type.PLUGIN, "Reloading plugins for guild " + _parentHandler.GetGuild().Name);
 
-            Filter<string> filter = new Filter<string>(x => _enabledPlugins.GetValue().Any (y => NameMatches (x, y)), x => ContainsDependancies (_enabledPlugins.GetValue (), x));
+            Filter<string> filter = new Filter<string>(x => _enabledPlugins.GetValue().Any (y => NameMatches (x, y)), x => ContainsDependencies (_enabledPlugins.GetValue (), x));
             string[] toLoad = PluginLoader.GetPlugins ().Select (x => Plugin.GetFullName (x)).ToArray ();
             toLoad = filter.FilterModules(toLoad).ToArray ();
 
@@ -225,11 +225,11 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
                     throw new ArgumentException("Plugin " + fullName + " is already active.");
                 }
 
-                Type[] dependancies = PluginLoader.DependancyTree.GetDependencies(fullName);
-                Type[] missing = dependancies.Where(x => !_enabledPlugins.GetValue ().Any(y => y.StartsWith (Plugin.GetFullName(x), StringComparison.Ordinal))).ToArray();
+                Type[] dependencies = PluginLoader.DependencyTree.GetDependencies(fullName);
+                Type[] missing = dependencies.Where(x => !_enabledPlugins.GetValue ().Any(y => y.StartsWith (Plugin.GetFullName(x), StringComparison.Ordinal))).ToArray();
                 if (missing.Length > 0)
                 {
-                    throw new ArgumentException($"Plugin {fullName} cannot be loaded as it is missing dependancies: {string.Join(",", missing.Select(x => Plugin.GetVersionedFullName(x)))}");
+                    throw new ArgumentException($"Plugin {fullName} cannot be loaded as it is missing dependencies: {string.Join(",", missing.Select(x => Plugin.GetVersionedFullName(x)))}");
                 }
 
                 _enabledPlugins.GetValue().Add(fullName);
@@ -249,11 +249,11 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
                     throw new ArgumentException("Plugin " + fullName + " is marked critical and cannot be disabled.");
                 }
 
-                Type[] dependants = PluginLoader.DependancyTree.GetDependants(fullName);
+                Type[] dependants = PluginLoader.DependencyTree.GetDependants(fullName);
                 Type[] active = dependants.Where(x => _enabledPlugins.GetValue ().Any(y => y.StartsWith(Plugin.GetFullName(x), StringComparison.Ordinal))).ToArray();
                 if (active.Length > 0)
                 {
-                    throw new ArgumentException($"Plugin {fullName} cannot be unloaded as it has active dependancies: {string.Join(",", active.Select(x => Plugin.GetFullName(x)))}");
+                    throw new ArgumentException($"Plugin {fullName} cannot be unloaded as it has active dependencies: {string.Join(",", active.Select(x => Plugin.GetFullName(x)))}");
                 }
 
                 string storedName = _enabledPlugins.GetValue().Find(x => x.StartsWith(fullName, StringComparison.Ordinal));

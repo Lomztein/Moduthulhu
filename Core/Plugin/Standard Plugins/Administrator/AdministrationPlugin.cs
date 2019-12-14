@@ -7,7 +7,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
 {
     [Dependency ("Lomztein-Command Root")]
     [Descriptor("Lomztein", "Administrator", "Implements commands for managing the bot itself.")]
-    [Source("https://github.com/Lomztein", "https://github.com/Lomztein/Moduthulhu")]
+    [Source("https://github.com/Lomztein", "https://github.com/Lomztein/Moduthulhu/tree/master/Core/Plugin/Standard%20Plugins/Administrator")]
     public class AdministrationPlugin : PluginBase {
 
         private CoreAdminCommands CoreCommands { get; set; }

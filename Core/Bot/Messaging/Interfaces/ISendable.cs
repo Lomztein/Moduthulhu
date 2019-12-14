@@ -10,8 +10,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Messaging.Advanced
         Task SendAsync(IMessageChannel channel);
     }
 
-    public interface ISendable<TResult, TIntermediate> : ISendable {
-        TResult Message { get; set; }
-        TIntermediate Intermediate { get; set; }
+    public interface ISendable<TResult> : ISendable {
+        TResult Result { get; }
     }
 }

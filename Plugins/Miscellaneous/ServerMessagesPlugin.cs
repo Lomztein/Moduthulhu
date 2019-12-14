@@ -14,7 +14,9 @@ using System.Collections.Generic;
 namespace Lomztein.Moduthulhu.Modules.ServerMessages {
 
     [Descriptor ("Lomztein", "Server Messages", "Sends out a variety of messages in response to server events, such as new member joins.")]
-    public class ServerMessagesModule : PluginBase {
+    [Source ("https://github.com/Lomztein", "https://github.com/Lomztein/Moduthulhu/blob/master/Plugins/Miscellaneous/ServerMessagesModule.cs")]
+    public class ServerMessagesPlugin : PluginBase
+    {
 
         private CachedValue<ulong> _channelId;
         private CachedValue<List<string>> _onJoinedNewGuild;

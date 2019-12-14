@@ -12,6 +12,7 @@ using Newtonsoft.Json.Linq;
 namespace Lomztein.Moduthulhu.Modules.Shipping {
 
     [Descriptor ("Lomztein", "Shipping Simulator 2018", "At the core of all this lies Guffe.")]
+    [Source ("https://github.com/Lomztein", "https://github.com/Lomztein/Moduthulhu/tree/master/Plugins/Shipping")]
     [GDPR(GDPRCompliance.Partial, "Users may ship each other, thus storing other users ID in a ship.")]
     public class ShippingPlugin : PluginBase {
 

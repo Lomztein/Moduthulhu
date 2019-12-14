@@ -15,6 +15,7 @@ using Newtonsoft.Json.Linq;
 namespace Lomztein.Moduthulhu.Modules.Phrases
 {
     [Descriptor ("Lomztein", "Response Phrases", "Responds to certain phrases from certain users in certain channels with a certain chance.")]
+    [Source ("https://github.com/Lomztein", "https://github.com/Lomztein/Moduthulhu/blob/master/Plugins/Miscellaneous/PhrasesPlugin.cs")]
     [GDPR (GDPRCompliance.Partial, "Other users may create phrases for each other, thus storing each others ID in a phrase.")]
     public class PhrasesPlugin : PluginBase {
 

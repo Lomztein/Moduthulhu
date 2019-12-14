@@ -4,33 +4,57 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Lomztein.Moduthulhu.Core.Extensions;
+using Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild;
 
 namespace Lomztein.Moduthulhu.Core.Bot.Messaging.Advanced {
 
-    class BookMessage : ICustomMessage<string, BookMessage.Book, IMessage> {
+    public class BookMessage : ISendable<IMessage>, IDeletable, IAttachable {
 
-        public IMessage Message { get; set; }
-        public Book Intermediate { get; set; }
+        private GuildHandler _attachedHandler;
+        private Book _book;
 
-        public string Sorrounder { get; private set; }
+        public IMessage Result { get; private set; }
 
-        public BookMessage (string sorrounder) {
-            Sorrounder = sorrounder;
+        public BookMessage (string sorrounder, string contents) {
+            _book = new Book(contents.SplitMessage(sorrounder));
         }
 
-        public void CreateFrom(string source) {
-            Intermediate = new Book (source.SplitMessage (Sorrounder));
+        public async Task DeleteAsync(RequestOptions options = null) {
+            await Result.DeleteAsync();
+            Detach(_attachedHandler);
         }
 
-        public Task DeleteAsync(RequestOptions options = null) {
-            throw new NotImplementedException ();
+        public async Task SendAsync(IMessageChannel channel) {
+            await _book.SendAsync(channel);
         }
 
-        public Task SendAsync(IMessageChannel channel) {
-            throw new NotImplementedException ();
+        public void Attach(GuildHandler guildHandler)
+        {
+            _attachedHandler = guildHandler;
+            guildHandler.ReactionAdded += GuildHandler_ReactionAdded;
         }
 
-        public class Book {
+        private async Task GuildHandler_ReactionAdded(Cacheable<IUserMessage, ulong> arg1, Discord.WebSocket.ISocketMessageChannel arg2, Discord.WebSocket.SocketReaction arg3)
+        {
+            if (arg1.Id == _book.Message.Id)
+            {
+                if (arg3.Emote.Name == Book.LeftArrow)
+                {
+                    await _book.Flip(-1);
+                }
+                if (arg3.Emote.Name == Book.RightArrow)
+                {
+                    await _book.Flip(1);
+                }
+            }
+        }
+
+        public void Detach(GuildHandler guildHandler)
+        {
+            guildHandler.ReactionAdded -= GuildHandler_ReactionAdded;
+        }
+
+        private class Book {
 
             public uint Index { get; set; }
             public string[] Pages { get; private set; }

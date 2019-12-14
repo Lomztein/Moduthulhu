@@ -10,7 +10,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
     [Critical]
     [Dependency ("Lomztein-Command Root")]
     [Descriptor ("Lomztein", "Plugin Manager", "Plugin to handle toggling of other plugins on a per-server basis.")]
-    [Source ("https://github.com/Lomztein", "https://github.com/Lomztein/Moduthulhu")]
+    [Source ("https://github.com/Lomztein", "https://github.com/Lomztein/Moduthulhu/tree/master/Core/Plugin/Standard%20Plugins/Plugin%20Manager")]
     public class PluginManagerPlugin : PluginBase
     {
         public PluginManager Manager => GuildHandler.Plugins;
