@@ -16,7 +16,7 @@ namespace Lomztein.Moduthulhu.Core.Plugins
 
         public static Assembly LoadAssembly (string path)
         {
-            Log.Write(Log.Type.SYSTEM, "Loading assembly file " + Path.GetFileName(path));
+            Log.System ("Loading assembly file " + Path.GetFileName(path));
             return AssemblyLoadContext.Default.LoadFromAssemblyPath(path);
         }
 
@@ -28,7 +28,7 @@ namespace Lomztein.Moduthulhu.Core.Plugins
             foreach (Type type in allTypes) {
 
                 if (type.GetInterfaces().Contains(typeof (T))) {
-                    Log.Write (Log.Type.SYSTEM, $"{typeof(T).Name} type \"{type.Name}\" loaded.");
+                    Log.System($"{typeof(T).Name} type \"{type.Name}\" loaded.");
                     exportedTypes.Add (type);
                 }
             }

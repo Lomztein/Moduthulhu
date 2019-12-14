@@ -101,7 +101,7 @@ namespace Lomztein.Moduthulhu.Core.Plugins
             }
             if (branch == null)
             {
-                Log.Critical($"Plugins type {pluginName} cannot be found, perhaps it is missing in the Modules folder.");
+                Log.Critical($"Plugins type {pluginName} cannot be found, perhaps it is missing in the Plugins folder.");
             }
             return branch;
         }

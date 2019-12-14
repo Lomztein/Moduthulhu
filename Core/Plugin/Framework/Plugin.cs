@@ -28,7 +28,7 @@ namespace Lomztein.Moduthulhu.Core.Plugins.Framework
         public static string GetFullName (string author, string name) => $"{author}-{name}";
         public static string GetFullName (Type plugin) => $"{GetAuthor(plugin)}-{GetName (plugin)}";
 
-        public static void Log(IPlugin plugin, string text) => Core.Log.Write(Core.Log.GetColor(Core.Log.Type.PLUGIN), $"{GetVersionedFullName (plugin.GetType ())} - { plugin.GuildHandler.Name}", text);
+        public static void Log(IPlugin plugin, string text) => Core.Log.Plugin($"[{GetVersionedFullName (plugin.GetType ())} - { plugin.GuildHandler.Name}] {text}");
 
         public static Type Find (IEnumerable<Type> plugins, string search)
         {

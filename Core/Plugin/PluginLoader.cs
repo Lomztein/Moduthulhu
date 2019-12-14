@@ -63,12 +63,12 @@ namespace Lomztein.Moduthulhu.Core.Plugins
             
             if (File.Exists (IncludedPath))
             {
-                Log.Write(Log.Type.PLUGIN, "Loading first party plugins..");
+                Log.Plugin("Loading first party plugins..");
                 firstParty = AssemblyLoader.ExtractTypes<IPlugin>(AssemblyLoader.LoadAssembly(IncludedPath));
             }
             else
             {
-                Log.Write(Log.Type.PLUGIN, "There are no first party plugins to load.");
+                Log.Plugin("There are no first party plugins to load.");
             }
 
             var thirdParty = AssemblyLoader.LoadAndExtractTypes<IPlugin>(ThirdPartyPath);

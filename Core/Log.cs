@@ -7,55 +7,54 @@ namespace Lomztein.Moduthulhu.Core
 {
     public static class Log
     {
-        public enum Type { SYSTEM, BOT, PLUGIN, DATA, CHAT, CONFIRM, CHANNEL, SERVER, USER, WARNING, EXCEPTION, CRITICAL }
+        public static int LogLevel { get; set; } = int.TryParse (Environment.GetEnvironmentVariable ("MODUTHULHU_LOGLEVEL"), out int level) ? level : int.MaxValue;
+        public enum Type { CRITICAL, EXCEPTION, WARNING, SYSTEM, CONFIRM, BOT, PLUGIN, DATA, CHAT, CHANNEL, SERVER, USER }
         private static ConsoleColor[] _typeColor = new [] {
+            ConsoleColor.Red, // CRITICAL
+            ConsoleColor.DarkRed, // EXCEPTION
+            ConsoleColor.Yellow, // WARNING
 
             ConsoleColor.Blue, // SYSTEM
+            ConsoleColor.Green, // CONFIRM
             ConsoleColor.Cyan, // BOT
             ConsoleColor.Green, // PLUGIN
             ConsoleColor.Magenta, // DATA
-            ConsoleColor.Green, // CONFIRM
 
             ConsoleColor.White, // CHAT
             ConsoleColor.White, // CHANNEL
             ConsoleColor.White, // SERVER
             ConsoleColor.White, // USER
-
-            ConsoleColor.Yellow, // WARNING
-            ConsoleColor.DarkRed, // EXCEPTION
-            ConsoleColor.Red // CRITICAL
         };
 
-        public static void Write(ConsoleColor color, string prefix, string text) {
+        private static void Write(ConsoleColor color, string prefix, string text) {
             Console.ForegroundColor = color;
             Console.WriteLine ($"[{prefix}] - [{DateTime.Now.ToString ("dd/MM/yyyy HH:mm:ss", CultureInfo.InvariantCulture)}] {text}");
         }
 
         public static void Write (Type type, string text) {
-            Write (_typeColor[(int)type], type.ToString (), text);
+            if (LogLevel >= (int)type)
+            {
+                Write(GetColor (type), type.ToString(), text);
+            }
         }
 
         public static void Exception (Exception exc) {
             Write (Type.EXCEPTION, exc.Message + " - " + exc.StackTrace);
         }
 
-        public static void Write(string text) {
-            Write (Type.BOT, text);
-        }
+        public static void System(string text) => Write(Type.SYSTEM, text);
+        public static void Bot(string text) => Write(Type.BOT, text);
+        public static void Plugin(string text) => Write(Type.PLUGIN, text);
+        public static void Data(string text) => Write(Type.DATA, text);
+        public static void Confirm(string text) => Write(Type.CONFIRM, text);
 
-        public static void System(string text) => Write(Log.Type.SYSTEM, text);
-        public static void Bot(string text) => Write(Log.Type.BOT, text);
-        public static void Plugin(string text) => Write(Log.Type.PLUGIN, text);
-        public static void Data(string text) => Write(Log.Type.DATA, text);
-        public static void Confirm(string text) => Write(Log.Type.CONFIRM, text);
+        public static void Chat(string text) => Write(Type.CHAT, text);
+        public static void Channel(string text) => Write(Type.CHANNEL, text);
+        public static void Server(string text) => Write(Type.SERVER, text);
+        public static void User(string text) => Write(Type.USER, text);
 
-        public static void Chat(string text) => Write(Log.Type.CHAT, text);
-        public static void Channel(string text) => Write(Log.Type.CHANNEL, text);
-        public static void Server(string text) => Write(Log.Type.SERVER, text);
-        public static void User(string text) => Write(Log.Type.USER, text);
-
-        public static void Warning(string text) => Write(Log.Type.WARNING, text);
-        public static void Critical(string text) => Write(Log.Type.CRITICAL, text);
+        public static void Warning(string text) => Write(Type.WARNING, text);
+        public static void Critical(string text) => Write(Type.CRITICAL, text);
 
 
         public static ConsoleColor GetColor (Type type) {
