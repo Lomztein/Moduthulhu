@@ -6,6 +6,7 @@ using Lomztein.Moduthulhu.Core.IO.Database.Repositories;
 using Lomztein.Moduthulhu.Core.Plugins.Framework;
 using Lomztein.Moduthulhu.Modules.Misc.Karma.Commands;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,6 +16,7 @@ namespace Lomztein.Moduthulhu.Modules.Misc.Karma
 {
     [Dependency ("Lomztein-Command Root")]
     [Descriptor ("Lomztein", "Karma", "Keep track of an accurate representation of peoples self-worth.")]
+    [GDPR(GDPRCompliance.Partial, "Stores user ID automatically to keep track of user score.")]
     public class KarmaPlugin : PluginBase {
 
         private CachedValue<ulong> _upvoteEmoteId;
@@ -75,6 +77,26 @@ namespace Lomztein.Moduthulhu.Modules.Misc.Karma
             GuildHandler.ReactionAdded -= OnReactionAdded;
             GuildHandler.ReactionRemoved -= OnReactionRemoved;
             SendMessage("Lomztein-Command Root", "RemoveCommand", _karmaCommand);
+        }
+
+        public override JToken RequestUserData(ulong id)
+        {
+            if (_karma.GetValue ().ContainsKey (id))
+            {
+                return new JObject
+                {
+                    { "Karma", JObject.FromObject (_karma.GetValue ()[id]) }
+                };
+            }
+            return null;
+        }
+
+        public override void DeleteUserData(ulong id)
+        {
+            if (_karma.GetValue ().ContainsKey (id))
+            {
+                _karma.MutateValue(x => x.Remove(id));
+            }
         }
 
         public Dictionary<ulong, Selfworth> GetKarmaDictionary () => _karma.GetValue();

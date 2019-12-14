@@ -40,6 +40,12 @@ namespace Lomztein.Moduthulhu.Core.Bot
             GetConnector().UpdateQuery(query, new Dictionary<string, object> { { "@guild", guild.ToString(CultureInfo.InvariantCulture) }, { "@userid", user.ToString (CultureInfo.InvariantCulture) }, { "@value", value } });
         }
 
+        public static void DeleteConsent (ulong guild, ulong user)
+        {
+            string query = "DELETE FROM consent WHERE guild = @guild AND userid = @userid";
+            GetConnector().UpdateQuery(query, new Dictionary<string, object> { { "@guild", guild.ToString(CultureInfo.InvariantCulture) }, { "@userid", user.ToString (CultureInfo.InvariantCulture) } });
+        }
+
         public static bool TryAssertConsent(ulong guild, ulong user)
         {
             try

@@ -263,6 +263,5 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
                 throw new MissingPermissionException($"Bot does not have channel {nameof (permission)} '{permission} in channel '{channel.Name}'");
             }
         }
-
     }
 }

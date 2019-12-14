@@ -14,10 +14,12 @@ using Lomztein.Moduthulhu.Core.IO.Database.Repositories;
 using Lomztein.Moduthulhu.Plugins.Standard;
 using Lomztein.Moduthulhu.Core.Bot;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Lomztein.Moduthulhu.Plugins.Birthday {
 
     [Descriptor ("Lomztein", "Birthdays", "Plugin that allows people to enter in their birthdays and have it announced when the date arrives!")]
+    [GDPR (GDPRCompliance.Full)]
     public class BirthdayPlugin : PluginBase {
 
         private CachedValue<string> _announcementMessage;
@@ -107,6 +109,25 @@ namespace Lomztein.Moduthulhu.Plugins.Birthday {
             string age = date.GetAge ().ToString () + date.GetAgeSuffix ();
             string message = _announcementMessage.GetValue ().Replace ("[USERNAME]", user.GetShownName ()).Replace ("[AGE]", age);
             await channel.SendMessageAsync (message);
+        }
+
+        public override JToken RequestUserData(ulong id)
+        {
+            if (_allBirthdays.GetValue ().TryGetValue (id, out BirthdayDate date)) {
+                return new JObject
+                {
+                    { "Birthdate", JObject.FromObject (date) }
+                };
+            }
+            return null;
+        }
+
+        public override void DeleteUserData(ulong id)
+        {
+            if (_allBirthdays.GetValue ().ContainsKey (id))
+            {
+                _allBirthdays.MutateValue(x => x.Remove(id));
+            }
         }
 
         public class BirthdayDate {

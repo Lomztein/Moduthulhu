@@ -9,10 +9,12 @@ using Lomztein.Moduthulhu.Core.Plugins.Framework;
 using Lomztein.Moduthulhu.Core.IO.Database.Repositories;
 using Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Lomztein.Moduthulhu.Modules.Clock.ActivityMonitor
 {
     [Descriptor ("Lomztein", "User Activity Monitor", "Positively sinister sounding plugin that applies roles to people based on last date of activity.")]
+    [GDPR (GDPRCompliance.Partial, "User IDs are automatically stored on any user activty, in order to keep track of last user activity.")]
     public class UserActivityMonitorPlugin : PluginBase {
 
         private CachedValue<Dictionary<ulong, DateTime>> _userActivity;
@@ -167,6 +169,26 @@ namespace Lomztein.Moduthulhu.Modules.Clock.ActivityMonitor
                 if (!_userActivity.GetValue().ContainsKey (u.Id)) {
                     await RecordActivity (u, GetDefaultDate ());
                 }
+            }
+        }
+
+        public override JToken RequestUserData(ulong id)
+        {
+            if (_userActivity.GetValue ().ContainsKey (id))
+            {
+                return new JObject
+                {
+                    { "LastActivity", _userActivity.GetValue ()[id] }
+                };
+            }
+            return null;
+        }
+
+        public override void DeleteUserData (ulong id)
+        {
+            if (_userActivity.GetValue ().ContainsKey (id))
+            {
+                _userActivity.MutateValue(x => x.Remove(id));
             }
         }
 

@@ -7,10 +7,12 @@ using Lomztein.AdvDiscordCommands.Extensions;
 using Lomztein.Moduthulhu.Core.Plugins.Framework;
 using Lomztein.Moduthulhu.Core.IO.Database.Repositories;
 using Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild;
+using Newtonsoft.Json.Linq;
 
 namespace Lomztein.Moduthulhu.Modules.Shipping {
 
     [Descriptor ("Lomztein", "Shipping Simulator 2018", "At the core of all this lies Guffe.")]
+    [GDPR(GDPRCompliance.Partial, "Users may ship each other, thus storing other users ID in a ship.")]
     public class ShippingPlugin : PluginBase {
 
         private CachedValue<List<Ship>> _ships;
@@ -26,23 +28,23 @@ namespace Lomztein.Moduthulhu.Modules.Shipping {
             _shipNames = GetDataCache("ShipNames", x => new List<ShipName>());
         }
 
-        public bool Ship (SocketGuildUser shipper, SocketGuildUser shippieOne, SocketGuildUser shippieTwo) {
+        public bool Ship (ulong shipper, ulong shippieOne, ulong shippieTwo) {
 
-            Ship ship = new Ship (this, shipper.Guild.Id, shipper.Id, shippieOne.Id, shippieTwo.Id);
+            Ship ship = new Ship (this, GuildHandler.GuildId, shipper, shippieOne, shippieTwo);
 
             if (!ContainsShip (ship)) {
-                AddShip (shipper.Guild.Id, ship);
+                AddShip (GuildHandler.GuildId, ship);
                 return true;
             }
 
             return false;
         }
 
-        public bool Sink(SocketGuildUser shipper, SocketGuildUser shippieOne, SocketGuildUser shippieTwo) {
-            Ship ship = new Ship (this, shipper.Guild.Id, shipper.Id, shippieOne.Id, shippieTwo.Id);
+        public bool Sink(ulong shipper, ulong shippieOne, ulong shippieTwo) {
+            Ship ship = new Ship (this, GuildHandler.GuildId, shipper, shippieOne, shippieTwo);
 
             if (ContainsShip (ship)) {
-                RemoveShip (shipper.Guild.Id, ship);
+                RemoveShip (GuildHandler.GuildId, ship);
                 return true;
             }
 
@@ -56,7 +58,6 @@ namespace Lomztein.Moduthulhu.Modules.Shipping {
 
         public Dictionary<ulong, List<Ship>> GetShipLeaderboard(SocketGuild guild)
         {
-
             Dictionary<ulong, List<Ship>> leaderboard = new Dictionary<ulong, List<Ship>>();
             foreach (Ship ship in _ships.GetValue())
             {
@@ -94,8 +95,8 @@ namespace Lomztein.Moduthulhu.Modules.Shipping {
         }
        
 
-        public IList<Ship> GetShippieShips(SocketGuildUser shippie) {
-                return _ships.GetValue().Where (x => x.ShippieOne == shippie.Id || x.ShippieTwo == shippie.Id).ToList ();
+        public IList<Ship> GetShippieShips(ulong shippie) {
+                return _ships.GetValue().Where (x => x.ShippieOne == shippie || x.ShippieTwo == shippie).ToList ();
         }
 
         public bool ContainsShip(Ship ship)
@@ -116,19 +117,19 @@ namespace Lomztein.Moduthulhu.Modules.Shipping {
             _ships.MutateValue (x => x.Remove (ship));
         }
 
-        public Ship GetShipByShippies(SocketGuildUser shippieOne, SocketGuildUser shippieTwo)
+        public Ship GetShipByShippies(ulong shippieOne, ulong shippieTwo)
         {
-            return _ships.GetValue().Find(x => x.IsShippiesIdentical(shippieOne.Id, shippieTwo.Id));
+            return _ships.GetValue().Find(x => x.IsShippiesIdentical(shippieOne, shippieTwo));
         }
 
-        public void NameShip (SocketGuildUser shippieOne, SocketGuildUser shippieTwo, string name) {
-            ShipName shipName = new ShipName(shippieOne.Id, shippieTwo.Id, name);
+        public void NameShip (ulong shippieOne, ulong shippieTwo, string name) {
+            ShipName shipName = new ShipName(shippieOne, shippieTwo, name);
             _shipNames.GetValue().Remove(shipName);
             _shipNames.MutateValue (x => x.Add (shipName));
         }
 
-        public void DeleteShipName (SocketGuildUser shippieOne, SocketGuildUser shippieTwo) {
-            ShipName shipName = GetCustomShipName (shippieOne.Id, shippieTwo.Id);
+        public void DeleteShipName (ulong shippieOne, ulong shippieTwo) {
+            ShipName shipName = GetCustomShipName (shippieOne, shippieTwo);
             if (shipName != null) {
                 _shipNames.MutateValue(x => x.Remove (shipName));
             }
@@ -160,11 +161,53 @@ namespace Lomztein.Moduthulhu.Modules.Shipping {
             SendMessage("Lomztein-Command Root", "RemoveCommand", _commands);
         }
 
+        public override JToken RequestUserData(ulong id)
+        {
+            JArray allShips = new JArray();
+            var userShips = GetShippieShips(id);
+            foreach (var ship in userShips)
+            {
+                JObject jShip = new JObject();
+                jShip.Add("Ship", JObject.FromObject (ship));
+
+                ShipName shipName = GetCustomShipName(ship.ShippieOne, ship.ShippieTwo);
+                if (shipName != null)
+                {
+                    jShip.Add("CustomName", shipName.Name);
+                }
+                allShips.Add(jShip);
+            }
+            return allShips.Count > 0 ? allShips : null;
+        }
+
+        public override void DeleteUserData(ulong id)
+        {
+            var ships = GetShippieShips(id);
+            List<ShipName> shipNames = new List<ShipName>();
+            foreach (Ship ship in ships)
+            {
+                ShipName shipName = GetCustomShipName(ship.ShippieOne, ship.ShippieTwo);
+                if (shipName != null)
+                {
+                    shipNames.Add(shipName);
+                }
+            }
+
+            if (ships.Count > 0)
+            {
+                _ships.MutateValue(x => x.RemoveAll(y => ships.Contains(y)));
+            }
+
+            if (shipNames.Count > 0)
+            {
+                _shipNames.MutateValue(x => x.RemoveAll(y => shipNames.Contains(y)));
+            }
+        }
     }
 
     public class Ship
     {
-            [JsonProperty ("Shipper")]
+        [JsonProperty ("Shipper")]
         public ulong Shipper { get; set; }
 
         [JsonProperty ("ShippieOne")]
@@ -240,8 +283,6 @@ namespace Lomztein.Moduthulhu.Modules.Shipping {
 
             return firstPart + lastPart;
         }
-
-
 
         private static string GetPartName(string fullName, bool firstHalf, int maxLength)
         {

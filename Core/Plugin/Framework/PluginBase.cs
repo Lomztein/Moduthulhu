@@ -8,6 +8,7 @@ using Lomztein.Moduthulhu.Core.Bot.Client.Sharding;
 using Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild;
 using Lomztein.Moduthulhu.Core.Extensions;
 using Lomztein.Moduthulhu.Core.IO.Database.Repositories;
+using Newtonsoft.Json.Linq;
 
 namespace Lomztein.Moduthulhu.Core.Plugins.Framework
 {
@@ -36,6 +37,9 @@ namespace Lomztein.Moduthulhu.Core.Plugins.Framework
         public virtual void PostInitialize () { }
 
         public abstract void Shutdown();
+
+        public virtual JToken RequestUserData(ulong id) => null;
+        public virtual void DeleteUserData(ulong id) { }
 
         protected void Log(string contents) => Plugin.Log (this, contents);
 

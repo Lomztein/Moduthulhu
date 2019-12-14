@@ -1,4 +1,5 @@
 ﻿using Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild;
+using Newtonsoft.Json.Linq;
 using System;
 
 namespace Lomztein.Moduthulhu.Core.Plugins.Framework
@@ -64,5 +65,18 @@ namespace Lomztein.Moduthulhu.Core.Plugins.Framework
         /// This is called if the module is shut down for whatever reason. Use this to undo changes you might have done to the Core or other modules.
         /// </summary>
         void Shutdown();
+
+        /// <summary>
+        /// Calling this should return a JObject containing all data related to the end-user who's ID is given.
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        JToken RequestUserData(ulong userId);
+
+        /// <summary>
+        /// Calling this should delete any data related to the specific end-user who's ID is given.
+        /// </summary>
+        /// <param name="userId"></param>
+        void DeleteUserData(ulong userId);
     }
 }

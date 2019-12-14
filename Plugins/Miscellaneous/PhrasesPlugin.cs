@@ -10,10 +10,12 @@ using Lomztein.Moduthulhu.Core.IO.Database.Repositories;
 using System.Linq;
 using Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Lomztein.Moduthulhu.Modules.Phrases
 {
     [Descriptor ("Lomztein", "Response Phrases", "Responds to certain phrases from certain users in certain channels with a certain chance.")]
+    [GDPR (GDPRCompliance.Partial, "Other users may create phrases for each other, thus storing each others ID in a phrase.")]
     public class PhrasesPlugin : PluginBase {
 
         private CachedValue<List<Phrase>> _phrases;
@@ -107,6 +109,24 @@ namespace Lomztein.Moduthulhu.Modules.Phrases
 
         public override void Shutdown() {
             GuildHandler.MessageReceived -= OnMessageRecieved;
+        }
+
+        public override JToken RequestUserData(ulong id)
+        {
+            var phrases = _phrases.GetValue().Where(x => x.UserId == id);
+            if (phrases.Count () > 0)
+            {
+                return JArray.FromObject(phrases.ToArray());
+            }
+            return null;
+        }
+
+        public override void DeleteUserData(ulong id)
+        {
+            if (_phrases.GetValue ().Any (x => x.UserId == id))
+            {
+                _phrases.MutateValue(x => x.RemoveAll(y => y.UserId == id));
+            }
         }
 
         public class Phrase {

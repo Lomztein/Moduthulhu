@@ -76,7 +76,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard {
 
                 if (result.Exception != null)
                 {
-                    Log(result.Exception.Message + " - " + result.Exception.StackTrace);
+                    Core.Log.Exception(result.Exception);
                 }
 
                 if (result.Value is ISendable sendable)

@@ -140,7 +140,14 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
             public Task<Result> Execute(CommandMetadata metadata, string pluginName)
             {
                 Type pluginType = Plugin.Find(PluginLoader.GetPlugins (), pluginName);
-                return TaskResult(GetModuleEmbed(pluginType), null);
+                if (pluginType != null)
+                {
+                    return TaskResult(GetModuleEmbed(pluginType), null);
+                }
+                else
+                {
+                    return TaskResult(null, $"Failed to find any plugins matching '{pluginName}'");
+                }
             }
         }
 
@@ -150,19 +157,50 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
                 .WithTitle(Plugin.GetName(moduleType))
                 .WithDescription(Plugin.GetDescription(moduleType))
                 .WithAuthor("Plugin Information")
-                .WithFooter("Created by " + Plugin.GetAuthor(moduleType) + (Plugin.GetAuthorURI(moduleType) != null ? " - " + Plugin.GetAuthorURI(moduleType) : ""));
+                .WithFooter("Created by " + Plugin.GetAuthor(moduleType));
 
-            AddDependanciesInline("Prerequisite Plugins", PluginLoader.DependancyTree.GetDependencies(Plugin.GetVersionedFullName(moduleType)).Select(x => Plugin.GetVersionedFullName(x)).ToArray());
+            if (Plugin.IsCritical (moduleType))
+            {
+                builder.AddField("Notice: ", "This plugin is critical and cannot be disabled.", true);
+            }
 
-            void AddDependanciesInline(string header, string[] dependancies)
-            { // Never did I ever say I knew how to spell.
+            string[] dependancies = PluginLoader.DependancyTree.GetDependencies(Plugin.GetVersionedFullName(moduleType)).Select(x => Plugin.GetVersionedFullName(x)).ToArray();
+            if (dependancies.Length > 0)
+            {
+                string content = $"```{string.Join('\n', dependancies)}```";
+                builder.AddField("Dependancies", content);
+            }
 
-                if (dependancies.Length > 0)
+            if (Plugin.GetAuthorURI (moduleType) != null)
+            {
+                string authorUrl = $"Author URL: {(Plugin.GetAuthorURI(moduleType) == null ? "Unspecified" : Plugin.GetAuthorURI(moduleType).AbsoluteUri)}";
+                string pluginUrl = $"Plugin URL: {(Plugin.GetProjectURI(moduleType) == null ? "Unspecified" : Plugin.GetProjectURI(moduleType).AbsoluteUri)}";
+                string patchUrl = $"Patch URL: {(Plugin.GetPatchURI(moduleType) == null ? "Unspecified" : Plugin.GetPatchURI(moduleType).AbsoluteUri)}";
+
+                builder.AddField("Plugin Source", $"{authorUrl}\n{pluginUrl}\n{patchUrl}");
+            }
+
+            GDPRCompliance? compliance = Plugin.GetGDPRCompliance(moduleType);
+            string header = null;
+            if (compliance.HasValue)
+            {
+                switch (compliance.Value)
                 {
-                    string content = string.Join(", ", dependancies);
-                    builder.AddField(header, content);
+                    case GDPRCompliance.Full:
+                        header = "This plugin is fully GDPR compliant.";
+                        break;
+
+                    case GDPRCompliance.Partial:
+                        header = "This plugin is only partially GDPR compliant.";
+                        break;
+
+                    case GDPRCompliance.None:
+                        header = "WARNING: This plugin does not comply with GDPR.";
+                        break;
                 }
 
+                string notes = Plugin.GetGDPRNotes(moduleType).Length == 0 ? "```No notes on compliance.```" : $"```{string.Join('\n', Plugin.GetGDPRNotes(moduleType))}```";
+                builder.AddField(header, notes);
             }
 
             return builder.Build();

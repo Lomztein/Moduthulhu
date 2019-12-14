@@ -14,7 +14,6 @@ namespace Lomztein.Moduthulhu.Core.Plugins
         private static Type[] _loadedPlugins;
         private static Type[] _standardPlugins = new [] { 
             typeof (PluginManagerPlugin),
-            typeof (LoggerPlugin),
             typeof (StandardCommandsPlugin),
             typeof (AdministrationPlugin),
             typeof (ConfigurationPlugin),

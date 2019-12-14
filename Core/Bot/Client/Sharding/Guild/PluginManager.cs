@@ -2,6 +2,7 @@ using Lomztein.Moduthulhu.Core.IO.Database.Repositories;
 using Lomztein.Moduthulhu.Core.Plugins;
 using Lomztein.Moduthulhu.Core.Plugins.Framework;
 using Lomztein.Moduthulhu.Plugins.Standard;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -267,5 +268,22 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
         {
             return Plugin.Find (_activePlugins.Select (x => x.GetType ()), pluginName) != null;
         }
+
+        public JObject RequestUserData (ulong userId)
+        {
+            JObject data = new JObject();
+            foreach (var plugin in _activePlugins)
+            {
+                string pluginName = Plugin.GetVersionedFullName(plugin.GetType ());
+                JToken pluginData = plugin.RequestUserData(userId);
+                if (pluginData != null)
+                {
+                    data.Add(pluginName, pluginData);
+                }
+            }
+            return data;
+        }
+
+        public void DeleteUserData(ulong userId) => _activePlugins.ForEach(x => x.DeleteUserData(userId));
     }
 }

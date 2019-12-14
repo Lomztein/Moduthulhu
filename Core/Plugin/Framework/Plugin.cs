@@ -11,6 +11,7 @@ namespace Lomztein.Moduthulhu.Core.Plugins.Framework
         private static DependencyAttribute[] GetDependancyAttributes(Type plugin) => plugin.GetCustomAttributes(typeof(DependencyAttribute), false).Cast<DependencyAttribute>().ToArray();
         private static DescriptorAttribute GetDescriptorAttribute(Type plugin) => GetAttribute<DescriptorAttribute>(plugin);
         private static SourceAttribute GetSourceAttribute(Type plugin) => GetAttribute<SourceAttribute>(plugin);
+        private static GDPRAttribute GetGDPRAttribute(Type plugin) => GetAttribute<GDPRAttribute>(plugin);
 
         public static string[] GetDependancy(Type plugin) => GetDependancyAttributes(plugin).Select(x => x.DependencyName).ToArray();
         public static string GetName(Type plugin) => GetDescriptorAttribute(plugin)?.Name;
@@ -22,6 +23,9 @@ namespace Lomztein.Moduthulhu.Core.Plugins.Framework
         public static Uri GetAuthorURI(Type plugin) => Uri.TryCreate(GetSourceAttribute(plugin)?.AuthorURI, UriKind.Absolute, out Uri uri) ? uri : null;
         public static Uri GetPatchURI(Type plugin) => Uri.TryCreate(GetSourceAttribute(plugin)?.PatchURI, UriKind.Absolute, out Uri uri) ? uri : null;
         public static Uri GetProjectURI(Type plugin) => Uri.TryCreate(GetSourceAttribute(plugin)?.ProjectURI, UriKind.Absolute, out Uri uri) ? uri : null;
+
+        public static GDPRCompliance? GetGDPRCompliance(Type plugin) => GetGDPRAttribute (plugin)?.Compliance;
+        public static string[] GetGDPRNotes(Type plugin) => GetGDPRAttribute(plugin)?.Notes;
 
         public static string GetVersionedFullName (string author, string name, string version) => $"{author}-{name}-{version}";
         public static string GetVersionedFullName (Type plugin) => $"{GetAuthor (plugin)}-{GetName (plugin)}-{GetVersion (plugin)}";
