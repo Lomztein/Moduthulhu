@@ -1,5 +1,6 @@
 ﻿using Discord.WebSocket;
 using Lomztein.AdvDiscordCommands.Framework;
+using Lomztein.AdvDiscordCommands.Framework.Categories;
 using Lomztein.AdvDiscordCommands.Framework.Interfaces;
 using Lomztein.Moduthulhu.Plugins.Standard;
 using System;
@@ -14,8 +15,7 @@ namespace Lomztein.Moduthulhu.Modules.Voice.Commands
         public VoiceNameSet () {
             Name = "voice";
             Description = "Voice related commands.";
-            Category = AdditionalCategories.Voice;
-            Flatname = "vname";
+            Category = StandardCategories.Utility;
 
             commandsInSet = new List<ICommand> {
                 new CustomName (),
@@ -27,7 +27,7 @@ namespace Lomztein.Moduthulhu.Modules.Voice.Commands
             public CustomName () {
                 Name = "name";
                 Description = "Specify channel name.";
-                Category = AdditionalCategories.Voice;
+                Category = StandardCategories.Utility;
                 Flatname = "vname";
             }
 
