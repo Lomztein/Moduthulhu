@@ -22,6 +22,7 @@ namespace Lomztein.Moduthulhu.Core.Bot {
 
         internal static string BaseDirectory { get => AppContext.BaseDirectory; }
         internal static string DataDirectory { get => AppContext.BaseDirectory + "/Data"; }
+        public static string ResourcesDirectory { get => AppContext.BaseDirectory + "/Resources"; }
 
         private readonly CancellationTokenSource _shutdownToken = new CancellationTokenSource();
 
