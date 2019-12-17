@@ -19,11 +19,13 @@ namespace Lomztein.Moduthulhu.Modules.Shipping {
             Description = "Most important commands.";
             Category = StandardCategories.Fun;
 
-            commandsInSet = new List<ICommand> {
+            _commandsInSet = new List<ICommand> {
                 new Ship (), new Sink (),
                 new Shipname (), new List (),
                 new OTPs (), new ATPs (),
             };
+
+            _defaultCommand = new Ship();
         }
 
         public class Ship : PluginCommand<ShippingPlugin> {

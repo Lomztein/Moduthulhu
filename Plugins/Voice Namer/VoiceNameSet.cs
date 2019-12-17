@@ -17,13 +17,14 @@ namespace Lomztein.Moduthulhu.Modules.Voice.Commands
             Description = "Voice related commands.";
             Category = StandardCategories.Utility;
 
-            commandsInSet = new List<ICommand> {
+            _commandsInSet = new List<ICommand> {
                 new CustomName (),
             };
+
+            _defaultCommand = new CustomName();
         }
 
         public class CustomName : PluginCommand<AutoVoiceNamePlugin> {
-
             public CustomName () {
                 Name = "name";
                 Description = "Specify channel name.";

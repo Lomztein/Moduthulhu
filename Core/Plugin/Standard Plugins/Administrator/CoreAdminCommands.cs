@@ -22,7 +22,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
             Description = "Core administration.";
             Category = AdditionalCategories.Management;
 
-            commandsInSet = new List<ICommand> {
+            _commandsInSet = new List<ICommand> {
                 new ShutdownCommand (),
                 new StatusCommand (),
                 new SetAvatarCommand (),

@@ -21,7 +21,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
         public T ParentPlugin { get; set; }
 
         public override void Initialize() {
-            foreach (Command cmd in commandsInSet) {
+            foreach (Command cmd in _commandsInSet) {
                 if (cmd is PluginCommand<T> child)
                 {
                     child.ParentPlugin = ParentPlugin;

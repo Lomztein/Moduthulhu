@@ -21,7 +21,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
             Description = "Manage active plugins.";
             Category = AdditionalCategories.Management;
 
-            commandsInSet = new List<ICommand>
+            _commandsInSet = new List<ICommand>
             {
                 new AddCommand (),
                 new RemoveCommand (),
@@ -30,6 +30,8 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
                 new AllCommand (),
                 new InfoCommand (),
             };
+
+            _defaultCommand = new InfoCommand();
         }
 
         private class AddCommand : PluginCommand<PluginManagerPlugin>
