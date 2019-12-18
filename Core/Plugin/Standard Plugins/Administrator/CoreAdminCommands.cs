@@ -58,13 +58,13 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
             }
 
             [Overload (typeof (LargeEmbed), "Check the status for the core and its clients.")]
-            public Task<Result> Execute (CommandMetadata metadata) {
+            public Task<Result> Execute (CommandMetadata _) {
 
                 // TODO: Add status for shards and GuildHandlers.
                 EmbedBuilder builder = new EmbedBuilder()
                     .WithTitle("Core Process Status")
                     .WithAuthor(ParentPlugin.GuildHandler.BotUser)
-                    .WithDescription(ParentPlugin.GuildHandler.Core.GetStatusString())
+                    .WithDescription($"```{ParentPlugin.GuildHandler.Core.ToString()}```")
                     .WithCurrentTimestamp();
 
                 LargeEmbed embed = new LargeEmbed(builder);

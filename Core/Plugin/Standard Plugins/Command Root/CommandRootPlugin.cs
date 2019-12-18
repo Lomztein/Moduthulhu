@@ -71,25 +71,28 @@ namespace Lomztein.Moduthulhu.Plugins.Standard {
         // This is neccesary since awaiting the result in the event would halt the rest of the bot, and we don't really want that.
         private async Task AwaitAndSend(SocketMessage arg) {
 
-            var result = await _commandRoot.EnterCommand (arg.Content, arg as SocketUserMessage, arg.GetGuild ().Id);
-            if (result != null) {
-
-                if (result.Exception != null)
+            if (arg is SocketUserMessage userMessage) // Temporary solution untill this can be fixed library-side.
+            {
+                var result = await _commandRoot.EnterCommand (userMessage);
+                if (result != null)
                 {
-                    Core.Log.Exception(result.Exception);
-                }
+                    if (result.Exception != null)
+                    {
+                        Core.Log.Exception(result.Exception);
+                    }
 
-                if (result.Value is ISendable sendable)
-                {
-                    await sendable.SendAsync(arg.Channel);
-                }
+                    if (result.Value is ISendable sendable)
+                    {
+                        await sendable.SendAsync(arg.Channel);
+                    }
 
-                if (result.Value is IAttachable attachable)
-                {
-                    attachable.Attach(GuildHandler);
-                }
+                    if (result.Value is IAttachable attachable)
+                    {
+                        attachable.Attach(GuildHandler);
+                    }
 
-                await MessageControl.SendMessage (arg.Channel as ITextChannel, result?.GetMessage (), false, result?.Value as Embed);
+                    await MessageControl.SendMessage(arg.Channel as ITextChannel, result?.GetMessage(), false, result?.Value as Embed);
+                }
             }
         }
 

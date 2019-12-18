@@ -56,7 +56,7 @@ namespace Lomztein.Moduthulhu.Core.Bot {
             return _errorReporter.ReportError(exception);
         }
 
-        public string GetStatusString() => $"Core uptime: {Uptime}";
+        public override string ToString() => $"Core uptime: {Uptime}\n{Client}";
 
         public void Dispose()
         {

@@ -52,7 +52,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client
         internal async Task Initialize()
         {
             PluginLoader.ReloadPluginAssemblies();
-            _botAdministrators = new UserList(Path.Combine(DataDirectory, "/Administrators"));
+            _botAdministrators = new UserList(DataDirectory + "/Administrators");
 
             InitializeShards();
             await AwaitAllConnected().ConfigureAwait (false);
@@ -110,7 +110,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client
 
         private void InitStatusMessages ()
         {
-            AddStatusMessage("UsersServed", ActivityType.Watching, () => new Random().Next(0, 100) == 0 ? $"{AllGuilds.SelectMany(x => x.Users).Count()} puny mortals waste away their hilariously short lives." : $"{AllGuilds.SelectMany(x => x.Users).Count()} users in {AllGuilds.Count()} servers.");
+            AddStatusMessage("UsersServed", ActivityType.Watching, () => new Random().Next(0, 100) == 0 ? $"{AllGuilds.Sum(x => x.MemberCount)} puny mortals waste away their hilariously short lives." : $"{AllGuilds.Count()} servers with {AllGuilds.Sum(x => x.MemberCount)} users.");
             AddStatusMessage("Help", ActivityType.Listening, () => new Random().Next(0, 100) == 0 ? "the sweet cries of the fresh virgin sacrifices." : "!help commands! Prefix may vary between servers.");
             AddStatusMessage("AvailablePlugins", ActivityType.Playing, () => new Random().Next(0, 100) == 0 ? "the dice of the vast cosmos." : $"with the {PluginLoader.GetPlugins().Length} plugins available. Try '!plugins ?'!");
             AddStatusMessage("Uptime", ActivityType.Streaming, () => new Random().Next(0, 100) == 0 ? "V̌̾͒̓͏̸̼͔̘͎̳̦̮̰̹̥Ǫ̪͎̜̝͙̅ͫ͊̃͗̾̍ͣ̔̾͊͆ͭ͗̏͆̀͘͟͠I̴͛͌ͦ͊̇̾ͮ͂̈̌͏̪̜̳͙̰̝̺̱͈̗̥D̡̳͈̠͔̲̳̤̱͚̤ͥͮͤͪ̄ͤ͐̆̿ͩ͐ͭ̋̂͗̔ͬͦ͊" : $"for {Uptime.Days} days of uninterrupted service!");
@@ -174,7 +174,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client
             await Task.WhenAll (_shards.Select (x => x.AwaitConnected ()).ToArray ());
         }
 
-        public string GetStatusString() => $"Shards: {_shards.Sum (x => x == null ? 0 : 1)} / {_configuration.TotalShards}";
-        public string GetShardsStatus() => string.Join("\n", _shards.Select (x => x == null ? "Dead shard; please restart client." : x.GetStatusString ()));
+        public override string ToString() => $"Shards: {_configuration.TotalShards}\n{GetShardsStatus()}";
+        public string GetShardsStatus() => string.Join("\n\t", _shards.Select (x => x == null ? $"Disconnected shard, client will auto-shutdown in {_consecutiveOfflineMinutes} / {_automaticOfflineMinutesTreshold} minutes." : x.ToString ()));
     }
 }

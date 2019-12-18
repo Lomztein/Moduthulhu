@@ -40,7 +40,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding
         internal void Run () {
             void init() => Initialize().GetAwaiter().GetResult();
             _thread = new Thread (init) {
-                Name = ToString (),
+                Name = $"S{_shardId+1}/{_totalShards}",
             };
             _thread.Start ();
         }
@@ -145,8 +145,6 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding
             _thread.Abort();
         }
 
-        public override string ToString() => $"{BotClient} - S{_shardId}/{_totalShards}";
-
         private void RouteEvents () {  // It'd almost be worth writing a script to type this shiznat out automatically.
             Client.MessageReceived          += async (x) =>         { try { await ForGuild ((x.Channel as SocketTextChannel)?.Guild, g => g.OnMessageRecieved (x));     } catch (Exception exc) { OnExceptionCaught (exc); } };
             Client.ChannelCreated           += async (x) =>         { try { await ForGuild ((x as SocketGuildChannel)?.Guild, g => g.OnChannelCreated(x));              } catch (Exception exc) { OnExceptionCaught (exc); } };
@@ -218,8 +216,8 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding
         }
 
         // TODO: Change all these to extension methods since that'll better support null-cases.
-        public string GetStatusString () {
-            return $" -- SHARD {_shardId} -- \nGuilds: {Client.Guilds.Count}\nUsers: {Client.Guilds.Sum (x => x.MemberCount)}\nLogin state: {Client.LoginState}\nConnection: {Client.ConnectionState}\nLatency: {Client.Latency}\nUptime: {Uptime}\n";
+        public override string ToString () {
+            return $" -- SHARD {_shardId + 1}/{_totalShards} -- \nGuildHandlers: {_guildHandlers.Count}\nUsers: {Client.Guilds.Sum (x => x.MemberCount)}\nLogin state: {Client.LoginState}\nConnection: {Client.ConnectionState}\nLatency: {Client.Latency}\nUptime: {Uptime}\n";
         }
 
         // Guild item getters.
