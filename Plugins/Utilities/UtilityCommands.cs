@@ -160,4 +160,20 @@ namespace Lomztein.Moduthulhu.Plugins.Standard.Utilities
             return TaskResult("I'm so sorry you had to witness this.", null);
         }
     }
+
+    public class Ping : PluginCommand<UtilitiesPlugin>
+    {
+        public Ping ()
+        {
+            Name = "ping";
+            Description = "Ping the bot.";
+            Category = StandardCategories.Utility;
+        }
+
+        [Overload (typeof (int), "Ping the bot. Returns ping time in milliseconds.")]
+        public Task<Result> Execute (CommandMetadata _)
+        {
+            return TaskResult(ParentPlugin.GuildHandler.Shard.Client.Latency, "Pong!");
+        }
+    }
 }

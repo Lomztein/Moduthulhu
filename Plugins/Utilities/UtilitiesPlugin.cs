@@ -11,16 +11,17 @@ namespace Lomztein.Moduthulhu.Plugins.Standard.Utilities
     [Dependency("Lomztein-Command Root")]
     public class UtilitiesPlugin : PluginBase
     {
-        private ICommand[] _commands =
-        {
-            new RollTheDice (),
-            new FlipCoin (),
-            new Embolden (),
-            new Fizzfyr13 (),
-        };
+        private ICommand[] _commands;
 
         public override void Initialize()
         {
+            _commands = new ICommand[] {
+                new RollTheDice(),
+                new FlipCoin(),
+                new Embolden(),
+                new Fizzfyr13(),
+                new Ping { ParentPlugin = this },
+            };
             SendMessage("Lomztein-Command Root", "AddCommands", _commands);
         }
 

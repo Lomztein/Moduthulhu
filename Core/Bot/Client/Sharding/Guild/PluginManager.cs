@@ -12,6 +12,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
     public class PluginManager
     {
         private readonly List<IPlugin> _activePlugins = new List<IPlugin>();
+        public int ActiveCount => _activePlugins.Count;
 
         private readonly GuildHandler _parentHandler;
 
