@@ -31,6 +31,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
             var first = sources.First();
 
             Name = Regex.Replace(first.Name.ToLower (CultureInfo.InvariantCulture), "\\s", "");
+            Shortcut = Name;
             Description = first.Desc;
             Category = new Category (categoryName, categoryDesc);
             RequiredPermissions.Add(Discord.GuildPermission.ManageGuild);

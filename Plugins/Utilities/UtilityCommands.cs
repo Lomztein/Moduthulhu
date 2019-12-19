@@ -151,6 +151,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard.Utilities
             Name = "fizzfyr13";
             Description = "Raw sexual energy";
             Category = StandardCategories.Fun;
+            Aliases = new [] { "sexmachine", "guffesbodypillow" };
         }
 
         [Overload (typeof (string), "Witness the true power of the moist side.")]

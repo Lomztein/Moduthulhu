@@ -31,7 +31,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
                 new InfoCommand (),
             };
 
-            _defaultCommand = new InfoCommand();
+            _defaultCommand = new AllCommand();
         }
 
         private class AddCommand : PluginCommand<PluginManagerPlugin>
@@ -42,6 +42,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
                 Description = "Add a plugin.";
                 Category = AdditionalCategories.Management;
                 RequiredPermissions.Add(Discord.GuildPermission.ManageGuild);
+                Shortcut = "enableplugin";
 
                 Aliases = new [] { "add" };
             }
@@ -91,6 +92,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
                 Description = "Remove a plugin.";
                 Category = AdditionalCategories.Management;
                 RequiredPermissions.Add(GuildPermission.ManageGuild);
+                Shortcut = "disableplugin";
             
                 Aliases = new [] { "remove" };
             }

@@ -29,7 +29,7 @@ namespace Lomztein.Moduthulhu.Modules.Voice.Commands
                 Name = "name";
                 Description = "Specify channel name.";
                 Category = StandardCategories.Utility;
-                Flatname = "vname";
+                Shortcut = "vname";
             }
 
             [Overload (typeof (void), "Reset a custom channel name.")]

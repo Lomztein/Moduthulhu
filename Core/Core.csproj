@@ -24,7 +24,7 @@
 
   <ItemGroup>
     <PackageReference Include="Discord.Net" Version="2.1.1" />
-    <PackageReference Include="Lomztein.Advanced-Discord-Commands" Version="1.1.1-beta" />
+    <PackageReference Include="Lomztein.Advanced-Discord-Commands" Version="1.2.0-beta" />
     <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.8">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
