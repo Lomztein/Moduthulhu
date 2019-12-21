@@ -71,7 +71,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
 
         public Embed ToEmbed()
         {
-            Regex newLineRegex = new Regex(@"\[\n\]");
+            Regex newLineRegex = new Regex(@"\n");
 
             if (Success)
             {
@@ -83,7 +83,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
                     .WithFooter($"Defined by {Author}. Souce: www.urbandictionary.com");
                 if (Example.Length > 0)
                 {
-                    builder.AddField("Example", "> " + newLineRegex.Replace (EmbedNestedDefinitions (Example), (x) => $"\n> {x.Value}"));
+                    builder.AddField("Example", "> " + string.Join ("\n> ", EmbedNestedDefinitions (Example).Split ('\n')));
                 }
 
                 builder.AddField("Votes", ThumbsUp.ToString() + "↑ / " + ThumbsDown.ToString() + "↓");
