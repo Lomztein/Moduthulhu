@@ -50,9 +50,8 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
 
         }
 
-        private class StatusCommand : AdministratorCommand
+        private class StatusCommand : PluginCommand<AdministrationPlugin>
         {
-
             public StatusCommand () {
                 Name = "status";
                 Description = "Check core status.";
@@ -73,7 +72,6 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
                 LargeEmbed embed = new LargeEmbed(builder);
                 return TaskResult (embed, "");
             }
-
         }
 
         private class SetUsernameCommand : AdministratorCommand
@@ -138,7 +136,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
             }
         }
 
-        private class VersionCommand : PluginCommand<AdministrationPlugin>
+        private class VersionCommand : Command
         {
             public VersionCommand()
             {
