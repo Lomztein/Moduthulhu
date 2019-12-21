@@ -7,8 +7,9 @@ namespace Lomztein.Moduthulhu.Core.Extensions
 {
     public static class StringExtensions
     {
-        private const int MaxCharactersPerMessage = 2000;
-        public static string[] SplitMessage(this string message, string sorrounder) {
+        public static string[] SplitMessage(this string message, string sorrounder) => SplitMessage(message, sorrounder, 2000);
+
+        public static string[] SplitMessage(this string message, string sorrounder, int maxChars) {
             List<string> splitted = new List<string> ();
 
             int counted = 0;
@@ -16,7 +17,7 @@ namespace Lomztein.Moduthulhu.Core.Extensions
 
                 // Give some wiggle room, to avoid any shenanagens.
                 int margin = 10 + sorrounder.Length * 2;
-                if (counted > MaxCharactersPerMessage - margin) {
+                if (counted > maxChars - margin) {
 
                     int spaceSearch = counted; // First, try newlines.
                     while (message[spaceSearch] != '\n' && spaceSearch > 0) {

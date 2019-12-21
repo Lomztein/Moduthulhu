@@ -15,10 +15,10 @@ namespace Lomztein.Moduthulhu.Core.Bot.Messaging.Advanced {
 
         public LargeEmbed(EmbedBuilder source) {
 
-            EmbedBuilder header = null;
-            EmbedBuilder footer = null;
+            EmbedBuilder header = source;
+            EmbedBuilder footer = source;
 
-            List<EmbedBuilder> fields = new List<EmbedBuilder> ();
+            List<EmbedBuilder> fields = new List<EmbedBuilder> { source };
 
             List<List<EmbedFieldBuilder>> embedFields = new List<List<EmbedFieldBuilder>> ();
             int index = 0;
@@ -36,14 +36,15 @@ namespace Lomztein.Moduthulhu.Core.Bot.Messaging.Advanced {
 
             embedFields.Add (new List<EmbedFieldBuilder> (source.Fields));
 
-            if (embedFields.Count == 0)
-            {
-                header = new EmbedBuilder ();
-                footer = new EmbedBuilder ();
-            }
-
             for (int i = 0; i < embedFields.Count; i++) {
-                EmbedBuilder field = new EmbedBuilder ();
+
+                EmbedBuilder field = source;
+
+                if (i > FieldsPerEmbed - 1)
+                {
+                    field = new EmbedBuilder();
+                    fields.Add (field);
+                }
 
                 for (int j = 0; j < embedFields[i].Count; j++) {
                     field.AddField (embedFields[i][j]);
@@ -59,7 +60,6 @@ namespace Lomztein.Moduthulhu.Core.Bot.Messaging.Advanced {
                     footer = field;
                 }
 
-                fields.Add (field);
             }
 
             header.Author = source.Author;
@@ -73,10 +73,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Messaging.Advanced {
             footer.Footer = source.Footer;
             footer.Timestamp = source.Timestamp;
 
-            List<EmbedBuilder> result = new List<EmbedBuilder> ();
-            result.AddRange (fields);
-
-            _builders = result.ToArray ();
+            _builders = fields.ToArray ();
         }
 
         public async Task DeleteAsync(RequestOptions options) {
