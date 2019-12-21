@@ -115,6 +115,12 @@ namespace Lomztein.Moduthulhu.Plugins.Standard {
 
         public void AddCommands(params ICommand [ ] newCommands) {
             Log ($"Adding commands: {string.Join (", ", newCommands.Select (x => x.Name).ToArray ())}");
+            
+            foreach (ICommand cmd in newCommands)
+            {
+                AddPluginStateAttribute("Added the following commands", "Removed the following commands", cmd.Name, _commandRoot.GetChildPrefix (GuildHandler.GuildId) + cmd.Name);
+            }
+
             ((ICommandSet)_commandRoot).AddCommands (newCommands);
         }
 

@@ -50,7 +50,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
         readonly int ThumbsUp;
         readonly int ThumbsDown;
 
-        public UrbanDefinition(JObject jObject)
+        public UrbanDefinition(JObject jObject, string word)
         {
             Success = (jObject["list"] as JArray).Count > 0;
 
@@ -67,6 +67,10 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
 
                 ThumbsUp = first["thumbs_up"].ToObject<int>();
                 ThumbsDown = first["thumbs_down"].ToObject<int>();
+            }
+            else
+            {
+                Word = word;
             }
         }
 
@@ -139,7 +143,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
         public static async Task<UrbanDefinition> Get(string word)
         {
             JObject json = await HTTP.GetJSON(new Uri(ApiUrl.Replace("{word}", word))).ConfigureAwait (false);
-            return new UrbanDefinition(json);
+            return new UrbanDefinition(json, word);
         }
 
     }

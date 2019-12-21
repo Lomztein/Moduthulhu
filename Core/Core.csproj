@@ -20,6 +20,7 @@
     <PackageIconUrl>https://i.imgur.com/vO9aWZR.png</PackageIconUrl>
     <icon>https://i.imgur.com/STOT7SZ.png</icon>
     <SignAssembly>false</SignAssembly>
+    <RootNamespace>Lomztein.Moduthulhu.Core</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

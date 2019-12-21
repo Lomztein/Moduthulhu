@@ -1,3 +1,4 @@
+using Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild.StateManagement;
 using Lomztein.Moduthulhu.Core.IO.Database.Repositories;
 using Lomztein.Moduthulhu.Core.Plugins;
 using Lomztein.Moduthulhu.Core.Plugins.Framework;
@@ -18,8 +19,11 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
 
         private readonly CachedValue<List<string>> _enabledPlugins;
         private readonly List<Exception> _initializationExceptions = new List<Exception>();
+        public readonly StateManager State = new StateManager();
 
+        public event Action OnPluginsLoaded;
         public event Action<IPlugin> OnPluginLoaded;
+        public event Action OnPluginsUnloaded;
         public event Action<IPlugin> OnPluginUnloaded;
 
         public PluginManager (GuildHandler parent)
@@ -27,9 +31,15 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
             _parentHandler = parent;
             _enabledPlugins = new CachedValue<List<string>>(new IdentityKeyJsonRepository("plugindata"), _parentHandler.GuildId, "EnabledPlugins", () => PluginLoader.GetPlugins().Where (x => PluginLoader.IsStandard (x)).Select (y => Plugin.GetFullName (y)).ToList ());
             _enabledPlugins.Cache();
+            OnPluginsUnloaded += PluginManager_OnPluginsUnloaded;
 
             MakeSuperSureCriticalPluginsAreEnabled();
             PurgeDuplicateEnabledPlugins();
+        }
+
+        private void PluginManager_OnPluginsUnloaded()
+        {
+            State.Reset();
         }
 
         private void MakeSuperSureCriticalPluginsAreEnabled ()
@@ -115,6 +125,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
                 OnPluginUnloaded?.Invoke(plugin);
             }
             _activePlugins.Clear();
+            OnPluginsUnloaded?.Invoke();
         }
 
         private static bool ContainsDependencies (IEnumerable<string> enabledList, string pluginName)
@@ -193,6 +204,8 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
             {
                 ReloadPlugins();
             }
+
+            OnPluginsLoaded?.Invoke();
         }
 
         private void ReportInitError (string step, Exception exc, IPlugin plugin, ref bool initErrorFlag)

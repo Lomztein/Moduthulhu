@@ -31,7 +31,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
                 new InfoCommand (),
             };
 
-            _defaultCommand = new AllCommand();
+            _defaultCommand = new AvailableCommand();
         }
 
         private class AddCommand : PluginCommand<PluginManagerPlugin>
@@ -41,7 +41,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
                 Name = "enable";
                 Description = "Add a plugin.";
                 Category = AdditionalCategories.Management;
-                RequiredPermissions.Add(Discord.GuildPermission.ManageGuild);
+                RequiredPermissions.Add(GuildPermission.ManageGuild);
                 Shortcut = "enableplugin";
 
                 Aliases = new [] { "add" };
@@ -61,7 +61,8 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
                             ParentPlugin.AddPlugin(pluginName);
                             if (ParentPlugin.GuildHandler.Plugins.IsPluginActive(pluginName))
                             {
-                                await metadata.Message.Channel.SendMessageAsync($"Succesfully enabled plugin '{name}' in this server.");
+                                var state = ParentPlugin.GuildHandler.Plugins.State;
+                                await metadata.Message.Channel.SendMessageAsync(string.Empty, false, state.ChangesToEmbed ($"Succesfully enabled plugin '{name}' in this server."));
                             }
                             else
                             {
@@ -97,11 +98,12 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
                 Aliases = new [] { "remove" };
             }
 
-            [Overload(typeof(void), "Remove a plugin from currently active plugins.")]
-            public Task<Result> Execute(CommandMetadata metadata, string pluginName)
+            [Overload(typeof(Embed), "Remove a plugin from currently active plugins.")]
+            public Task<Result> Execute(CommandMetadata _, string pluginName)
             {
                 ParentPlugin.RemovePlugin(pluginName);
-                return TaskResult(null, $"Sucessfully disabled plugin '{Plugin.GetFullName(PluginLoader.GetPlugin(pluginName))}' in this server.");
+                var state = ParentPlugin.GuildHandler.Plugins.State;
+                return TaskResult(state.ChangesToEmbed($"Successfully disabled plugin '{Plugin.GetFullName(PluginLoader.GetPlugin(pluginName))}' in this server."), string.Empty);
             }
         }
 

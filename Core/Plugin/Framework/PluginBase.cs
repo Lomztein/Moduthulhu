@@ -66,5 +66,8 @@ namespace Lomztein.Moduthulhu.Core.Plugins.Framework
         protected void AssertChannelPermission(ChannelPermission perm, ulong channelId) => GuildHandler.AssertChannelPermission(perm, channelId);
         protected bool HasPermission(GuildPermission perm) => GuildHandler.HasPermission(perm);
         protected void HasChannelPermission(ChannelPermission perm, ulong channelId) => GuildHandler.HasChannelPermission(perm, channelId);
+
+        protected void AddPluginStateAttribute(string addedHeader, string removedHeader, string mutatedHeader, string name, string description) => GuildHandler.AddPluginStateAttribute(Plugin.GetVersionedFullName(GetType()), addedHeader, removedHeader, mutatedHeader, name, description);
+        protected void AddPluginStateAttribute(string addedHeader, string removedHeader, string name, string description) => GuildHandler.AddPluginStateAttribute(Plugin.GetVersionedFullName(GetType()), addedHeader, removedHeader, name, description);
     }
 }
