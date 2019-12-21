@@ -69,7 +69,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
                                 IEnumerable<string> exceptions = ParentPlugin.GuildHandler.Plugins.GetInitializationExceptions().Select(x => x.Message);
                                 await metadata.Message.Channel.SendMessageAsync($"Failed to add plugin '{name}'. Issues occured during initialization:\n\t{string.Join("\n\t", exceptions)}");
                             }
-                        }, async () => await metadata.Message.Channel.SendMessageAsync($"Cancelled enabled plugin '{name}'."));
+                        }, async () => await metadata.Message.Channel.SendMessageAsync($"Cancelled enabled plugin '{name}'.")).SetRecipient (metadata.AuthorID);
                         await metadata.Message.Channel.SendMessageAsync(null, false, GetModuleEmbed(PluginLoader.GetPlugin(pluginName)));
                         return new Result (question, string.Empty);
                     }
@@ -103,7 +103,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
             {
                 ParentPlugin.RemovePlugin(pluginName);
                 var state = ParentPlugin.GuildHandler.Plugins.State;
-                return TaskResult(state.ChangesToEmbed($"Successfully disabled plugin '{Plugin.GetFullName(PluginLoader.GetPlugin(pluginName))}' in this server."), string.Empty);
+                return TaskResult(state.ChangesToEmbed($"Successfully disabled plugin '{Plugin.GetName(PluginLoader.GetPlugin(pluginName))}' in this server."), string.Empty);
             }
         }
 
@@ -114,6 +114,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
                 Name = "active";
                 Description = "Active plugins.";
                 Category = AdditionalCategories.Management;
+                Aliases = new[] { "enabled", "running" };
             }
 
             [Overload(typeof(Embed), "Display all currently active plugins on this server.")]

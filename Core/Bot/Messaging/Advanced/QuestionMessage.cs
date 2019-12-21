@@ -11,6 +11,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Messaging.Advanced
     public class QuestionMessage : ISendable<IMessage>, IAttachable, IDeletable {
 
         private readonly string _contents;
+        private ulong? _recipient;
         public IMessage Result { get; set; }
 
         private QuestionOption[] _options;
@@ -25,6 +26,12 @@ namespace Lomztein.Moduthulhu.Core.Bot.Messaging.Advanced
         public QuestionMessage(string contents, Func<Task> ifYes, Func<Task> ifNo) : this(contents, new QuestionOption("👍", ifYes), new QuestionOption("👎", ifNo)) { }
         public QuestionMessage(string contents, Func<Task> ifYes) : this(contents, new QuestionOption("👍", ifYes), new QuestionOption("👎", () => Task.CompletedTask)) { }
 
+        public QuestionMessage SetRecipient(ulong recipient)
+        {
+            _recipient = recipient;
+            return this;
+        }
+
         public void Attach(GuildHandler guildHandler)
         {
             _handler = guildHandler;
@@ -37,11 +44,14 @@ namespace Lomztein.Moduthulhu.Core.Bot.Messaging.Advanced
 
             if (arg1.Id == Result.Id && message.Author.Id != arg3.UserId)
             {
-                QuestionOption option = _options.First(x => x.Emoji == arg3.Emote.Name);
-                if (option != null)
+                if (!_recipient.HasValue || _recipient.Value == arg3.UserId)
                 {
-                    await option.OnOption();
-                    Detach(_handler);
+                    QuestionOption option = _options.First(x => x.Emoji == arg3.Emote.Name);
+                    if (option != null)
+                    {
+                        await option.OnOption();
+                        Detach(_handler);
+                    }
                 }
             }
         }

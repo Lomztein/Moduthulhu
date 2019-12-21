@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Lomztein.ModularDiscordBot.Modules.Misc.Brainfuck
 {
-    [Descriptor ("Lozmtein", "Brainfuck", "Plugin with a command that can interpret and execute Brainfuck programs.")]
+    [Descriptor ("Lomztein", "Brainfuck", "Plugin with a command that can interpret and execute Brainfuck programs.")]
     [Source ("https://github.com/Lomztein", "https://github.com/Lomztein/Moduthulhu/blob/master/Plugins/Brainfuck/BrainfuckPlugin.cs")]
     public class BrainfuckPlugin : PluginBase {
 
