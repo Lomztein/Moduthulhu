@@ -22,9 +22,16 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
 
         public override void Initialize() {
             foreach (Command cmd in _commandsInSet) {
-                if (cmd is PluginCommand<T> child)
+                if (cmd is IPluginCommand<T> child)
                 {
                     child.ParentPlugin = ParentPlugin;
+                }
+                if (cmd is PluginCommandSet<T> set)
+                {
+                    if (set._defaultCommand is IPluginCommand<T> pluginCmd)
+                    {
+                        pluginCmd.ParentPlugin = ParentPlugin;
+                    }
                 }
             }
             base.Initialize ();
