@@ -34,7 +34,8 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
 
     public class UrbanDefinition
     {
-        public const string URL = "http://api.urbandictionary.com/v0/define?term={word}";
+        public const string ApiUrl = "http://api.urbandictionary.com/v0/define?term={word}";
+        public const string SearchUrl = "https://www.urbandictionary.com/define.php?term={word}";
 
         public readonly string Word;
         public readonly string Definition;
@@ -79,11 +80,11 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
                     .WithTitle($"Top definition of {Word}")
                     .WithUrl(Permalink)
                     .WithColor(new Color(0, 0, 128))
-                    .WithDescription(EmbedNestedDefinitions (Definition))
+                    .WithDescription(EscapeEmphasis (EmbedNestedDefinitions(Definition)))
                     .WithFooter($"Defined by {Author}. Souce: www.urbandictionary.com");
                 if (Example.Length > 0)
                 {
-                    builder.AddField("Example", "> " + string.Join ("\n> ", EmbedNestedDefinitions (Example).Split ('\n')));
+                    builder.AddField("Example", "> " + EscapeEmphasis (string.Join("\n> ", EmbedNestedDefinitions(Example).Split('\n'))));
                 }
 
                 builder.AddField("Votes", ThumbsUp.ToString() + "↑ / " + ThumbsDown.ToString() + "↓");
@@ -91,7 +92,8 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
                 if (Sounds.Length > 0)
                 {
                     int index = 1;
-                    builder.AddField("Sound", string.Join("\n", Sounds.ToList().GetRange (0, Math.Min (Sounds.Length, GetAmountBeforeSize (Sounds, 1000))).Select (x => $"[Sound {index++}]({x})").ToArray ()));
+                    IEnumerable<string> sounds = Sounds.Select(x => $"[Sound {index++}]({x})");
+                    builder.AddField("Sound", string.Join("\n", sounds.ToList().GetRange(0, Math.Min(Sounds.Length, GetAmountBeforeSize(sounds, 1024))).ToArray()));
                 }
 
                 return builder.Build();
@@ -102,32 +104,41 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
             }
         }
 
-        private int GetAmountBeforeSize (string[] strings, int maxSize)
+        private int GetAmountBeforeSize(IEnumerable<string> strings, int maxSize)
         {
             int size = 0;
-            for (int i = 0; i < strings.Length; i++)
+            int index = 0;
+            foreach (string str in strings)
             {
-                string str = strings[i];
                 int newSize = size + str.Length;
                 if (newSize > maxSize)
                 {
-                    return i - 1;
+                    return index - 1;
                 }
                 size = newSize;
+                index++;
             }
-            return strings.Length;
+            return strings.Count();
         }
 
-        private string EmbedNestedDefinitions (string input)
+        private string EmbedNestedDefinitions(string input)
         {
             Regex squareBracketRegex = new Regex(@"\[(.*?)\]");
-            string result = squareBracketRegex.Replace(input, x => $"{x.Value}({Get(x.Value.Substring(1, x.Value.Length - 2)).Result.Permalink})");
+            string result = squareBracketRegex.Replace(input, x => $"{x.Value}({GetSearchUrl(x.Value.Substring(1, x.Value.Length - 2))})");
             return result;
         }
 
+        private string EscapeEmphasis (string input)
+        {
+            Regex toEscapeRegex = new Regex(@"_|\*");
+            return toEscapeRegex.Replace(input, x => $"\\{x.Value}");
+        }
+
+        private string GetSearchUrl(string word) => SearchUrl.Replace("{word}", word).Replace (" ", "%20");
+
         public static async Task<UrbanDefinition> Get(string word)
         {
-            JObject json = await HTTP.GetJSON(new Uri(URL.Replace("{word}", word))).ConfigureAwait (false);
+            JObject json = await HTTP.GetJSON(new Uri(ApiUrl.Replace("{word}", word))).ConfigureAwait (false);
             return new UrbanDefinition(json);
         }
 
