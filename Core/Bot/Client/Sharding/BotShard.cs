@@ -25,22 +25,22 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding
         private Thread _thread;
 
         private readonly string _token;
-        private readonly int _shardId;
-        private readonly int _totalShards;
+        public readonly int ShardId;
+        public readonly int TotalShards;
 
         public event Func<Exception, Task> ExceptionCaught;
 
         internal BotShard(BotClient parentManager, string token, int shardId, int totalShards) {
             BotClient = parentManager;
             _token = token;
-            _shardId = shardId;
-            _totalShards = totalShards;
+            ShardId = shardId;
+            TotalShards = totalShards;
         }
 
         internal void Run () {
             void init() => Initialize().GetAwaiter().GetResult();
             _thread = new Thread (init) {
-                Name = $"S{_shardId+1}/{_totalShards}",
+                Name = $"S{ShardId+1}/{TotalShards}",
             };
             _thread.Start ();
         }
@@ -49,8 +49,8 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding
 
             BootDate = DateTime.Now;
             DiscordSocketConfig config = new DiscordSocketConfig {
-                ShardId = _shardId,
-                TotalShards = _totalShards,
+                ShardId = ShardId,
+                TotalShards = TotalShards,
                 DefaultRetryMode = RetryMode.AlwaysRetry,
             };
 
@@ -89,6 +89,8 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding
             return Task.CompletedTask;
         }
 
+        internal GuildHandler[] GetGuildHandlers () => _guildHandlers.ToArray();
+
         private void InitInitialHandlers ()
         {
             foreach (SocketGuild guild in Client.Guilds)
@@ -113,32 +115,32 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding
         }
 
         private Task Client_Ready() {
-            Log.Write (Log.Type.BOT, $"Shard {_shardId} is ready and connected.");
+            Log.Write (Log.Type.BOT, $"Shard {ShardId} is ready and connected.");
             return Task.CompletedTask;
         }
 
         private async Task Start () {
             await Client.StartAsync ();
-            Log.Write (Log.Type.BOT, $"Shard {_shardId} started.");
+            Log.Write (Log.Type.BOT, $"Shard {ShardId} started.");
         }
 
         private async Task Stop() {
             await Client.StopAsync ();
-            Log.Write (Log.Type.BOT, $"Shard {_shardId} stopped.");
+            Log.Write (Log.Type.BOT, $"Shard {ShardId} stopped.");
         }
 
         private async Task Login () {
             await Client.LoginAsync (TokenType.Bot, _token);
-            Log.Write (Log.Type.BOT, $"Shard {_shardId} logged in.");
+            Log.Write (Log.Type.BOT, $"Shard {ShardId} logged in.");
         }
 
         private async Task Logout () {
             await Client.LogoutAsync ();
-            Log.Write (Log.Type.BOT, $"Shard {_shardId} logged out in.");
+            Log.Write (Log.Type.BOT, $"Shard {ShardId} logged out in.");
         }
 
         internal async Task Kill () {
-            Log.Write (Log.Type.CRITICAL, $"KILLING SHARD {_shardId}!");
+            Log.Write (Log.Type.CRITICAL, $"KILLING SHARD {ShardId}!");
             await Logout ();
             await Stop ();
             Client.Dispose ();
@@ -215,9 +217,12 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding
             }
         }
 
+        public string GetIndexString ()
+            => $"Shard {ShardId + 1}/{TotalShards}";
+
         // TODO: Change all these to extension methods since that'll better support null-cases.
         public override string ToString () {
-            return $" -- SHARD {_shardId + 1}/{_totalShards} -- \nGuildHandlers: {_guildHandlers.Count}\nPlugin Instances: {_guildHandlers.Sum (x => x.Plugins.ActiveCount)}\nUsers: {Client.Guilds.Sum (x => x.MemberCount)}\nLogin state: {Client.LoginState}\nConnection: {Client.ConnectionState}\nLatency: {Client.Latency}\nUptime: {Uptime}\n";
+            return $"GuildHandlers: {_guildHandlers.Count}\nPlugin Instances: {_guildHandlers.Sum (x => x.Plugins.ActiveCount)}\nUsers: {Client.Guilds.Sum (x => x.MemberCount)}\nLogin state: {Client.LoginState}\nConnection: {Client.ConnectionState}\nLatency: {Client.Latency}\nUptime: {Uptime}\n";
         }
 
         // Guild item getters.

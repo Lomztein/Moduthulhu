@@ -3,7 +3,10 @@ using Discord.Net;
 using Lomztein.AdvDiscordCommands.Framework;
 using Lomztein.AdvDiscordCommands.Framework.Interfaces;
 using Lomztein.Moduthulhu.Core.Bot.Client;
+using Lomztein.Moduthulhu.Core.Bot.Client.Sharding;
+using Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild;
 using Lomztein.Moduthulhu.Core.Bot.Messaging.Advanced;
+using Lomztein.Moduthulhu.Core.Extensions;
 using Lomztein.Moduthulhu.Core.Plugins.Framework;
 using System;
 using System.Collections.Generic;
@@ -62,15 +65,58 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
             [Overload (typeof (LargeEmbed), "Check the status for the core and its clients.")]
             public Task<Result> Execute (CommandMetadata _) {
 
+                int shardIndex = 0;
                 // TODO: Add status for shards and GuildHandlers.
                 EmbedBuilder builder = new EmbedBuilder()
                     .WithTitle("Core Process Status")
                     .WithAuthor(ParentPlugin.GuildHandler.BotUser)
-                    .WithDescription($"```{ParentPlugin.GuildHandler.Core.ToString()}```")
+                    .WithDescription(ParentPlugin.GuildHandler.Core.ToString())
+                    .WithFields (ParentPlugin.GuildHandler.Client.GetShardsStatus().Select (x => new EmbedFieldBuilder ().WithName ($"Shard {shardIndex++}").WithValue ($"```{x}```")))
                     .WithCurrentTimestamp();
 
                 LargeEmbed embed = new LargeEmbed(builder);
                 return TaskResult (embed, "");
+            }
+
+            [Overload (typeof (LargeEmbed), "Check status for a specific shard.")]
+            public Task<Result> Execute (CommandMetadata _, int shardId)
+            {
+                BotShard shard = ParentPlugin.GuildHandler.Shard.BotClient.GetShards().FirstOrDefault(x => x.ShardId == shardId);
+                GuildHandler[] handlers = shard?.GetGuildHandlers();
+                if (shard == null)
+                {
+                    return TaskResult(null, $"Failed to fetch status for shard {shardId}, it may be running on a different physical process. ShardsIds on this process range from {ParentPlugin.GuildHandler.Client.Configuration.ShardRange.Min} to {ParentPlugin.GuildHandler.Client.Configuration.ShardRange.Max - 1}");
+                }
+                int fieldIndex = 1;
+                EmbedBuilder builder = new EmbedBuilder()
+                    .WithTitle($"Shard {shardId} status")
+                    .WithDescription($"```{shard}```")
+                    .WithFields(string.Join ("\n", handlers.Select (x => x.ToString ())).SplitMessage ("```", 1000).Select(x => new EmbedFieldBuilder().WithName ($"Field {fieldIndex++}").WithValue(x)));
+
+                return TaskResult(new LargeEmbed (builder), string.Empty);
+            }
+
+            [Overload (typeof (Embed), "Check status of a specific GuildHandler")]
+            public Task<Result> Execute (CommandMetadata _, string guildHandler)
+            {
+                GuildHandler handler = ParentPlugin.GuildHandler.Shard.GetGuildHandlers().FirstOrDefault(x => x.Name.ToUpperInvariant() == guildHandler.ToUpperInvariant());
+                if (handler != null)
+                {
+                    string status = handler.ToString();
+                    string activePlugins = string.Join("\n", handler.Plugins.GetActivePlugins().Select(x => Plugin.GetVersionedFullName(x.GetType())));
+
+                    return TaskResult(new EmbedBuilder()
+                        .WithTitle(handler.Name + " status")
+                        .WithDescription($"```{status}```")
+                        .AddField("Active Plugins", $"```{activePlugins}```")
+                        .WithCurrentTimestamp()
+                        .Build(), string.Empty);
+                }
+                else
+                {
+                    return TaskResult(null, $"Failed to fetch GuildHandler status, no GuildHandler matching '{guildHandler}' could be found.");
+                }
+
             }
         }
 
@@ -169,7 +215,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
             public Task<Result> Execute (CommandMetadata _)
             {
                 StringBuilder credits = new StringBuilder();
-                credits.AppendLine("Bot core is created by Lomztein *(https://github.com/Lomztein)*, as a hobby passion project and passingly sentient slave.\n");
+                credits.AppendLine("Bot core is created by Marcus \"Lomztein\" Jensen *(https://github.com/Lomztein)*, as a hobby passion project and passingly sentient slave.\n");
                 credits.AppendLine("Additional council and help by the glorious Frederik \"Fred\" Rosenberg *(https://github.com/Frede175)*, the outrageously attractive Younes \"drcd\" Zakaria *(https://github.com/drcd)*, the suave servermaster Thorvald \"Purvaldur\" Kjartansson *(https://github.com/purvaldur)*, and the bona fide baguette Mph!");
                 credits.AppendLine("Patience for listening to incomprehensible, overly excited ~~and mildly aroused~~ explanations of inner workings provided by the illustrious Victor \"Nyx\" Koch!\n");
                 credits.AppendLine("Suffering and despair though testing the many awful versions Adminthulhu/Moduthulhu by my magnificant friends of Monster Mash!\n");

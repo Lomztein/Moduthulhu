@@ -18,6 +18,8 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
         public BotClient Client => Shard.BotClient;
         public BotCore Core => Client.Core;
         public ISelfUser BotUser => Shard.Client.CurrentUser;
+        public readonly DateTime BootDate;
+        public TimeSpan Uptime => DateTime.Now - BootDate;
 
         public ulong GuildId { get; private set; }
 
@@ -38,6 +40,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
             Clock.Start();
 
             Name = GetGuild().Name;
+            BootDate = DateTime.Now;
             Plugins.OnPluginUnloaded += Plugins_OnPluginUnloaded;
 
             Culture = new CachedValue<CultureInfo>(new IdentityKeyJsonRepository("pluginconfig"), GuildId, "Culture", () => new CultureInfo("en-US"));
@@ -63,9 +66,9 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
             Plugins.ShutdownPlugins();
         }
 
-        public string GetStatus ()
+        public override string ToString ()
         {
-            return $"GuildHandler for {GetGuild().Name} has {Plugins.GetActivePlugins().Length} active plugins.";
+            return $"{GetGuild().Name} (Users: {GetGuild().MemberCount}, Plugins: {Plugins.GetActivePlugins().Length}, Uptime {Uptime})";
         }
 
         // ROUTED DISCORD EVENTS //

@@ -19,7 +19,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client
 
         public BotCore Core { get; private set; }
 
-        private ClientConfiguration _configuration;
+        public ClientConfiguration Configuration;
 
         public static string DataDirectory => BotCore.DataDirectory;
 
@@ -44,9 +44,9 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client
             BootDate = DateTime.Now;
             Core = core;
 
-            _configuration = LoadConfiguration(DataDirectory + "/Configuration");
+            Configuration = LoadConfiguration(DataDirectory + "/Configuration");
 
-            Log.Write (Log.Type.BOT, "Creating bot client with token " + _configuration.Token);
+            Log.Write (Log.Type.BOT, "Creating bot client with token " + Configuration.Token);
         }
 
         internal async Task Initialize()
@@ -68,17 +68,17 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client
         private ClientConfiguration LoadConfiguration (string path)
         {
             Log.Write(Log.Type.BOT, "Loading configuration for bot client.");
-            _configuration = ClientConfiguration.Load(path);
-            if (_configuration == null)
+            Configuration = ClientConfiguration.Load(path);
+            if (Configuration == null)
             {
                 // If no file exists, create a new one.
-                _configuration = new ClientConfiguration();
-                _configuration.Save(path);
+                Configuration = new ClientConfiguration();
+                Configuration.Save(path);
             }
 
-            _configuration.CheckValidity();
+            Configuration.CheckValidity();
             
-            return _configuration;
+            return Configuration;
         }
 
         private Task RotateStatus(DateTime previous, DateTime now)
@@ -146,9 +146,9 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client
         }
 
         internal void InitializeShards () {
-            _shards = new BotShard[_configuration.TotalShards];
-            for (int i = _configuration.ShardRange.Min; i < _configuration.ShardRange.Max; i++) {
-                _shards[i] = CreateShard (i, _configuration.TotalShards);
+            _shards = new BotShard[Configuration.TotalShards];
+            for (int i = Configuration.ShardRange.Min; i < Configuration.ShardRange.Max; i++) {
+                _shards[i] = CreateShard (i, Configuration.TotalShards);
                 _shards[i].Run();
             }
         }
@@ -159,7 +159,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client
         }
 
         internal BotShard CreateShard (int shardId, int totalShards) {
-            BotShard shard = new BotShard (this, _configuration.Token, shardId, totalShards);
+            BotShard shard = new BotShard (this, Configuration.Token, shardId, totalShards);
             shard.ExceptionCaught += OnExceptionCaught;
             return shard;
         }
@@ -174,7 +174,9 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client
             await Task.WhenAll (_shards.Select (x => x.AwaitConnected ()).ToArray ());
         }
 
-        public override string ToString() => $"Shards: {_configuration.TotalShards}\n{GetShardsStatus()}";
-        public string GetShardsStatus() => string.Join("\n\t", _shards.Select (x => x == null ? $"Disconnected shard, client will auto-shutdown in {_consecutiveOfflineMinutes} / {_automaticOfflineMinutesTreshold} minutes." : x.ToString ()));
+        public BotShard[] GetShards () => _shards.Clone () as BotShard[];
+
+        public override string ToString() => $"Shards: {Configuration.TotalShards}";
+        public string[] GetShardsStatus() => _shards.Select (x => x == null ? $"Disconnected shard, client will auto-shutdown in {_consecutiveOfflineMinutes} / {_automaticOfflineMinutesTreshold} minutes." : x.ToString ()).ToArray ();
     }
 }

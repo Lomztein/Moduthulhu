@@ -53,7 +53,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client
             [JsonProperty]
         public int TotalShards { get; private set; }
             [JsonProperty]
-        public string Token { get; private set; }
+        internal string Token { get; private set; }
 
         public void CheckValidity ()
         {
