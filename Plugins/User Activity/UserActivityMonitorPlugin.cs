@@ -52,6 +52,9 @@ namespace Lomztein.Moduthulhu.Modules.Clock.ActivityMonitor
         }
 
         public override void Shutdown() {
+            _ = UpdateAll();
+            StoreData();
+
             GuildHandler.MessageReceived -= DiscordClient_MessageReceived;
             GuildHandler.UserVoiceStateUpdated -= DiscordClient_UserVoiceStateUpdated;
             GuildHandler.UserJoined -= DiscordClient_UserJoined;

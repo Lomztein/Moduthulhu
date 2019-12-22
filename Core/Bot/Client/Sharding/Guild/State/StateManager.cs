@@ -65,8 +65,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild.StateManagement
         public Embed ChangesToEmbed (string title)
         {
             IEnumerable<StateChanges> changes = GetChanges();
-            EmbedBuilder result = new EmbedBuilder()
-                .WithTitle(title).WithDescription("The following changes have occured.");
+            EmbedBuilder result = new EmbedBuilder();
 
             foreach (var change in changes)
             {
@@ -87,6 +86,15 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild.StateManagement
                     result.AddField(change.MutatedHeader,
                     $"```{string.Join("\n", change.GetMutations())}```");
                 }
+            }
+
+            if (result.Fields.Count > 0)
+            {
+                result.WithTitle(title).WithDescription("The following tracked changes have occured.");
+            }
+            else
+            {
+                result.WithTitle(title).WithDescription("No tracked changes have occured.");
             }
 
             return result.Build ();

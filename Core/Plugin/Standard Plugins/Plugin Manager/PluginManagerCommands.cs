@@ -114,7 +114,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
                 Name = "active";
                 Description = "Active plugins.";
                 Category = AdditionalCategories.Management;
-                Aliases = new[] { "enabled", "running" };
+                Aliases = new[] { "enabled", "running" };   
             }
 
             [Overload(typeof(Embed), "Display all currently active plugins on this server.")]

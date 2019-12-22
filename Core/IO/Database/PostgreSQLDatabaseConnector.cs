@@ -32,6 +32,7 @@ namespace Lomztein.Moduthulhu.Core.IO.Database
 
         public Dictionary<string, object>[] ReadQuery(string query, Dictionary<string, object> parameters)
         {
+            Log.Data($"PostgreSQL Read '{query}' with params: {string.Join(", ", parameters.Select(x => $"{x.Key} = '{x.Value}'"))}");
             using (NpgsqlConnection connection = GetConnection(GetConnectionString()))
             {
                 using (NpgsqlCommand cmd = PrepareQuery(query, parameters))
@@ -53,6 +54,7 @@ namespace Lomztein.Moduthulhu.Core.IO.Database
 
         public void UpdateQuery (string query, Dictionary<string, object> parameters)
         {
+            Log.Data($"PostgreSQL Update '{query}' with params: {string.Join(", ", parameters.Select(x => $"{x.Key} = '{x.Value}'"))}");
             using (NpgsqlConnection connection = GetConnection(GetConnectionString()))
             {
                 using (NpgsqlCommand cmd = PrepareQuery(query, parameters))

@@ -240,7 +240,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
 
         private static bool ObjectNameMatches (string search, string name)
         {
-            return name.ToUpperInvariant ().Contains(search.ToUpperInvariant (), StringComparison.Ordinal);
+            return name.ToUpperInvariant () == search.ToUpperInvariant ();
         }
 
         private T ThrowIfNull<T> (T value, string message)
