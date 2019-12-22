@@ -2,9 +2,49 @@
 
 # Moduthulhu - Modular Discord Bot
 
-Introducing Moduthulhu 2.0! The all new slightly more thought out, slightly less overly complicated bot core!
+The 'Moduthulhu - Modular Discord Bot' is a Discord bot core framework build on the [Discord.NET API Wrapper by RougeException](https://github.com/RogueException/Discord.Net). This project intends to create a foundation framework on which more front-end bot functionality can be added through the runtime loading of functionality-containing Plugins. The core framework, standard- and first party plugins, as well as the [command framework](https://github.com/Lomztein/Advanced-Discord-Commands) are under active dvelopment, so bugs, issues, or strange behaviour might occur. Any general feedback / bug reports / suggestions are welcome [here!](https://github.com/Lomztein/Moduthulhu/issues)
 
-The 'Moduthulhu - Modular Discord Bot' is a Discord bot core framework build on the [Discord.NET API Wrapper by RougeException](https://github.com/RogueException/Discord.Net). This project intends to create a foundation framework on which more front-end bot functionality can be added through the runtime loading of functionality-containing Plugins. While there exists a few standard plugins which are enabled by default, they provide no real functionality. These standard plugins will be further outlined later.
+Everything is subject to change.
+
+## Usage Guide
+
+### Quickstart Guide
+ * `!help` To view all available root commands.
+ * `!plugins` To view all available plugins.
+ * `!plugins enable/disable` To add or remove plugins.
+ * `!config` To configure plugins.
+ * `!config settrigger <trigger>` To change command trigger.
+ * Suffix `?` to a command to get help for it. Example: `!plugins ?`
+
+Have fun!
+
+### Detailed Guide
+
+To get started using this bot, you need to know of a few primary commands, as well as how to request command help, or <i>'autodocs'</i>.
+
+The first and arguably most important command is `!help` or one of it's aliases such as `!commands` or `!clist`. This command displays a list of all available root commands.
+
+In order to enable and disable plugins for your server, the commands `!plugins enable` `!plugins disable` area available. To view a list of all, available or active plugins, the commands `!plugins all`, `!plugins available`, and `!plugins active` are your friends.
+
+Finally, `!config` is where you configure all of the active plugins to fit your need. Many servers have mulitple bots, need the bots to respond to specific individual triggers. To change which trigger this bot responds to, use `!config settrigger <trigger>`, and `!config resettrigger` to reset it to the default `!`.
+
+To view the previously mentioned autodocs for a command, suffix the call with an `?`, for example `!help ?`. This shows you a bunch of information about the command, such as aliases, available variants, and which types of arguments they take, and what they return. Autodocs are also displayed if a command fails to execute due to mismatched arguments.
+
+Some commands have the suffix `(set)` behind them. This means that they are what is known as a 'Command Set', which is in itself a list of nested commands. The previously mentioned `!plugins` is one such set, that contains commands such as `enable` or `disable`. `!config` is another such set. If executing a command was like climbing a tree and picking a leaf, think of command sets as moving up a specific branch. Sets may also provide command functionality on their own, like `plugins` that return a list of available plugins when executed.
+
+### Standard plugins
+
+The core framework includes some standard plugins which are all enabled by default, as well as some which are critical and cannot be disabled. These are as follows:
+
+ * Command Root: Plugin for managing commands. Any plugin may add commands to it using the aforementioned messaging system.
+ * Plugin Manager: Plugin for enabling and disabling individual plugins, as well as display data about them.
+ * Configuration: Plugin that exposes registered configuration options through commands.
+ * Consent: Simple plugin that allows users to toggle whether or not they consent to storage of their personal data, in accordance with GDPR. Also allows users to request or delete any data the bot has stored, that is linked to their user ID.
+ * Standard Commands: Plugin that adds the standard commands from the command framework. May be disabled.
+ * Logger: Simple plugin that prints out any happenings to Standard Output, used primarily for debugging. Recommended to be disabled if you have privacy concerns.
+ * Administrator: Plugin that allows for the basic administration of the bot client, unneccesary for most users and may be disabled.
+
+## Deployment Guide
 
 This bot is written in C#, targets the .NET Core 2.1 LTS framework, and is fully dockerizable and may be pulled from [Docker Hub](https://hub.docker.com/repository/docker/lomztein/moduthulhu), however do notice that it cannot just run out of the box, as it additionally needs a PostgreSQL database to store information on, as well as a mounted volume to read client configuration data as well as store error logs on. Basic familiarity with Docker is recommended, as that's about what I had when I dockerized it. C:
 
@@ -20,37 +60,18 @@ Any vulnurable information has been omitted, of course. DB is short for database
 
 I intend to replace this with a Docker-compose file later on, however this works for the time being. Additionally, I run [Watchtower](https://github.com/containrrr/watchtower) to automatically the bot when a new build is build though Docker Hub Automated Builds. It is a very convenient and easy to set up Continuous Deployment solution that I can heartedly recommend you try. If you believe you know a better alternative solution, feel free to let me know! :D
 
-## Disclaimer: Currently in development:
+## Development Guide
 
-While the core framework is fully functional and unlikely to see breaking changes any time soon, there may be additions and functionality changes as development progresses. It is perfectly possible to write plugins at this point in time, but it cannot be fully guaranteed that they will remain compatable with future versions.
-
-## So what can it do?
-
-### Core framework
+### Primary Features of the Core Framework
 
  * Runtime loading of plugin functionality, with the ability to toggle them on and off on a per-server basis. 
  * A simple plugin interface that is easy to develop with, and a base class for easier writing of new plugins.
  * Inter-plugin communication through a message system, which allows any plugin to call a registered action or function from another plugin.
+ * State change tracker system that keeps track of system state changes between plugin reloads.
  * Easy-to-use build-in configuration system that allows for the registration of configuration options, which may then be exposed through any means imaginable.
  * On-the-fly error handling that catches anything that goes wrong in a plugin and prints the full stacktrace to a file, while the bot keeps living.
  * PostgreSQL database support used for both data and config storage, as well as whatever you may need.
  * Consent Assertion that keeps track of whether or not users consent to the storage of personal data in the bots database.
-    
-That, and more is included in the core framework, with more features coming!
-
-### Standard plugins
-
-As mentioned previously, the core framework includes some standard plugins which are all enabled by default, as well as some which are critical and cannot be disabled. These are as follows:
-
- * Command Root: Plugin for managing commands. Any plugin may add commands to it using the aforementioned messaging system.
- * Plugin Manager: Plugin for enabling and disabling individual plugins, as well as display data about them.
- * Configuration: Plugin that exposes registered configuration options through commands.
- * Consent: Simple plugin that allows users to toggle whether or not they consent to storage of their personal data, in accordance with GDPR.
- * Standard Commands: Plugin that adds the standard commands from the command framework. May be disabled.
- * Logger: Simple plugin that prints out any happenings to Standard Output, used primarily for debugging. Recommended to be disabled if you have privacy concerns.
- * Administrator: Plugin that allows for the basic administration of the bot client, unneccesary for most users and may be disabled.
-
-## Creating new plugins
 
 If you desire to contribute to the bots available functionality by creating your own plugin, you can quite easily do so. After all, the framework is designed specifically to allow for that. There are a few prerequisites before you can do so, such as:
 
@@ -77,7 +98,7 @@ class ExamplePlugin : PluginBase {
     }
 }
 ```
-Everything is catagorised into borderline overdone namespaces, so you're gonna need a few `using`. The core namespace is `Lomztein.Moduthulhu.Core`, which also contains a few sub-namespaces.
+The default namespace for the core is Lomztein.Moduthulhu.Core.
 
 There are a few more members you can use, including two other Initialize functions that calls at different time during setup. You can also add the Dependancy attribute to declare that your plugin requires a certain other plugin to be able to function.
 
@@ -93,6 +114,8 @@ Familiarity with delegates and lambda expressions in C# is recommended, but not 
 As may be noticed here, calling a registered action/function requires specifiying the target plugin as well. Additionally, an alternative `RegisterMessageFunction` method may be used instead, which, unlike the previously mentioned, returns a value when the registered function is called.
  
  * PluginManager: Handles the plugins enabled on the server, and contains methods for adding and removing plugins from the list of active plugins. There is little reason to worry about this, unless you wish to create your own plugin management plugin to replace the standard one.
+ 
+ * StateManager: Keeps track of a representation of plugin state between plugin reloads. Any plugin can track something using the `AddPluginStateAttribute` method. This is to be used during initialization, and any descrepencies between before and after plugin reloads are then available by accessing the StateManager within the PluginManager within the GuildHandler. This functionality is very subject to refactorings and changes, so use with caution. Any changes detected by this system is displayed after executing the `!plugins enable/disable` commands.
  
  * PluginConfig: Handles plugin configuration by maintaining and exposing a list of config options, which are registered by individual plugins. Any outside functionality may access this list of config options and implement ways for users to configure plugins through it. By default, this is done by the standard Configuration plugin, however I wish to provide a web-based alternative later down the line.
  
