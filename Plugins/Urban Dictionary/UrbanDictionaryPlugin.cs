@@ -153,8 +153,14 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
 
         public static async Task<UrbanDefinition> Get(string word)
         {
-            JObject json = await HTTP.GetJSON(new Uri(ApiUrl.Replace("{word}", word))).ConfigureAwait (false);
-            return new UrbanDefinition(json, word);
+            try
+            {
+                JObject json = await HTTP.GetJSON(new Uri(ApiUrl.Replace("{word}", word))).ConfigureAwait(false);
+                return new UrbanDefinition(json, word);
+            } catch (InvalidOperationException)
+            {
+                throw new InvalidOperationException("Unable to fetch definition. The service may be temporarily unavailable.");
+            }
         }
 
     }

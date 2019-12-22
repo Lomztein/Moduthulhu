@@ -29,20 +29,26 @@ namespace Lomztein.Moduthulhu.Modules.Clock.ActivityMonitor
             GuildHandler.UserJoined += DiscordClient_UserJoined;
             GuildHandler.RoleDeleted += GuildHandler_RoleDeleted;
 
-            AddConfigInfo("Add Activity Role", "Add new role.", new Action<SocketRole, uint>((x, y) => _activityRoles.MutateValue(z => AddRole(new ActivityRole(x.Id, y)))), () => "Added new activity role", "Role", "Treshold (days)");
-            AddConfigInfo("Add Activity Role", "Add new role.", new Action<ulong, uint>((x, y) => _activityRoles.MutateValue(z => AddRole(new ActivityRole(GuildHandler.GetRole (x).Id, y)))), () => "Added new activity role", "Role", "Treshold (days)");
-            AddConfigInfo("Add Activity Role", "Add new role.", new Action<string, uint>((x, y) => _activityRoles.MutateValue(z => AddRole(new ActivityRole(GuildHandler.GetRole (x).Id, y)))), () => "Added new activity role", "Role", "Treshold (days)");
-            AddConfigInfo("Add Activity Role", "Display roles", () => "Current activity roles:\n" + string.Join("\n", _activityRoles.GetValue().Select(x => x.ToString(GuildHandler)).ToArray()));
+            AddConfigInfo("List Activity Roles", "Display roles", () => "Current activity roles:\n" + string.Join("\n", _activityRoles.GetValue().Select(x => x.ToString(GuildHandler)).ToArray()));
 
-            AddConfigInfo("Remove Activity Role", "Remove role.", new Action<SocketRole>(x => _activityRoles.MutateValue(y => y.Remove(AssertActivityRoleExists (z => z.Id == x.Id)))), () => "Removed activity role", "Role");
-            AddConfigInfo("Remove Activity Role", "Remove role.", new Action<string>(x => _activityRoles.MutateValue(y => y.Remove(AssertActivityRoleExists(z => z.Id == GuildHandler.GetRole (x).Id)))), () => "Removed activity role", "Role");
-            AddConfigInfo("Remove Activity Role", "Remove role.", new Action<uint>(x => _activityRoles.MutateValue(y => y.Remove(AssertActivityRoleExists(z => z.Id == GuildHandler.GetRole (x).Id)))), () => "Removed activity role", "Role");
+            AddConfigInfo("Add Activity Role", "Add new role.", new Action<SocketRole, uint>((x, y) => AddRole(new ActivityRole(x.Id, y))), () => "Added new activity role", "Role", "Treshold (days)");
+            AddConfigInfo("Add Activity Role", "Add new role.", new Action<ulong, uint>((x, y) => AddRole(new ActivityRole(GuildHandler.GetRole (x).Id, y))), () => "Added new activity role", "Role", "Treshold (days)");
+            AddConfigInfo("Add Activity Role", "Add new role.", new Action<string, uint>((x, y) => AddRole(new ActivityRole(GuildHandler.GetRole (x).Id, y))), () => "Added new activity role", "Role", "Treshold (days)");
+
+            AddConfigInfo("Remove Activity Role", "Remove role.", new Action<SocketRole>(x => RemoveRole(x.Id)), () => "Removed activity role", "Role");
+            AddConfigInfo("Remove Activity Role", "Remove role.", new Action<string>(x => RemoveRole(GuildHandler.GetRole(x).Id)), () => "Removed activity role", "Role");
+            AddConfigInfo("Remove Activity Role", "Remove role.", new Action<uint>(x => RemoveRole(x)), () => "Removed activity role", "Role");
 
             _userActivity = GetDataCache("UserActivity", x => new Dictionary<ulong, DateTime>());
             _activityRoles = GetConfigCache("ActivityRoles", x => new List<ActivityRole>());
 
             GuildHandler.Clock.OnDayPassed += CheckAll;
             PerformFilterMissing();
+        }
+
+        public override void PostInitialize()
+        {
+            _ = UpdateAll();
         }
 
         private Task GuildHandler_RoleDeleted(SocketRole arg)
@@ -61,11 +67,6 @@ namespace Lomztein.Moduthulhu.Modules.Clock.ActivityMonitor
             GuildHandler.RoleDeleted -= GuildHandler_RoleDeleted;
 
             GuildHandler.Clock.OnDayPassed -= CheckAll;
-        }
-
-        private void AddRole (ActivityRole newRole)
-        {
-            _activityRoles.MutateValue (x => x.Add (newRole));
         }
 
         private List<ActivityRole> FilterMissing(List<ActivityRole> current) => current.Where(x => GuildHandler.FindRole(x.Id) != null).ToList();
@@ -94,71 +95,107 @@ namespace Lomztein.Moduthulhu.Modules.Clock.ActivityMonitor
         }
 
         private async Task DiscordClient_UserJoined(SocketGuildUser arg) {
-            await RecordActivity (arg, DateTime.Now);
+            await RecordActivity (arg.Id, DateTime.Now);
         }
 
         private async Task DiscordClient_UserVoiceStateUpdated(SocketUser arg1, SocketVoiceState arg2, SocketVoiceState arg3) {
-            SocketGuildUser afterUser = arg1 as SocketGuildUser;
-            if (afterUser?.VoiceChannel != null) {
-                await RecordActivity (afterUser, DateTime.Now);
-            }
+            await RecordActivity (arg1.Id, DateTime.Now);
         }
 
         private async Task DiscordClient_MessageReceived(SocketMessage arg) {
-            await RecordActivity (arg.Author as SocketGuildUser, DateTime.Now);
+            await RecordActivity (arg.Author.Id, DateTime.Now);
         }
 
-        public async Task RecordActivity(SocketGuildUser user, DateTime time) {
+        public async Task RecordActivity(ulong user, DateTime time) {
             
-            if (!_userActivity.GetValue ().ContainsKey (user.Id))
+            if (!_userActivity.GetValue ().ContainsKey (user))
             {
-                _userActivity.GetValue().Add(user.Id, time);
+                _userActivity.GetValue().Add(user, time);
             }
             else
             {
-                _userActivity.GetValue()[user.Id] = time;
+                _userActivity.GetValue()[user] = time;
             }
 
             await UpdateUser (user);
         }
 
-        public DateTime GetLastActivity(SocketGuildUser user) {
-            return _userActivity.GetValue()[user.Id];
+        public DateTime GetLastActivity(ulong user) {
+            return _userActivity.GetValue()[user];
         }
 
-        private async Task UpdateUser(SocketGuildUser user) {
+        private async Task UpdateUser(ulong user) {
+            DateTime activity = GetLastActivity(user);
+            ulong role = GetRole(_activityRoles.GetValue(), activity);
+            SocketRole roleObj = GuildHandler.FindRole(role);
 
-            DateTime activity = GetLastActivity (user);
+            if (roleObj != null)
+            {
+                SocketGuildUser userObj = GuildHandler.GetUser(user);
+                List<SocketRole> toRemove = userObj.Roles.Where(x => _activityRoles.GetValue().Any(y => x.Id == y.Id)).ToList ();
+                toRemove.Remove(roleObj);
+
+                if (!userObj.Roles.Contains (roleObj))
+                {
+                    Core.Log.User($"Adding activity role {roleObj.Name} to {userObj.GetShownName ()}");
+                    await userObj.AsyncSecureAddRole(roleObj);
+                }
+                foreach (var toRemoveRole in toRemove)
+                {
+                    Core.Log.User($"Removing activity role {toRemoveRole.Name} from {userObj.GetShownName()}");
+                    await userObj.AsyncSecureRemoveRole(toRemoveRole);
+                }
+            }
+        }
+
+        private void AddRole (ActivityRole role)
+        {
+            _activityRoles.MutateValue(x => x.Add(role));
+            SortRoles();
+        } 
+
+        private void RemoveRole (ulong role)
+        {
+            if (_activityRoles.GetValue().Any (x => x.Id == role))
+            {
+                _activityRoles.MutateValue(x => x.RemoveAll(y => y.Id == role));
+                SortRoles();
+            }
+            else
+            {
+                throw new InvalidOperationException("Cannot remove role, role currently isn't in the list of Activity Roles.");
+            }
+        }
+
+        private void SortRoles ()
+        {
+            _activityRoles.GetValue ().Sort(Comparer<ActivityRole>.Create((x, y) => (int)x.Treshold - (int)y.Treshold));
+        }
+
+        public static ulong GetRole (List<ActivityRole> roles, DateTime activity)
+        {
+            ulong[] roleObjs = roles.Select(x => x.Id).ToArray();
             DateTime now = DateTime.Now;
 
-            List<ActivityRole> activityStates = _activityRoles.GetValue ();
-            activityStates.Sort(Comparer<ActivityRole>.Create((x, y) => (int)x.Treshold - (int)y.Treshold));
-            SocketRole[] roles = activityStates.Select (x => user.Guild.GetRole (x.Id)).ToArray ();
+            ulong finalRole = roleObjs[0];
+            DateTime lastDate = now.AddDays(1);
 
-            SocketRole finalRole = roles[0];
+            for (int i = 0; i < roles.Count; i++)
+            {
+                DateTime thisDate = now.AddDays(-roles[i].Treshold);
 
-            DateTime lastDate = now.AddDays (1);
-
-            for (int i = 0; i < activityStates.Count; i++) {
-                DateTime thisDate = now.AddDays (-activityStates[i].Treshold);
-
-                if (activity < lastDate && activity > thisDate) {
-                    finalRole = roles[i];
+                if (activity < lastDate && activity > thisDate)
+                {
+                    finalRole = roleObjs[i];
                     lastDate = thisDate;
                 }
             }
 
-            if (activity < now.AddDays (-activityStates.Last ().Treshold))
+            if (activity < now.AddDays(-roles.Last().Treshold))
             {
-                finalRole = roles.Last();
+                finalRole = roleObjs.Last();
             }
-
-            List<SocketRole> toRemove = roles.ToList ();
-            toRemove.Remove (finalRole);
-
-            await user.AsyncSecureAddRole (finalRole);
-            toRemove.ForEach (x => user.AsyncSecureRemoveRole (x));
-
+            return finalRole;
         }
 
         public async Task CheckAll(DateTime lastTick, DateTime now) {
@@ -167,11 +204,12 @@ namespace Lomztein.Moduthulhu.Modules.Clock.ActivityMonitor
         }
 
         private async Task UpdateAll () {
+            await GuildHandler.GetGuild().DownloadUsersAsync();
             List<SocketGuildUser> users = GuildHandler.GetGuild().Users.ToList();
 
             foreach (SocketGuildUser u in users) {
                 if (!_userActivity.GetValue().ContainsKey (u.Id)) {
-                    await RecordActivity (u, GetDefaultDate ());
+                    await RecordActivity (u.Id, GetDefaultDate ());
                 }
             }
         }

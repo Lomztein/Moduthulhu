@@ -39,7 +39,14 @@ namespace Lomztein.Moduthulhu.Core
 
         public static async Task<JObject> GetJSON (Uri uri)
         {
-            return JObject.Parse(await Get(uri));
+            string response = await Get(uri);
+            try
+            {
+                return JObject.Parse(response);
+            } catch
+            {
+                throw new InvalidOperationException("Unable to parse response. It may not be correct JSON format.");
+            }
         }
     }
 }
