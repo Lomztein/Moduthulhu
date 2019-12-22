@@ -42,7 +42,6 @@ The core framework includes some standard plugins which are all enabled by defau
  * Configuration: Plugin that exposes registered configuration options through commands.
  * Consent: Simple plugin that allows users to toggle whether or not they consent to storage of their personal data, in accordance with GDPR. Also allows users to request or delete any data the bot has stored, that is linked to their user ID.
  * Standard Commands: Plugin that adds the standard commands from the command framework. May be disabled.
- * Logger: Simple plugin that prints out any happenings to Standard Output, used primarily for debugging. Recommended to be disabled if you have privacy concerns.
  * Administrator: Plugin that allows for the basic administration of the bot client, unneccesary for most users and may be disabled.
 
 ## Deployment Guide
