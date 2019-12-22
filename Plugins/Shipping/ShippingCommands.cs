@@ -116,14 +116,15 @@ namespace Lomztein.Moduthulhu.Modules.Shipping {
                 builder.WithAuthor (user).
                     WithTitle ("Ships containing " + user.GetShownName () + ".");
 
+                List<EmbedFieldBuilder> embedFields = new List<EmbedFieldBuilder>();
                 foreach (var ship in catagorized) {
                     var shippers = ship.Select (x => ParentPlugin.GuildHandler.GetUser (x.Shipper));
 
                     SocketGuildUser companion = ParentPlugin.GuildHandler.GetUser (ship.Key);
-                    builder.AddField ("Shipped with " + companion.GetShownName () + " as " + ParentPlugin.GetShipName (ship.FirstOrDefault()) + " " + ship.Count () + " times by:", string.Join (", ", shippers));
+                    embedFields.Add (new EmbedFieldBuilder ().WithName ("Shipped with " + companion.GetShownName () + " as " + ParentPlugin.GetShipName (ship.FirstOrDefault()) + " " + ship.Count () + " times by:").WithValue (string.Join (", ", shippers)));
                 }
 
-                LargeEmbed largeEmbed = new LargeEmbed (builder);
+                LargeEmbed largeEmbed = new LargeEmbed (builder, embedFields);
                 return TaskResult(largeEmbed, null);
             }
 
@@ -168,13 +169,15 @@ namespace Lomztein.Moduthulhu.Modules.Shipping {
                     WithAuthor (ParentPlugin.GuildHandler.BotUser).
                     WithTitle ("All ships on " + data.Message.GetGuild ().Name + ".");
 
-                foreach (var pair in leaderboard) {
+                List<EmbedFieldBuilder> embedFields = new List<EmbedFieldBuilder>();
+                foreach (var pair in leaderboard)
+                {
                     SocketGuildUser shippie = ParentPlugin.GuildHandler.GetUser(pair.Key);
                     var ships = string.Join("\n", ParentPlugin.GetShippieShips(shippie.Id).Select(x => ParentPlugin.ShipToString(x)));
-                    builder.AddField ($"{shippie.GetShownName ()} has been shipped {pair.Value.Count} times in the following ships:\n", ships);
+                    embedFields.Add (new EmbedFieldBuilder ().WithName($"{shippie.GetShownName ()} has been shipped {pair.Value.Count} times in the following ships:\n").WithValue (ships));
                 }
 
-                LargeEmbed largeEmbed = new LargeEmbed (builder);
+                LargeEmbed largeEmbed = new LargeEmbed (builder, embedFields);
                 return TaskResult(largeEmbed, null);
             }
         }

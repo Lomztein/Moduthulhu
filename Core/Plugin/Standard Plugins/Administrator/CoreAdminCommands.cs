@@ -71,10 +71,9 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
                     .WithTitle("Core Process Status")
                     .WithAuthor(ParentPlugin.GuildHandler.BotUser)
                     .WithDescription(ParentPlugin.GuildHandler.Core.ToString())
-                    .WithFields (ParentPlugin.GuildHandler.Client.GetShardsStatus().Select (x => new EmbedFieldBuilder ().WithName ($"Shard {shardIndex++}").WithValue ($"```{x}```")))
                     .WithCurrentTimestamp();
 
-                LargeEmbed embed = new LargeEmbed(builder);
+                LargeEmbed embed = new LargeEmbed(builder, ParentPlugin.GuildHandler.Client.GetShardsStatus().Select(x => new EmbedFieldBuilder().WithName($"Shard {shardIndex++}").WithValue($"```{x}```")));
                 return TaskResult (embed, "");
             }
 
@@ -90,10 +89,9 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
                 int fieldIndex = 1;
                 EmbedBuilder builder = new EmbedBuilder()
                     .WithTitle($"Shard {shardId} status")
-                    .WithDescription($"```{shard}```")
-                    .WithFields(string.Join ("\n", handlers.Select (x => x.ToString ())).SplitMessage ("```", 1000).Select(x => new EmbedFieldBuilder().WithName ($"Field {fieldIndex++}").WithValue(x)));
+                    .WithDescription($"```{shard}```");
 
-                return TaskResult(new LargeEmbed (builder), string.Empty);
+                return TaskResult(new LargeEmbed (builder, string.Join("\n", handlers.Select(x => x.ToString())).SplitMessage("```", 1000).Select(x => new EmbedFieldBuilder().WithName($"Field {fieldIndex++}").WithValue(x))), string.Empty);
             }
 
             [Overload (typeof (Embed), "Check status of a specific GuildHandler")]

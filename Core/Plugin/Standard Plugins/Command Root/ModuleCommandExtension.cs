@@ -27,6 +27,11 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
                     child.ParentPlugin = ParentPlugin;
                 }
             }
+
+            if (_defaultCommand != null && _defaultCommand is PluginCommand<T> pluginDefault)
+            {
+                pluginDefault.ParentPlugin = ParentPlugin;
+            }
             base.Initialize ();
         }
 

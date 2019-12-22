@@ -31,7 +31,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
                 new InfoCommand (),
             };
 
-            _defaultCommand = new AllCommand();
+            _defaultCommand = new AvailableCommand();
         }
 
         private class AddCommand : PluginCommand<PluginManagerPlugin>
@@ -45,6 +45,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
                 Shortcut = "enableplugin";
 
                 Aliases = new [] { "add" };
+                ShortcutAliases = new[] { "addplugin" };
             }
 
             [Overload(typeof(Embed), "Add a new plugin from the list of available plugins.")]
@@ -95,6 +96,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
                 Shortcut = "disableplugin";
             
                 Aliases = new [] { "remove" };
+                ShortcutAliases = new[] { "removeplugin" };
             }
 
             [Overload(typeof(void), "Remove a plugin from currently active plugins.")]
@@ -112,6 +114,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
                 Name = "active";
                 Description = "Active plugins.";
                 Category = AdditionalCategories.Management;
+                Aliases = new[] { "enabled" };
             }
 
             [Overload(typeof(Embed), "Display all currently active plugins on this server.")]
@@ -232,20 +235,15 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
             return builder.Build();
         }
 
-        public static Embed GetModuleListEmbed(IEnumerable<Type> pluginsTypes, string title, string description)
+        public static LargeEmbed GetModuleListEmbed(IEnumerable<Type> pluginTypes, string title, string description)
         {
             EmbedBuilder builder = new EmbedBuilder()
                 .WithAuthor("Plugin Information")
                 .WithTitle(title)
                 .WithDescription(description)
-                .WithFooter(pluginsTypes.Count () + " plugins.");
+                .WithFooter(pluginTypes.Count () + " plugins.");
 
-            foreach (Type plugin in pluginsTypes)
-            {
-                builder.AddField(Plugin.GetVersionedFullName (plugin), Plugin.GetDescription (plugin));
-            }
-
-            return builder.Build();
+            return new LargeEmbed (builder, pluginTypes.Select (x => new EmbedFieldBuilder ().WithName (Plugin.GetVersionedFullName(x)).WithValue (Plugin.GetDescription(x))));
         }
     }
 }

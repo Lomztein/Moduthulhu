@@ -1,6 +1,7 @@
 ﻿using Discord;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -13,7 +14,9 @@ namespace Lomztein.Moduthulhu.Core.Bot.Messaging.Advanced {
 
         public IMessage[] Result { get; private set; }
 
-        public LargeEmbed(EmbedBuilder source) {
+        public LargeEmbed(EmbedBuilder source, IEnumerable<EmbedFieldBuilder> fieldBuilders) {
+
+            List<EmbedFieldBuilder> fieldBuildersList = fieldBuilders.ToList();
 
             EmbedBuilder header = source;
             EmbedBuilder footer = source;
@@ -22,25 +25,23 @@ namespace Lomztein.Moduthulhu.Core.Bot.Messaging.Advanced {
 
             List<List<EmbedFieldBuilder>> embedFields = new List<List<EmbedFieldBuilder>> ();
             int index = 0;
-            while (source.Fields.Count != 0)
+            while (fieldBuildersList.Count != 0)
             {
-                int amount = Math.Min(FieldsPerEmbed, embedFields.Count);
+                int amount = Math.Min(FieldsPerEmbed, fieldBuildersList.Count);
                 if (index > amount)
                 { // This goes a bit against the typical for-loop conventions, but it should work rather simply. Please don't scream at me. // nvm i changed it after a website screamed at me.
-                    embedFields.Add(new List<EmbedFieldBuilder>(source.Fields.GetRange(0, amount)));
-                    source.Fields.RemoveRange(0, amount);
+                    embedFields.Add(new List<EmbedFieldBuilder>(fieldBuildersList.GetRange(0, amount)));
+                    fieldBuildersList.RemoveRange(0, amount);
                     index = -1;
                 }
                 index++;
             }
 
-            embedFields.Add (new List<EmbedFieldBuilder> (source.Fields));
-
             for (int i = 0; i < embedFields.Count; i++) {
 
                 EmbedBuilder field = source;
 
-                if (i > FieldsPerEmbed - 1)
+                if (i > 0)
                 {
                     field = new EmbedBuilder();
                     fields.Add (field);
