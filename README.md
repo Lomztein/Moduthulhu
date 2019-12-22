@@ -1,4 +1,5 @@
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/9107d84996d94ad388733b47047f5c7d)](https://www.codacy.com/manual/Lomztein/Moduthulhu?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Lomztein/Moduthulhu&amp;utm_campaign=Badge_Grade)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/9107d84996d94ad388733b47047f5c7d)](https://www.codacy.com/manual/Lomztein/Moduthulhu?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Lomztein/Moduthulhu&amp;utm_campaign=Badge_Grade) [![Discord Bots](https://top.gg/api/widget/status/192707822876622850.svg)](https://top.gg/bot/192707822876622850)
+
 
 # Moduthulhu - Modular Discord Bot
 
