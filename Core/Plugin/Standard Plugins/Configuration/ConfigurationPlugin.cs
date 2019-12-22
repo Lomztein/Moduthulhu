@@ -41,10 +41,14 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
                 }
 
                 var commands = overloadGroups.Select(x => new ConfigCommand(x.ToArray(), name, desc));
-
                 _configCommands.AddCommands(commands.ToArray());
             }
             _configCommands.InitCommands();
+
+            foreach (var cmd in _configCommands.GetCommands())
+            {
+                AddPluginStateAttribute("Added configuration options", "Removed configuration options", cmd.Name, cmd.GetCommand(GuildHandler.GuildId));
+            }
         }
 
         public override void Shutdown()

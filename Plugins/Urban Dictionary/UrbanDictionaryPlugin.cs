@@ -50,7 +50,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
         readonly int ThumbsUp;
         readonly int ThumbsDown;
 
-        public UrbanDefinition(JObject jObject)
+        public UrbanDefinition(JObject jObject, string word)
         {
             Success = (jObject["list"] as JArray).Count > 0;
 
@@ -68,6 +68,10 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
                 ThumbsUp = first["thumbs_up"].ToObject<int>();
                 ThumbsDown = first["thumbs_down"].ToObject<int>();
             }
+            else
+            {
+                Word = word;
+            }
         }
 
         public Embed ToEmbed()
@@ -80,11 +84,11 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
                     .WithTitle($"Top definition of {Word}")
                     .WithUrl(Permalink)
                     .WithColor(new Color(0, 0, 128))
-                    .WithDescription(EscapeEmphasis (EmbedNestedDefinitions(Definition)))
+                    .WithDescription(Cutoff(EscapeEmphasis(EmbedNestedDefinitions(Definition)), 2048, "... (See source for more)"))
                     .WithFooter($"Defined by {Author}. Souce: www.urbandictionary.com");
                 if (Example.Length > 0)
                 {
-                    builder.AddField("Example", "> " + EscapeEmphasis (string.Join("\n> ", EmbedNestedDefinitions(Example).Split('\n'))));
+                    builder.AddField("Example", Cutoff ("> " + EscapeEmphasis (string.Join("\n> ", EmbedNestedDefinitions(Example).Split('\n'))), 1024, "... (See source for more)"));
                 }
 
                 builder.AddField("Votes", ThumbsUp.ToString() + "↑ / " + ThumbsDown.ToString() + "↓");
@@ -134,12 +138,23 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
             return toEscapeRegex.Replace(input, x => $"\\{x.Value}");
         }
 
+        private string Cutoff (string input, int maxChars, string trail)
+        {
+            int max = maxChars - trail.Length;
+            if (input.Length > max)
+            {
+                string cutoff = input.Substring(0, max) + trail;
+                return cutoff;
+            }
+            return input;
+        }
+
         private string GetSearchUrl(string word) => SearchUrl.Replace("{word}", word).Replace (" ", "%20");
 
         public static async Task<UrbanDefinition> Get(string word)
         {
             JObject json = await HTTP.GetJSON(new Uri(ApiUrl.Replace("{word}", word))).ConfigureAwait (false);
-            return new UrbanDefinition(json);
+            return new UrbanDefinition(json, word);
         }
 
     }

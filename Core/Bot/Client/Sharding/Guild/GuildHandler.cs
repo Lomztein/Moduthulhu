@@ -8,6 +8,7 @@ using System.Globalization;
 using Lomztein.Moduthulhu.Core.IO.Database.Repositories;
 using Lomztein.Moduthulhu.Core.Plugins.Framework;
 using System.Collections.Generic;
+using Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild.StateManagement;
 
 namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
 {
@@ -25,6 +26,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
 
         public PluginManager Plugins { get; private set; }
         public PluginMessenger Messenger { get; private set; }
+        public StateManager State { get; private set; }
         public PluginConfig Config { get; private set; }
         public CachedValue<CultureInfo> Culture { get; private set; }
         public Clock Clock { get; private set; }
@@ -51,6 +53,9 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
             Messenger.Clear(Plugin.GetFullName(plugin.GetType ()));
             Config.Clear(Plugin.GetFullName(plugin.GetType ()));
         }
+
+        public void AddPluginStateAttribute(string target, string addedHeader, string removedHeader, string mutatedHeader, string name, string desc) => Plugins.State.AddAttribute(target, addedHeader, removedHeader, mutatedHeader, name, desc);
+        public void AddPluginStateAttribute(string target, string addedHeader, string removedHeader, string name, string desc) => Plugins.State.AddAttribute(target, addedHeader, removedHeader, string.Empty, name, desc);
 
         public bool IsBotAdministrator(ulong userId) => Shard.BotClient.IsBotAdministrator(userId);
 
@@ -235,7 +240,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
 
         private static bool ObjectNameMatches (string search, string name)
         {
-            return name.ToUpperInvariant ().Contains(search.ToUpperInvariant (), StringComparison.Ordinal);
+            return name.ToUpperInvariant () == search.ToUpperInvariant ();
         }
 
         private T ThrowIfNull<T> (T value, string message)

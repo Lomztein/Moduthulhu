@@ -24,7 +24,6 @@ namespace Lomztein.Moduthulhu.Core.IO.Database.Repositories
 
         public TValue Get (TIdentifier identifier, TKey key)
         {
-            Log.Write(Log.Type.DATA, $"Querying database table {_tableName} for identifier {identifier} and key {key}.");
             IDatabaseConnector db = GetConnector();
             var res = db.ReadQuery($"SELECT value FROM {_tableName} WHERE identifier = @identifier AND key = @key", new Dictionary<string, object> { { "@identifier", identifier }, { "@key", key } });
             return res.Length == 0 ? default : (TValue)res.Single ().FirstOrDefault ().Value;
@@ -32,7 +31,6 @@ namespace Lomztein.Moduthulhu.Core.IO.Database.Repositories
 
         public void Set (TIdentifier identifier, TKey key, TValue value)
         {
-            Log.Write(Log.Type.DATA, $"Querying database table {_tableName} to set value at identifier {identifier} and key {key} to {value}.");
             IDatabaseConnector db = GetConnector();
             string query = $"INSERT INTO {_tableName} VALUES (@identifier, @key, @value) ON CONFLICT ON CONSTRAINT {_tableName}identkey DO UPDATE SET value = @value WHERE {_tableName}.identifier = @identifier AND {_tableName}.key = @key";
             db.UpdateQuery(query, new Dictionary<string, object> { { "@identifier", identifier }, { "@key", key }, { "@value", value } });

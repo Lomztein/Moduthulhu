@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Discord.WebSocket;
+using Lomztein.AdvDiscordCommands.Autodocumentation;
 using Lomztein.AdvDiscordCommands.ExampleCommands;
 using Lomztein.AdvDiscordCommands.Extensions;
 using Lomztein.AdvDiscordCommands.Framework;
@@ -62,6 +63,11 @@ namespace Lomztein.Moduthulhu.Plugins.Standard {
 
         public override void PostInitialize() {
             _commandRoot.InitializeCommands ();
+
+            TypeDescriptions.Add(typeof(GuildHandler), "Server Handler", "This represents a handler for a specific server, and is responsible for making sure a server can communicate with the bot core.");
+            TypeDescriptions.Add(typeof(LargeEmbed), "Large Embed", "Special version of [Discord.Embed] that automatically splits into multiple [Discord.Embed]s to facilitate more than 25 fields.");
+            TypeDescriptions.Add(typeof(BookMessage), "Book", "Specialized [Discord.IMessage] that allows for flipping between 'pages', like in a book.");
+            TypeDescriptions.Add(typeof(LargeTextMessage), "Large Message", "Specialized [Discord.IMessage] that automatically splits into multiple [Discord.IMessage]s if a required to fit.");
         }
 
         private async Task OnMessageRecieved(SocketMessage arg) {
@@ -109,6 +115,12 @@ namespace Lomztein.Moduthulhu.Plugins.Standard {
 
         public void AddCommands(params ICommand [ ] newCommands) {
             Log ($"Adding commands: {string.Join (", ", newCommands.Select (x => x.Name).ToArray ())}");
+            
+            foreach (ICommand cmd in newCommands)
+            {
+                AddPluginStateAttribute("Added the following commands", "Removed the following commands", cmd.Name, _commandRoot.GetChildPrefix (GuildHandler.GuildId) + cmd.Name);
+            }
+
             ((ICommandSet)_commandRoot).AddCommands (newCommands);
         }
 
