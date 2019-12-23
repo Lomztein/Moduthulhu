@@ -14,20 +14,13 @@ namespace Lomztein.Moduthulhu.Core.Plugins.Framework
 {
     public abstract class PluginBase : IPlugin {
 
-        [Obsolete ("Use Plugin.GetName instead.")]
         public string Name => Plugin.GetName(GetType ());
-        [Obsolete ("Use Plugin.GetDescription instead.")]
         public string Description => Plugin.GetDescription(GetType());
-        [Obsolete ("Use Plugin.GetAuthor instead.")]
         public string Author => Plugin.GetAuthor(GetType());
-        [Obsolete ("Use Plugin.GetVersion instead.")]
         public string Version => Plugin.GetVersion(GetType());
 
-        [Obsolete ("Use Plugin.GetAuthorURI instead.")]
         public Uri AuthorURI => Plugin.GetAuthorURI(GetType());
-        [Obsolete ("Use Plugin.GetPatchURI instead.")]
         public Uri PatchURI => Plugin.GetPatchURI(GetType());
-        [Obsolete ("Use Plugin.GetProjectURI instead.")]
         public Uri ProjectURI => Plugin.GetProjectURI(GetType());
 
         public GuildHandler GuildHandler { get; private set; }

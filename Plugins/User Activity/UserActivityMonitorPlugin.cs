@@ -10,6 +10,7 @@ using Lomztein.Moduthulhu.Core.IO.Database.Repositories;
 using Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Lomztein.Moduthulhu.Core.Extensions;
 
 namespace Lomztein.Moduthulhu.Modules.Clock.ActivityMonitor
 {
@@ -125,9 +126,11 @@ namespace Lomztein.Moduthulhu.Modules.Clock.ActivityMonitor
         }
 
         private async Task UpdateUser(ulong user) {
+
             DateTime activity = GetLastActivity(user);
             ulong role = GetRole(_activityRoles.GetValue(), activity);
             SocketRole roleObj = GuildHandler.FindRole(role);
+            Core.Log.Plugin($"User with Id {user} activityrole has been evaluated to {roleObj?.Name.ToStringOrNull ()}.");
 
             if (roleObj != null)
             {
@@ -199,6 +202,7 @@ namespace Lomztein.Moduthulhu.Modules.Clock.ActivityMonitor
         }
 
         public async Task CheckAll(DateTime lastTick, DateTime now) {
+            Core.Log.Plugin("Checking all users for their last activity.");
             await UpdateAll ();
             StoreData ();
         }
@@ -208,8 +212,16 @@ namespace Lomztein.Moduthulhu.Modules.Clock.ActivityMonitor
             List<SocketGuildUser> users = GuildHandler.GetGuild().Users.ToList();
 
             foreach (SocketGuildUser u in users) {
-                if (!_userActivity.GetValue().ContainsKey (u.Id)) {
+                Core.Log.Plugin($"Checking user {u.GetShownName ()}.");
+                if (!_userActivity.GetValue().ContainsKey (u.Id))
+                {
+                    Core.Log.Plugin($"No last date for user {u.GetShownName ()}. Recording default date.");
                     await RecordActivity (u.Id, GetDefaultDate ());
+                }
+                else
+                {
+                    Core.Log.Plugin($"No last date for user {u.GetShownName ()}. Recording default date.");
+                    await UpdateUser(u.Id);
                 }
             }
         }
