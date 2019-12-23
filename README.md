@@ -58,7 +58,7 @@ Currently I run the container with following command: `sudo docker run --env 'Po
 
 Any vulnurable information has been omitted, of course. DB is short for database, and you must fill out those slots with the connection information for your own database.
 
-I intend to replace this with a Docker-compose file later on, however this works for the time being. Additionally, I run [Watchtower](https://github.com/containrrr/watchtower) to automatically the bot when a new build is build though Docker Hub Automated Builds. It is a very convenient and easy to set up Continuous Deployment solution that I can heartedly recommend you try. If you believe you know a better alternative solution, feel free to let me know! :D
+I intend to replace this with a Docker-compose file later on, however this works for the time being. Additionally, I run [Watchtower](https://github.com/containrrr/watchtower) to automatically update the bot when a new build is build though Docker Hub Automated Builds. It is a very convenient and easy to set up Continuous Deployment solution that I can heartedly recommend you try. If you believe you know a better alternative solution, feel free to let me know! :D
 
 ## Development Guide
 
@@ -102,9 +102,11 @@ The default namespace for the core is Lomztein.Moduthulhu.Core.
 
 There are a few more members you can use, including two other Initialize functions that calls at different time during setup. You can also add the Dependancy attribute to declare that your plugin requires a certain other plugin to be able to function.
 
-You have access to a GuildHandler through IPlugin, which contains all Discord events defined by Discord.NET, however they only fire for the specific Discord server that the GuildHandler is tied to. Each individual server that the bot is connected to has its own instance of a GuildHandler, as well as any plugins that may be enabled on the server. Through the GuildHandler you have access to other tools, such as the PluginMessenger, the PluginManager and the PluginConfig classes. These do as following:
+You have access to a GuildHandler through IPlugin, which contains all Discord events defined by Discord.NET, however they only fire for the specific Discord server that the GuildHandler is tied to. Each individual server that the bot is connected to has its own instance of a GuildHandler, as well as any plugins that may be enabled on the server. Through the GuildHandler you have access to other tools. These tools are as following:
 
- * PluginMessenger: Handles registering and calling of cross-plugin messages, so as to allow plugins to communicate without being strictly coupled together. Attempting to call an unregistered action/function returns displays a warning message in console and returns null/default.
+### PluginMessenger
+
+Handles registering and calling of cross-plugin messages, so as to allow plugins to communicate without being strictly coupled together. Attempting to call an unregistered action/function returns displays a warning message in console and returns null/default.
  
 Registering an action/function may look like this: `RegisterMessageAction ("Name", (x) => Method (x))`.
 Calling a registered action/function would then look like: `SendMessage ("PluginAuthor-PluginName", "Name", value)`
@@ -113,11 +115,36 @@ Familiarity with delegates and lambda expressions in C# is recommended, but not 
 
 As may be noticed here, calling a registered action/function requires specifiying the target plugin as well. Additionally, an alternative `RegisterMessageFunction` method may be used instead, which, unlike the previously mentioned, returns a value when the registered function is called.
  
- * PluginManager: Handles the plugins enabled on the server, and contains methods for adding and removing plugins from the list of active plugins. There is little reason to worry about this, unless you wish to create your own plugin management plugin to replace the standard one.
+### PluginManager
+
+Handles the plugins enabled on the server, and contains methods for adding and removing plugins from the list of active plugins. There is little reason to worry about this, unless you wish to create your own plugin management plugin to replace the standard one.
  
- * StateManager: Keeps track of a representation of plugin state between plugin reloads. Any plugin can track something using the `AddPluginStateAttribute` method. This is to be used during initialization, and any descrepencies between before and after plugin reloads are then available by accessing the StateManager within the PluginManager within the GuildHandler. This functionality is very subject to refactorings and changes, so use with caution. Any changes detected by this system is displayed after executing the `!plugins enable/disable` commands.
+### StateManager
+
+Keeps track of a representation of plugin state between plugin reloads. Any plugin can track changes to it between reloads using this system, and any changes detected will be accessable using the `GetChanges ()` method of the StateManager. This is done by the default plugin management plugin when enabling/disabling plugins, and printed to the user.
  
- * PluginConfig: Handles plugin configuration by maintaining and exposing a list of config options, which are registered by individual plugins. Any outside functionality may access this list of config options and implement ways for users to configure plugins through it. By default, this is done by the standard Configuration plugin, however I wish to provide a web-based alternative later down the line.
+In order to track a state you first need to register change headers using `SetChangeStateHeaders (identifier, additionHeader, removalHeader, mutationHeader)`. The last header is optional, and only needed if you expect *State Attributes* to change between reloads, instead of just being added/removed. These headers are used to display what kind of change has occured.
+
+State Attributes are objects that represent a single "piece" of a state. This can for instance represent a specific command being present. A list of State Attributes represent a State. To add State Attributes, use `AddStateAttribute (identifier, name, description)`.
+
+The system will throw an exception if a doesn't have headers, so don't forget to add headers.
+
+Additionally, an `AddGeneralFeaturesStateAttribute (name, description)` method is available, that adds a State Attribute to a general all-purpose State, and is meant to be used for notifying users of overall feature additions, such as automated functionality.
+
+As an example, the included Command Root plugin keeps track of which root commands are added by new plugins. It firsts sets a header by calling `SetStateChangeHeaders ("Commands", "The following commands has been added", "The following commands has been removed")`, and calling `AddStateAttribute("Commands", command.Name, prefix + cmd.Name);` (shortened). This results in this being printed out to the user when enabling a plugin that adds new commands, in this instance the included Utilities plugin
+
+```
+The following commands has been added
+ > !rtd 
+ > !flipcoin
+ > !embolden
+ > !fizzfyr13
+ > !ping
+```
+ 
+### PluginConfig
+
+Handles plugin configuration by maintaining and exposing a list of config options, which are registered by individual plugins. Any outside functionality may access this list of config options and implement ways for users to configure plugins through it. By default, this is done by the standard Configuration plugin, however I wish to provide a web-based alternative later down the line.
  
 Adding a configuration option looks something like this: `AddConfigInfo ("Name", "Description", new Action<T>(x => _config.SetValue (x))`.
 
