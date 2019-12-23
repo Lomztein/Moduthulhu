@@ -133,7 +133,7 @@ The system will throw an exception if a doesn't have headers, so don't forget to
 
 Additionally, an `AddGeneralFeaturesStateAttribute (name, description)` method is available, that adds a State Attribute to a general all-purpose State, and is meant to be used for notifying users of overall feature additions, such as automated functionality.
 
-As an example, the included Command Root plugin keeps track of which root commands are added by new plugins. It firsts sets a header by calling `SetStateChangeHeaders ("Commands", "The following commands has been added", "The following commands has been removed")`, and calling `AddStateAttribute("Commands", command.Name, prefix + command.Name);` (shortened). This results in this being printed out to the user when enabling a plugin that adds new commands, in this instance the included Utilities plugin
+As an example, the included Command Root plugin keeps track of which root commands are added by new plugins. It firsts sets a header by calling `SetStateChangeHeaders ("Commands", "The following commands has been added", "The following commands has been removed")`, and calling `AddStateAttribute ("Commands", command.Name, prefix + command.Name);` (shortened). This results in this being printed out to the user when enabling a plugin that adds new commands, in this instance the included Utilities plugin
 
 ```
 The following commands has been added
