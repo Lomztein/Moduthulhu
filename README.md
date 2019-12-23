@@ -127,11 +127,13 @@ In order to track a state you first need to register change headers using `SetCh
 
 State Attributes are objects that represent a single "piece" of a state. This can for instance represent a specific command being present. A list of State Attributes represent a State. To add State Attributes, use `AddStateAttribute (identifier, name, description)`.
 
+The `identifier` parameter is to keep track of different states for the same plugin.
+
 The system will throw an exception if a doesn't have headers, so don't forget to add headers.
 
 Additionally, an `AddGeneralFeaturesStateAttribute (name, description)` method is available, that adds a State Attribute to a general all-purpose State, and is meant to be used for notifying users of overall feature additions, such as automated functionality.
 
-As an example, the included Command Root plugin keeps track of which root commands are added by new plugins. It firsts sets a header by calling `SetStateChangeHeaders ("Commands", "The following commands has been added", "The following commands has been removed")`, and calling `AddStateAttribute("Commands", command.Name, prefix + cmd.Name);` (shortened). This results in this being printed out to the user when enabling a plugin that adds new commands, in this instance the included Utilities plugin
+As an example, the included Command Root plugin keeps track of which root commands are added by new plugins. It firsts sets a header by calling `SetStateChangeHeaders ("Commands", "The following commands has been added", "The following commands has been removed")`, and calling `AddStateAttribute("Commands", command.Name, prefix + command.Name);` (shortened). This results in this being printed out to the user when enabling a plugin that adds new commands, in this instance the included Utilities plugin
 
 ```
 The following commands has been added
