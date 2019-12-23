@@ -59,6 +59,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard {
 
         public override void Initialize() {
             GuildHandler.MessageReceived += OnMessageRecieved;
+            SetStateChangeHeaders("Commands", "The following commands has been added", "The following commands has been removed");
         }
 
         public override void PostInitialize() {
@@ -68,6 +69,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard {
             TypeDescriptions.Add(typeof(LargeEmbed), "Large Embed", "Special version of [Discord.Embed] that automatically splits into multiple [Discord.Embed]s to facilitate more than 25 fields.");
             TypeDescriptions.Add(typeof(BookMessage), "Book", "Specialized [Discord.IMessage] that allows for flipping between 'pages', like in a book.");
             TypeDescriptions.Add(typeof(LargeTextMessage), "Large Message", "Specialized [Discord.IMessage] that automatically splits into multiple [Discord.IMessage]s if a required to fit.");
+            TypeDescriptions.Add(typeof(uint), "Positive Integer", "An integer number that may only be positive.");
         }
 
         private async Task OnMessageRecieved(SocketMessage arg) {
@@ -118,7 +120,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard {
             
             foreach (ICommand cmd in newCommands)
             {
-                AddPluginStateAttribute("Added the following commands", "Removed the following commands", cmd.Name, _commandRoot.GetChildPrefix (GuildHandler.GuildId) + cmd.Name);
+                AddStateAttribute("Commands", cmd.Name, _commandRoot.GetChildPrefix (GuildHandler.GuildId) + cmd.Name);
             }
 
             ((ICommandSet)_commandRoot).AddCommands (newCommands);

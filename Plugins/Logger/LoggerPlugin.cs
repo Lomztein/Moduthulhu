@@ -39,6 +39,8 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
             GuildHandler.UserLeft += OnUserLeft;
             GuildHandler.UserUnbanned += OnUserUnbanned;
             GuildHandler.UserVoiceStateUpdated += OnUserVoiceStateUpdated;
+
+            AddGeneralFeaturesStateAttribute("SpookyLogging", "Spooky logging of all ongoings.");
         }
 
         public override void Shutdown() {

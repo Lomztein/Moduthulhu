@@ -80,6 +80,8 @@ namespace Lomztein.Moduthulhu.Modules.Voice
             var guild = GuildHandler.GetGuild();
             var nonCachedChannels = guild.VoiceChannels.Where(x => !_defaultChannels.GetValue ().Contains(x.Id));
             _temporaryChannels = nonCachedChannels.Select(x => x.Id).ToList();
+
+            AddGeneralFeaturesStateAttribute("AutomatedVoiceCreation", "Automatic creation of new voice channels when needed.");
         }
 
         private Task OnChannelCreated(SocketChannel channel) {

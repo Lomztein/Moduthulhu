@@ -66,6 +66,8 @@ namespace Lomztein.Moduthulhu.Modules.Voice {
             AddConfigInfo("Set International Role", "Show role.", () => GuildHandler.FindRole(_internationalRoleId.GetValue()) == null ? "Current international role doesn't exist :(" : "Current international role is " + GuildHandler.GetRole(_internationalRoleId.GetValue()).Name);
 
             SendMessage("Lomztein-Command Root", "AddCommand", _commandSet);
+
+            AddGeneralFeaturesStateAttribute("AutomatedVoiceNames", "Automatically changing voice channel names to reflect games played within.");
         }
 
         void InitDefaultTags () {

@@ -49,6 +49,8 @@ namespace Lomztein.Moduthulhu.Plugins.Birthday {
             GuildHandler.Clock.OnHourPassed += Clock_OnHourPassed;
 
             SendMessage("Lomztein-Command Root", "AddCommand", _command);
+
+            AddGeneralFeaturesStateAttribute("BirthdayGreetings", "Automatic birthday wishing if desired.");
         }
 
         private async Task Clock_OnHourPassed(DateTime currentTick, DateTime lastTick)

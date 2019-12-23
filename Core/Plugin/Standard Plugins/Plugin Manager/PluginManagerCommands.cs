@@ -62,7 +62,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
                             ParentPlugin.AddPlugin(pluginName);
                             if (ParentPlugin.GuildHandler.Plugins.IsPluginActive(pluginName))
                             {
-                                var state = ParentPlugin.GuildHandler.Plugins.State;
+                                var state = ParentPlugin.GuildHandler.State;
                                 await metadata.Message.Channel.SendMessageAsync(string.Empty, false, state.ChangesToEmbed ($"Succesfully enabled plugin '{name}' on this server."));
                             }
                             else
@@ -104,7 +104,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
             public Task<Result> Execute(CommandMetadata _, string pluginName)
             {
                 ParentPlugin.RemovePlugin(pluginName);
-                var state = ParentPlugin.GuildHandler.Plugins.State;
+                var state = ParentPlugin.GuildHandler.State;
                 return TaskResult(state.ChangesToEmbed($"Successfully disabled plugin '{Plugin.GetName(PluginLoader.GetPlugin(pluginName))}' on this server."), string.Empty);
             }
         }

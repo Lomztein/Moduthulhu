@@ -49,6 +49,7 @@ namespace Lomztein.Moduthulhu.Modules.Clock.ActivityMonitor
 
         public override void PostInitialize()
         {
+            AddGeneralFeaturesStateAttribute("UserActivityMonitor", "Automated assigning roles to users based on last date of activity.");
             _ = UpdateAll();
         }
 

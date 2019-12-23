@@ -19,8 +19,8 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
 
         private readonly CachedValue<List<string>> _enabledPlugins;
         private readonly List<Exception> _initializationExceptions = new List<Exception>();
-        public readonly StateManager State = new StateManager();
 
+        public event Action OnPrePluginsLoaded;
         public event Action OnPluginsLoaded;
         public event Action<IPlugin> OnPluginLoaded;
         public event Action OnPluginsUnloaded;
@@ -31,15 +31,9 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
             _parentHandler = parent;
             _enabledPlugins = new CachedValue<List<string>>(new IdentityKeyJsonRepository("plugindata"), _parentHandler.GuildId, "EnabledPlugins", () => PluginLoader.GetPlugins().Where (x => PluginLoader.IsStandard (x)).Select (y => Plugin.GetFullName (y)).ToList ());
             _enabledPlugins.Cache();
-            OnPluginsUnloaded += PluginManager_OnPluginsUnloaded;
 
             MakeSuperSureCriticalPluginsAreEnabled();
             PurgeDuplicateEnabledPlugins();
-        }
-
-        private void PluginManager_OnPluginsUnloaded()
-        {
-            State.Reset();
         }
 
         private void MakeSuperSureCriticalPluginsAreEnabled ()
@@ -138,6 +132,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
         public void LoadPlugins ()
         {
             Log.Write(Log.Type.PLUGIN, "Reloading plugins for guild " + _parentHandler.GetGuild().Name);
+            OnPrePluginsLoaded?.Invoke();
 
             Filter<string> filter = new Filter<string>(x => _enabledPlugins.GetValue().Any (y => NameMatches (x, y)), x => ContainsDependencies (_enabledPlugins.GetValue (), x));
             string[] toLoad = PluginLoader.GetPlugins ().Select (x => Plugin.GetFullName (x)).ToArray ();

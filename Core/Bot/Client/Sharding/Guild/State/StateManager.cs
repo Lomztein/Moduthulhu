@@ -11,6 +11,10 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild.StateManagement
         private Dictionary<string, State> _currentStates = new Dictionary<string, State>();
         private Dictionary<string, State> _previousStates = new Dictionary<string, State>();
 
+        private Dictionary<string, string> _additionsHeaders = new Dictionary<string, string>();
+        private Dictionary<string, string> _removingsHeaders = new Dictionary<string, string>();
+        private Dictionary<string, string> _mutationsHeaders = new Dictionary<string, string>();
+
         public StateManager ()
         {
             Reset();
@@ -20,19 +24,69 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild.StateManagement
         {
             _previousStates = new Dictionary<string, State>(_currentStates);
             _currentStates.Clear();
+            ClearHeaders();
         }
 
-        public void AddAttribute (string target, string addedHeader, string removedHeader, string mutatedHeader, string name, string desc)
+        public void SetChangeHeaders (string identifier, string addition, string removing, string mutation)
         {
-            if (!_currentStates.ContainsKey (target))
+            if (!_additionsHeaders.ContainsKey (identifier))
             {
-                _currentStates.Add(target, new State(addedHeader, removedHeader, mutatedHeader));
+                _additionsHeaders.Add(identifier, addition);
+                _removingsHeaders.Add(identifier, removing);
+                _mutationsHeaders.Add(identifier, mutation);
             }
-            _currentStates[target].Add(name, desc);
+
+            AssertHeadersEqualCount();
         }
 
-        public static StateChanges Compare (State prev, State curr)
+        private void ClearHeaders ()
         {
+            _additionsHeaders.Clear();
+            _removingsHeaders.Clear();
+            _mutationsHeaders.Clear();
+        }
+
+        private void AssertHeadersEqualCount ()
+        {
+            if (_additionsHeaders.Count != _removingsHeaders.Count || 
+                _additionsHeaders.Count != _mutationsHeaders.Count)
+            {
+                throw new InvalidOperationException("State headers have unequal lengths.");
+            }
+        }
+
+        private void AssertHeadersForAllStates ()
+        {
+            string missingHeader = string.Empty;
+            if (!_currentStates.All (x => {
+                if (_additionsHeaders.ContainsKey(x.Key))
+                {
+                    return true;
+                }
+                else
+                {
+                    missingHeader = x.Key;
+                    return false;
+                }
+                }))
+            {
+                throw new InvalidOperationException($"State {missingHeader} is missing a header. Remember to call the SetHeader method to assign headers.");
+            }
+        }
+
+        public void AddAttribute (string identifier, string name, string desc)
+        {
+            if (!_currentStates.ContainsKey (identifier))
+            {
+                _currentStates.Add(identifier, new State(identifier));
+            }
+            _currentStates[identifier].Add(name, desc);
+        }
+
+        public StateChanges Compare (State prev, State curr)
+        {
+            AssertHeadersForAllStates();
+
             StateAttribute[] additions = prev.GetAttributes().Except(curr.GetAttributes()).ToArray ();
             StateAttribute[] removings = curr.GetAttributes().Except(prev.GetAttributes()).ToArray ();
             StateAttribute[] mutationsPrev = prev.GetAttributes().Where (x => curr.GetAttributes ().Any (y => y.Name == x.Name && y.Description != x.Description)).ToArray ();
@@ -41,9 +95,9 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild.StateManagement
             int index = 0;
             string[] mutations = mutationsPrev.Select(x => $"{x.Description} => {mutationsCurr[index++].Description}").ToArray ();
 
-            return new StateChanges (curr.AddedHeader, additions.Select (x => x.Description).ToArray (),
-                curr.RemovedHeader, removings.Select (x => x.Description).ToArray (),
-                curr.MutatedHeader, mutations);
+            return new StateChanges (_additionsHeaders[curr.Identifier], additions.Select (x => x.Description).ToArray (),
+                _removingsHeaders[curr.Identifier], removings.Select (x => x.Description).ToArray (),
+                _mutationsHeaders[curr.Identifier], mutations);
         }
 
         public IEnumerable<StateChanges> GetChanges ()
@@ -54,7 +108,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild.StateManagement
                 var prev = _previousStates.GetValueOrDefault(pair.Key);
                 if (prev == null)
                 {
-                    prev = new State(pair.Value.AddedHeader, pair.Value.RemovedHeader, pair.Value.MutatedHeader);
+                    prev = new State(pair.Value.Identifier);
                 }
 
                 changes.Add (Compare(pair.Value, prev));
@@ -72,19 +126,19 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild.StateManagement
                 if (change.GetAdditions().Length > 0)
                 {
                     result.AddField(change.AddedHeader,
-                    $"```{string.Join("\n", change.GetAdditions())}```");
+                    $"```> {string.Join("\n> ", change.GetAdditions())}```");
                 }
 
                 if (change.GetRemovals().Length > 0)
                 {
                     result.AddField(change.RemovedHeader,
-                    $"```{string.Join("\n", change.GetRemovals())}```");
+                    $"```> {string.Join("\n> ", change.GetRemovals())}```");
                 }
 
                 if (change.GetMutations().Length > 0)
                 {
                     result.AddField(change.MutatedHeader,
-                    $"```{string.Join("\n", change.GetMutations())}```");
+                    $"```> {string.Join("\n> ", change.GetMutations())}```");
                 }
             }
 

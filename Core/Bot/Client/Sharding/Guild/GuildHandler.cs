@@ -24,10 +24,11 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
 
         public ulong GuildId { get; private set; }
 
-        public PluginManager Plugins { get; private set; }
-        public PluginMessenger Messenger { get; private set; }
-        public StateManager State { get; private set; }
-        public PluginConfig Config { get; private set; }
+        public readonly PluginManager Plugins;
+        public readonly PluginMessenger Messenger;
+        public readonly PluginConfig Config;
+        public readonly StateManager State;
+
         public CachedValue<CultureInfo> Culture { get; private set; }
         public Clock Clock { get; private set; }
 
@@ -38,14 +39,22 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
             Plugins = new PluginManager(this);
             Messenger = new PluginMessenger();
             Config = new PluginConfig();
+            State = new StateManager();
             Clock = new Clock(1, Name);
             Clock.Start();
 
             Name = GetGuild().Name;
             BootDate = DateTime.Now;
+            Plugins.OnPrePluginsLoaded += Plugins_OnPrePluginsLoaded;
             Plugins.OnPluginUnloaded += Plugins_OnPluginUnloaded;
 
             Culture = new CachedValue<CultureInfo>(new IdentityKeyJsonRepository("pluginconfig"), GuildId, "Culture", () => new CultureInfo("en-US"));
+        }
+
+        private void Plugins_OnPrePluginsLoaded()
+        {
+            State.Reset();
+            State.SetChangeHeaders("GeneralFeatures", "The following features has been added", "The following features has been removed", "The following features has been changed");
         }
 
         private void Plugins_OnPluginUnloaded(IPlugin plugin)
@@ -54,8 +63,11 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
             Config.Clear(Plugin.GetFullName(plugin.GetType ()));
         }
 
-        public void AddPluginStateAttribute(string target, string addedHeader, string removedHeader, string mutatedHeader, string name, string desc) => Plugins.State.AddAttribute(target, addedHeader, removedHeader, mutatedHeader, name, desc);
-        public void AddPluginStateAttribute(string target, string addedHeader, string removedHeader, string name, string desc) => Plugins.State.AddAttribute(target, addedHeader, removedHeader, string.Empty, name, desc);
+        public void AddStateAttribute(string identifier, string name, string desc)
+            => State.AddAttribute(identifier, name, desc);
+
+        public void SetStateChangeHeaders(string identifier, string addition, string removal, string mutation)
+            => State.SetChangeHeaders(identifier, addition, removal, mutation);
 
         public bool IsBotAdministrator(ulong userId) => Shard.BotClient.IsBotAdministrator(userId);
 

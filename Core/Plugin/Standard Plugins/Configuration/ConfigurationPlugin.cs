@@ -19,6 +19,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
         {
             _configCommands = new ConfigCommandSet();
             SendMessage("Lomztein-Command Root", "AddCommand", _configCommands);
+            SetStateChangeHeaders("ConfigCmds", "The following configuration commands has been added", "The following configuration commands has been removed.");
         }
 
         public override void PostInitialize()
@@ -47,7 +48,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
 
             foreach (var cmd in _configCommands.GetCommands())
             {
-                AddPluginStateAttribute("Added configuration options", "Removed configuration options", cmd.Name, cmd.GetCommand(GuildHandler.GuildId));
+                AddStateAttribute("ConfigCmds", cmd.Name, cmd.GetCommand(GuildHandler.GuildId));
             }
         }
 
