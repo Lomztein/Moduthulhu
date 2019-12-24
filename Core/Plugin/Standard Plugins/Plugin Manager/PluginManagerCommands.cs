@@ -138,7 +138,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
             [Overload(typeof(Embed), "Display all available plugins.")]
             public Task<Result> Execute(CommandMetadata metadata)
             {
-                return TaskResult(GetModuleListEmbed(ParentPlugin.GetAvailablePlugins().Where (x => !ParentPlugin.GetActivePlugins ().Any (y => y.GetType () == x)), "All available plugins.", "A list of all currently available, but not enabled plugins on this server."), null);
+                return TaskResult(GetModuleListEmbed(PluginManagerPlugin.GetAvailablePlugins().Where (x => !ParentPlugin.GetActivePlugins ().Any (y => y.GetType () == x)), "All available plugins.", "A list of all currently available, but not enabled plugins on this server."), null);
             }
         }
 
@@ -154,7 +154,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
             [Overload(typeof(Embed), "Display all plugins.")]
             public Task<Result> Execute(CommandMetadata metadata)
             {
-                return TaskResult(GetModuleListEmbed(ParentPlugin.GetAvailablePlugins(), "All available plugins.", "A list of all currently available."), null);
+                return TaskResult(GetModuleListEmbed(PluginManagerPlugin.GetAvailablePlugins(), "All available plugins.", "A list of all currently available."), null);
             }
         }
 

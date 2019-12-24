@@ -28,7 +28,6 @@ namespace Lomztein.Moduthulhu.Core.Bot {
 
         internal async Task InitializeCore(string[] args)
         {
-
             // Set up core
             BootDate = DateTime.Now;
 

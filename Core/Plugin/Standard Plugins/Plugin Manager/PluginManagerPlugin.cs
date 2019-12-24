@@ -44,7 +44,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
 
         public void ReloadPlugins() => Manager.ReloadPlugins();
 
-        public Type[] GetAvailablePlugins() => PluginLoader.GetPlugins();
+        public static Type[] GetAvailablePlugins() => PluginLoader.GetPlugins();
 
         public IPlugin[] GetActivePlugins() => Manager.GetActivePlugins();
     }

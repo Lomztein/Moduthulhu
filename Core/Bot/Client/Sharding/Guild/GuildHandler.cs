@@ -48,7 +48,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
             Plugins.OnPrePluginsLoaded += Plugins_OnPrePluginsLoaded;
             Plugins.OnPluginUnloaded += Plugins_OnPluginUnloaded;
 
-            Culture = new CachedValue<CultureInfo>(new IdentityKeyJsonRepository("pluginconfig"), GuildId, "Culture", () => new CultureInfo("en-US"));
+            Culture = new CachedValue<CultureInfo>(new DoubleKeyJsonRepository("pluginconfig"), GuildId, "Culture", () => new CultureInfo("en-US"));
         }
 
         private void Plugins_OnPrePluginsLoaded()

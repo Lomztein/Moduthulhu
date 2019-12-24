@@ -1,4 +1,5 @@
-﻿using Npgsql;
+﻿using Lomztein.Moduthulhu.Core.IO.Database.Factories;
+using Npgsql;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,30 +7,32 @@ using System.Text;
 
 namespace Lomztein.Moduthulhu.Core.IO.Database.Repositories
 {
-    internal class IdentityKeyValueRepository<TIdentifier, TKey, TValue>
+    internal class SQLDoubleKeyRepository<TIdentifier, TKey, TValue> : IDoubleKeyRepository<TIdentifier, TKey, TValue>
     {
-        private readonly string _tableName;
+        private string _tableName;
+        private IDatabaseConnector _connector;
 
-        public IdentityKeyValueRepository (string tableName)
+        public SQLDoubleKeyRepository (string table, IDatabaseConnector connector)
         {
-            _tableName = tableName;
-        }
+            _tableName = table;
+            _connector = connector;
+        } 
 
         public void Init ()
         {
             GetConnector().CreateTable(_tableName, $"CREATE TABLE {_tableName} (identifier text, key text, value text, CONSTRAINT {_tableName}identkey UNIQUE (identifier, key));");
         }
 
-        private static IDatabaseConnector GetConnector() => new PostgreSQLDatabaseConnector();
+        private IDatabaseConnector GetConnector() => _connector;
 
-        public TValue Get (TIdentifier identifier, TKey key)
+        public TValue GetValue (TIdentifier identifier, TKey key)
         {
             IDatabaseConnector db = GetConnector();
             var res = db.ReadQuery($"SELECT value FROM {_tableName} WHERE identifier = @identifier AND key = @key", new Dictionary<string, object> { { "@identifier", identifier }, { "@key", key } });
             return res.Length == 0 ? default : (TValue)res.Single ().FirstOrDefault ().Value;
         }
 
-        public void Set (TIdentifier identifier, TKey key, TValue value)
+        public void SetValue (TIdentifier identifier, TKey key, TValue value)
         {
             IDatabaseConnector db = GetConnector();
             string query = $"INSERT INTO {_tableName} VALUES (@identifier, @key, @value) ON CONFLICT ON CONSTRAINT {_tableName}identkey DO UPDATE SET value = @value WHERE {_tableName}.identifier = @identifier AND {_tableName}.key = @key";
