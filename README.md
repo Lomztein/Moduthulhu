@@ -62,6 +62,25 @@ I intend to replace this with a Docker-compose file later on, however this works
 
 ## Development Guide
 
+If you desire to contribute to the bots available functionality by creating your own plugin, you can quite easily do so. After all, the framework is designed specifically to allow for that. There are a few prerequisites before you can do so, such as:
+
+* An IDE, such as Microsoft Visual Studio or Visual Studio Code. Anything should do as long as it can compile .NET Core.
+* The .NET Core 2.1 LTS framework SDK, which is required for any .NET Core based applications to be compiled.
+* Either a copy of the source code from here, or the [assemblies downloaded through NuGet](https://www.nuget.org/packages/Lomztein.Moduthulhu.Core.Assemblies) for reference.
+
+If you download the assemblies via NuGet, you need to instantiate a BotCore and call it's `InitializeCore (args)` method, which will start up the bot and all of it's systems. To stop the program from shutting down, call `GetAwaiter ().GetResult ()` on the Task object given by `InitializeCore`.
+
+As an example, this is the `Main` method of the bot:
+    `static void Main(string [ ] args) => new BotCore ().InitializeCore (args).GetAwaiter ().GetResult ();`
+    
+Once the Bot Core is launched, it will generate an empty Configuration file in the `./Data/` folder, and then promptly throw an exception because the config file is invalid. You'll have to fill it up yourself. It needs a Bot Token that you need to create [here](https://discordapp.com/developers/applications/). Shards min/max/total should just be 0/1/1 if you only need the bot for testing. More information on sharding can be found [here](https://discordapp.com/developers/docs/topics/gateway#sharding) if you're curious.
+
+The bot attempts to read plugins from `IncludedPlugins.dll` in the root folder, and from the `/Data/Plugins/` folder. You should build your plugins to either of these in order to test them.
+
+By default, the bot reads data from local JSON files. In order to change this, you have to set Environment Variable `DATABASE_TYPE` to one of the following supperted options.
+ * Path/Json *(default)*
+ * SQL/PostgreSQL
+
 ### Primary Features of the Core Framework
 
  * Runtime loading of plugin functionality, with the ability to toggle them on and off on a per-server basis. 
@@ -73,15 +92,9 @@ I intend to replace this with a Docker-compose file later on, however this works
  * PostgreSQL database support used for both data and config storage, as well as whatever you may need.
  * Consent Assertion that keeps track of whether or not users consent to the storage of personal data in the bots database.
 
-If you desire to contribute to the bots available functionality by creating your own plugin, you can quite easily do so. After all, the framework is designed specifically to allow for that. There are a few prerequisites before you can do so, such as:
+The most basic element you should be aware of is the "IPlugin" interface, as this is the interface between plugin and bot framework. However, it isn't really neccesary to worry about it, as it is much easier to work with the "PluginBase" abstract class, the default implementation of IPlugin. Inheriting from PluginBase will provide you with an easy foundation to work with, as well as a bunch of build in utility methods.  Additionally, a Descriptor attribute is required to be added to the class, as it is used to define the plugins author, name, as well as optionally a description and a version. An optional Source attribute may also be added, which contains links to an authors website, a source repository, and a link to where the plugins .dll file may be downloaded for patching.
 
-* An IDE, such as Microsoft Visual Studio or Visual Studio Code. Anything should do as long as it can compile .NET Core.
-* The .NET Core 2.1 LTS framework SDK, which is required for any .NET Core based applications to be compiled.
-* Either a copy of the source code from here, or the [assemblies downloaded through NuGet](https://www.nuget.org/packages/Lomztein.Moduthulhu.Core.Assemblies) for reference.
-
-That should be the basics. Now to create an actual plugin.
-
-As mentioned previously, the most basic element you should be aware of is the "IPlugin" interface, as this is the interface between plugin and bot framework. However, it isn't really neccesary to worry about it, as it is much easier to work with the "PluginBase" abstract class, the default implementation of IPlugin. Inheriting from PluginBase will provide you with an easy foundation to work with, as well as a bunch of build in utility methods.  Additionally, a Descriptor attribute is required to be added to the class, as it is used to define the plugins author, name, as well as optionally a description and a version. An optional Source attribute may also be added, which contains links to an authors website, a source repository, and a link to where the plugins .dll file may be downloaded for patching.
+Now to create an actual plugin.
 
 ### Here is an empty class that inherits from PluginBase:
 
@@ -101,6 +114,15 @@ class ExamplePlugin : PluginBase {
 The default namespace for the core is Lomztein.Moduthulhu.Core.
 
 There are a few more members you can use, including two other Initialize functions that calls at different time during setup. You can also add the Dependancy attribute to declare that your plugin requires a certain other plugin to be able to function.
+
+There are in total four methods defined by IPlugin, all of which are called by PluginManager.
+
+* `PreInitialize (GuildHandler handler)` - Executed before anything else is done. It is recommended that messages and config options are registered here, as well as any setup that may be neccesary for other plugins to this one. Additionally it takes in the plugins GuildHandler to be assigned.
+* `Initialize ()` - The "Default" initialize function, as well as the only one neccesary to worry about if you don't need to interact with other plugins at all.
+* `PostInitialize ()` - Executed lastly. It is recommended to use this to process data given by other plugins.
+* `Shutdown ()` - Executed when the plugin must shutdown, perhaps to be disabled or reloaded. Use this to revert any changes done to other plugins or the core.
+
+Initialize and Shutdown must be implemented in your plugin class.
 
 You have access to a GuildHandler through IPlugin, which contains all Discord events defined by Discord.NET, however they only fire for the specific Discord server that the GuildHandler is tied to. Each individual server that the bot is connected to has its own instance of a GuildHandler, as well as any plugins that may be enabled on the server. Through the GuildHandler you have access to other tools. These tools are as following:
 
@@ -143,6 +165,12 @@ The following commands has been added
  > !fizzfyr13
  > !ping
 ```
+
+### Persistant Storage
+
+In order to save data between bot reboots, which can happen at any time due to updates or crashes, or some other unforseen catastrophe like the the earth going under in a beautiful cacophany of suffering, you need to use the `GetDataCache` method which returns a CachedValue where you can use `GetValue`, `SetValue` and `MutateValue` to get, set, or change the value it contains both locally and in a persistant database.
+
+For storing configuration values, use `GetConfigCache` instead, which is completely identical except that it stores it's data elsewhere.
  
 ### PluginConfig
 
@@ -153,31 +181,3 @@ Adding a configuration option looks something like this: `AddConfigInfo ("Name",
 Again, familiarity with delegates and lambda expressions in C# is recommended. Due to limitations of generic classes in C#, this is a bit more verbose than the previously mentioned RegisterMessageAction/Function methods.
 
 Do note that the methods examplified here are shortcut methods from PluginBase.
-
-## IPlugin defined Methods
-
-There are in total four methods defined by IPlugin, all of which are called by PluginManager.
-
-* `PreInitialize (GuildHandler handler)` - Executed before anything else is done. It is recommended that messages and config options are registered here, as well as any setup that may be neccesary for other plugins to this one. Additionally it takes in the plugins GuildHandler to be assigned.
-* `Initialize ()` - The "Default" initialize function, as well as the only one neccesary to worry about if you don't need to interact with other plugins at all.
-* `PostInitialize ()` - Executed lastly. It is recommended to use this to process data given by other plugins.
-* `Shutdown ()` - Executed when the plugin must shutdown, perhaps to be disabled or reloaded. Use this to revert any changes done to other plugins or the core.
-
-Initialize and Shutdown must be implemented in your plugin class.
-
-### Building your plugins
-
-You're going to want to build your plugins into .dll files for the core to load up and provide. The simple way to do this is just to build the project as with any other, and moving the primary output file into your running cores ./Data/Plugins folder. This should be fairly straightforward for anyone who've used Visual Studio in the past, albiet a bit of a trivial hassle after a few times.
-
-The slightly more advanced but easier once set up method is by using post-build commands. Right-click on your project in the solution explorer, click to "Properties", and go to the Build Events tab. To automatically copy the build plugin .dll, add this line to post-build event: `xcopy "$(TargetPath)" "$(SolutionDir)Core\bin\Debug\netcoreapp2.1\Data\Plugins\" /y`
-
-This will only be benificial if you have downloaded this entire solution, and have your plugin project as a project within the solution. In case you are running an instance of the bot via the assemblies provided via NuGet, you naturally need the xcopy command to copy your plugin files into whereever the /Data/Plugins folder is found in this case. 
-
-You can also add another xcopy line that copies the symbol files from compilation, which will make it much easier to debug your plugins. They must be placed in the bots root folder, so a command line for this would look something like
-`xcopy "$(TargetDir)$(TargetFileName).pdb" "$(SolutionDir)Core\bin\Debug\netcoreapp2.1\" /y`
-
-In a future version I will provide an entrypoint for running a debug bot instance with specific plugins, instead of you having to move the plugin files around yourself.
-
-### Loading your plugins
-
-When the bot framework launches, it loads all .dll files within the ./Data/Plugins folder and caches all IPlugin based types found within. These are then stored as plugins available for servers to enable.
