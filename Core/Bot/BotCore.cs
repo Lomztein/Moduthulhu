@@ -1,14 +1,7 @@
 ﻿using System;
-using Discord;
-using Discord.WebSocket;
 using System.Threading.Tasks;
-using Lomztein.Moduthulhu.Core.Plugins;
-using System.IO;
 using System.Threading;
-using System.Linq;
-using System.Collections.Generic;
 using Lomztein.Moduthulhu.Core.Bot.Client;
-using System.Reflection;
 using System.Globalization;
 
 namespace Lomztein.Moduthulhu.Core.Bot {
@@ -26,7 +19,7 @@ namespace Lomztein.Moduthulhu.Core.Bot {
 
         private readonly CancellationTokenSource _shutdownToken = new CancellationTokenSource();
 
-        internal async Task InitializeCore(string[] args)
+        public async Task InitializeCore(string[] args)
         {
             // Set up core
             BootDate = DateTime.Now;
