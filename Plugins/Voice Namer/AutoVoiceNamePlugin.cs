@@ -109,6 +109,8 @@ namespace Lomztein.Moduthulhu.Modules.Voice {
         public async Task UpdateChannel(SocketVoiceChannel channel) {
             string highestGame = "";
 
+            DisablePluginIfPermissionMissing(GuildPermission.ManageChannels, true);
+
             if (channel != null) {
 
                 string name = _channelNames.GetValue ().GetValueOrDefault (channel.Id);

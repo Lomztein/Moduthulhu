@@ -67,7 +67,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
                             }
                             else
                             {
-                                IEnumerable<string> exceptions = ParentPlugin.GuildHandler.Plugins.GetInitializationExceptions().Select(x => x.Message);
+                                IEnumerable<string> exceptions = ParentPlugin.GuildHandler.Plugins.GetInitializationExceptions().Select(x => x.InnerException.Message);
                                 await metadata.Message.Channel.SendMessageAsync($"Failed to add plugin '{name}'. Issues occured during initialization:\n\t{string.Join("\n\t", exceptions)}");
                             }
                         }, async () => await metadata.Message.Channel.SendMessageAsync($"Cancelled enabled plugin '{name}'.")).SetRecipient (metadata.AuthorID);

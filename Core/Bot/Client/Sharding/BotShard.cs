@@ -177,8 +177,6 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding
             Client.GuildMembersDownloaded   += async (x) =>         { try { await ForGuild (x, g => g.OnGuildMembersDownloaded ());                                     } catch (Exception exc) { OnExceptionCaught (exc); } };
             Client.GuildUnavailable         += async (x) =>         { try { await ForGuild (x, g => g.OnGuildUnavailable ());                                           } catch (Exception exc) { OnExceptionCaught (exc); } };
             Client.GuildUpdated             += async (x, y) =>      { try { await ForGuild (x, g => g.OnGuildUpdated (x, y));                                           } catch (Exception exc) { OnExceptionCaught (exc); } };
-            Client.JoinedGuild              += async (x) =>         { try { await ForGuild (x, g => g.OnJoinedGuild ());                                                } catch (Exception exc) { OnExceptionCaught (exc); } };
-            Client.LeftGuild                += async (x) =>         { try { await ForGuild (x, g => g.OnLeftGuild());                                                   } catch (Exception exc) { OnExceptionCaught (exc); } };
             Client.UserBanned               += async (x, y) =>      { try { await ForGuild (y, g => g.OnUserBanned (x));                                                } catch (Exception exc) { OnExceptionCaught (exc); } };
             Client.UserUnbanned             += async (x, y) =>      { try { await ForGuild (y, g => g.OnUserUnbanned (x));                                              } catch (Exception exc) { OnExceptionCaught (exc); } };
         }

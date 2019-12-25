@@ -20,6 +20,8 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client
             _onChange = onChange;
             _timeTreshold = treshold;
             _messages = messages;
+
+            Change();
         }
 
         public Task Cycle (DateTime before, DateTime after)
@@ -28,12 +30,17 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client
             if (-_currentTimePassed >= _timeTreshold)
             {
                 _currentIndex = (_currentIndex + 1) % _messages.Length;
-                StatusMessage msg = _messages[_currentIndex];
-                _onChange(msg.Type, msg.Message());
+                Change();
             }
             return Task.CompletedTask;
         }
 
-
+        private void Change ()
+        {
+            StatusMessage msg = _messages[_currentIndex];
+            string status = msg.Message();
+            Log.Bot($"Changing status to '{status}'.");
+            _onChange(msg.Type, status);
+        }
     }
 }

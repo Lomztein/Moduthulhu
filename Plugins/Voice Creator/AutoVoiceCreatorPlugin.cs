@@ -124,6 +124,7 @@ namespace Lomztein.Moduthulhu.Modules.Voice
         // Have to put it in a seperate async void function, so it doesn't block the event. Async root?
         private async Task CheckAndModifyChannelCount (SocketGuildUser user) {
 
+            DisablePluginIfPermissionMissing(Discord.GuildPermission.ManageChannels, true);
             List<SocketVoiceChannel> voiceChannels = user.Guild.VoiceChannels.ToList ();
 
             int freeChannels = 0;

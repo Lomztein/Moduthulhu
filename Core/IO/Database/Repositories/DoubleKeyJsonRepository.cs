@@ -19,17 +19,16 @@ namespace Lomztein.Moduthulhu.Core.IO.Database.Repositories
             _dataRepo.Init();
         }
 
-        public T Get<T> (ulong id, string key)
+        public JToken Get (ulong id, string key)
         {
             string json = _dataRepo.GetValue(id.ToString (CultureInfo.InvariantCulture), key);
-            if (json == null) { return default; }
-            T obj = JsonConvert.DeserializeObject<T>(json);
+            JToken obj = string.IsNullOrEmpty (json) ? null : JToken.Parse(json);
             return obj;
         }
 
-        public void Set(ulong id, string key, object value)
+        public void Set(ulong id, string key, JToken value)
         {
-            _dataRepo.SetValue(id.ToString (CultureInfo.InvariantCulture), key, JsonConvert.SerializeObject (value));
+            _dataRepo.SetValue(id.ToString (CultureInfo.InvariantCulture), key, value.ToString (Formatting.None));
         }
     }
 }

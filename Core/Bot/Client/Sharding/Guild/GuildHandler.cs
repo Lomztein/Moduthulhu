@@ -9,6 +9,7 @@ using Lomztein.Moduthulhu.Core.IO.Database.Repositories;
 using Lomztein.Moduthulhu.Core.Plugins.Framework;
 using System.Collections.Generic;
 using Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild.StateManagement;
+using System.Text;
 
 namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
 {
@@ -28,6 +29,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
         public readonly PluginMessenger Messenger;
         public readonly PluginConfig Config;
         public readonly StateManager State;
+        public readonly GuildNotifier Notifier;
 
         public CachedValue<CultureInfo> Culture { get; private set; }
         public Clock Clock { get; private set; }
@@ -40,6 +42,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
             Messenger = new PluginMessenger();
             Config = new PluginConfig();
             State = new StateManager();
+            Notifier = new GuildNotifier(this);
             Clock = new Clock(1, Name);
             Clock.Start();
 
@@ -47,8 +50,23 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
             BootDate = DateTime.Now;
             Plugins.OnPrePluginsLoaded += Plugins_OnPrePluginsLoaded;
             Plugins.OnPluginUnloaded += Plugins_OnPluginUnloaded;
+            JoinedGuild += GuildHandler_JoinedGuild;
 
             Culture = new CachedValue<CultureInfo>(new DoubleKeyJsonRepository("pluginconfig"), GuildId, "Culture", () => new CultureInfo("en-US"));
+        }
+
+        private async Task GuildHandler_JoinedGuild(SocketGuild arg)
+        {
+            StringBuilder notification = new StringBuilder();
+            notification.AppendLine($"Hello! I am {Shard.Client.CurrentUser.Username}!");
+            notification.AppendLine("Thank you for adding me to your server!\n");
+            notification.AppendLine($"I have created to ~~collect virgin souls for my dark master~~ provide an easy to use, extensible, and fully customizeable bot.");
+            notification.AppendLine("You can read more about me, as well as find a basic usage guide here: https://github.com/Lomztein/Moduthulhu/blob/master/README.md#moduthulhu---modular-discord-bot");
+            notification.AppendLine("\nI may occasionally send notifications like this to this channel on behalf of my provided plugins, or if I feel there is something important for you to know. To change notification channel, use the command `!config setnotificationchannel` and give it a text channel #mention.");
+            notification.AppendLine("Alternatively, you may entirely opt-out of this feature using `!config togglenotifications`.\n");
+            notification.AppendLine("Have fun! ~~Users with type-O negative blood are particularily welcome!~~");
+
+            await Notifier.Notify(notification.ToString());
         }
 
         private void Plugins_OnPrePluginsLoaded()
@@ -75,6 +93,12 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
         {
             Moduthulhu.Core.Log.Write(Moduthulhu.Core.Log.Type.BOT, $"Initializing GuildHandler for Guild {GetGuild().Name}.");
             Plugins.LoadPlugins();
+
+            Exception[] initExceptions = Plugins.GetInitializationExceptions();
+            if (initExceptions.Length > 0)
+            {
+                Notifier.Notify($"Some things went wrong while loading plugins after a patch:\n\t{string.Join("\n\t", initExceptions.Select(x => x.Message + " - " + x.InnerException.Message))}\n\n Offending plugins have been disabled.");
+            }
         }
 
         public void Kill ()

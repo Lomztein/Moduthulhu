@@ -11,6 +11,7 @@ using Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Lomztein.Moduthulhu.Core.Extensions;
+using Discord;
 
 namespace Lomztein.Moduthulhu.Modules.Clock.ActivityMonitor
 {
@@ -49,7 +50,6 @@ namespace Lomztein.Moduthulhu.Modules.Clock.ActivityMonitor
         public override void PostInitialize()
         {
             AddGeneralFeaturesStateAttribute("UserActivityMonitor", "Automated assigning roles to users based on last date of activity.");
-            _ = UpdateAll();
         }
 
         private Task GuildHandler_RoleDeleted(SocketRole arg)
@@ -59,9 +59,6 @@ namespace Lomztein.Moduthulhu.Modules.Clock.ActivityMonitor
         }
 
         public override void Shutdown() {
-            _ = UpdateAll();
-            StoreData();
-
             GuildHandler.MessageReceived -= DiscordClient_MessageReceived;
             GuildHandler.UserVoiceStateUpdated -= DiscordClient_UserVoiceStateUpdated;
             GuildHandler.UserJoined -= DiscordClient_UserJoined;
@@ -127,10 +124,11 @@ namespace Lomztein.Moduthulhu.Modules.Clock.ActivityMonitor
 
         private async Task UpdateUser(ulong user) {
 
+            DisablePluginIfPermissionMissing(GuildPermission.ManageRoles, true);
+
             DateTime activity = GetLastActivity(user);
             ulong role = GetRole(_activityRoles.GetValue(), activity);
             SocketRole roleObj = GuildHandler.FindRole(role);
-            Core.Log.Plugin($"User with Id {user} activityrole has been evaluated to {roleObj?.Name.ToStringOrNull ()}.");
 
             if (roleObj != null)
             {
@@ -208,11 +206,11 @@ namespace Lomztein.Moduthulhu.Modules.Clock.ActivityMonitor
         }
 
         private async Task UpdateAll () {
+
             await GuildHandler.GetGuild().DownloadUsersAsync();
             List<SocketGuildUser> users = GuildHandler.GetGuild().Users.ToList();
 
             foreach (SocketGuildUser u in users) {
-                Core.Log.Plugin($"Checking user {u.GetShownName ()}.");
                 if (!_userActivity.GetValue().ContainsKey (u.Id))
                 {
                     Core.Log.Plugin($"No last date for user {u.GetShownName ()}. Recording default date.");
@@ -220,7 +218,6 @@ namespace Lomztein.Moduthulhu.Modules.Clock.ActivityMonitor
                 }
                 else
                 {
-                    Core.Log.Plugin($"No last date for user {u.GetShownName ()}. Recording default date.");
                     await UpdateUser(u.Id);
                 }
             }

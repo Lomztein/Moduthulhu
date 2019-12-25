@@ -18,8 +18,8 @@ namespace Lomztein.Moduthulhu.Core.Bot
 
         public static void AssertConsent(ulong guild, ulong user)
         {
-            var queryRes = _consent.Get<bool>(guild, user.ToString(CultureInfo.InvariantCulture));
-            if (!queryRes)
+            var queryRes = _consent.Get(guild, user.ToString(CultureInfo.InvariantCulture));
+            if (!queryRes.ToObject<bool>())
             {
                 throw new ConsentException("User has not given consent to storage of personal data.");
             }

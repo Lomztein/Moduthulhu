@@ -18,7 +18,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
         private readonly GuildHandler _parentHandler;
 
         private readonly CachedValue<List<string>> _enabledPlugins;
-        private readonly List<Exception> _initializationExceptions = new List<Exception>();
+        private readonly List<PluginInitializationException> _initializationExceptions = new List<PluginInitializationException>();
 
         public event Action OnPrePluginsLoaded;
         public event Action OnPluginsLoaded;
@@ -163,7 +163,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
                     plugin.PreInitialize(_parentHandler);
                 } catch (Exception exc)
                 {
-                    ReportInitError("pre-initialization", exc, plugin, ref initError);
+                    ReportInitError("pre-initialization", new PluginInitializationException(Plugin.GetName(plugin.GetType()), exc), plugin, ref initError);
                 }
             }
 
@@ -176,7 +176,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
                 }
                 catch (Exception exc)
                 {
-                    ReportInitError("initialization", exc, plugin, ref initError);
+                    ReportInitError("initialization", new PluginInitializationException(Plugin.GetName(plugin.GetType()), exc), plugin, ref initError);
                 }
             }
 
@@ -189,7 +189,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
                 }
                 catch (Exception exc)
                 {
-                    ReportInitError("post-initialization", exc, plugin, ref initError);
+                    ReportInitError("post-initialization", new PluginInitializationException (Plugin.GetName (plugin.GetType ()), exc), plugin, ref initError);
                 }
 
                 OnPluginLoaded?.Invoke(plugin);
@@ -203,7 +203,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
             OnPluginsLoaded?.Invoke();
         }
 
-        private void ReportInitError (string step, Exception exc, IPlugin plugin, ref bool initErrorFlag)
+        private void ReportInitError (string step, PluginInitializationException exc, IPlugin plugin, ref bool initErrorFlag)
         {
             Log.Write(Log.Type.WARNING, $"Something went wrong during plugin {step} of plugin '{Plugin.GetName(plugin.GetType())}'. The plugin has been disabled and plugin initialization scheduled to be restarted.");
             Log.Exception(exc);

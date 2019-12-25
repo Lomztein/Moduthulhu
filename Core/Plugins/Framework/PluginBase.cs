@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using Discord;
 using Lomztein.Moduthulhu.Core.Bot;
 using Lomztein.Moduthulhu.Core.Bot.Client.Sharding;
@@ -77,5 +78,27 @@ namespace Lomztein.Moduthulhu.Core.Plugins.Framework
         protected void AddGeneralFeaturesStateAttribute(string name, string description) => GuildHandler.AddStateAttribute("GeneralFeatures", name, description);
         protected void SetStateChangeHeaders(string identifier, string addition, string removals, string mutations) => GuildHandler.SetStateChangeHeaders(Plugin.GetVersionedFullName(GetType())+identifier, addition, removals, mutations);
         protected void SetStateChangeHeaders(string identifier, string addition, string removals) => GuildHandler.SetStateChangeHeaders(Plugin.GetVersionedFullName(GetType())+identifier, addition, removals, string.Empty);
+
+        protected Task NotifyGuild(string message, Embed embed) => GuildHandler.Notifier.Notify(message, embed);
+        protected Task NotifyGuild(string message) => GuildHandler.Notifier.Notify(message);
+        protected Task NotifyGuild(Embed embed) => GuildHandler.Notifier.Notify(embed);
+
+        protected void DisablePlugin(string message)
+        {
+            GuildHandler.Plugins.RemovePlugin(Plugin.GetName(GetType()));
+            throw new PluginDisabledException(message);
+        }
+
+        protected void DisablePluginIfPermissionMissing(GuildPermission permission, bool notifyGuild)
+        {
+            if (!HasPermission(permission))
+            {
+                if (notifyGuild)
+                {
+                    NotifyGuild($"Plugin {Plugin.GetName(GetType())} requires permission '{permission}' to function, which has been revoked. The plugin has automatically been disabled.");
+                }
+                DisablePlugin($"Disabled plugin due to revoked permission '{permission}'.");
+            }
+        }
     }
 }

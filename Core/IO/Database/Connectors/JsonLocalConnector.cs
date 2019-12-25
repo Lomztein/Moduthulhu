@@ -14,7 +14,8 @@ namespace Lomztein.Moduthulhu.Core.IO.Database.Connectors
         public T GetValue<T>(string path)
         {
             Log.Data($"Reading JSON data at '{path}'.");
-            return JSONSerialization.DeserializeFile<T>(GetPath() + path);
+            var val = JSONSerialization.DeserializeFile<T>(GetPath() + path);
+            return val;
         }
 
         public void SetValue(string path, object value)
