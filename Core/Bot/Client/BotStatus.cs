@@ -27,7 +27,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client
         public Task Cycle (DateTime before, DateTime after)
         {
             _currentTimePassed++;
-            if (-_currentTimePassed >= _timeTreshold)
+            if (_currentTimePassed >= _timeTreshold)
             {
                 _currentIndex = (_currentIndex + 1) % _messages.Length;
                 Change();

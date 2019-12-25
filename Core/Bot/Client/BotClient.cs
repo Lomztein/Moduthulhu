@@ -28,10 +28,6 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client
         private DiscordSocketClient FirstClient => _shards.First ().Client;
 
         private BotStatus _status;
-
-    private int _statusMessageIndex = -1;
-        private const int _statusChangeChance = 10;
-
         private readonly Clock _statusClock = new Clock(1, "StatusClock");
         private UserList _botAdministrators;
         private int _consecutiveOfflineMinutes;
