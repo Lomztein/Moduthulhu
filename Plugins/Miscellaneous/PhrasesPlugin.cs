@@ -26,48 +26,48 @@ namespace Lomztein.Moduthulhu.Modules.Phrases
             _phrases = GetConfigCache("Phrases", x => new List<Phrase>());
 
             #region
-            AddConfigInfo("Add Phrase", "Add empty phrase.", new Action(() => { _phrases.GetValue().Add(new Phrase()); _phrases.Store(); }), () => $"Added new empty response phrase at index {_phrases.GetValue ().Count - 1}. You must edit it using the other config options available here.");
-            AddConfigInfo("Remove Phrase", "Remove phrase.", new Action<int>((x) => { _phrases.GetValue().RemoveAt(x); _phrases.Store(); }), () => $"Removed response phrase at the given index.", "Index");
+            AddConfigInfo("Add Phrase", "Add empty phrase.", () => { _phrases.GetValue().Add(new Phrase()); _phrases.Store(); }, () => $"Added new empty response phrase at index {_phrases.GetValue ().Count - 1}. You must edit it using the other config options available here.");
+            AddConfigInfo<int>("Remove Phrase", "Remove phrase.", x => { _phrases.GetValue().RemoveAt(x); _phrases.Store(); }, x => $"Removed response phrase at the index {x}.", "Index");
             AddConfigInfo("List Phrases", "List current phrases.", () => "Current phrases:\n" + string.Join('\n', _phrases.GetValue().Select(x => _phrases.GetValue ().IndexOf (x) + " -> " + x.ToString (GuildHandler))));
             
-            AddConfigInfo("Set Phrase Trigger", "Set trigger", new Action(() => { _phrases.GetValue().LastOrDefault().Trigger = string.Empty; _phrases.Store(); }), () => $"Phrase trigger reset.");
-            AddConfigInfo("Set Phrase Trigger", "Set trigger", new Action<string>((y) => { _phrases.GetValue().LastOrDefault().Trigger = y; _phrases.Store(); }), () => $"Phrase trigger updated.", "Trigger");
-            AddConfigInfo("Set Phrase Trigger", "Set trigger", new Action<int>((x) => { _phrases.GetValue()[x].Trigger = string.Empty; _phrases.Store(); }), () => $"Phrase trigger reset.", "Index");
-            AddConfigInfo("Set Phrase Trigger", "Set trigger", new Action<int, string>((x, y) => { _phrases.GetValue()[x].Trigger = y; _phrases.Store(); }), () => $"Phrase trigger updated.", "Index", "Trigger");
+            AddConfigInfo("Set Phrase Trigger", "Set trigger", () => { _phrases.GetValue().LastOrDefault().Trigger = string.Empty; _phrases.Store(); }, () => $"Most recent phrase trigger reset.");
+            AddConfigInfo<string>("Set Phrase Trigger", "Set trigger", y => { _phrases.GetValue().LastOrDefault().Trigger = y; _phrases.Store(); }, y => $"Most recent phrase trigger set to {y}.", "Trigger");
+            AddConfigInfo<int>("Set Phrase Trigger", "Set trigger", x => { _phrases.GetValue()[x].Trigger = string.Empty; _phrases.Store(); }, x => $"Phrase trigger at index {x} reset.", "Index");
+            AddConfigInfo<int, string>("Set Phrase Trigger", "Set trigger", (x, y) => { _phrases.GetValue()[x].Trigger = y; _phrases.Store(); }, (x, y) => $"Phrase trigger at index {x} updated to '{y}'.", "Index", "Trigger");
 
-            AddConfigInfo("Set Phrase User", "Set user", new Action(() => { _phrases.GetValue().LastOrDefault ().UserId = 0; _phrases.Store(); }), () => $"Phrase user reset.");
-            AddConfigInfo("Set Phrase User", "Set user", new Action<SocketGuildUser>((y) => { _phrases.GetValue().LastOrDefault ().UserId = y.Id; _phrases.Store(); }), () => $"Phrase user updated.", "User");
-            AddConfigInfo("Set Phrase User", "Set user", new Action<string>((y) => { _phrases.GetValue().LastOrDefault ().UserId = GuildHandler.FindUser(y).Id; _phrases.Store(); }), () => $"Phrase user updated.", "Username");
-            AddConfigInfo("Set Phrase User", "Set user", new Action<ulong>((y) => { _phrases.GetValue().LastOrDefault ().UserId = y; _phrases.Store(); }), () => $"Phrase user updated.", "User ID");
+            AddConfigInfo("Set Phrase User", "Set user", () => { _phrases.GetValue().LastOrDefault ().UserId = 0; _phrases.Store(); }, () => $"Most recent phrase user reset.");
+            AddConfigInfo<SocketGuildUser>("Set Phrase User", "Set user", y => { _phrases.GetValue().LastOrDefault ().UserId = y.Id; _phrases.Store(); }, x => $"Most recent phrase user updated to '{x.GetShownName ()}'.", "User");
+            AddConfigInfo<string>("Set Phrase User", "Set user", y => { _phrases.GetValue().LastOrDefault ().UserId = GuildHandler.GetUser(y).Id; _phrases.Store(); }, y => $"Most recent phrase user updated to '{GuildHandler.GetUser (y).GetShownName ()}'.", "Username");
+            AddConfigInfo<ulong>("Set Phrase User", "Set user", y => { _phrases.GetValue().LastOrDefault ().UserId = y; _phrases.Store(); }, y => $"Most recent phrase user updated to '{GuildHandler.GetUser (y).GetShownName ()}.", "User ID");
 
-            AddConfigInfo("Set Phrase User", "Set user", new Action<int>((x) => { _phrases.GetValue()[x].UserId = 0; _phrases.Store(); }), () => $"Phrase user reset.", "Index");
-            AddConfigInfo("Set Phrase User", "Set user", new Action<int, SocketGuildUser>((x, y) => { _phrases.GetValue()[x].UserId = y.Id; _phrases.Store(); }), () => $"Phrase user updated.", "Index", "User");
-            AddConfigInfo("Set Phrase User", "Set user", new Action<int, string>((x, y) => { _phrases.GetValue()[x].UserId = GuildHandler.FindUser (y).Id; _phrases.Store(); }), () => $"Phrase user updated.", "Index", "Username");
-            AddConfigInfo("Set Phrase User", "Set user", new Action<int, ulong>((x, y) => { _phrases.GetValue()[x].UserId = y; _phrases.Store(); }), () => $"Phrase user updated.", "Index", "User ID");
+            AddConfigInfo<int>("Set Phrase User", "Set user", x => { _phrases.GetValue()[x].UserId = 0; _phrases.Store(); }, x => $"Phrase user at index {x} reset.", "Index");
+            AddConfigInfo<int, SocketGuildUser>("Set Phrase User", "Set user", (x, y) => { _phrases.GetValue()[x].UserId = y.Id; _phrases.Store(); }, (x, y) => $"Phrase user at index {x} updated to '{y.GetShownName()}'.", "Index", "User");
+            AddConfigInfo<int, string>("Set Phrase User", "Set user", (x, y) => { _phrases.GetValue()[x].UserId = GuildHandler.FindUser (y).Id; _phrases.Store(); }, (x, y) => $"Phrase user at index {x} updated to '{GuildHandler.GetUser (y).GetShownName ()}'.", "Index", "Username");
+            AddConfigInfo<int, ulong>("Set Phrase User", "Set user", (x, y) => { _phrases.GetValue()[x].UserId = y; _phrases.Store(); }, (x, y) => $"Phrase user at index {x} updated to '{GuildHandler.GetUser(y).GetShownName ()}'.", "Index", "User ID");
 
-            AddConfigInfo("Set Phrase Channel", "Set channel", new Action(() => { _phrases.GetValue().LastOrDefault ().ChannelId = 0; _phrases.Store(); }), () => $"Phrase channel reset.");
-            AddConfigInfo("Set Phrase Channel", "Set channel", new Action<SocketTextChannel>((y) => { _phrases.GetValue().LastOrDefault ().ChannelId = y.Id; _phrases.Store(); }), () => $"Phrase channel updated.", "Channel");
-            AddConfigInfo("Set Phrase Channel", "Set channel", new Action<string>((y) => { _phrases.GetValue().LastOrDefault().ChannelId = GuildHandler.FindTextChannel(y).Id; _phrases.Store(); }), () => $"Phrase channel updated.", "Channel Name");
-            AddConfigInfo("Set Phrase Channel", "Set channel", new Action<ulong>((y) => { _phrases.GetValue().LastOrDefault().ChannelId = y; _phrases.Store(); }), () => $"Phrase trigger updated.", "Channel ID");
+            AddConfigInfo("Set Phrase Channel", "Set channel", () => { _phrases.GetValue().LastOrDefault ().ChannelId = 0; _phrases.Store(); }, () => $"Most recent phrase channel reset.");
+            AddConfigInfo<SocketTextChannel>("Set Phrase Channel", "Set channel", y => { _phrases.GetValue().LastOrDefault ().ChannelId = y.Id; _phrases.Store(); }, x => $"Most recent phrase channel updated to '{x.Name}'.", "Channel");
+            AddConfigInfo<string>("Set Phrase Channel", "Set channel", y => { _phrases.GetValue().LastOrDefault().ChannelId = GuildHandler.GetTextChannel(y).Id; _phrases.Store(); }, x => $"Most recent phrase channel updated to '{GuildHandler.GetTextChannel (x).Name}'.", "Channel Name");
+            AddConfigInfo<ulong>("Set Phrase Channel", "Set channel", y => { _phrases.GetValue().LastOrDefault().ChannelId = y; _phrases.Store(); }, x => $"Most recent phrase channel updated to '{GuildHandler.GetTextChannel (x).Name}'.", "Channel ID");
 
-            AddConfigInfo("Set Phrase Channel", "Set channel", new Action<int>((x) => { _phrases.GetValue()[x].ChannelId = 0; _phrases.Store(); }), () => $"Phrase channel reset.", "Index");
-            AddConfigInfo("Set Phrase Channel", "Set channel", new Action<int, SocketTextChannel>((x, y) => { _phrases.GetValue()[x].ChannelId = y.Id; _phrases.Store(); }), () => $"Phrase channel updated.", "Index", "Channel");
-            AddConfigInfo("Set Phrase Channel", "Set channel", new Action<int, string>((x, y) => { _phrases.GetValue()[x].ChannelId = GuildHandler.FindTextChannel (y).Id; _phrases.Store(); }), () => $"Phrase channel updated.", "Index", "Channel Name");
-            AddConfigInfo("Set Phrase Channel", "Set channel", new Action<int, ulong>((x, y) => { _phrases.GetValue()[x].ChannelId = y; _phrases.Store(); }), () => $"Phrase trigger updated.", "Index", "Channel ID");
+            AddConfigInfo<int>("Set Phrase Channel", "Set channel", x => { _phrases.GetValue()[x].ChannelId = 0; _phrases.Store(); }, x => $"Phrase channel at index {x} reset.", "Index");
+            AddConfigInfo<int, SocketTextChannel>("Set Phrase Channel", "Set channel", (x, y) => { _phrases.GetValue()[x].ChannelId = y.Id; _phrases.Store(); }, (x, y) => $"Phrase channel at index {x} updated to '{y.Name}'.", "Index", "Channel");
+            AddConfigInfo<int, string>("Set Phrase Channel", "Set channel", (x, y) => { _phrases.GetValue()[x].ChannelId = GuildHandler.GetTextChannel (y).Id; _phrases.Store(); }, (x, y) => $"Phrase channel at index {x} updated to '{GuildHandler.GetTextChannel(y).Name}'.", "Index", "Channel Name");
+            AddConfigInfo<int, ulong>("Set Phrase Channel", "Set channel", (x, y) => { _phrases.GetValue()[x].ChannelId = y; _phrases.Store(); }, (x, y) => $"Phrase channel at index {x} '{GuildHandler.GetTextChannel (y)}'.", "Index", "Channel ID");
 
-            AddConfigInfo("Set Phrase Chance", "Set chance", new Action(() => { _phrases.GetValue().LastOrDefault ().Chance = 0; _phrases.Store(); }), () => $"Phrase chance reset.");
-            AddConfigInfo("Set Phrase Chance", "Set chance", new Action<double>((y) => { _phrases.GetValue().LastOrDefault ().Chance = Math.Clamp(y, 0d, 100d); _phrases.Store(); }), () => $"Phrase chance updated.", "Chance");
-            AddConfigInfo("Set Phrase Response", "Set response", new Action(() => { _phrases.GetValue().LastOrDefault().Response = string.Empty; _phrases.Store(); }), () => $"Phrase response reset.");
-            AddConfigInfo("Set Phrase Response", "Set response", new Action<string>((y) => { _phrases.GetValue().LastOrDefault().Response = y; _phrases.Store(); }), () => $"Phrase response updated.", "Response");
-            AddConfigInfo("Set Phrase Emoji", "Set emoji", new Action(() => { _phrases.GetValue().LastOrDefault().Emoji = string.Empty; _phrases.Store(); }), () => $"Phrase Emoji reset.");
-            AddConfigInfo("Set Phrase Emoji", "Set emoji", new Action<string>((y) => { _phrases.GetValue().LastOrDefault().Emoji = y; _phrases.Store(); }), () => $"Phrase Emoji updated.", "Emoji");
+            AddConfigInfo("Set Phrase Chance", "Set chance", () => { _phrases.GetValue().LastOrDefault ().Chance = 0; _phrases.Store(); }, () => $"Most recent chance reset.");
+            AddConfigInfo<double>("Set Phrase Chance", "Set chance", y => { _phrases.GetValue().LastOrDefault ().Chance = Math.Clamp(y, 0d, 100d); _phrases.Store(); }, y => $"Most recent phrase chance updated to {y}.", "Chance");
+            AddConfigInfo("Set Phrase Response", "Set response", () => { _phrases.GetValue().LastOrDefault().Response = string.Empty; _phrases.Store(); }, () => $"Most recent phrase response reset.");
+            AddConfigInfo<string>("Set Phrase Response", "Set response", y => { _phrases.GetValue().LastOrDefault().Response = y; _phrases.Store(); }, x => $"Most recent phrase response updated {x}.", "Response");
+            AddConfigInfo("Set Phrase Emoji", "Set emoji", () => { _phrases.GetValue().LastOrDefault().Emoji = string.Empty; _phrases.Store(); }, () => $"Most recent phrase emoji reset.");
+            AddConfigInfo<string>("Set Phrase Emoji", "Set emoji", y => { _phrases.GetValue().LastOrDefault().Emoji = y; _phrases.Store(); }, x => $"Most recent phrase emoji updated {x}.", "Emoji");
 
-            AddConfigInfo("Set Phrase Chance", "Set chance", new Action<int>((x) => { _phrases.GetValue()[x].Chance = 100; _phrases.Store(); }), () => $"Phrase chance reset.", "Index");
-            AddConfigInfo("Set Phrase Chance", "Set chance", new Action<int, double>((x, y) => { _phrases.GetValue()[x].Chance = Math.Clamp (y, 0d, 100d); _phrases.Store(); }), () => $"Phrase chance updated.", "Index", "Chance");
-            AddConfigInfo("Set Phrase Response", "Set response", new Action<int>((x) => { _phrases.GetValue()[x].Response = string.Empty; _phrases.Store(); }), () => $"Phrase response reset.", "Index");
-            AddConfigInfo("Set Phrase Response", "Set response", new Action<int, string>((x, y) => { _phrases.GetValue()[x].Response = y; _phrases.Store(); }), () => $"Phrase response updated.", "Index", "Response");
-            AddConfigInfo("Set Phrase Emoji", "Set emoji", new Action<int>((x) => { _phrases.GetValue()[x].Emoji = string.Empty; _phrases.Store(); }), () => $"Phrase Emoji reset.", "Index");
-            AddConfigInfo("Set Phrase Emoji", "Set emoji", new Action<int, string>((x, y) => { _phrases.GetValue()[x].Emoji = y; _phrases.Store(); }), () => $"Phrase Emoji updated.", "Index", "Emoji");
+            AddConfigInfo<int>("Set Phrase Chance", "Set chance", x => { _phrases.GetValue()[x].Chance = 100; _phrases.Store(); }, x => $"Phrase at index {x} chance reset.", "Index");
+            AddConfigInfo<int, double>("Set Phrase Chance", "Set chance", (x, y) => { _phrases.GetValue()[x].Chance = Math.Clamp (y, 0d, 100d); _phrases.Store(); }, (x, y) => $"Phrase at index {x} chance updated to {y}.", "Index", "Chance");
+            AddConfigInfo<int>("Set Phrase Response", "Set response", x => { _phrases.GetValue()[x].Response = string.Empty; _phrases.Store(); }, x => $"Phrase at index {x} response reset.", "Index");
+            AddConfigInfo<int, string>("Set Phrase Response", "Set response", (x, y) => { _phrases.GetValue()[x].Response = y; _phrases.Store(); }, (x, y) => $"Phrase at index {x} response updated to {y}.", "Index", "Response");
+            AddConfigInfo<int>("Set Phrase Emoji", "Set emoji", x => { _phrases.GetValue()[x].Emoji = string.Empty; _phrases.Store(); }, x => $"Phrase at index {x} emoji reset.", "Index");
+            AddConfigInfo<int, string>("Set Phrase Emoji", "Set emoji", (x, y) => { _phrases.GetValue()[x].Emoji = y; _phrases.Store(); }, (x, y) => $"Phrase at index {x} emoji updated to {y}.", "Index", "Emoji");
             #endregion
         }
 

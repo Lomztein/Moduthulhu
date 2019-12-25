@@ -37,7 +37,7 @@ namespace Lomztein.Moduthulhu.Plugins.Birthday {
 
             AddConfigInfo<string>("Set Birthday Channel", "Set announcement channel.", x => _announcementChannel.SetValue(GuildHandler.GetVoiceChannel (x).Id), x => $"Channel channel set to {GuildHandler.GetTextChannel(x).Mention}.", "Channel Name");
             AddConfigInfo<ulong>("Set Birthday Channel", "Set announcement channel.", x => _announcementChannel.SetValue(GuildHandler.GetVoiceChannel (x).Id), x => $"Channel channel set to {GuildHandler.GetTextChannel(x).Mention}.", "Channel Id");
-            AddConfigInfo<SocketTextChannel>("Set Birthday Channel", "Set announcement channel.", x => _announcementChannel.SetValue(x.Id), x => $"Channel channel set to {GuildHandler.GetTextChannel(x)}", "Channel");
+            AddConfigInfo<SocketTextChannel>("Set Birthday Channel", "Set announcement channel.", x => _announcementChannel.SetValue(x.Id), x => $"Channel channel set to {x.Name}", "Channel");
             AddConfigInfo("Set Birthday Channel", "Get announcement channel.", () => $"Current announcement channel is {GuildHandler.GetTextChannel(_announcementChannel.GetValue()).Mention}.");
 
             AddConfigInfo<string>("Set Birthday Message", "Set birthday message.", x => _announcementMessage.SetValue(x), x => $"New announcement message: '{x}'.", "Message");

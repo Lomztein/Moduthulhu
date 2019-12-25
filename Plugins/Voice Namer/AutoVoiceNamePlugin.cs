@@ -46,23 +46,23 @@ namespace Lomztein.Moduthulhu.Modules.Voice {
             _internationalRoleId = GetConfigCache("MusicBotId", x => (ulong)0);
 
             AddConfigInfo("Set Channel Name", "Display channel names", () => "Current channel names:\n" + string.Join('\n', _channelNames.GetValue().Select(x => x.Value).ToArray()));
-            AddConfigInfo("Set Channel Name", "Set channel name", new Action<SocketVoiceChannel, string>((x, y) => _channelNames.MutateValue(z => z[x.Id] = y)), () => "Succesfully set channel names.", "Channel", "New name");
-            AddConfigInfo("Set Channel Name", "Set channel name", new Action<string, string>((x, y) => _channelNames.MutateValue(z => z[GuildHandler.GetVoiceChannel(x).Id] =  y)), () => "Succesfully set channel names.", "Channel", "New name");
+            AddConfigInfo<SocketVoiceChannel, string>("Set Channel Name", "Set channel name", (x, y) => _channelNames.MutateValue(z => z[x.Id] = y), (x, y) => $"Succesfully set channel '{x.Name}' to '{y}'", "Channel", "New name");
+            AddConfigInfo<string, string>("Set Channel Name", "Set channel name", (x, y) => _channelNames.MutateValue(z => z[GuildHandler.GetVoiceChannel(x).Id] =  y), (x, y) => "Succesfully set channel names.", "Channel", "New name");
 
-            AddConfigInfo("Dont Name Channel", "Ignore channel", new Action<SocketVoiceChannel>((x) => _toIgnore.MutateValue(y => y.Add(x.Id))), () => "Added channel to list of ignored.", "Channel");
-            AddConfigInfo("Dont Name Channel", "Ignore channel", new Action<ulong>((x) => _toIgnore.MutateValue(y => y.Add(GuildHandler.GetVoiceChannel (x).Id))), () => "Added channel to list of default.", "ignored");
-            AddConfigInfo("Dont Name Channel", "Ignore channel", new Action<string>((x) => _toIgnore.MutateValue(y => y.Add(GuildHandler.GetVoiceChannel(x).Id))), () => "Added channel to list of ignored.", "Channel");
+            AddConfigInfo<SocketVoiceChannel>("Dont Name Channel", "Ignore channel", x => _toIgnore.MutateValue(y => y.Add(x.Id)), x => $"Added channel '{x.Name}' to list of ignored channels.", "Channel");
+            AddConfigInfo<ulong>("Dont Name Channel", "Ignore channel", x => _toIgnore.MutateValue(y => y.Add(GuildHandler.GetVoiceChannel (x).Id)), x => $"Added channel '{GuildHandler.GetVoiceChannel (x).Name}' to list of ignored channels.", "ignored");
+            AddConfigInfo<string>("Dont Name Channel", "Ignore channel", x => _toIgnore.MutateValue(y => y.Add(GuildHandler.GetVoiceChannel(x).Id)), x => $"Added channel '{GuildHandler.GetVoiceChannel(x).Name}' to list of ignored channels.", "Channel");
 
-            AddConfigInfo("Do Name Channel", "Unignore channel", new Action<SocketVoiceChannel>((x) => _toIgnore.MutateValue(y => y.Remove(x.Id))), () => "Removed channel from list of ignored.", "Channel");
-            AddConfigInfo("Do Name Channel", "Unignore channel", new Action<ulong>((x) => _toIgnore.MutateValue(y => y.Remove(GuildHandler.GetVoiceChannel (x).Id))), () => "Removed channel from list of ignored.", "Channel");
-            AddConfigInfo("Do Name Channel", "Unignore channel", new Action<string>((x) => _toIgnore.MutateValue(y => y.Remove(GuildHandler.GetVoiceChannel(x).Id))), () => "Removed channel from list of ignored.", "Channel");
+            AddConfigInfo<SocketVoiceChannel>("Do Name Channel", "Unignore channel", x => _toIgnore.MutateValue(y => y.Remove(x.Id)), x => $"Removed channel '{x.Name}' from list of ignored.", "Channel");
+            AddConfigInfo<ulong>("Do Name Channel", "Unignore channel", x => _toIgnore.MutateValue(y => y.Remove(GuildHandler.GetVoiceChannel (x).Id)), x => $"Removed channel '{GuildHandler.GetChannel(x)}' from list of ignored.", "Channel");
+            AddConfigInfo<string>("Do Name Channel", "Unignore channel", x => _toIgnore.MutateValue(y => y.Remove(GuildHandler.GetVoiceChannel(x).Id)), x => $"Removed channel '{GuildHandler.GetChannel(x)}' from list of ignored.", "Channel");
 
-            AddConfigInfo("Set Music Bot", "Set music bot.", new Action<SocketGuildUser>((x) => _musicBotId.SetValue(x.Id)), () => $"Set music bot to be {GuildHandler.GetUser(_musicBotId.GetValue()).GetShownName()}.", "Music Bot");
-            AddConfigInfo("Set Music Bot", "Set music bot.", new Action<string>((x) => _musicBotId.SetValue(GuildHandler.GetUser(x).Id)), () => $"Set music bot to be {GuildHandler.GetUser(_musicBotId.GetValue()).GetShownName()}.", "Music Bot");
+            AddConfigInfo<SocketGuildUser>("Set Music Bot", "Set music bot.", x => _musicBotId.SetValue(x.Id), x => $"Set music bot to be {x.Id}.", "Music Bot");
+            AddConfigInfo<string>("Set Music Bot", "Set music bot.", x => _musicBotId.SetValue(GuildHandler.GetUser(x).Id), x => $"Set music bot to be {GuildHandler.GetUser(x).GetShownName()}.", "Music Bot");
             AddConfigInfo("Set Music Bot", "Show music bot.", () => GuildHandler.FindUser(_musicBotId.GetValue()) == null ? "Current music bot doesn't exist :(" : "Current music bot is " + GuildHandler.GetUser(_musicBotId.GetValue()).GetShownName());
 
-            AddConfigInfo("Set International Role", "Set role.", new Action<SocketRole>((x) => _internationalRoleId.SetValue(x.Id)), () => $"Set international role to be {GuildHandler.GetRole(_internationalRoleId.GetValue()).Name}.", "Role");
-            AddConfigInfo("Set International Role", "Set role.", new Action<string>((x) => _internationalRoleId.SetValue(GuildHandler.GetRole(x).Id)), () => $"Set international role to be {GuildHandler.GetRole(_internationalRoleId.GetValue()).Name}.", "Role Name");
+            AddConfigInfo<SocketRole>("Set International Role", "Set role.", x => _internationalRoleId.SetValue(x.Id), x => $"Set international role to be {x}.", "Role");
+            AddConfigInfo<string>("Set International Role", "Set role.", x => _internationalRoleId.SetValue(GuildHandler.GetRole(x).Id), x => $"Set international role to be {GuildHandler.GetRole(x).Name}.", "Role Name");
             AddConfigInfo("Set International Role", "Show role.", () => GuildHandler.FindRole(_internationalRoleId.GetValue()) == null ? "Current international role doesn't exist :(" : "Current international role is " + GuildHandler.GetRole(_internationalRoleId.GetValue()).Name);
 
             SendMessage("Lomztein-Command Root", "AddCommand", _commandSet);

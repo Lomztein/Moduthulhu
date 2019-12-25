@@ -32,13 +32,12 @@ namespace Lomztein.Moduthulhu.Modules.Clock.ActivityMonitor
 
             AddConfigInfo("List Activity Roles", "Display roles", () => "Current activity roles:\n" + string.Join("\n", _activityRoles.GetValue().Select(x => x.ToString(GuildHandler)).ToArray()));
 
-            AddConfigInfo<SocketRole, uint>("Add Activity Role", "Add new role.", (x, y) => AddRole(new ActivityRole(x.Id, y)), () => "Added new activity role", "Role", "Treshold (days)");
-            AddConfigInfo<ulong, uint>("Add Activity Role", "Add new role.", (x, y) => AddRole(new ActivityRole(GuildHandler.GetRole (x).Id, y)), () => "Added new activity role", "Role", "Treshold (days)");
-            AddConfigInfo<string, uint>("Add Activity Role", "Add new role.", (x, y) => AddRole(new ActivityRole(GuildHandler.GetRole (x).Id, y)), () => "Added new activity role", "Role", "Treshold (days)");
+            AddConfigInfo<SocketRole, uint>("Add Activity Role", "Add new role.", (x, y) => AddRole(new ActivityRole(x.Id, y)), (x, y) => $"Added new activity role '{x.Name}' with a treshold of {y} days.", "Role", "Treshold (days)");
+            AddConfigInfo<ulong, uint>("Add Activity Role", "Add new role.", (x, y) => AddRole(new ActivityRole(GuildHandler.GetRole (x).Id, y)), (x, y) => $"Added new activity role '{GuildHandler.GetRole(x).Name}' with a treshold of {y} days.", "Role", "Treshold (days)");
+            AddConfigInfo<string, uint>("Add Activity Role", "Add new role.", (x, y) => AddRole(new ActivityRole(GuildHandler.GetRole (x).Id, y)), (x, y) => $"Added new activity role '{GuildHandler.GetRole(x).Name}' with a treshold of {y} days.", "Role", "Treshold (days)");
 
-            AddConfigInfo<SocketRole>("Remove Activity Role", "Remove role.", x => RemoveRole(x.Id), () => "Removed activity role", "Role");
-            AddConfigInfo<string>("Remove Activity Role", "Remove role.", x => RemoveRole(GuildHandler.GetRole(x).Id), () => "Removed activity role", "Role");
-            AddConfigInfo<uint>("Remove Activity Role", "Remove role.", x => RemoveRole(x), x => "Removed activity role", "Role");
+            AddConfigInfo<SocketRole>("Remove Activity Role", "Remove role.", x => RemoveRole(x.Id), x => $"Removed activity role {x.Name}.", "Role");
+            AddConfigInfo<string>("Remove Activity Role", "Remove role.", x => RemoveRole(GuildHandler.GetRole(x).Id), x => $"Removed activity role '{x}'", "Role");
 
             _userActivity = GetDataCache("UserActivity", x => new Dictionary<ulong, DateTime>());
             _activityRoles = GetConfigCache("ActivityRoles", x => new List<ActivityRole>());

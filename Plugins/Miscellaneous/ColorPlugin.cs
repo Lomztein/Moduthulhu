@@ -33,10 +33,10 @@ namespace Lomztein.Moduthulhu.Modules.Colour
             _colourRolePrefix = GetConfigCache("ColourRolePrefix", x => "cl_");
             _colourOnJoin = GetConfigCache("ColourOnJoin", x => false);
 
-            AddConfigInfo("Set Colour Prefix", "Set colour prefix", new Action<string>(x => _colourRolePrefix.SetValue(x)), () => $"Set colour prefix to '{_colourRolePrefix.GetValue()}'", "Prefix");
+            AddConfigInfo<string>("Set Colour Prefix", "Set colour prefix", x => _colourRolePrefix.SetValue(x), x => $"Set colour prefix to '{x}'", "Prefix");
             AddConfigInfo("Set Colour Prefix", "Get colour prefix", () => $"Current colour prefix is '{_colourRolePrefix.GetValue()}'.");
 
-            AddConfigInfo("Colour on Join", "Colour on join?", new Action (() => _colourOnJoin.SetValue (!_colourOnJoin.GetValue ())), () => _colourOnJoin.GetValue() ? $"New members now be automatically given a random available colour on join." : $"New members will no longer be coloured on join.");
+            AddConfigInfo("Colour on Join", "Colour on join?", () => _colourOnJoin.SetValue (!_colourOnJoin.GetValue ()), () => _colourOnJoin.GetValue() ? $"New members now be automatically given a random available colour on join." : $"New members will no longer be coloured on join.");
         }
 
         public override void Shutdown()

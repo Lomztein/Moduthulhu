@@ -54,9 +54,9 @@ namespace Lomztein.Moduthulhu.Modules.ServerMessages {
             AddConfigInfoForMessage(_onUserJoinedGuildByInvite, "On New Member Invited");
 
             // TODO: Split names and descriptions into seperate methods, and link using an identifier.
-            AddConfigInfo<SocketTextChannel>("Set Message Channel", "Set channel", y => _channelId.SetValue (y.Id), y => $"Message channel set to {y.Mention}", "Index", "Channel");
-            AddConfigInfo<ulong>("Set Message Channel", "Set channel", y => _channelId.SetValue (GuildHandler.GetTextChannel (y).Id), y => $"Message channel set to {GuildHandler.GetTextChannel(y).Mention}", "Index", "Channel");
-            AddConfigInfo<string>("Set Message Channel", "Set channel", y => _channelId.SetValue (GuildHandler.GetTextChannel (y).Id), y => $"Message channel set to {GuildHandler.GetTextChannel(y).Mention}", "Index", "Channel");
+            AddConfigInfo<SocketTextChannel>("Set Message Channel", "Set channel", y => _channelId.SetValue (y.Id), y => $"Message channel set to {y.Mention}", "Channel");
+            AddConfigInfo<ulong>("Set Message Channel", "Set channel", y => _channelId.SetValue (GuildHandler.GetTextChannel (y).Id), y => $"Message channel set to {GuildHandler.GetTextChannel(y).Mention}", "Channel");
+            AddConfigInfo<string>("Set Message Channel", "Set channel", y => _channelId.SetValue (GuildHandler.GetTextChannel (y).Id), y => $"Message channel set to {GuildHandler.GetTextChannel(y).Mention}", "Channel");
 
             if (HasPermission (GuildPermission.ManageGuild))
             {
