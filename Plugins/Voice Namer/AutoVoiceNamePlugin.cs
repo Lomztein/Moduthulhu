@@ -6,6 +6,7 @@ using Lomztein.Moduthulhu.Core.Plugins.Framework;
 using Lomztein.Moduthulhu.Modules.Voice.Commands;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,7 +21,11 @@ namespace Lomztein.Moduthulhu.Modules.Voice {
 
         private CachedValue<Dictionary<ulong, string>> _channelNames;
         private CachedValue<List<ulong>> _toIgnore;
-        // TODO: Implement option to change name format.
+
+        private CachedValue<string> _nameFormat;
+        private const string _formatNameStr = "{NAME}";
+        private const string _formatGameStr = "{GAME}";
+        private const string _formatAmountPlayersStr = "{PLAYERCOUNT}";
 
         private CachedValue<ulong> _musicBotId;
         private CachedValue<ulong> _internationalRoleId;
@@ -44,6 +49,7 @@ namespace Lomztein.Moduthulhu.Modules.Voice {
             _toIgnore = GetConfigCache("ToIgnore", x => new List<ulong> { (x.GetGuild().AFKChannel?.Id).GetValueOrDefault() });
             _musicBotId = GetConfigCache("MusicBotId", x => (ulong)0);
             _internationalRoleId = GetConfigCache("MusicBotId", x => (ulong)0);
+            _nameFormat = GetConfigCache("NameFormat", x => $"{_formatNameStr} - {_formatGameStr} ({_formatAmountPlayersStr})");
 
             AddConfigInfo("Set Channel Name", "Display channel names", () => "Current channel names:\n" + string.Join('\n', _channelNames.GetValue().Select(x => x.Value).ToArray()));
             AddConfigInfo<SocketVoiceChannel, string>("Set Channel Name", "Set channel name", (x, y) => _channelNames.MutateValue(z => z[x.Id] = y), (x, y) => $"Succesfully set channel '{x.Name}' to '{y}'", "Channel", "New name");
@@ -65,10 +71,15 @@ namespace Lomztein.Moduthulhu.Modules.Voice {
             AddConfigInfo<string>("Set International Role", "Set role.", x => _internationalRoleId.SetValue(GuildHandler.GetRole(x).Id), x => $"Set international role to be {GuildHandler.GetRole(x).Name}.", "Role Name");
             AddConfigInfo("Set International Role", "Show role.", () => GuildHandler.FindRole(_internationalRoleId.GetValue()) == null ? "Current international role doesn't exist :(" : "Current international role is " + GuildHandler.GetRole(_internationalRoleId.GetValue()).Name);
 
+            AddConfigInfo("Set Name Format", "Set format", () => $"Current format is '{_nameFormat.GetValue()}' which might look like this in practice: '{FormatName(_nameFormat.GetValue(), "General 1", "Cool Game 3: The Coolest", 5)}'.");
+            AddConfigInfo<string>("Set Name Format", "Set format", x => _nameFormat.SetValue (x), x => $"Set format to '{x}' which might look like this in practice: '{FormatName(x, "General 1", "Cool Game 3: The Coolest", 5)}'.", "Format");
             SendMessage("Lomztein-Command Root", "AddCommand", _commandSet);
 
             AddGeneralFeaturesStateAttribute("AutomatedVoiceNames", "Automatically changing voice channel names to reflect games played within.");
         }
+
+        private string FormatName(string format, string name, string game, int playerAmount)
+            => _nameFormat.GetValue().Replace(_formatNameStr, name).Replace(_formatGameStr, game).Replace(_formatAmountPlayersStr, playerAmount.ToString (CultureInfo.InvariantCulture));
 
         void InitDefaultTags () {
             AddTag (new Tag ("🎵", x => x.Users.Any (y => y.Id == _musicBotId.GetValue ())));
@@ -152,7 +163,11 @@ namespace Lomztein.Moduthulhu.Modules.Voice {
                 string possibleShorten = splitVoice.Length > 1 ? splitVoice [ 1 ] : splitVoice [ 0 ];
 
                 string tags = GetTags (channel);
-                string newName = highestGame != "" ? possibleShorten + " - " + highestGame : splitVoice [ 0 ];
+                string newName = splitVoice[0];
+                if (!string.IsNullOrWhiteSpace (highestGame))
+                {
+                    newName = FormatName(_nameFormat.GetValue(), possibleShorten, highestGame, highest);
+                }
                 newName = tags + " " + newName;
 
                 if (channel.Users.Count == 0)

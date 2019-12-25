@@ -27,9 +27,9 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client
         private IEnumerable<SocketGuild> AllGuilds => _shards.SelectMany (x => x.Guilds);
         private DiscordSocketClient FirstClient => _shards.First ().Client;
 
-        // TODO: Consider splitting status rotation into a seperate class.
-        private readonly Dictionary<string, StatusMessage> _statusMessages = new Dictionary<string, StatusMessage>();
-        private int _statusMessageIndex = -1;
+        private BotStatus _status;
+
+    private int _statusMessageIndex = -1;
         private const int _statusChangeChance = 10;
 
         private readonly Clock _statusClock = new Clock(1, "StatusClock");
@@ -57,12 +57,21 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client
             InitializeShards();
             await AwaitAllConnected().ConfigureAwait (false);
 
-            InitStatusMessages();
+            InitStatus();
             _statusClock.OnMinutePassed += StatusClock_OnMinutePassed;
-            _statusClock.OnMinutePassed += RotateStatus;
+            _statusClock.OnMinutePassed += _status.Cycle;
             _statusClock.Start();
+        }
 
-            _statusMessages.First().Value.ApplyTo(FirstClient);
+        internal void InitStatus()
+        {
+            _status = new BotStatus((x, y) => FirstClient.SetActivityAsync(new Game(y, x)), 10, new StatusMessage[] {
+                new StatusMessage(ActivityType.Streaming, () => "https://github.com/Lomztein/Moduthulhu/blob/master/README.md#usage-guide"),
+                new StatusMessage(ActivityType.Watching, () => new Random().Next(0, 100) == 0 ? $"{AllGuilds.Sum(x => x.MemberCount)} puny mortals waste away their hilariously short lives." : $"{AllGuilds.Count()} servers with {AllGuilds.Sum(x => x.MemberCount)} users."),
+                new StatusMessage(ActivityType.Listening, () => new Random().Next(0, 100) == 0 ? "the sweet cries of the fresh virgin sacrifices." : "!help commands! Prefix may vary between servers."),
+                new StatusMessage(ActivityType.Playing, () => new Random().Next(0, 100) == 0 ? "the dice of the vast cosmos." : $"with the {PluginLoader.GetPlugins().Length} plugins available. Try '!plugins ?'!"),
+                new StatusMessage(ActivityType.Streaming, () => new Random().Next(0, 100) == 0 ? "V̌̾͒̓͏̸̼͔̘͎̳̦̮̰̹̥Ǫ̪͎̜̝͙̅ͫ͊̃͗̾̍ͣ̔̾͊͆ͭ͗̏͆̀͘͟͠I̴͛͌ͦ͊̇̾ͮ͂̈̌͏̪̜̳͙̰̝̺̱͈̗̥D̡̳͈̠͔̲̳̤̱͚̤ͥͮͤͪ̄ͤ͐̆̿ͩ͐ͭ̋̂͗̔ͬͦ͊" : $"for {Uptime.Days} days of uninterrupted service!"),
+            });
         }
 
         private ClientConfiguration LoadConfiguration (string path)
@@ -81,41 +90,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client
             return Configuration;
         }
 
-        private Task RotateStatus(DateTime previous, DateTime now)
-        {
-            if (new Random().Next(0, _statusChangeChance) == 0)
-            {
-                _statusMessageIndex++;
-                _statusMessageIndex %= _statusMessages.Count;
-                _statusMessages.ElementAt(_statusMessageIndex).Value.ApplyTo(FirstClient);
-            }
-            return Task.CompletedTask;
-        }
 
-        public void AddStatusMessage (string identifier, ActivityType activityType, Func<string> function)
-        {
-            if (_statusMessages.ContainsKey (identifier))
-            {
-                throw new InvalidOperationException($"Cannot add message with {nameof(identifier)} '{identifier}' since one such already exists.");
-            }
-            else
-            {
-                _statusMessages.Add(identifier, new StatusMessage(activityType, function));
-            }
-        }
-
-        public void RemoveStatusMessage(string identifier) => _statusMessages.Remove(identifier);
-
-
-
-        private void InitStatusMessages ()
-        {
-            AddStatusMessage("Guide", ActivityType.Streaming, () => "https://github.com/Lomztein/Moduthulhu/blob/master/README.md#usage-guide");
-            AddStatusMessage("UsersServed", ActivityType.Watching, () => new Random().Next(0, 100) == 0 ? $"{AllGuilds.Sum(x => x.MemberCount)} puny mortals waste away their hilariously short lives." : $"{AllGuilds.Count()} servers with {AllGuilds.Sum(x => x.MemberCount)} users.");
-            AddStatusMessage("Help", ActivityType.Listening, () => new Random().Next(0, 100) == 0 ? "the sweet cries of the fresh virgin sacrifices." : "!help commands! Prefix may vary between servers.");
-            AddStatusMessage("AvailablePlugins", ActivityType.Playing, () => new Random().Next(0, 100) == 0 ? "the dice of the vast cosmos." : $"with the {PluginLoader.GetPlugins().Length} plugins available. Try '!plugins ?'!");
-            AddStatusMessage("Uptime", ActivityType.Streaming, () => new Random().Next(0, 100) == 0 ? "V̌̾͒̓͏̸̼͔̘͎̳̦̮̰̹̥Ǫ̪͎̜̝͙̅ͫ͊̃͗̾̍ͣ̔̾͊͆ͭ͗̏͆̀͘͟͠I̴͛͌ͦ͊̇̾ͮ͂̈̌͏̪̜̳͙̰̝̺̱͈̗̥D̡̳͈̠͔̲̳̤̱͚̤ͥͮͤͪ̄ͤ͐̆̿ͩ͐ͭ̋̂͗̔ͬͦ͊" : $"for {Uptime.Days} days of uninterrupted service!");
-        }
 
         private Task StatusClock_OnMinutePassed(DateTime currentTick, DateTime lastTick)
         {

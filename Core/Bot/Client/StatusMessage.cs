@@ -8,19 +8,13 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client
 {
     public class StatusMessage
     {
-        private readonly ActivityType _type;
-        private readonly Func<string> _message;
+        public readonly ActivityType Type;
+        public readonly Func<string> Message;
 
         public StatusMessage (ActivityType type, Func<string> message)
         {
-            _type = type;
-            _message = message;
-        }
-
-        public void ApplyTo (DiscordSocketClient client)
-        {
-            IActivity activity = new Game(_message(), _type);
-            client.SetActivityAsync(activity);
+            Type = type;
+            Message = message;
         }
     }
 }
