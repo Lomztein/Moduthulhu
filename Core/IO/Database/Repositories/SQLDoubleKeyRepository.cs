@@ -7,7 +7,7 @@ using System.Text;
 
 namespace Lomztein.Moduthulhu.Core.IO.Database.Repositories
 {
-    internal class SQLDoubleKeyRepository<TIdentifier, TKey, TValue> : IDoubleKeyRepository<TIdentifier, TKey, TValue>
+    public class SQLDoubleKeyRepository<TIdentifier, TKey, TValue> : IDoubleKeyRepository<TIdentifier, TKey, TValue>
     {
         private string _tableName;
         private IDatabaseConnector _connector;

@@ -273,7 +273,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
             throw new ArgumentException("No plugin named '" + pluginName + "' is currently active.");
         }
 
-        public bool IsPluginActive (string pluginName) // TODO: Figure out a consistant and simple way to differentiate between plugins. Perhaps a cache of plugin IDs given when their type is loaded? Using strings is at best gonna be a pain in the ass, at worst cause serious issue down the line.
+        public bool IsPluginActive (string pluginName)
         {
             return Plugin.Find (_activePlugins.Select (x => x.GetType ()), pluginName) != null;
         }

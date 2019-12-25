@@ -39,11 +39,11 @@ namespace Lomztein.Moduthulhu.Modules.Misc.Karma
             _karma = GetDataCache("Karma", x => new Dictionary<ulong, Selfworth>());
 
             AddConfigInfo("Set Upvote Emote", "Get emote", () => $"Current upvote emote is '{GuildHandler.GetGuild().GetEmoteAsync(_upvoteEmoteId.GetValue()).Result.Name}'.");
-            AddConfigInfo("Set Upvote Emote", "Set emote", new Action<string>(x => _upvoteEmoteId.SetValue((GuildHandler.GetGuild().GetEmoteAsync(_upvoteEmoteId.GetValue()).Result?.Id).GetValueOrDefault())),
-                 () => $"Set upvote emote to '{GuildHandler.GetGuild().GetEmoteAsync(_upvoteEmoteId.GetValue()).Result?.Name}'.", "Emote");
+            AddConfigInfo<string>("Set Upvote Emote", "Set emote", x => _upvoteEmoteId.SetValue((GuildHandler.GetGuild().GetEmoteAsync(_upvoteEmoteId.GetValue()).Result?.Id).GetValueOrDefault()),
+                 x => $"Set upvote emote to '{x}'.", "Emote");
             AddConfigInfo("Set Downvote Emote", "Get emote", () => $"Current downvote emote is '{GuildHandler.GetGuild().GetEmoteAsync(_downvoteEmoteId.GetValue()).Result.Name}'.");
-            AddConfigInfo("Set Downvote Emote", "Set emote", new Action<string>(x => _downvoteEmoteId.SetValue((GuildHandler.GetGuild().GetEmoteAsync(_downvoteEmoteId.GetValue()).Result?.Id).GetValueOrDefault())),
-                () => $"Set downote emote to '{GuildHandler.GetGuild().GetEmoteAsync(_downvoteEmoteId.GetValue()).Result?.Name}'.", "Emote");
+            AddConfigInfo<string>("Set Downvote Emote", "Set emote", x => _downvoteEmoteId.SetValue((GuildHandler.GetGuild().GetEmoteAsync(_downvoteEmoteId.GetValue()).Result?.Id).GetValueOrDefault()),
+                x => $"Set downote emote to '{x}'.", "Emote");
         }
 
         private async Task OnReactionRemoved(Cacheable<IUserMessage, ulong> arg1, ISocketMessageChannel arg2, SocketReaction arg3) {

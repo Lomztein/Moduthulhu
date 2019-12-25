@@ -17,7 +17,6 @@ namespace Lomztein.Moduthulhu.Modules.ServerMessages {
     [Source ("https://github.com/Lomztein", "https://github.com/Lomztein/Moduthulhu/blob/master/Plugins/Miscellaneous/ServerMessagesModule.cs")]
     public class ServerMessagesPlugin : PluginBase
     {
-
         private CachedValue<ulong> _channelId;
         private CachedValue<List<string>> _onJoinedNewGuild;
         private CachedValue<List<string>> _onUserJoinedGuild;
@@ -54,9 +53,10 @@ namespace Lomztein.Moduthulhu.Modules.ServerMessages {
             AddConfigInfoForMessage(_onUserNameChanged, "On Name Changed");
             AddConfigInfoForMessage(_onUserJoinedGuildByInvite, "On New Member Invited");
 
-            AddConfigInfo("Set Message Channel", "Set channel", new Action<int, SocketTextChannel>((x, y) => _channelId.SetValue (y.Id)), () => $"Message channel set to {GuildHandler.GetTextChannel(_channelId.GetValue ()).Name}", "Index", "Channel");
-            AddConfigInfo("Set Message Channel", "Set channel", new Action<int, ulong>((x, y) => _channelId.SetValue (GuildHandler.GetTextChannel (y).Id)), () => $"Message channel set to {GuildHandler.GetTextChannel(_channelId.GetValue()).Name}", "Index", "Channel");
-            AddConfigInfo("Set Message Channel", "Set channel", new Action<int, string>((x, y) => _channelId.SetValue (GuildHandler.GetTextChannel (y).Id)), () => $"Message channel set to {GuildHandler.GetTextChannel(_channelId.GetValue()).Name}", "Index", "Channel");
+            // TODO: Split names and descriptions into seperate methods, and link using an identifier.
+            AddConfigInfo<SocketTextChannel>("Set Message Channel", "Set channel", y => _channelId.SetValue (y.Id), y => $"Message channel set to {y.Mention}", "Index", "Channel");
+            AddConfigInfo<ulong>("Set Message Channel", "Set channel", y => _channelId.SetValue (GuildHandler.GetTextChannel (y).Id), y => $"Message channel set to {GuildHandler.GetTextChannel(y).Mention}", "Index", "Channel");
+            AddConfigInfo<string>("Set Message Channel", "Set channel", y => _channelId.SetValue (GuildHandler.GetTextChannel (y).Id), y => $"Message channel set to {GuildHandler.GetTextChannel(y).Mention}", "Index", "Channel");
 
             if (HasPermission (GuildPermission.ManageGuild))
             {
@@ -69,8 +69,9 @@ namespace Lomztein.Moduthulhu.Modules.ServerMessages {
 
         private void AddConfigInfoForMessage (CachedValue<List<string>> message, string name)
         {
-            AddConfigInfo(name, "Add a message", new Action<int>(x => { message.GetValue().RemoveAt (x); message.Store(); }), () => $"Removed {name} message.", "Index");
-            AddConfigInfo(name, "The above one actually removes lol will fix later", new Action<string>(x => { message.GetValue().Add(x); message.Store(); }), () => $"Added new {name} message.", "Message");
+            string msg = string.Empty;
+            AddConfigInfo<string>(name, "Add a message", x => message.MutateValue(y => y.Add (x)), x => $"Added new {name} message: '{x}'.", "Message");
+            AddConfigInfo<int>(name, "Remove a message", x => message.MutateValue(y => { msg = y[x]; y.RemoveAt(x); }), x => $"Removed {name} message: {msg}.", "Index");
             AddConfigInfo(name, "Display messages", () => $"Current '{name}' messages:\n{string.Join('\n', message.GetValue().ToArray ())}");
         }
 

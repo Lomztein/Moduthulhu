@@ -220,7 +220,6 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding
         public string GetIndexString ()
             => $"Shard {ShardId + 1}/{TotalShards}";
 
-        // TODO: Change all these to extension methods since that'll better support null-cases.
         public override string ToString () {
             return $"GuildHandlers: {_guildHandlers.Count}\nPlugin Instances: {_guildHandlers.Sum (x => x.Plugins.ActiveCount)}\nUsers: {Client.Guilds.Sum (x => x.MemberCount)}\nLogin state: {Client.LoginState}\nConnection: {Client.ConnectionState}\nLatency: {Client.Latency}\nUptime: {Uptime}\n";
         }

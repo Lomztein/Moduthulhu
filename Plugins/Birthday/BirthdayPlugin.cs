@@ -35,12 +35,12 @@ namespace Lomztein.Moduthulhu.Plugins.Birthday {
             _announcementChannel = GetConfigCache("AnnouncementChannel", x => x.GetGuild().TextChannels.FirstOrDefault(y => y.Name == "general" || y.Name == "main" || y.Name == "chat").ZeroIfNull());
             _announcementMessage = GetConfigCache("AnnouncementMessage", x => "Congratulations to **[USERNAME]** as today they celebrate their [AGE] birthday!");
 
-            AddConfigInfo("Set Birthday Channel", "Set announcement channel.", new Action<string>(x => _announcementChannel.SetValue(GuildHandler.GetVoiceChannel (x).Id)), () => $"Channel channel set to {GuildHandler.GetTextChannel(_announcementChannel.GetValue()).Mention}.", "Channel Name");
-            AddConfigInfo("Set Birthday Channel", "Set announcement channel.", new Action<ulong>(x => _announcementChannel.SetValue(GuildHandler.GetVoiceChannel (x).Id)), () => $"Channel channel set to {GuildHandler.GetTextChannel(_announcementChannel.GetValue()).Mention}.", "Channel Id");
-            AddConfigInfo("Set Birthday Channel", "Set announcement channel.", new Action<SocketTextChannel>(x => _announcementChannel.SetValue(x.Id)), () => $"Channel channel set to {GuildHandler.GetTextChannel(_announcementChannel.GetValue()).Mention}.", "Channel");
+            AddConfigInfo<string>("Set Birthday Channel", "Set announcement channel.", x => _announcementChannel.SetValue(GuildHandler.GetVoiceChannel (x).Id), x => $"Channel channel set to {GuildHandler.GetTextChannel(x).Mention}.", "Channel Name");
+            AddConfigInfo<ulong>("Set Birthday Channel", "Set announcement channel.", x => _announcementChannel.SetValue(GuildHandler.GetVoiceChannel (x).Id), x => $"Channel channel set to {GuildHandler.GetTextChannel(x).Mention}.", "Channel Id");
+            AddConfigInfo<SocketTextChannel>("Set Birthday Channel", "Set announcement channel.", x => _announcementChannel.SetValue(x.Id), x => $"Channel channel set to {GuildHandler.GetTextChannel(x)}", "Channel");
             AddConfigInfo("Set Birthday Channel", "Get announcement channel.", () => $"Current announcement channel is {GuildHandler.GetTextChannel(_announcementChannel.GetValue()).Mention}.");
 
-            AddConfigInfo("Set Birthday Message", "Set birthday message.", new Action<string>(x => _announcementMessage.SetValue(x)), () => $"New announcement message: '{_announcementMessage.GetValue()}'.", "Message");
+            AddConfigInfo<string>("Set Birthday Message", "Set birthday message.", x => _announcementMessage.SetValue(x), x => $"New announcement message: '{x}'.", "Message");
             AddConfigInfo("Set Birthday Message", "Get birthday message.", () => $"Current announcement message: '{_announcementMessage.GetValue()}'.");
 
             _command = new BirthdayCommand { ParentPlugin = this };

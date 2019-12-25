@@ -54,7 +54,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
                         args.RemoveAt(0); // Remove command metadata.
 
                         source.Action.DynamicInvoke (args.ToArray ());
-                        return TaskResult(null, source.Message ());
+                        return TaskResult(null, source.Message.DynamicInvoke (args.ToArray ()) as string);
                     });
             }
             return overloads;

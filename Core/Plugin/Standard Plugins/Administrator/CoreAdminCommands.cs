@@ -66,7 +66,6 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
             public Task<Result> Execute (CommandMetadata _) {
 
                 int shardIndex = 0;
-                // TODO: Add status for shards and GuildHandlers.
                 EmbedBuilder builder = new EmbedBuilder()
                     .WithTitle("Core Process Status")
                     .WithAuthor(ParentPlugin.GuildHandler.BotUser)
