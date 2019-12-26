@@ -322,7 +322,7 @@ namespace Lomztein.Moduthulhu.Core.Plugins.Framework
             {
                 if (notifyGuild)
                 {
-                    NotifyGuild($"Plugin {Plugin.GetName(GetType())} requires permission '{permission}' to function, which has been revoked. The plugin has automatically been disabled.");
+                    NotifyGuild($"Plugin '{Plugin.GetName(GetType())}' requires permission '{permission}' to function, which has been revoked. The plugin has automatically been disabled.");
                 }
                 DisablePlugin($"Disabled plugin due to revoked permission '{permission}'.");
             }

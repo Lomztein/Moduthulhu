@@ -260,3 +260,5 @@ paket-files/
 __pycache__/
 *.pyc
 Core/Properties/
+
+Core/Core.xml
