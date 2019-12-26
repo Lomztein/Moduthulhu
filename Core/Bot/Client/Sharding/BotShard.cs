@@ -20,7 +20,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding
         public DiscordSocketClient Client { get; private set; }
         private readonly List<GuildHandler> _guildHandlers = new List<GuildHandler>();
         public IReadOnlyCollection<SocketGuild> Guilds { get => Client.Guilds; }
-        public bool IsConnected { get => Client != null && Guilds.Count > 0 && Guilds.First().IsConnected; }
+        public bool IsConnected { get; private set; }
 
         private Thread _thread;
 
@@ -40,12 +40,13 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding
         internal void Run () {
             void init() => Initialize().GetAwaiter().GetResult();
             _thread = new Thread (init) {
-                Name = $"S{ShardId+1}/{TotalShards}",
+                Name = $"S{ShardId + 1}/{TotalShards}",
             };
             _thread.Start ();
         }
 
         internal async Task Initialize () {
+            Log.Bot($"Initializing shard {ShardId+1}/{TotalShards}.");
 
             BootDate = DateTime.Now;
             DiscordSocketConfig config = new DiscordSocketConfig {
@@ -61,13 +62,21 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding
             Client.LeftGuild += Client_LeftGuild;
             Client.Disconnected += Client_Disconnected;
 
-            await Start ().ConfigureAwait (false);
-            await Login ().ConfigureAwait(false);
-            await AwaitConnected ().ConfigureAwait(false);
+            Client.GuildMembersDownloaded += Client_GuildMembersDownloaded;
 
-            RouteEvents();
+            await Login ();
+            await Start ();
+
+            await AwaitConnected ();
 
             InitInitialHandlers();
+            RouteEvents();
+        }
+
+        private Task Client_GuildMembersDownloaded(SocketGuild arg)
+        {
+            Log.Warning(arg + " member downloaded.");
+            return Task.CompletedTask;
         }
 
         private async Task Client_LeftGuild(SocketGuild arg)
@@ -84,6 +93,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding
 
         private Task Client_Disconnected(Exception arg)
         {
+            IsConnected = false;
             Log.Exception(arg);
             OnExceptionCaught(arg);
             return Task.CompletedTask;
@@ -116,6 +126,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding
 
         private Task Client_Ready() {
             Log.Write (Log.Type.BOT, $"Shard {ShardId} is ready and connected.");
+            IsConnected = true;
             return Task.CompletedTask;
         }
 
@@ -181,27 +192,29 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding
             Client.UserUnbanned             += async (x, y) =>      { try { await ForGuild (y, g => g.OnUserUnbanned (x));                                              } catch (Exception exc) { OnExceptionCaught (exc); } };
         }
 
-        private async Task ForGuild (ulong? guildId, Func<GuildHandler, Task> func)
+        private Task ForGuild (ulong? guildId, Func<GuildHandler, Task> func)
         {
             if (!guildId.HasValue)
             {
-                return;
+                return Task.CompletedTask;
             }
 
             GuildHandler handler = _guildHandlers.Find(x => x.GuildId == guildId.Value);
-            await func(handler);
+            _ = func(handler);
+            return Task.CompletedTask;
         }
 
         private async Task ForGuild(SocketGuild guild, Func<GuildHandler, Task> func) => await ForGuild(guild?.Id, func);
 
-        private async Task ForEachGuild (Func<GuildHandler, Task> func)
+        private Task ForEachGuild (Func<GuildHandler, Task> func)
         {
             Task[] tasks = new Task[_guildHandlers.Count];
             for (int i = 0; i < _guildHandlers.Count; i++)
             {
                 tasks[i] = func(_guildHandlers[i]);
             }
-            await Task.WhenAll(tasks);
+            _ = Task.WhenAll(tasks);
+            return Task.CompletedTask;
         }
 
         private void OnExceptionCaught(Exception exception) {

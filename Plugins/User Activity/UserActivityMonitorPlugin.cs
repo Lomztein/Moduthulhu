@@ -207,7 +207,6 @@ namespace Lomztein.Moduthulhu.Modules.Clock.ActivityMonitor
 
         private async Task UpdateAll () {
 
-            await GuildHandler.GetGuild().DownloadUsersAsync();
             List<SocketGuildUser> users = GuildHandler.GetGuild().Users.ToList();
 
             foreach (SocketGuildUser u in users) {

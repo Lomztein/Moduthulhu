@@ -24,11 +24,15 @@ namespace Lomztein.Moduthulhu.Core.Bot
             }
         }
 
-        internal Task ReportError (Exception exception) {
+        private static Task ReportError (Exception exception) {
             Log.Exception (exception);
             if (UsesSQLDatabase ())
             {
                 GetConnector().UpdateQuery("INSERT INTO errors VALUES (@type, @date, @target, @message, @stacktrace)", new Dictionary<string, object> { { "@type", exception.GetType().Name }, { "@date", DateTime.Now }, { "@target", exception.TargetSite.ToString() }, { "@message", exception.Message }, { "@stacktrace", exception.StackTrace } });
+            }
+            if (exception.InnerException != null)
+            {
+                ReportError(exception.InnerException);
             }
             return Task.CompletedTask;
         }
