@@ -24,7 +24,7 @@ namespace Lomztein.Moduthulhu.Core.Bot
             }
         }
 
-        private static Task ReportError (Exception exception) {
+        internal Task ReportError (Exception exception) {
             Log.Exception (exception);
             if (UsesSQLDatabase ())
             {

@@ -30,6 +30,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client
             if (_currentTimePassed >= _timeTreshold)
             {
                 _currentIndex = (_currentIndex + 1) % _messages.Length;
+                _currentTimePassed = 0;
                 Change();
             }
             return Task.CompletedTask;
