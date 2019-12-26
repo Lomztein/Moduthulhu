@@ -86,6 +86,7 @@ namespace Lomztein.Moduthulhu.Core.Plugins.Framework
         protected void DisablePlugin(string message)
         {
             GuildHandler.Plugins.RemovePlugin(Plugin.GetName(GetType()));
+            GuildHandler.Plugins.ReloadPlugins();
             throw new PluginDisabledException(message);
         }
 

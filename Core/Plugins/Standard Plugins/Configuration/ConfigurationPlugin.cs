@@ -7,9 +7,9 @@ using System.Text;
 
 namespace Lomztein.Moduthulhu.Plugins.Standard 
 {
-    [Descriptor("Lomztein", "Configuration", "Plugin that exposes plugin configuration functions as commands.")]
+    [Descriptor("Moduthulhu", "Configuration", "Plugin that exposes plugin configuration functions as commands.")]
     [Source("https://github.com/Lomztein", "https://github.com/Lomztein/Moduthulhu/tree/master/Core/Plugin/Standard%20Plugins/Configuration")]
-    [Dependency ("Lomztein-Command Root")]
+    [Dependency ("Moduthulhu-Command Root")]
     [Critical]
     public class ConfigurationPlugin : PluginBase
     {
@@ -18,7 +18,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
         public override void Initialize()
         {
             _configCommands = new ConfigCommandSet();
-            SendMessage("Lomztein-Command Root", "AddCommand", _configCommands);
+            SendMessage("Moduthulhu-Command Root", "AddCommand", _configCommands);
             SetStateChangeHeaders("ConfigCmds", "The following configuration commands has been added", "The following configuration commands has been removed.");
         }
 
@@ -54,7 +54,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
 
         public override void Shutdown()
         {
-            SendMessage("Lomztein-Command Root", "RemoveCommand", _configCommands);
+            SendMessage("Moduthulhu-Command Root", "RemoveCommand", _configCommands);
         }
     }
 }

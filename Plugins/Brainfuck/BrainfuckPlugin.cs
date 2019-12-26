@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 namespace Lomztein.ModularDiscordBot.Modules.Misc.Brainfuck
 {
     [Descriptor ("Lomztein", "Brainfuck", "Plugin with a command that can interpret and execute Brainfuck programs.")]
+    [Dependency ("Moduthulhu-Command Root")]
     [Source ("https://github.com/Lomztein", "https://github.com/Lomztein/Moduthulhu/blob/master/Plugins/Brainfuck/BrainfuckPlugin.cs")]
     public class BrainfuckPlugin : PluginBase {
 
@@ -18,11 +19,11 @@ namespace Lomztein.ModularDiscordBot.Modules.Misc.Brainfuck
 
         public override void Initialize() {
             _command = new BrainfuckCommand { ParentPlugin = this };
-            SendMessage("Lomztein-Command Root", "AddCommand", _command);
+            SendMessage("Moduthulhu-Command Root", "AddCommand", _command);
         }
 
         public override void Shutdown() {
-            SendMessage("Lomztein-Command Root", "RemoveCommand", _command);
+            SendMessage("Moduthulhu-Command Root", "RemoveCommand", _command);
         }
 
         private async Task<string> Run (string program, ulong channelID) {

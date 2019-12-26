@@ -8,8 +8,8 @@ using System.Text;
 namespace Lomztein.Moduthulhu.Plugins.Standard
 {
     [Critical]
-    [Dependency ("Lomztein-Command Root")]
-    [Descriptor ("Lomztein", "Plugin Manager", "Plugin to handle toggling of other plugins on a per-server basis.")]
+    [Dependency ("Moduthulhu-Command Root")]
+    [Descriptor ("Moduthulhu", "Plugin Manager", "Plugin to handle toggling of other plugins on a per-server basis.")]
     [Source ("https://github.com/Lomztein", "https://github.com/Lomztein/Moduthulhu/tree/master/Core/Plugin/Standard%20Plugins/Plugin%20Manager")]
     public class PluginManagerPlugin : PluginBase
     {
@@ -19,12 +19,12 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
         public override void Initialize()
         {
             _commandSet = new PluginManagerCommands { ParentPlugin = this };
-            SendMessage("Lomztein-Command Root", "AddCommand", _commandSet);
+            SendMessage("Moduthulhu-Command Root", "AddCommand", _commandSet);
         }
 
         public override void Shutdown()
         {
-            SendMessage("Lomztein-Command Root", "RemoveCommand", _commandSet);
+            SendMessage("Moduthulhu-Command Root", "RemoveCommand", _commandSet);
         }
 
         public bool AddPlugin(string pluginName)

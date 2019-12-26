@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace Lomztein.Moduthulhu.Modules.Misc.Karma
 {
-    [Dependency ("Lomztein-Command Root")]
+    [Dependency ("Moduthulhu-Command Root")]
     [Descriptor ("Lomztein", "Karma", "Keep track of an accurate representation of peoples self-worth.")]
     [Source ("https://github.com/Lomztein", "https://github.com/Lomztein/Moduthulhu/tree/master/Plugins/Karma")]
     [GDPR(GDPRCompliance.Partial, "Stores user ID automatically to keep track of user score.")]
@@ -31,7 +31,7 @@ namespace Lomztein.Moduthulhu.Modules.Misc.Karma
             GuildHandler.ReactionAdded += OnReactionAdded;
             GuildHandler.ReactionRemoved += OnReactionRemoved;
             _karmaCommand = new KarmaCommand { ParentPlugin = this };
-            SendMessage("Lomztein-Command Root", "AddCommand", _karmaCommand);
+            SendMessage("Moduthulhu-Command Root", "AddCommand", _karmaCommand);
 
             _upvoteEmoteId = GetConfigCache("UpvoteEmoteId", x => x.GetGuild ().Emotes.Where (y => y.Name == "upvote").FirstOrDefault ().ZeroIfNull ());
             _downvoteEmoteId = GetConfigCache("DownvoteEmoteId", x => x.GetGuild ().Emotes.Where (y => y.Name == "downvote").FirstOrDefault ().ZeroIfNull ());
@@ -77,7 +77,7 @@ namespace Lomztein.Moduthulhu.Modules.Misc.Karma
         public override void Shutdown() {
             GuildHandler.ReactionAdded -= OnReactionAdded;
             GuildHandler.ReactionRemoved -= OnReactionRemoved;
-            SendMessage("Lomztein-Command Root", "RemoveCommand", _karmaCommand);
+            SendMessage("Moduthulhu-Command Root", "RemoveCommand", _karmaCommand);
         }
 
         public override JToken RequestUserData(ulong id)

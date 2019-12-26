@@ -195,7 +195,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
                 builder.AddField("Notice: ", "This plugin is critical and cannot be disabled.", true);
             }
 
-            string[] dependencies = PluginLoader.DependencyTree.GetDependencies(Plugin.GetVersionedFullName(moduleType)).Select(x => Plugin.GetVersionedFullName(x)).ToArray();
+            string[] dependencies = PluginLoader.DependencyTree.GetDependencies(Plugin.GetVersionedFullName(moduleType)).Select(x => Plugin.GetName(x) + " by " + Plugin.GetAuthor (x) + ", version " + Plugin.GetVersion (x)).ToArray();
             if (dependencies.Length > 0)
             {
                 string content = $"```{string.Join('\n', dependencies)}```";
@@ -245,7 +245,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
                 .WithDescription(description)
                 .WithFooter(pluginTypes.Count () + " plugins.");
 
-            return new LargeEmbed (builder, pluginTypes.Select (x => new EmbedFieldBuilder ().WithName (Plugin.GetVersionedFullName(x)).WithValue (Plugin.GetDescription(x))));
+            return new LargeEmbed (builder, pluginTypes.Select (x => new EmbedFieldBuilder ().WithName (Plugin.GetName(x)).WithValue ($"> {Plugin.GetDescription(x)}\n*Created by {Plugin.GetAuthor(x)}*.\n\u200B")));
         }
     }
 }

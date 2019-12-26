@@ -14,6 +14,7 @@ namespace Lomztein.Moduthulhu.Modules.Shipping {
     [Descriptor ("Lomztein", "Shipping Simulator 2018", "At the core of all this lies Guffe.")]
     [Source ("https://github.com/Lomztein", "https://github.com/Lomztein/Moduthulhu/tree/master/Plugins/Shipping")]
     [GDPR(GDPRCompliance.Partial, "Users may ship each other, thus storing other users ID in a ship.")]
+    [Dependency ("Moduthulhu-Command Root")]
     public class ShippingPlugin : PluginBase {
 
         private CachedValue<List<Ship>> _ships;
@@ -23,7 +24,7 @@ namespace Lomztein.Moduthulhu.Modules.Shipping {
 
         public override void Initialize() {
             _commands = new ShippingCommands { ParentPlugin = this };
-            SendMessage("Lomztein-Command Root", "AddCommand", _commands);
+            SendMessage("Moduthulhu-Command Root", "AddCommand", _commands);
 
             _ships = GetDataCache("Ships", x => new List<Ship>());
             _shipNames = GetDataCache("ShipNames", x => new List<ShipName>());
@@ -159,7 +160,7 @@ namespace Lomztein.Moduthulhu.Modules.Shipping {
         }
 
         public override void Shutdown() {
-            SendMessage("Lomztein-Command Root", "RemoveCommand", _commands);
+            SendMessage("Moduthulhu-Command Root", "RemoveCommand", _commands);
         }
 
         public override JToken RequestUserData(ulong id)

@@ -17,18 +17,19 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
 {
     [Descriptor ("Lomztein", "Urban Dictionary", "Provides a single command for querying for definitions of words from the single most correct and factual source, Urban Dictionary.")]
     [Source ("https://github.com/Lomztein", "https://github.com/Lomztein/Moduthulhu/blob/master/Plugins/Urban%20Dictionary/UrbanDictionaryPlugin.cs")]
+    [Dependency("Moduthulhu-Command Root")]
     public class UrbanDictionaryPlugin : PluginBase
     {
         private readonly ICommand cmd = new UrbanDefineCommand();
 
         public override void Initialize()
         {
-            SendMessage("Lomztein-Command Root", "AddCommand", cmd);
+            SendMessage("Moduthulhu-Command Root", "AddCommand", cmd);
         }
 
         public override void Shutdown()
         {
-            SendMessage("Lomztein-Command Root", "RemoveCommand", cmd);
+            SendMessage("Moduthulhu-Command Root", "RemoveCommand", cmd);
         }
     }
 

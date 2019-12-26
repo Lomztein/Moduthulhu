@@ -8,7 +8,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard.Utilities
 {
     [Descriptor("Lomztein", "Utilities", "General miscellaneous utility commands such as Roll the Dice and Coinflip. Pull requests that add new ones are welcome! See Plugin URL for source repository.")]
     [Source("https://github.com/Lomztein", "https://github.com/Lomztein/Moduthulhu/blob/master/Plugins/Utilities")]
-    [Dependency("Lomztein-Command Root")]
+    [Dependency("Moduthulhu-Command Root")]
     public class UtilitiesPlugin : PluginBase
     {
         private ICommand[] _commands;
@@ -22,12 +22,12 @@ namespace Lomztein.Moduthulhu.Plugins.Standard.Utilities
                 new Fizzfyr13(),
                 new Ping { ParentPlugin = this },
             };
-            SendMessage("Lomztein-Command Root", "AddCommands", _commands);
+            SendMessage("Moduthulhu-Command Root", "AddCommands", _commands);
         }
 
         public override void Shutdown()
         {
-            SendMessage("Lomztein-Command Root", "RemoveCommands", _commands);
+            SendMessage("Moduthulhu-Command Root", "RemoveCommands", _commands);
         }
     }
 }

@@ -19,7 +19,7 @@ using System.Threading.Tasks;
 namespace Lomztein.Moduthulhu.Plugins.Standard {
 
     [Critical]
-    [Descriptor ("Lomztein", "Command Root", "Default container and manager of bot commands.")]
+    [Descriptor ("Moduthulhu", "Command Root", "Default container and manager of bot commands.")]
     [Source ("https://github.com/Lomztein", "https://github.com/Lomztein/Moduthulhu/tree/master/Core/Plugin/Standard%20Plugins/Command%20Root")]
     public class CommandPlugin : PluginBase, ICommandSet {
 

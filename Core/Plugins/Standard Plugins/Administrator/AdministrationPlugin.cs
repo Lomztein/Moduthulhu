@@ -5,8 +5,8 @@ using System.Text;
 
 namespace Lomztein.Moduthulhu.Plugins.Standard
 {
-    [Dependency ("Lomztein-Command Root")]
-    [Descriptor("Lomztein", "Administrator", "Implements commands for managing the bot itself.")]
+    [Dependency ("Moduthulhu-Command Root")]
+    [Descriptor("Moduthulhu", "Administrator", "Implements commands for managing the bot itself.")]
     [Source("https://github.com/Lomztein", "https://github.com/Lomztein/Moduthulhu/tree/master/Core/Plugin/Standard%20Plugins/Administrator")]
     public class AdministrationPlugin : PluginBase {
 
@@ -14,11 +14,11 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
 
         public override void Initialize() {
             CoreCommands = new CoreAdminCommands { ParentPlugin = this };
-            SendMessage("Lomztein-Command Root", "AddCommand", CoreCommands);
+            SendMessage("Moduthulhu-Command Root", "AddCommand", CoreCommands);
         }
 
         public override void Shutdown() {
-            SendMessage("Lomztein-Command Root", "RemoveCommand", CoreCommands);
+            SendMessage("Moduthulhu-Command Root", "RemoveCommand", CoreCommands);
         }
     }
 }

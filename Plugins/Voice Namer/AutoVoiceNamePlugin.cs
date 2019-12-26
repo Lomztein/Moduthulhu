@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace Lomztein.Moduthulhu.Modules.Voice {
 
-    [Dependency ("Lomztein-Command Root")]
+    [Dependency ("Moduthulhu-Command Root")]
     [Descriptor ("Lomztein", "Auto Voice Names", "Automatically renames voice channels to reflect the games played within.")]
     [Source ("https://github.com/Lomztein", "https://github.com/Lomztein/Moduthulhu/tree/master/Plugins/Voice%20Namer")]
     public class AutoVoiceNamePlugin : PluginBase
@@ -73,7 +73,7 @@ namespace Lomztein.Moduthulhu.Modules.Voice {
 
             AddConfigInfo("Set Name Format", "Set format", () => $"Current format is '{_nameFormat.GetValue()}' which might look like this in practice: '{FormatName(_nameFormat.GetValue(), "General 1", "Cool Game 3: The Coolest", 5)}'.");
             AddConfigInfo<string>("Set Name Format", "Set format", x => _nameFormat.SetValue (x), x => $"Set format to '{x}' which might look like this in practice: '{FormatName(x, "General 1", "Cool Game 3: The Coolest", 5)}'.", "Format");
-            SendMessage("Lomztein-Command Root", "AddCommand", _commandSet);
+            SendMessage("Moduthulhu-Command Root", "AddCommand", _commandSet);
 
             AddGeneralFeaturesStateAttribute("AutomatedVoiceNames", "Automatically changing voice channel names to reflect games played within.");
         }
@@ -211,7 +211,7 @@ namespace Lomztein.Moduthulhu.Modules.Voice {
             GuildHandler.ChannelDestroyed -= OnChannelDestroyed;
             GuildHandler.UserVoiceStateUpdated -= OnVoiceStateUpdated;
             GuildHandler.GuildMemberUpdated -= OnGuildMemberUpdated;
-            SendMessage("Lomztein-Command Root", "RemoveCommand", _commandSet);
+            SendMessage("Moduthulhu-Command Root", "RemoveCommand", _commandSet);
         }
 
         public void AddTag (Tag newTag) {

@@ -20,6 +20,7 @@ namespace Lomztein.Moduthulhu.Plugins.Birthday {
 
     [Descriptor ("Lomztein", "Birthdays", "Plugin that allows people to enter in their birthdays and have it announced when the date arrives!")]
     [Source ("https://github.com/Lomztein", "https://github.com/Lomztein/Moduthulhu/blob/master/Plugins/Birthday/BirthdayPlugin.cs")]
+    [Dependency("Moduthulhu-Command Root")]
     [GDPR (GDPRCompliance.Full)]
     public class BirthdayPlugin : PluginBase {
 
@@ -48,7 +49,7 @@ namespace Lomztein.Moduthulhu.Plugins.Birthday {
 
             GuildHandler.Clock.OnHourPassed += Clock_OnHourPassed;
 
-            SendMessage("Lomztein-Command Root", "AddCommand", _command);
+            SendMessage("Moduthulhu-Command Root", "AddCommand", _command);
 
             AddGeneralFeaturesStateAttribute("BirthdayGreetings", "Automatic birthday wishing if desired.");
         }

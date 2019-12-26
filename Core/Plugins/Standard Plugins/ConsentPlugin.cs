@@ -14,9 +14,9 @@ using System.Threading.Tasks;
 
 namespace Lomztein.Moduthulhu.Plugins.Standard
 {
-    [Descriptor("Lomztein", "Consent", "Plugin that allows users to toggle whether or not they consent to personal data storage. Whether or not it is respected is dependant on individual plugins. Use '!plugin info <plugin>' on a plugin to view compliance.", "1.0.0")]
+    [Descriptor("Moduthulhu", "Consent", "Plugin that allows users to toggle whether or not they consent to personal data storage. Whether or not it is respected is dependant on individual plugins. Use '!plugin info <plugin>' on a plugin to view compliance.", "1.0.0")]
     [Source("https://github.com/Lomztein", "https://github.com/Lomztein/Moduthulhu/blob/master/Core/Plugin/Standard%20Plugins/ConsentPlugin.cs")]
-    [Dependency("Lomztein-Command Root")]
+    [Dependency("Moduthulhu-Command Root")]
     [GDPR(GDPRCompliance.Full)]
     [Critical]
     public class ConsentPlugin : PluginBase
@@ -31,16 +31,16 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
             _requestCommand = new RequestDataCommand { ParentPlugin = this };
             _deleteCommand = new DeleteDataCommand { ParentPlugin = this };
 
-            SendMessage("Lomztein-Command Root", "AddCommand", _consentCommand);
-            SendMessage("Lomztein-Command Root", "AddCommand", _requestCommand);
-            SendMessage("Lomztein-Command Root", "AddCommand", _deleteCommand);
+            SendMessage("Moduthulhu-Command Root", "AddCommand", _consentCommand);
+            SendMessage("Moduthulhu-Command Root", "AddCommand", _requestCommand);
+            SendMessage("Moduthulhu-Command Root", "AddCommand", _deleteCommand);
         }
 
         public override void Shutdown()
         {
-            SendMessage("Lomztein-Command Root", "RemoveCommand", _consentCommand);
-            SendMessage("Lomztein-Command Root", "RemoveCommand", _requestCommand);
-            SendMessage("Lomztein-Command Root", "RemoveCommand", _deleteCommand);
+            SendMessage("Moduthulhu-Command Root", "RemoveCommand", _consentCommand);
+            SendMessage("Moduthulhu-Command Root", "RemoveCommand", _requestCommand);
+            SendMessage("Moduthulhu-Command Root", "RemoveCommand", _deleteCommand);
         }
 
         public override JToken RequestUserData(ulong id)

@@ -16,7 +16,7 @@ namespace Lomztein.Moduthulhu.Modules.Colour
 {
     [Descriptor ("Lomztein", "COLOURS!", "Plugin scientifically proven to increase funkyness by between negative thirty two, to about four percent.")]
     [Source ("https://github.com/Lomztein", "https://github.com/Lomztein/Moduthulhu/blob/master/Plugins/Miscellaneous/ColorPlugin.cs")]
-    [Dependency ("Lomztein-Command Root")]
+    [Dependency ("Moduthulhu-Command Root")]
     public class ColourPlugin : PluginBase {
 
         private SetColour _command;
@@ -28,7 +28,7 @@ namespace Lomztein.Moduthulhu.Modules.Colour
             _command = new SetColour { ParentPlugin = this };
 
             GuildHandler.UserJoined += OnUserJoined;
-            SendMessage("Lomztein-Command Root", "AddCommand", _command);
+            SendMessage("Moduthulhu-Command Root", "AddCommand", _command);
 
             _colourRolePrefix = GetConfigCache("ColourRolePrefix", x => "cl_");
             _colourOnJoin = GetConfigCache("ColourOnJoin", x => false);
@@ -42,7 +42,7 @@ namespace Lomztein.Moduthulhu.Modules.Colour
         public override void Shutdown()
         {
             GuildHandler.UserJoined -= OnUserJoined;
-            SendMessage("Lomztein-Command Root", "RemoveCommand", _command);
+            SendMessage("Moduthulhu-Command Root", "RemoveCommand", _command);
         }
 
         private async Task OnUserJoined(SocketGuildUser guildUser) {

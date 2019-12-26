@@ -4,8 +4,8 @@ using Lomztein.AdvDiscordCommands.Framework.Interfaces;
 
 namespace Lomztein.Moduthulhu.Plugins.Standard
 {
-    [Dependency ("Lomztein-Command Root")]
-    [Descriptor("Lomztein", "Standard Commands", "Implements all the default commands from the command framework.")]
+    [Dependency ("Moduthulhu-Command Root")]
+    [Descriptor("Moduthulhu", "Standard Commands", "Implements all the default commands from the command framework.")]
     [Source("https://github.com/Lomztein", "https://github.com/Lomztein/Moduthulhu/blob/master/Core/Plugin/Standard%20Plugins/Command%20Root/StandardCommandsPlugin.cs")]
     public class StandardCommandsPlugin : PluginBase {
 
@@ -19,11 +19,11 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
         };
 
         public override void Initialize() {
-            SendMessage ("Lomztein-Command Root", "AddCommands", _commands);
+            SendMessage ("Moduthulhu-Command Root", "AddCommands", _commands);
         }
 
         public override void Shutdown() {
-            SendMessage ("Lomztein-Command Root", "RemoveCommands", _commands);
+            SendMessage ("Moduthulhu-Command Root", "RemoveCommands", _commands);
         }
     }
 }
