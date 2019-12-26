@@ -61,12 +61,13 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client
 
         internal void InitStatus()
         {
-            _status = new BotStatus((x, y) => FirstClient.SetActivityAsync(new Game(y, x)), 10, new StatusMessage[] {
-                new StatusMessage(ActivityType.Playing, () => "https://github.com/Lomztein/Moduthulhu/blob/master/README.md#usage-guide"),
-                new StatusMessage(ActivityType.Watching, () => new Random().Next(0, 100) == 0 ? $"{AllGuilds.Count()} puny realms waste away their hilariously short lives." : $"{AllGuilds.Count()} servers!."),
-                new StatusMessage(ActivityType.Listening, () => new Random().Next(0, 100) == 0 ? "the sweet cries of the fresh virgin sacrifices." : "!help commands! Prefix may vary between servers."),
-                new StatusMessage(ActivityType.Playing, () => new Random().Next(0, 100) == 0 ? "the dice of the vast cosmos." : $"with the {PluginLoader.GetPlugins().Length} plugins available. Try '!plugins ?'!"),
-                new StatusMessage(ActivityType.Streaming, () => new Random().Next(0, 100) == 0 ? "V̌̾͒̓͏̸̼͔̘͎̳̦̮̰̹̥Ǫ̪͎̜̝͙̅ͫ͊̃͗̾̍ͣ̔̾͊͆ͭ͗̏͆̀͘͟͠I̴͛͌ͦ͊̇̾ͮ͂̈̌͏̪̜̳͙̰̝̺̱͈̗̥D̡̳͈̠͔̲̳̤̱͚̤ͥͮͤͪ̄ͤ͐̆̿ͩ͐ͭ̋̂͗̔ͬͦ͊" : $"for {Uptime.Days} days of uninterrupted service!"),
+            _status = new BotStatus(x => FirstClient.SetActivityAsync(x), 10, new StatusMessage[] {
+                new StatusMessage(ActivityType.Watching, () => "https://github.com/Lomztein/Moduthulhu/blob/master/README.md#usage-guide"),
+                new StatusMessage(ActivityType.Watching, () => new Random().Next(0, 100) == 0 ? $"{AllGuilds.Sum(x => x.MemberCount)} puny souls waste away their hilariously short lives." : $"{AllGuilds.Count()} servers!"),
+                new StatusMessage(ActivityType.Watching, () => new Random().Next(0, 100) == 0 ? "the sweet cries of the fresh virgin sacrifices." : "!help | !plugins | !config"),
+                new StatusMessage(ActivityType.Watching, () => new Random().Next(0, 100) == 0 ? "V̌̾͒̓͏̸̼͔̘͎̳̦̮̰̹̥Ǫ̪͎̜̝͙̅ͫ͊̃͗̾̍ͣ̔̾͊͆ͭ͗̏͆̀͘͟͠I̴͛͌ͦ͊̇̾ͮ͂̈̌͏̪̜̳͙̰̝̺̱͈̗̥D̡̳͈̠͔̲̳̤̱͚̤ͥͮͤͪ̄ͤ͐̆̿ͩ͐ͭ̋̂͗̔ͬͦ͊" : $"for {Uptime.Days} days!"),
+                new StatusMessage(ActivityType.Watching, () => new Random().Next(0, 100) == 0 ? "the dice of the vast cosmos." : $"!help | !plugins | !config"),
+                new StatusMessage(ActivityType.Watching, () => new Random().Next(0, 100) == 0 ? "the dice of the vast cosmos." : $"!help | !plugins | !config"),
             });
         }
 

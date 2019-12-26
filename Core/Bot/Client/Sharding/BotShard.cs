@@ -75,7 +75,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding
 
         private Task Client_GuildMembersDownloaded(SocketGuild arg)
         {
-            Log.Warning(arg + " member downloaded.");
+            Log.Server(arg + " member downloaded.");
             return Task.CompletedTask;
         }
 

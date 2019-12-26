@@ -6,15 +6,17 @@ using System.Text;
 
 namespace Lomztein.Moduthulhu.Core.Bot.Client
 {
-    public class StatusMessage
+    public class StatusMessage : IActivity
     {
-        public readonly ActivityType Type;
-        public readonly Func<string> Message;
+        public ActivityType Type { get; }
+        private readonly Func<string> _message;
+        public string Name => _message();
 
         public StatusMessage (ActivityType type, Func<string> message)
         {
             Type = type;
-            Message = message;
+            _message = message;
         }
+
     }
 }

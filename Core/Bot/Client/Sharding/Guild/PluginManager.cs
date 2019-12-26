@@ -42,7 +42,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
                 {
                     try // One day I promise to stop abusing throw statements, so that we can avoid this.
                     {
-                        if (!IsPluginActive(Plugin.GetName(pluginType)))
+                        if (!IsPluginEnabled(Plugin.GetFullName(pluginType)))
                         {
                             AddPlugin(Plugin.GetFullName(pluginType));
                             Log.Write(Log.Type.PLUGIN, $"Added missing critical {Plugin.GetVersionedFullName(pluginType)} plugin to enabled list.");
@@ -276,6 +276,11 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
         public bool IsPluginActive (string pluginName)
         {
             return Plugin.Find (_activePlugins.Select (x => x.GetType ()), pluginName) != null;
+        }
+
+        public bool IsPluginEnabled (string pluginName)
+        {
+            return _enabledPlugins.GetValue().Any(x => x.StartsWith(pluginName, StringComparison.InvariantCulture));
         }
 
         public JObject RequestUserData (ulong userId)

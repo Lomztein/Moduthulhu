@@ -23,6 +23,10 @@
     <RootNamespace>Lomztein.Moduthulhu.Core</RootNamespace>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile>C:\Users\Lomztein\Documents\GitHub\Moduthulhu\Core\Core.xml</DocumentationFile>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="Discord.Net" Version="2.1.1" />
     <PackageReference Include="Lomztein.Advanced-Discord-Commands" Version="1.2.2-beta" />

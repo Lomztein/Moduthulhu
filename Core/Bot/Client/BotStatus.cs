@@ -12,10 +12,10 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client
         private int _timeTreshold;
         private int _currentIndex;
 
-        private Action<ActivityType, string> _onChange;
+        private Action<IActivity> _onChange;
         private StatusMessage[] _messages;
 
-        public BotStatus (Action<ActivityType, string> onChange, int treshold, params StatusMessage[] messages)
+        public BotStatus (Action<IActivity> onChange, int treshold, params StatusMessage[] messages)
         {
             _onChange = onChange;
             _timeTreshold = treshold;
@@ -39,9 +39,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client
         private void Change ()
         {
             StatusMessage msg = _messages[_currentIndex];
-            string status = msg.Message();
-            Log.Bot($"Changing status to '{status}'.");
-            _onChange(msg.Type, status);
+            _onChange(msg);
         }
     }
 }
