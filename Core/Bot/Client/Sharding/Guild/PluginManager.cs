@@ -31,9 +31,6 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
             _parentHandler = parent;
             _enabledPlugins = new CachedValue<List<string>>(new DoubleKeyJsonRepository("plugindata"), _parentHandler.GuildId, "EnabledPlugins", () => PluginLoader.GetPlugins().Where (x => PluginLoader.IsStandard (x)).Select (y => Plugin.GetFullName (y)).ToList ());
             _enabledPlugins.Cache();
-
-            MakeSuperSureCriticalPluginsAreEnabled();
-            PurgeDuplicateEnabledPlugins();
         }
 
         private void MakeSuperSureCriticalPluginsAreEnabled ()
@@ -45,7 +42,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
                 {
                     try // One day I promise to stop abusing throw statements, so that we can avoid this.
                     {
-                        if (IsPluginActive(Plugin.GetName(pluginType)))
+                        if (!IsPluginActive(Plugin.GetName(pluginType)))
                         {
                             AddPlugin(Plugin.GetFullName(pluginType));
                             Log.Write(Log.Type.PLUGIN, $"Added missing critical {Plugin.GetVersionedFullName(pluginType)} plugin to enabled list.");
@@ -131,6 +128,9 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
 
         public void LoadPlugins ()
         {
+            MakeSuperSureCriticalPluginsAreEnabled();
+            PurgeDuplicateEnabledPlugins();
+
             Log.Write(Log.Type.PLUGIN, "Reloading plugins for guild " + _parentHandler.GetGuild().Name);
             OnPrePluginsLoaded?.Invoke();
 
