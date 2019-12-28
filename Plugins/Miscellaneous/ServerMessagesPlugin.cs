@@ -129,7 +129,6 @@ namespace Lomztein.Moduthulhu.Modules.ServerMessages {
         }
 
         public override void Shutdown() {
-            GuildHandler.JoinedGuild -= OnJoinedNewGuild;
             GuildHandler.UserJoined -= OnUserJoinedGuild;
             GuildHandler.UserLeft -= OnUserLeftGuild;
             GuildHandler.UserBanned -= OnUserBannedFromGuild;
