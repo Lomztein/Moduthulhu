@@ -18,7 +18,6 @@ namespace Lomztein.Moduthulhu.Modules.ServerMessages {
     public class ServerMessagesPlugin : PluginBase
     {
         private CachedValue<ulong> _channelId;
-        private CachedValue<List<string>> _onJoinedNewGuild;
         private CachedValue<List<string>> _onUserJoinedGuild;
         private CachedValue<List<string>> _onUserJoinedGuildByInvite;
         private CachedValue<List<string>> _onUserLeftGuild;
@@ -29,7 +28,6 @@ namespace Lomztein.Moduthulhu.Modules.ServerMessages {
         private InviteHandler _inviteHandler;
 
         public override void Initialize() {
-            GuildHandler.JoinedGuild += OnJoinedNewGuild;
             GuildHandler.UserJoined += OnUserJoinedGuild;
             GuildHandler.UserLeft += OnUserLeftGuild;
             GuildHandler.UserBanned += OnUserBannedFromGuild;
@@ -37,7 +35,6 @@ namespace Lomztein.Moduthulhu.Modules.ServerMessages {
             GuildHandler.GuildMemberUpdated += OnGuildMemberUpdated;
 
             _channelId = GetConfigCache("MessageChannelID", x => x.GetGuild().TextChannels.FirstOrDefault().ZeroIfNull());
-            _onJoinedNewGuild = GetConfigCache("OnJoinedNewGuild", x => new List<string> { "**[BOTNAME]** here, arrived ready and primed to crash at inoppertune times!" });
             _onUserJoinedGuild = GetConfigCache("OnUserJoinedGuild", x => new List<string> { "**[USERNAME]** has joined this server!" });
             _onUserJoinedGuildByInvite = GetConfigCache("OnUserJoinedNewGuildByInvite", x => new List<string> { "**[USERNAME]** has joined this server through the help of **[INVITERNAME]**!" });
             _onUserLeftGuild = GetConfigCache("OnUserLeftGuild", x => new List<string> { "**[USERNAME]** has left this server. :C" });
@@ -45,7 +42,6 @@ namespace Lomztein.Moduthulhu.Modules.ServerMessages {
             _onUserUnbannedFromGuild = GetConfigCache("OnUserUnbannedFromGuild", x => new List<string> { "**[USERNAME]** has been unbanned from this server!" });
             _onUserNameChanged = GetConfigCache("OnUserNameChanged", x => new List<string> { "**[USERNAME] changed their name to **[NEWNAME]**!" });
 
-            AddConfigInfoForMessage(_onJoinedNewGuild, "On Bot Joined");
             AddConfigInfoForMessage(_onUserJoinedGuild, "On New Member");
             AddConfigInfoForMessage(_onUserLeftGuild, "On Member Left");
             AddConfigInfoForMessage(_onUserBannedFromGuild, "On Member Banned");
@@ -116,14 +112,6 @@ namespace Lomztein.Moduthulhu.Modules.ServerMessages {
             else
             {
                 await SendMessage(_onUserJoinedGuildByInvite, "[USERNAME]", user.GetShownName(), "[INVITERNAME]", invite.Inviter.GetShownName());
-            }
-        }
-
-        private async Task OnJoinedNewGuild(SocketGuild guild) {
-            await SendMessage (_onJoinedNewGuild, "[BOTNAME]", GuildHandler.BotUser.GetShownName ());
-            if (HasPermission (GuildPermission.ManageGuild))
-            {
-                await _inviteHandler.UpdateData(guild);
             }
         }
 

@@ -9,6 +9,9 @@ using System.Threading.Tasks;
 
 namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
 {
+    /// <summary>
+    /// Class for sending messages to a user-defined channel on the assigned guild.
+    /// </summary>
     public class GuildNotifier
     {
         private GuildHandler _parentGuild;
@@ -42,6 +45,12 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
         private SocketTextChannel GetNotificationChannel() => _parentGuild.FindTextChannel(_notificationChannel.GetValue());
         private void ResetNotificationChannel() => _notificationChannel.SetValue((_parentGuild.GetGuild().TextChannels.FirstOrDefault()?.Id).GetValueOrDefault());
 
+        /// <summary>
+        /// Send a message to the assigned guild containing both a <paramref name="message"/> and an <paramref name="embed"/>.
+        /// </summary>
+        /// <param name="message">Message to be sent</param>
+        /// <param name="embed">Embed to be sent</param>
+        /// <returns>Send Message Task</returns>
         public async Task Notify (string message, Embed embed)
         {
             var channel = GetNotificationChannel();
@@ -63,8 +72,18 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
             }
         }
 
+        /// <summary>
+        /// See <see cref="Notify(string, Embed)"/>
+        /// </summary>
+        /// <param name="message"></param>
+        /// <returns></returns>
         public Task Notify(string message) => Notify(message, null);
 
+        /// <summary>
+        /// See <see cref="Notify(string, Embed)"/>
+        /// </summary>
+        /// <param name="embed"></param>
+        /// <returns></returns>
         public Task Notify(Embed embed) => Notify(string.Empty, embed);
     }
 }

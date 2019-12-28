@@ -222,9 +222,9 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
         public SocketGuildUser FindUser(Predicate<SocketGuildUser> predicate) => GetGuild().Users.FirstOrDefault(x => predicate(x));
         public SocketGuildUser FindUser(string name) => FindUser (x => ObjectNameMatches(name, string.IsNullOrWhiteSpace (x.Nickname) ? x.Username : x.Nickname));
 
-        public SocketGuildChannel FindChannel(ulong channelId) => GetGuild().GetChannel(channelId);
-        public SocketGuildChannel FindChannel(Predicate<SocketGuildChannel> predicate) => GetGuild().Channels.FirstOrDefault(x => predicate(x));
-        public SocketGuildChannel FindChannel(string name) => FindChannel(x => ObjectNameMatches(name, x.Name));
+        public IGuildChannel FindChannel(ulong channelId) => GetGuild().GetChannel(channelId);
+        public IGuildChannel FindChannel(Predicate<SocketGuildChannel> predicate) => GetGuild().Channels.FirstOrDefault(x => predicate(x));
+        public IGuildChannel FindChannel(string name) => FindChannel(x => ObjectNameMatches(name, x.Name));
 
         public SocketTextChannel FindTextChannel(ulong channelId) => FindChannel(channelId) as SocketTextChannel;
         public SocketTextChannel FindTextChannel(Predicate<SocketTextChannel> predicate) => GetGuild().TextChannels.FirstOrDefault(x => predicate(x));
@@ -246,9 +246,9 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
         public SocketGuildUser GetUser(Predicate<SocketGuildUser> predicate) => ThrowIfNull(FindUser (predicate), "No matching user could be found on this server.");
         public SocketGuildUser GetUser(string name) => ThrowIfNull(FindUser(name), $"User '{name}' could not be found on this server.");
 
-        public SocketGuildChannel GetChannel(ulong channelId) => ThrowIfNull(FindChannel(channelId), "That channel does not exist on this server.");
-        public SocketGuildChannel GetChannel(Predicate<SocketGuildChannel> predicate) => ThrowIfNull(FindChannel(predicate), "No matching channel could be found on this server.");
-        public SocketGuildChannel GetChannel(string name) => ThrowIfNull(FindChannel(name), $"Channel '{name}' could not be found on this server.");
+        public IGuildChannel GetChannel(ulong channelId) => ThrowIfNull(FindChannel(channelId), "That channel does not exist on this server.");
+        public IGuildChannel GetChannel(Predicate<SocketGuildChannel> predicate) => ThrowIfNull(FindChannel(predicate), "No matching channel could be found on this server.");
+        public IGuildChannel GetChannel(string name) => ThrowIfNull(FindChannel(name), $"Channel '{name}' could not be found on this server.");
 
         public SocketTextChannel GetTextChannel(ulong channelId) => ThrowIfNull(FindTextChannel(channelId), "That text channel does not exist on this server.");
         public SocketTextChannel GetTextChannel(Predicate<SocketTextChannel> predicate) => ThrowIfNull(FindTextChannel(predicate), "No matching text channel could be found on this server.");
