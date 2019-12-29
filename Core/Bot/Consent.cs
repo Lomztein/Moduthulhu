@@ -10,18 +10,19 @@ namespace Lomztein.Moduthulhu.Core.Bot
 {
     public static class Consent
     {
-        private static DoubleKeyJsonRepository _consent = new DoubleKeyJsonRepository("consent");
+        private static DoubleKeyJsonRepository _consent;
 
         public static void Init ()
         {
+            _consent = new DoubleKeyJsonRepository("consent");
         }
 
         public static void AssertConsent(ulong guild, ulong user)
         {
             var queryRes = _consent.Get(guild, user.ToString(CultureInfo.InvariantCulture));
-            if (!queryRes.ToObject<bool>())
+            if (queryRes == null || !queryRes.ToObject<bool>())
             {
-                throw new ConsentException("User has not given consent to storage of personal data.");
+                throw new ConsentException("User has not given consent to storage of personal data. See `!consent`.");
             }
         }
 

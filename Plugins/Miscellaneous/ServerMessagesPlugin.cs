@@ -67,7 +67,7 @@ namespace Lomztein.Moduthulhu.Modules.ServerMessages {
         {
             string msg = string.Empty;
             AddConfigInfo<string>(name, "Add a message", x => message.MutateValue(y => y.Add (x)), x => $"Added new {name} message: '{x}'.", "Message");
-            AddConfigInfo<int>(name, "Remove a message", x => message.MutateValue(y => { msg = y[x]; y.RemoveAt(x); }), x => $"Removed {name} message: {msg}.", "Index");
+            AddConfigInfo<int>(name, "Remove a message", x => message.MutateValue(y => { msg = y[x]; y.RemoveAt(x); }), x => $"Removed {name} message: '{msg}'.", "Index");
             AddConfigInfo(name, "Display messages", () => $"Current '{name}' messages:\n{string.Join('\n', message.GetValue().ToArray ())}");
         }
 
@@ -115,17 +115,22 @@ namespace Lomztein.Moduthulhu.Modules.ServerMessages {
             }
         }
 
-        private async Task SendMessage (CachedValue<List<string>> messages, params string[] findAndReplace) {
-            SocketTextChannel channel = GuildHandler.GetChannel (_channelId.GetValue ()) as SocketTextChannel;
-            string [ ] guildMessages = messages.GetValue ().ToArray ();
-            string message = guildMessages [ new Random ().Next (0, guildMessages.Length) ];
+        private async Task SendMessage(CachedValue<List<string>> messages, params string[] findAndReplace)
+        {
+            SocketTextChannel channel = GuildHandler.GetChannel(_channelId.GetValue()) as SocketTextChannel;
+            string[] guildMessages = messages.GetValue().ToArray();
 
-            for (int i = 0; i < findAndReplace.Length; i += 2)
+            if (guildMessages.Any())
             {
-                message = message.Replace(findAndReplace[i], findAndReplace[i + 1]);
-            }
+                string message = guildMessages[new Random().Next(0, guildMessages.Length)];
 
-            await MessageControl.SendMessage (channel, message);
+                for (int i = 0; i < findAndReplace.Length; i += 2)
+                {
+                    message = message.Replace(findAndReplace[i], findAndReplace[i + 1]);
+                }
+
+                await MessageControl.SendMessage(channel, message);
+            }
         }
 
         public override void Shutdown() {
