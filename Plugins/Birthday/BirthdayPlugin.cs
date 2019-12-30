@@ -15,6 +15,7 @@ using Lomztein.Moduthulhu.Plugins.Standard;
 using Lomztein.Moduthulhu.Core.Bot;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Globalization;
 
 namespace Lomztein.Moduthulhu.Plugins.Birthday {
 
@@ -110,7 +111,7 @@ namespace Lomztein.Moduthulhu.Plugins.Birthday {
         }
 
         public async Task AnnounceBirthday(ITextChannel channel, SocketGuildUser user, BirthdayDate date) {
-            string age = date.GetAge ().ToString () + date.GetAgeSuffix ();
+            string age = GetAge (date.Date).ToString () + GetNumberSuffix (GetAge (date.Date));
             string message = _announcementMessage.GetValue ().Replace ("[USERNAME]", user.GetShownName ()).Replace ("[AGE]", age);
             await channel.SendMessageAsync (message);
         }
@@ -134,62 +135,78 @@ namespace Lomztein.Moduthulhu.Plugins.Birthday {
             }
         }
 
+        public static int GetAge(DateTime date)
+        {
+            try
+            {
+                return DateTime.MinValue.Add(DateTime.Now - new DateTime(date.Year, date.Month, date.Day)).Year - DateTime.MinValue.Year;
+            }
+            catch (IndexOutOfRangeException exc)
+            {
+                Core.Log.Exception(exc);
+                return 0;
+            }
+        }
+
+        public static (int age, DateTime date) GetNextBirthday (DateTime birthDate)
+        {
+            DateTime now = DateTime.Now;
+            DateTime date = new DateTime(now.Year, birthDate.Month, birthDate.Day, birthDate.Hour, birthDate.Minute, birthDate.Second);
+            if (now > date)
+            {
+                date.AddYears(1);
+            }
+
+            return (GetAge(date), date);
+        }
+
+        public static string GetNumberSuffix(int age)
+        {
+
+            string ageSuffix = "'th";
+            switch (age.ToString().Last())
+            {
+                case '1':
+                    ageSuffix = "'st";
+                    break;
+                case '2':
+                    ageSuffix = "'nd";
+                    break;
+                case '3':
+                    ageSuffix = "'rd";
+                    break;
+                default:
+                    ageSuffix = "'th";
+                    break;
+            }
+
+            return ageSuffix;
+        }
+
         public class BirthdayDate {
 
             [JsonProperty ("Date")]
-            private readonly DateTime _date;
-            [JsonProperty ("LastPassedYear")]
-            private long _lastPassedYear;
+            public readonly DateTime Date;
+            [JsonProperty("LastPassedYear")]
+            public long LastPassedYear { get; private set; }
 
             public BirthdayDate(DateTime _date, long lastPassedYear)
             {
-                this._date = _date;
-                _lastPassedYear = lastPassedYear;
+                this.Date = _date;
+                LastPassedYear = lastPassedYear;
             }
 
-            public int GetAge() {
-                try {
-                    return DateTime.MinValue.Add (GetNow () - new DateTime (_date.Year, _date.Month, _date.Day)).Year - DateTime.MinValue.Year;
-                } catch (IndexOutOfRangeException exc) {
-                    Core.Log.Exception (exc);
-                    return 0;
-                }
-            }
-
-            public string GetAgeSuffix() => GetAgeSuffix (GetAge ());
-
-            public static string GetAgeSuffix(int age) {
-
-                string ageSuffix = "'th";
-                switch (age.ToString ().Last ()) {
-                    case '1':
-                        ageSuffix = "'st";
-                        break;
-                    case '2':
-                        ageSuffix = "'nd";
-                        break;
-                    case '3':
-                        ageSuffix = "'rd";
-                        break;
-                    default:
-                        ageSuffix = "'th";
-                        break;
-                }
-
-                return ageSuffix;
-            }
-
-            public bool IsToday() => (_date.Month == GetNow ().Month && _date.Day == GetNow ().Day);
+            public bool IsToday() => (Date.Month == GetNow ().Month && Date.Day == GetNow ().Day);
 
             public bool IsNow() {
-                DateTime dateThisYear = new DateTime (GetNow ().Year, _date.Month, _date.Day, _date.Hour, _date.Minute, _date.Second);
-                if (GetNow () > dateThisYear && _lastPassedYear != GetNow ().Year) {
+                DateTime dateThisYear = new DateTime (GetNow ().Year, Date.Month, Date.Day, Date.Hour, Date.Minute, Date.Second);
+                if (GetNow () > dateThisYear && LastPassedYear != GetNow ().Year) {
                     return true;
                 }
                 return false;
             }
 
-            public void SetLastPassedToNow() => _lastPassedYear = DateTime.Now.Year;
+            public void SetLastPassedToNow() => LastPassedYear = DateTime.Now.Year;
 
             public virtual DateTime GetNow() => DateTime.Now; // Gotta allow for them unit tests amirite?
 
@@ -208,9 +225,8 @@ namespace Lomztein.Moduthulhu.Plugins.Birthday {
                 Consent.AssertConsent((data.Author as SocketGuildUser).Guild.Id, data.AuthorID);
                 DateTime date = new DateTime (year, month, day, 12, 0, 0);
                 ParentPlugin.SetBirthday (data.Message.Author.Id, date);
-                return TaskResult (null, $"Succesfully set birthday date to **{date.ToShortDateString ()}**.");
+                return TaskResult (null, $"Succesfully set birthday date to **{date.ToString ("MMMM dd, yyyy", CultureInfo.InvariantCulture)}**.");
             }
-
         }
     }
 }
