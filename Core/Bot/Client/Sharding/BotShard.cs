@@ -91,12 +91,18 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding
             await handler.OnJoinedGuild();
         }
 
-        private Task Client_Disconnected(Exception arg)
+        private async Task Client_Disconnected(Exception arg)
         {
             IsConnected = false;
+
+            Log.Warning($"Shard {ShardId} disconnected. Attempting reconnect..");
             Log.Exception(arg);
             OnExceptionCaught(arg);
-            return Task.CompletedTask;
+
+            await Login();
+            await Start();
+
+            await AwaitConnected();
         }
 
         internal GuildHandler[] GetGuildHandlers () => _guildHandlers.ToArray();
@@ -200,6 +206,11 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding
             }
 
             GuildHandler handler = _guildHandlers.Find(x => x.GuildId == guildId.Value);
+            if (handler == null) // GuildHandler is missing for whatever reason. Perhaps the guild was added while the bot was temporarily offline.
+            {
+                InitGuildHandler(GetGuild(guildId.Value));
+            }
+
             _ = func(handler);
             return Task.CompletedTask;
         }

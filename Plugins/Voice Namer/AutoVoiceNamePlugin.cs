@@ -79,7 +79,7 @@ namespace Lomztein.Moduthulhu.Modules.Voice {
         }
 
         private string FormatName(string format, string name, string game, int playerAmount)
-            => _nameFormat.GetValue().Replace(_formatNameStr, name).Replace(_formatGameStr, game).Replace(_formatAmountPlayersStr, playerAmount.ToString (CultureInfo.InvariantCulture));
+            => format.Replace(_formatNameStr, name).Replace(_formatGameStr, game).Replace(_formatAmountPlayersStr, playerAmount.ToString (CultureInfo.InvariantCulture));
 
         void InitDefaultTags () {
             AddTag (new Tag ("🎵", x => x.Users.Any (y => y.Id == _musicBotId.GetValue ())));
