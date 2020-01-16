@@ -95,9 +95,19 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding
         {
             IsConnected = false;
 
-            Log.Warning($"Shard {ShardId} disconnected. Attempting reconnect..");
+            Log.Warning($"Shard {ShardId} disconnected.");
             Log.Exception(arg);
             OnExceptionCaught(arg);
+
+            await AttemptReconnect();
+        }
+
+        internal async Task AttemptReconnect ()
+        {
+            await Logout();
+            await Stop();
+
+            Log.Bot("Attempting reconnect..");
 
             await Login();
             await Start();
@@ -153,7 +163,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding
 
         private async Task Logout () {
             await Client.LogoutAsync ();
-            Log.Write (Log.Type.BOT, $"Shard {ShardId} logged out in.");
+            Log.Write (Log.Type.BOT, $"Shard {ShardId} logged out.");
         }
 
         internal async Task Kill () {

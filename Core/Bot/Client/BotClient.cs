@@ -89,11 +89,15 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client
 
 
 
-        private Task StatusClock_OnMinutePassed(DateTime currentTick, DateTime lastTick)
+        private async Task StatusClock_OnMinutePassed(DateTime currentTick, DateTime lastTick)
         {
             if (_shards.Any (x => x.IsConnected == false)) {
                 _consecutiveOfflineMinutes++;
                 Log.Write(Log.Type.WARNING, $"Disconnected shard detected, commencing auto-shutdown in {_consecutiveOfflineMinutes}/{_automaticOfflineMinutesTreshold} minutes..");
+                foreach (var shard in _shards.Where (x => !x.IsConnected))
+                {
+                    await shard.AttemptReconnect();
+                }
             }
             else
             {
@@ -110,7 +114,6 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client
                 Log.Write(Log.Type.CRITICAL, $"Commencing automatic shutdown due to disconnected shard. :(");
                 Shutdown();
             }
-            return Task.CompletedTask;
         }
 
         private void Shutdown()
