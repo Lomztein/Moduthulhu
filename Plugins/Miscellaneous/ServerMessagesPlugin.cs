@@ -60,7 +60,7 @@ namespace Lomztein.Moduthulhu.Modules.ServerMessages {
                 _ = _inviteHandler.Intialize().ConfigureAwait(false);
             }
 
-            AddGeneralFeaturesStateAttribute("ServerMessages", "The bot will now automatically respond to certain phrases as configured.");
+            AddGeneralFeaturesStateAttribute("ServerMessages", "Automated messages when certain server events occur.");
         }
 
         private void AddConfigInfoForMessage (CachedValue<List<string>> message, string name)

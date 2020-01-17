@@ -69,6 +69,7 @@ namespace Lomztein.Moduthulhu.Modules.Phrases
             AddConfigInfo<int>("Set Phrase Emoji", "Set emoji", x => { _phrases.GetValue()[x].Emoji = string.Empty; _phrases.Store(); }, x => $"Phrase at index {x} emoji reset.", "Index");
             AddConfigInfo<int, string>("Set Phrase Emoji", "Set emoji", (x, y) => { _phrases.GetValue()[x].Emoji = y; _phrases.Store(); }, (x, y) => $"Phrase at index {x} emoji updated to {y}.", "Index", "Emoji");
             #endregion
+            AddGeneralFeaturesStateAttribute("ServerMessages", "Automatic response to certain phrases as configured.");
         }
 
         private async Task OnMessageRecieved(SocketMessage message) {

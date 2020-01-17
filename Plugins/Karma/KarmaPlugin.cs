@@ -44,6 +44,8 @@ namespace Lomztein.Moduthulhu.Modules.Misc.Karma
             AddConfigInfo("Set Downvote Emote", "Get emote", () => $"Current downvote emote is '{GuildHandler.GetGuild().GetEmoteAsync(_downvoteEmoteId.GetValue()).Result.Name}'.");
             AddConfigInfo<string>("Set Downvote Emote", "Set emote", x => _downvoteEmoteId.SetValue((GuildHandler.GetGuild().GetEmoteAsync(_downvoteEmoteId.GetValue()).Result?.Id).GetValueOrDefault()),
                 x => $"Set downote emote to '{x}'.", "Emote");
+
+            AddGeneralFeaturesStateAttribute("Karma", "Tracking of total upvotes / downvotes per user.");
         }
 
         private async Task OnReactionRemoved(Cacheable<IUserMessage, ulong> arg1, ISocketMessageChannel arg2, SocketReaction arg3) {

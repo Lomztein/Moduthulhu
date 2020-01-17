@@ -29,7 +29,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
         public PluginManager (GuildHandler parent)
         {
             _parentHandler = parent;
-            _enabledPlugins = new CachedValue<List<string>>(new DoubleKeyJsonRepository("plugindata"), _parentHandler.GuildId, "EnabledPlugins", () => PluginLoader.GetPlugins().Where (x => PluginLoader.IsStandard (x)).Select (y => Plugin.GetFullName (y)).ToList ());
+            _enabledPlugins = new CachedValue<List<string>>(new DoubleKeyJsonRepository("plugindata"), _parentHandler.GuildId, "EnabledPlugins", () => PluginLoader.GetPlugins().Where (x => PluginLoader.IsDefault (x)).Select (y => Plugin.GetFullName (y)).ToList ());
             _enabledPlugins.Cache();
         }
 
