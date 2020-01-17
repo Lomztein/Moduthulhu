@@ -94,9 +94,10 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client
             if (_shards.Any (x => x.IsConnected == false)) {
                 _consecutiveOfflineMinutes++;
                 Log.Write(Log.Type.WARNING, $"Disconnected shard detected, commencing auto-shutdown in {_consecutiveOfflineMinutes}/{_automaticOfflineMinutesTreshold} minutes..");
+
                 foreach (var shard in _shards.Where (x => !x.IsConnected))
                 {
-                    await shard.AttemptReconnect();
+                    await shard.Connect();
                 }
             }
             else

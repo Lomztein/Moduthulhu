@@ -48,29 +48,34 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding
         internal async Task Initialize () {
             Log.Bot($"Initializing shard {ShardId+1}/{TotalShards}.");
 
+            await Connect();
+
+            InitInitialHandlers();
+            RouteEvents();
+        }
+
+        private DiscordSocketClient CreateClient ()
+        {
+            Log.Bot($"Initializing Discord Client for shard {ShardId + 1}/{TotalShards}.");
+
             BootDate = DateTime.Now;
-            DiscordSocketConfig config = new DiscordSocketConfig {
+            DiscordSocketConfig config = new DiscordSocketConfig
+            {
                 ShardId = ShardId,
                 TotalShards = TotalShards,
                 DefaultRetryMode = RetryMode.AlwaysRetry,
             };
 
-            Client = new DiscordSocketClient (config);
+            var client = new DiscordSocketClient(config);
 
-            Client.Ready += Client_Ready;
-            Client.JoinedGuild += Client_JoinedGuild;
-            Client.LeftGuild += Client_LeftGuild;
-            Client.Disconnected += Client_Disconnected;
+            client.Ready += Client_Ready;
+            client.JoinedGuild += Client_JoinedGuild;
+            client.LeftGuild += Client_LeftGuild;
+            client.Disconnected += Client_Disconnected;
 
-            Client.GuildMembersDownloaded += Client_GuildMembersDownloaded;
+            client.GuildMembersDownloaded += Client_GuildMembersDownloaded;
 
-            await Login ();
-            await Start ();
-
-            await AwaitConnected ();
-
-            InitInitialHandlers();
-            RouteEvents();
+            return client;
         }
 
         private Task Client_GuildMembersDownloaded(SocketGuild arg)
@@ -99,15 +104,14 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding
             Log.Exception(arg);
             OnExceptionCaught(arg);
 
-            await AttemptReconnect();
+            await Connect();
         }
 
-        internal async Task AttemptReconnect ()
+        internal async Task Connect ()
         {
-            await Logout();
-            await Stop();
+            Client = CreateClient();
 
-            Log.Bot("Attempting reconnect..");
+            Log.Bot("Connecting..");
 
             await Login();
             await Start();
