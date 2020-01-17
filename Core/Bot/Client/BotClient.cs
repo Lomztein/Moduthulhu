@@ -61,13 +61,17 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client
 
         internal void InitStatus()
         {
+            int easterEggFraction = 1000;
+            string universalHelp = "!help | !plugins | !config";
+
             _status = new BotStatus(x => FirstClient.SetActivityAsync(x), 10, new StatusMessage[] {
-                new StatusMessage(ActivityType.Watching, () => "https://github.com/Lomztein/Moduthulhu/blob/master/README.md#usage-guide"),
-                new StatusMessage(ActivityType.Watching, () => new Random().Next(0, 100) == 0 ? $"{AllGuilds.Sum(x => x.MemberCount)} puny souls waste away their hilariously short lives." : $"{AllGuilds.Count()} servers!"),
-                new StatusMessage(ActivityType.Watching, () => new Random().Next(0, 100) == 0 ? "the sweet cries of the fresh virgin sacrifices." : "!help | !plugins | !config"),
-                new StatusMessage(ActivityType.Watching, () => new Random().Next(0, 100) == 0 ? "V̌̾͒̓͏̸̼͔̘͎̳̦̮̰̹̥Ǫ̪͎̜̝͙̅ͫ͊̃͗̾̍ͣ̔̾͊͆ͭ͗̏͆̀͘͟͠I̴͛͌ͦ͊̇̾ͮ͂̈̌͏̪̜̳͙̰̝̺̱͈̗̥D̡̳͈̠͔̲̳̤̱͚̤ͥͮͤͪ̄ͤ͐̆̿ͩ͐ͭ̋̂͗̔ͬͦ͊" : $"for {Uptime.Days} days!"),
-                new StatusMessage(ActivityType.Watching, () => new Random().Next(0, 100) == 0 ? "the dice of the vast cosmos." : $"!help | !plugins | !config"),
-                new StatusMessage(ActivityType.Watching, () => new Random().Next(0, 100) == 0 ? "the dice of the vast cosmos." : $"!help | !plugins | !config"),
+                new StatusMessage(ActivityType.Watching, () => new Random().Next(0, easterEggFraction) == 0 ? "Bible Black" : universalHelp),
+                new StatusMessage(ActivityType.Watching, () => new Random().Next(0, easterEggFraction) == 0 ? $"{AllGuilds.Sum(x => x.MemberCount)} puny souls waste away their hilariously short lives." : $"{AllGuilds.Count()} servers!"),
+                new StatusMessage(ActivityType.Watching, () => new Random().Next(0, easterEggFraction) == 0 ? "the sweet cries of the fresh virgin sacrifices." : universalHelp),
+                new StatusMessage(ActivityType.Watching, () => new Random().Next(0, easterEggFraction) == 0 ? $"{AllGuilds.Count ()} realms lost to madness." : $"{AllGuilds.Sum(x => x.MemberCount)} people!"),
+                new StatusMessage(ActivityType.Watching, () => new Random().Next(0, easterEggFraction) == 0 ? "the dice of the vast cosmos." : universalHelp),
+                new StatusMessage(ActivityType.Watching, () => new Random().Next(0, easterEggFraction) == 0 ? "V̌̾͒̓͏̸̼͔̘͎̳̦̮̰̹̥Ǫ̪͎̜̝͙̅ͫ͊̃͗̾̍ͣ̔̾͊͆ͭ͗̏͆̀͘͟͠I̴͛͌ͦ͊̇̾ͮ͂̈̌͏̪̜̳͙̰̝̺̱͈̗̥D̡̳͈̠͔̲̳̤̱͚̤ͥͮͤͪ̄ͤ͐̆̿ͩ͐ͭ̋̂͗̔ͬͦ͊" : $"for {Uptime.Days} days!"),
+                new StatusMessage(ActivityType.Watching, () => new Random().Next(0, easterEggFraction) == 0 ? "Cars 2" : universalHelp),
             });
         }
 

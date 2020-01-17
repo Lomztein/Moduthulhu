@@ -7,13 +7,16 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Linq;
 using Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild;
+using System.Globalization;
 
 namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding
 {
     public class BotShard {
 
         public DateTime BootDate { get; private set; }
+        public DateTime ConnectDate { get; private set; }
         public TimeSpan Uptime { get => DateTime.Now - BootDate; }
+        public TimeSpan ConnectionUptime { get => DateTime.Now - ConnectDate; }
 
         public BotClient BotClient { get; private set; }
 
@@ -48,6 +51,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding
         internal async Task Initialize () {
             Log.Bot($"Initializing shard {ShardId+1}/{TotalShards}.");
 
+            BootDate = DateTime.Now;
             await Connect();
 
             InitInitialHandlers();
@@ -58,7 +62,6 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding
         {
             Log.Bot($"Initializing Discord Client for shard {ShardId + 1}/{TotalShards}.");
 
-            BootDate = DateTime.Now;
             DiscordSocketConfig config = new DiscordSocketConfig
             {
                 ShardId = ShardId,
@@ -109,6 +112,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding
 
         internal async Task Connect ()
         {
+            ConnectDate = DateTime.Now;
             Client = CreateClient();
 
             Log.Bot("Connecting..");
@@ -257,7 +261,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding
             => $"Shard {ShardId + 1}/{TotalShards}";
 
         public override string ToString () {
-            return $"GuildHandlers: {_guildHandlers.Count}\nPlugin Instances: {_guildHandlers.Sum (x => x.Plugins.ActiveCount)}\nUsers: {Client.Guilds.Sum (x => x.MemberCount)}\nLogin state: {Client.LoginState}\nConnection: {Client.ConnectionState}\nLatency: {Client.Latency}\nUptime: {Uptime}\n";
+            return $"GuildHandlers: {_guildHandlers.Count}\nPlugin Instances: {_guildHandlers.Sum (x => x.Plugins.ActiveCount)}\nUsers: {Client.Guilds.Sum (x => x.MemberCount)}\nLogin state: {Client.LoginState}\nConnection: {Client.ConnectionState}\nConnection Uptime: {ConnectionUptime.ToString("%d\\:%hh", CultureInfo.InvariantCulture)}\nLatency: {Client.Latency}\nUptime: {Uptime.ToString ("%d\\:%hh", CultureInfo.InvariantCulture)}\n";
         }
 
         // Guild item getters.

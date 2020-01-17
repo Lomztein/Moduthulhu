@@ -109,7 +109,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
 
         public override string ToString ()
         {
-            return $"{GetGuild().Name} (Users: {GetGuild().MemberCount}, Plugins: {Plugins.GetActivePlugins().Length}, Uptime {Uptime})";
+            return $"{GetGuild().Name} (Users: {GetGuild().MemberCount}, Plugins: {Plugins.GetActivePlugins().Length}, Uptime {Uptime.ToString("%d\\:%hh", CultureInfo.InvariantCulture)})";
         }
 
         // ROUTED DISCORD EVENTS //
