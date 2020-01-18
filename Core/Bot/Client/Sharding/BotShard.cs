@@ -261,7 +261,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding
             => $"Shard {ShardId + 1}/{TotalShards}";
 
         public override string ToString () {
-            return $"GuildHandlers: {_guildHandlers.Count}\nPlugin Instances: {_guildHandlers.Sum (x => x.Plugins.ActiveCount)}\nUsers: {Client.Guilds.Sum (x => x.MemberCount)}\nLogin state: {Client.LoginState}\nConnection: {Client.ConnectionState}\nConnection Uptime: {ConnectionUptime.ToString("%d\\:%hh", CultureInfo.InvariantCulture)}\nLatency: {Client.Latency}\nUptime: {Uptime.ToString ("%d\\:%hh", CultureInfo.InvariantCulture)}\n";
+            return $"GuildHandlers: {_guildHandlers.Count}\nPlugin Instances: {_guildHandlers.Sum (x => x.Plugins.ActiveCount)}\nUsers: {Client.Guilds.Sum (x => x.MemberCount)}\nLogin state: {Client.LoginState}\nConnection: {Client.ConnectionState}\nConnection Uptime: {ConnectionUptime.ToString("%d\\:%hh", CultureInfo.InvariantCulture)}\nLatency: {Client.Latency}\nUptime: {Uptime.ToString ("%d\\:%h", CultureInfo.InvariantCulture)}\n";
         }
 
         // Guild item getters.

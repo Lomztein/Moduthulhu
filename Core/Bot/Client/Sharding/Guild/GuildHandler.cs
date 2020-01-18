@@ -97,7 +97,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
             Exception[] initExceptions = Plugins.GetInitializationExceptions();
             if (initExceptions.Length > 0)
             {
-                Notifier.Notify($"Some things went wrong while loading plugins after a patch:\n\t{string.Join("\n\t", initExceptions.Select(x => x.Message + " - " + x.InnerException.Message))}\n\n Offending plugins have been disabled.");
+                Notifier.Notify($"Some things went wrong while loading plugins after a patch:\n\t{string.Join("\n\t", initExceptions.Select(x => x.Message + " - " + x.InnerException.Message))}\n\nOffending plugins have been disabled.");
             }
         }
 

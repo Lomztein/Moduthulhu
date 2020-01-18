@@ -49,7 +49,7 @@ namespace Lomztein.Moduthulhu.Core.Bot {
             return _errorReporter.ReportError(exception);
         }
 
-        public override string ToString() => $"Core uptime: {Uptime.ToString ("%d\\:%hh", CultureInfo.InvariantCulture)}\n{Client}";
+        public override string ToString() => $"Core uptime: {Uptime.ToString ("%d\\:%h", CultureInfo.InvariantCulture)}\n{Client}";
 
         public void Dispose()
         {
