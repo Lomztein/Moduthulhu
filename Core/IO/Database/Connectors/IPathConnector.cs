@@ -8,6 +8,8 @@ namespace Lomztein.Moduthulhu.Core.IO.Database.Connectors
     {
         T GetValue<T>(string path);
 
+        T[] GetAllValues<T>(string prefix);
+
         void SetValue(string path, object value);
     }
 }

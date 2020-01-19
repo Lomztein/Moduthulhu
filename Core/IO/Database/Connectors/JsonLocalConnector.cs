@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 
 namespace Lomztein.Moduthulhu.Core.IO.Database.Connectors
@@ -22,6 +23,19 @@ namespace Lomztein.Moduthulhu.Core.IO.Database.Connectors
         {
             Log.Data($"Storing JSON data {value} at '{path}'.");
             JSONSerialization.SerializeObject(value, GetPath() + path);
+        }
+
+        public T[] GetAllValues<T>(string path)
+        {
+            string directoryPath = GetPath() + path.Substring(0, path.LastIndexOf('/'));
+            string prefix = path.Substring(path.LastIndexOf("/") + 1);
+            string[] matches = Directory.GetFiles(directoryPath, $"{prefix}*");
+            T[] results = new T[matches.Length];
+            for (int i = 0; i < results.Length; i++)
+            {
+                results[i] = JSONSerialization.DeserializeFile<T>(matches[i]);
+            }
+            return results;
         }
     }
 }

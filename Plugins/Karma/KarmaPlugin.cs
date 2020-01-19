@@ -4,7 +4,7 @@ using Lomztein.Moduthulhu.Core.Extensions;
 using Lomztein.Moduthulhu.Core.IO;
 using Lomztein.Moduthulhu.Core.IO.Database.Repositories;
 using Lomztein.Moduthulhu.Core.Plugins.Framework;
-using Lomztein.Moduthulhu.Modules.Misc.Karma.Commands;
+using Lomztein.Moduthulhu.Plugins.Karma.Commands;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -12,7 +12,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Lomztein.Moduthulhu.Modules.Misc.Karma
+namespace Lomztein.Moduthulhu.Plugins.Karma
 {
     [Dependency ("Moduthulhu-Command Root")]
     [Descriptor ("Lomztein", "Karma", "Keep track of an accurate representation of peoples self-worth.")]
@@ -23,20 +23,17 @@ namespace Lomztein.Moduthulhu.Modules.Misc.Karma
         private CachedValue<ulong> _upvoteEmoteId;
         private CachedValue<ulong> _downvoteEmoteId;
 
-        private CachedValue<Dictionary<ulong, Selfworth>> _karma;
-
-        private KarmaCommand _karmaCommand;
+        private KarmaCommandSet _karmaCommand;
+        private IKarmaRepository _karmaRepo = new CachedValueKarmaRepository ();
 
         public override void Initialize() {
             GuildHandler.ReactionAdded += OnReactionAdded;
             GuildHandler.ReactionRemoved += OnReactionRemoved;
-            _karmaCommand = new KarmaCommand { ParentPlugin = this };
+            _karmaCommand = new KarmaCommandSet { ParentPlugin = this };
             SendMessage("Moduthulhu-Command Root", "AddCommand", _karmaCommand);
 
             _upvoteEmoteId = GetConfigCache("UpvoteEmoteId", x => x.GetGuild ().Emotes.Where (y => y.Name == "upvote").FirstOrDefault ().ZeroIfNull ());
             _downvoteEmoteId = GetConfigCache("DownvoteEmoteId", x => x.GetGuild ().Emotes.Where (y => y.Name == "downvote").FirstOrDefault ().ZeroIfNull ());
-
-            _karma = GetDataCache("Karma", x => new Dictionary<ulong, Selfworth>());
 
             AddConfigInfo("Set Upvote Emote", "Get emote", () => $"Current upvote emote is '{GuildHandler.GetGuild().GetEmoteAsync(_upvoteEmoteId.GetValue()).Result.Name}'.");
             AddConfigInfo<string>("Set Upvote Emote", "Set emote", x => _upvoteEmoteId.SetValue((GuildHandler.GetGuild().GetEmoteAsync(_upvoteEmoteId.GetValue()).Result?.Id).GetValueOrDefault()),
@@ -66,12 +63,13 @@ namespace Lomztein.Moduthulhu.Modules.Misc.Karma
 
             if (reaction.Channel is SocketGuildChannel guildChannel && reaction.Emote is Emote emote) {
 
+                // TODO: Differentiate between adding/removing upvotes/downvotes.
                 if (emote.Id == _upvoteEmoteId.GetValue ()) {
-                    ChangeKarma (reaction.User.Value, message.Author, direction * 1);
+                    ChangeKarma (reaction.User.Value, message.Channel, message, direction * 1);
                 }
 
                 if (emote.Id == _downvoteEmoteId.GetValue ()) {
-                    ChangeKarma (reaction.User.Value, message.Author, direction * -1);
+                    ChangeKarma (reaction.User.Value, message.Channel, message, direction * -1);
                 }
             }
         }
@@ -84,11 +82,12 @@ namespace Lomztein.Moduthulhu.Modules.Misc.Karma
 
         public override JToken RequestUserData(ulong id)
         {
-            if (_karma.GetValue ().ContainsKey (id))
+            Karma karma = _karmaRepo.GetKarma(GuildHandler.GuildId, id);
+            if (karma != null)
             {
                 return new JObject
                 {
-                    { "Karma", JObject.FromObject (_karma.GetValue ()[id]) }
+                    { "Karma", JObject.FromObject (karma) }
                 };
             }
             return null;
@@ -96,60 +95,26 @@ namespace Lomztein.Moduthulhu.Modules.Misc.Karma
 
         public override void DeleteUserData(ulong id)
         {
-            if (_karma.GetValue ().ContainsKey (id))
-            {
-                _karma.MutateValue(x => x.Remove(id));
-            }
+            // _karmaRepo.DeleteUserData(id);
         }
 
-        public Dictionary<ulong, Selfworth> GetKarmaDictionary () => _karma.GetValue();
-
-        private void ChangeKarma (IUser giver, IUser receiver, int direction) {
-            if (giver.Id == receiver.Id)
+        private void ChangeKarma (IUser giver, IMessageChannel channel, IUserMessage message, int direction) {
+            if (giver.Id == message.Author.Id)
             {
                 return; // Can't go around giving yourself karma, ye twat.
             }
-            if (!_karma.GetValue ().ContainsKey (receiver.Id))
-            {
-                _karma.GetValue().Add(receiver.Id, new Selfworth());
-            }
-
-            if (direction > 0)
-            {
-                _karma.GetValue()[receiver.Id].Upvote();
-            }
-            else if (direction < 0)
-            {
-                _karma.GetValue()[receiver.Id].Downvote();
-            }
-
-            _karma.Store();
+            _karmaRepo.ChangeKarma(GuildHandler.GuildId, giver.Id, message.Author.Id, channel.Id, message.Id, direction);
         }
 
-        public Selfworth GetKarma (ulong userID) {
-            Selfworth result = _karma.GetValue ().GetValueOrDefault (userID);
+        public Karma GetKarma (ulong userID) {
+            Karma result = _karmaRepo.GetKarma(GuildHandler.GuildId, userID);
             if (result == null)
             {
-                result = new Selfworth();
+                result = new Karma(userID);
             }
             return result;
         }
 
-        public class Selfworth {
-
-            [JsonProperty ("Upvotes")]
-            public int Upvotes { get; private set; }
-            [JsonProperty ("Downvotes")]
-            public int Downvotes { get; private set; }
-
-            [JsonIgnore]
-            public int Total { get =>  Upvotes - Downvotes; }
-
-            public void Upvote() => Upvotes++;
-            public void Downvote() => Downvotes++;
-
-            public override string ToString() => $"{Total} (+{Upvotes} / -{Downvotes})";
-
-        }
+        public Karma[] GetLeaderboard() => _karmaRepo.GetLeaderboard(GuildHandler.GuildId);
     }
 }

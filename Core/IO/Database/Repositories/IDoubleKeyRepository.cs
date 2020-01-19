@@ -4,12 +4,14 @@ using System.Text;
 
 namespace Lomztein.Moduthulhu.Core.IO.Database.Repositories
 {
-    public interface IDoubleKeyRepository<TIdentifier, TKey, TValue>
+    public interface IDoubleKeyRepository<TValue>
     {
         void Init();
 
-        TValue GetValue(TIdentifier identifier, TKey key);
+        TValue GetValue(ulong identifier, string key);
 
-        void SetValue(TIdentifier identifier, TKey key, TValue value);
+        TValue[] GetAllValues(ulong identifier, string prefix);
+
+        void SetValue(ulong identifier, string key, TValue value);
     }
 }

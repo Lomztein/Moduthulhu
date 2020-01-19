@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Lomztein.Moduthulhu.Core.IO.Database.Repositories
 {
-    public class PathDoubleKeyRepository<TIdentifier, TKey, TValue> : IDoubleKeyRepository<TIdentifier, TKey, TValue>
+    public class PathDoubleKeyRepository<TValue> : IDoubleKeyRepository<TValue>
     {
         private readonly string _table;
         private readonly IPathConnector _connector;
@@ -20,17 +20,22 @@ namespace Lomztein.Moduthulhu.Core.IO.Database.Repositories
 
         private IPathConnector GetConnector() => _connector;
 
-        private string GetPath(TIdentifier identifier, TKey key)
+        private string GetPath(ulong identifier, string key)
             => $"{_table}/{identifier}/{key}".Replace ('.', '/');
 
-        public TValue GetValue(TIdentifier identifier, TKey key)
+        public TValue GetValue(ulong identifier, string key)
         {
             return GetConnector ().GetValue<TValue>(GetPath(identifier, key));
         }
 
-        public void SetValue(TIdentifier identifier, TKey key, TValue value)
+        public void SetValue(ulong identifier, string key, TValue value)
         {
             GetConnector().SetValue(GetPath(identifier, key), value);
+        }
+
+        public TValue[] GetAllValues(ulong identifier, string prefix)
+        {
+            return GetConnector().GetAllValues<TValue>(GetPath(identifier, prefix));
         }
     }
 }

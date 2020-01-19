@@ -7,6 +7,7 @@ using System.Text;
 
 namespace Lomztein.Moduthulhu.Core.IO.Database.Repositories
 {
+    // TODO: Implement a Delete method, such that it has all CRUD functionality.
     public class CachedValue<T> : IValueRepository<T>
     {
         private readonly DoubleKeyJsonRepository _repo;
@@ -63,6 +64,12 @@ namespace Lomztein.Moduthulhu.Core.IO.Database.Repositories
         public void Store()
         {
             _repo.Set(_identity, _key, ToJson ());
+        }
+
+        public void Store (bool isSet)
+        {
+            Store();
+            _isSet = isSet;
         }
 
         private JToken ToJson()
