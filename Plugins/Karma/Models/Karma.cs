@@ -28,6 +28,23 @@ namespace Lomztein.Moduthulhu.Plugins.Karma
 
         public override string ToString() => $"{Total} (+{Upvotes} / -{Downvotes})";
 
+        public void Vote (ulong sender, ulong channelId, ulong messageId, VoteAction action)
+        {
+            Message message = _messages.FirstOrDefault(x => x.Id == messageId);
+            if (message == null)
+            {
+                message = new Message(messageId, channelId, UserId, new ulong[0], new ulong[0]);
+                AddMessage(message);
+            }
+
+            _messages.FirstOrDefault(x => x.Id == messageId)?.Vote(sender, action);
+
+            if (message.Downvotes == 0 && message.Upvotes == 0)
+            {
+                _messages.Remove(message);
+            }
+        }
+
         public Karma ()
         {
             _messages = new List<Message>();

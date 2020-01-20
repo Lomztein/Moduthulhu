@@ -14,16 +14,7 @@ namespace Lomztein.Moduthulhu.Plugins.Karma
         public void ChangeKarma(ulong guildId, ulong senderId, ulong recieverId, ulong channelId, ulong messageId, VoteAction action)
         {
             AddIfMissing(guildId, recieverId);
-
-            Message message = _karma[recieverId].GetValue().GetMessages().FirstOrDefault(x => x.Id == messageId);
-            if (message == null)
-            {
-                message = new Message(messageId, channelId, recieverId, new ulong[0], new ulong[0]);
-                _karma[recieverId].GetValue().AddMessage(message);
-            }
-
-            message.Vote(senderId, action);
-            _karma[recieverId].Store();
+            _karma[recieverId].MutateValue (x => x.Vote(senderId, channelId, messageId, action));
         }
 
         public void DeleteUserData(ulong guildId, ulong userId)

@@ -56,6 +56,21 @@ namespace Lomztein.Moduthulhu.Plugins.Karma.Commands
                 return new Result(await GetKarmaEmbed(karma, user.GetShownName(), 3, ParentPlugin.GuildHandler), string.Empty);
             }
 
+            [Overload(typeof(int), "Returns karma of a given user.")]
+            public async Task<Result> Execute(CommandMetadata data, string username)
+            {
+                IUser user = ParentPlugin.GuildHandler.GetUser(username);
+                var karma = ParentPlugin.GetKarma(user.Id);
+                return new Result(await GetKarmaEmbed(karma, user.GetShownName(), 3, ParentPlugin.GuildHandler), string.Empty);
+            }
+
+            [Overload(typeof(int), "Returns karma of a given user.")]
+            public async Task<Result> Execute(CommandMetadata data, ulong userId)
+            {
+                var karma = ParentPlugin.GetKarma(userId);
+                return new Result(await GetKarmaEmbed(karma, ParentPlugin.GuildHandler.GetUser (userId).GetShownName(), 3, ParentPlugin.GuildHandler), string.Empty);
+            }
+
             [Overload(typeof(SocketGuildUser[]), "Returns top <n> karma whores.")]
             public Task<Result> Execute(CommandMetadata data, int amount)
             {

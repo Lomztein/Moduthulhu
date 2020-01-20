@@ -31,6 +31,7 @@ namespace Lomztein.Moduthulhu.Core.IO.Database.Repositories
         private T _value;
         private bool _dirty = true;
         private bool _isSet = false;
+        private bool ShouldCache => _dirty || !_isSet;
 
         public CachedValue(DoubleKeyJsonRepository repo, ulong identity, string key, Func<T> defaultValue)
         {
@@ -41,7 +42,7 @@ namespace Lomztein.Moduthulhu.Core.IO.Database.Repositories
         }
 
         public T GetValue() {
-            if (_dirty)
+            if (ShouldCache)
             {
                 Cache();
             }
@@ -56,6 +57,11 @@ namespace Lomztein.Moduthulhu.Core.IO.Database.Repositories
 
         public void MutateValue(Action<T> action)
         {
+            if (ShouldCache)
+            {
+                Cache();
+            }
+
             action(_value);
             Store();
         }
