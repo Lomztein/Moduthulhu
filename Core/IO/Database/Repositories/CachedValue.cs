@@ -7,6 +7,19 @@ using System.Text;
 
 namespace Lomztein.Moduthulhu.Core.IO.Database.Repositories
 {
+    /* EXPERIMENTAL
+     * I'm trying out a thought. The idea is that there should never be a reason for storing the default value.
+     * As such, I've removed the Store () call when generating the default value, as well as setting isSet to
+     * true whenever the data is stored. This has the added benifit of less database accesses.
+     * In edge cases, Store () can just be called manually, if the default value should be saved for whatever reason.
+     * 
+     * The idea is based on the fact that Store () is never called in cases where it isn't a specific permanemt
+     * value that should be stored, regardless. Perhaps obvious in hindsight, or perhaps a catastrophe waiting to happen.
+     * 
+     * With this in mind, the only ever cases where values are stored, would be when isSet is true regardless.
+     * I'll keep it here for the time being though, just in case I am way off with this idea, and have to revert it.
+     */
+
     // TODO: Implement a Delete method, such that it has all CRUD functionality.
     public class CachedValue<T> : IValueRepository<T>
     {
@@ -38,14 +51,12 @@ namespace Lomztein.Moduthulhu.Core.IO.Database.Repositories
         public void SetValue(T value)
         {
             _value = value;
-            _isSet = true;
             Store();
         }
 
         public void MutateValue(Action<T> action)
         {
             action(_value);
-            _isSet = true;
             Store();
         }
 
@@ -57,19 +68,19 @@ namespace Lomztein.Moduthulhu.Core.IO.Database.Repositories
             if (!_isSet)
             {
                 _value = _defaultValue();
-                Store();
             }
+
             _dirty = false;
         }
         public void Store()
         {
-            _repo.Set(_identity, _key, ToJson ());
-        }
+            if (!_isSet)
+            {
+                _value = _defaultValue();
+            }
 
-        public void Store (bool isSet)
-        {
-            Store();
-            _isSet = isSet;
+            _isSet = true;
+            _repo.Set(_identity, _key, ToJson ());
         }
 
         private JToken ToJson()
