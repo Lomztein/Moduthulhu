@@ -241,8 +241,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
                     throw new ArgumentException($"Plugin {fullName} cannot be loaded as it is missing dependencies: {string.Join(",", missing.Select(x => Plugin.GetVersionedFullName(x)))}");
                 }
 
-                _enabledPlugins.GetValue().Add(fullName);
-                _enabledPlugins.Store();
+                _enabledPlugins.MutateValue(x => x.Add (fullName));
                 return true;
             }
             throw new ArgumentException("No plugin named '" + pluginName + "' is available to be added.");
@@ -266,8 +265,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
                 }
 
                 string storedName = _enabledPlugins.GetValue().Find(x => x.StartsWith(fullName, StringComparison.Ordinal));
-                _enabledPlugins.GetValue().Remove(storedName);
-                _enabledPlugins.Store();
+                _enabledPlugins.MutateValue(x => x.Add (storedName));
                 return true;
             }
             throw new ArgumentException("No plugin named '" + pluginName + "' is currently active.");

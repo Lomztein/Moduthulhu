@@ -46,6 +46,8 @@ namespace Lomztein.Moduthulhu.Modules.Voice {
             InitDefaultTags();
 
             _channelNames = GetConfigCache("ChannelNames", x => x.GetGuild().VoiceChannels.ToDictionary(y => y.Id, z => z.Name));
+            _channelNames.Store();
+
             _toIgnore = GetConfigCache("ToIgnore", x => new List<ulong> { (x.GetGuild().AFKChannel?.Id).GetValueOrDefault() });
             _musicBotId = GetConfigCache("MusicBotId", x => (ulong)0);
             _internationalRoleId = GetConfigCache("MusicBotId", x => (ulong)0);
