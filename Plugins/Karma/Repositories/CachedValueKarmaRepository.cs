@@ -23,7 +23,7 @@ namespace Lomztein.Moduthulhu.Plugins.Karma
             }
 
             message.Vote(senderId, action);
-            _karma[recieverId].Store(true);
+            _karma[recieverId].Store();
         }
 
         public void DeleteUserData(ulong guildId, ulong userId)
