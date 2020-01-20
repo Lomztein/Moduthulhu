@@ -45,7 +45,7 @@ namespace Lomztein.Moduthulhu.Core.IO.Database.Repositories
             IDatabaseConnector db = GetConnector();
             var res = db.ReadQuery($"SELECT value FROM {_tableName} WHERE identifier = @identifier AND key LIKE @prefix",
                 new Dictionary<string, object> { { "@identifier", identifier.ToString(CultureInfo.InvariantCulture) }, { "@prefix", $"{prefix}%" } });
-            return res.Length == 0 ? default : res.Single().Values.Select(x => (TValue)x).ToArray();
+            return res.Length == 0 ? default : res.Select (x => (TValue)x.Values.FirstOrDefault()).ToArray();
         }
     }
 }

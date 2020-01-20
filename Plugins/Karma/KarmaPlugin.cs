@@ -62,14 +62,14 @@ namespace Lomztein.Moduthulhu.Plugins.Karma
             }
 
             if (reaction.Channel is SocketGuildChannel guildChannel && reaction.Emote is Emote emote) {
-
-                // TODO: Differentiate between adding/removing upvotes/downvotes.
                 if (emote.Id == _upvoteEmoteId.GetValue ()) {
-                    ChangeKarma (reaction.User.Value, message.Channel, message, direction * 1);
+                    VoteAction action = direction == 1 ? VoteAction.AddUpvote : VoteAction.RemoveUpvote;
+                    ChangeKarma (reaction.User.Value, message.Channel, message, action);
                 }
 
                 if (emote.Id == _downvoteEmoteId.GetValue ()) {
-                    ChangeKarma (reaction.User.Value, message.Channel, message, direction * -1);
+                    VoteAction action = direction == 1 ? VoteAction.AddDownvote : VoteAction.RemoveDownvote;
+                    ChangeKarma (reaction.User.Value, message.Channel, message, action);
                 }
             }
         }
@@ -98,12 +98,12 @@ namespace Lomztein.Moduthulhu.Plugins.Karma
             // _karmaRepo.DeleteUserData(id);
         }
 
-        private void ChangeKarma (IUser giver, IMessageChannel channel, IUserMessage message, int direction) {
+        private void ChangeKarma (IUser giver, IMessageChannel channel, IUserMessage message, VoteAction action) {
             if (giver.Id == message.Author.Id)
             {
                 return; // Can't go around giving yourself karma, ye twat.
             }
-            _karmaRepo.ChangeKarma(GuildHandler.GuildId, giver.Id, message.Author.Id, channel.Id, message.Id, direction);
+            _karmaRepo.ChangeKarma(GuildHandler.GuildId, giver.Id, message.Author.Id, channel.Id, message.Id, action);
         }
 
         public Karma GetKarma (ulong userID) {

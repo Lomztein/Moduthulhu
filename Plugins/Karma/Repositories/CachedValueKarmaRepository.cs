@@ -11,9 +11,8 @@ namespace Lomztein.Moduthulhu.Plugins.Karma
         private Dictionary<ulong, CachedValue<Karma>> _karma = new Dictionary<ulong, CachedValue<Karma>>();
         private DoubleKeyJsonRepository _sourceRepo = new DoubleKeyJsonRepository("lomzkarma_cachedvalue");
 
-        public void ChangeKarma(ulong guildId, ulong senderId, ulong recieverId, ulong channelId, ulong messageId, int amount)
+        public void ChangeKarma(ulong guildId, ulong senderId, ulong recieverId, ulong channelId, ulong messageId, VoteAction action)
         {
-            int sign = Math.Sign(amount);
             AddIfMissing(guildId, recieverId);
 
             Message message = _karma[recieverId].GetValue().GetMessages().FirstOrDefault(x => x.Id == messageId);
@@ -23,7 +22,7 @@ namespace Lomztein.Moduthulhu.Plugins.Karma
                 _karma[recieverId].GetValue().AddMessage(message);
             }
 
-            message.Vote(senderId, sign);
+            message.Vote(senderId, action);
             _karma[recieverId].Store(true);
         }
 

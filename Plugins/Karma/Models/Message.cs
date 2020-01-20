@@ -6,6 +6,7 @@ using System.Text;
 
 namespace Lomztein.Moduthulhu.Plugins.Karma
 {
+    public enum VoteAction { AddUpvote, AddDownvote, RemoveUpvote, RemoveDownvote }
     public class Message
     {
         [JsonProperty ("MessageId")]
@@ -30,16 +31,25 @@ namespace Lomztein.Moduthulhu.Plugins.Karma
         public ulong[] GetUpvotes() => _upvotes.ToArray ();
         public ulong[] GetDownvotes() => _downvotes.ToArray ();
 
-        public void Vote(ulong sender, int value)
+        public void Vote(ulong sender, VoteAction action)
         {
-            int sign = Math.Sign(value);
-            if (sign == 1)
+            switch (action)
             {
-                _upvotes.Add(sender);
-            }
-            else if (sign == -1)
-            {
-                _downvotes.Add(sender);
+                case VoteAction.AddUpvote:
+                    _upvotes.Add(sender);
+                    break;
+
+                case VoteAction.AddDownvote:
+                    _downvotes.Add(sender);
+                    break;
+
+                case VoteAction.RemoveUpvote:
+                    _upvotes.Remove(sender);
+                    break;
+
+                case VoteAction.RemoveDownvote:
+                    _downvotes.Remove(sender);
+                    break;
             }
         }
 

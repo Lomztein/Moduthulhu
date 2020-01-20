@@ -14,6 +14,6 @@ namespace Lomztein.Moduthulhu.Plugins.Karma
 
         void DeleteUserData(ulong guildId, ulong userId);
 
-        void ChangeKarma(ulong guildId, ulong senderId, ulong recieverId, ulong channelId, ulong messageId, int amount);
+        void ChangeKarma(ulong guildId, ulong senderId, ulong recieverId, ulong channelId, ulong messageId, VoteAction action);
     }
 }
