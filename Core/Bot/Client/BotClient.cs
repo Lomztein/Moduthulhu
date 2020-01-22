@@ -101,6 +101,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client
 
                 foreach (var shard in _shards.Where (x => !x.IsConnected))
                 {
+                    Log.Bot($"Attempting reconnect of shard {shard.ShardId}.");
                     await shard.Connect();
                 }
             }
@@ -129,6 +130,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client
         internal void InitializeShards () {
             _shards = new BotShard[Configuration.TotalShards];
             for (int i = Configuration.ShardRange.Min; i < Configuration.ShardRange.Max; i++) {
+                Log.Bot($"Creating shard {i + 1}/{Configuration.ShardRange.Max}, Id = 0.");
                 _shards[i] = CreateShard (i, Configuration.TotalShards);
                 _shards[i].Run();
             }

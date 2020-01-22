@@ -82,7 +82,7 @@ namespace Lomztein.Moduthulhu.Core.IO.Database.Repositories
         {
             if (!_isSet)
             {
-                _value = _defaultValue();
+                Cache();
             }
 
             _isSet = true;

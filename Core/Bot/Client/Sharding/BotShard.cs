@@ -49,7 +49,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding
         }
 
         internal async Task Initialize () {
-            Log.Bot($"Initializing shard {ShardId+1}/{TotalShards}.");
+            Log.Bot($"Initializing shard {ShardId}.");
 
             BootDate = DateTime.Now;
             await Connect();
@@ -60,7 +60,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding
 
         private DiscordSocketClient CreateClient ()
         {
-            Log.Bot($"Initializing Discord Client for shard {ShardId + 1}/{TotalShards}.");
+            Log.Bot($"Initializing Discord Client for shard {ShardId}.");
 
             DiscordSocketConfig config = new DiscordSocketConfig
             {
@@ -106,8 +106,6 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding
             Log.Warning($"Shard {ShardId} disconnected.");
             Log.Exception(arg);
             OnExceptionCaught(arg);
-
-            await Connect();
         }
 
         internal async Task Connect ()
