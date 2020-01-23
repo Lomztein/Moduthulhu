@@ -1,4 +1,4 @@
-﻿using Lomztein.Moduthulhu.Core.IO.Database.Repositories;
+using Lomztein.Moduthulhu.Core.IO.Database.Repositories;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -30,8 +30,9 @@ namespace Lomztein.Moduthulhu.Core.IO.Database.Repositories
 
         private T _value;
         private bool _dirty = true;
-        private bool _isSet = false;
-        private bool ShouldCache => _dirty || !_isSet;
+        private enum State { Unset, Default, Local, Remote }
+        private State _state = State.Unset;
+        private bool ShouldCache => _dirty || _state == State.Unset;
 
         public CachedValue(DoubleKeyJsonRepository repo, ulong identity, string key, Func<T> defaultValue)
         {
@@ -70,23 +71,18 @@ namespace Lomztein.Moduthulhu.Core.IO.Database.Repositories
         {
             JToken obj = _repo.Get(_identity, _key);
             FromJson(obj);
-
-            if (!_isSet)
-            {
-                _value = _defaultValue();
-            }
-
+            
             _dirty = false;
         }
         public void Store()
         {
-            if (!_isSet)
+            if (ShouldCache)
             {
                 Cache();
             }
 
-            _isSet = true;
             _repo.Set(_identity, _key, ToJson ());
+            _state = State.Remote;
         }
 
         private JToken ToJson()
@@ -94,7 +90,6 @@ namespace Lomztein.Moduthulhu.Core.IO.Database.Repositories
             JObject obj = new JObject
             {
                 { "Value", JToken.FromObject (_value) },
-                { "IsSet", JToken.FromObject (_isSet) },
             };
             return obj;
         }
@@ -106,19 +101,19 @@ namespace Lomztein.Moduthulhu.Core.IO.Database.Repositories
                 Log.Data("Loaded simple CachedValue data.");
                 if (obj == null)
                 {
-                    _value = default;
-                    _isSet = false;
+                    _value = _defaultValue ();
+                    _state = State.Default;
                 }
                 else
                 {
                     _value = obj.ToObject<T>();
-                    _isSet = true;
+                    _state = State.Remote;
                 }
             }
             else
             {
                 _value = obj["Value"].ToObject<T>();
-                _isSet = obj["IsSet"].ToObject<bool>();
+                _state = State.Remote;
             }
         }
 
@@ -141,7 +136,6 @@ namespace Lomztein.Moduthulhu.Core.IO.Database.Repositories
         public void Reset ()
         {
             _value = _defaultValue ();
-            _isSet = false;
             Store();
         }
     }

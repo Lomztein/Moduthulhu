@@ -96,8 +96,15 @@ namespace Lomztein.Moduthulhu.Core.IO.Database
             return tableDict;
         }
 
+        private static List<string> _createdTables = new List<string>();
         public void CreateTable(string tableName, string createQuery)
         {
+            // If a table is deleted for some reason while system is running, then what are you even doing
+            if (_createdTables.Contains (tableName))
+            {
+                return;
+            }
+
             var res = ReadQuery("SELECT 1 FROM information_schema.tables WHERE table_name = @table", new Dictionary<string, object> { { "@table", tableName } });
 
             try
@@ -107,6 +114,7 @@ namespace Lomztein.Moduthulhu.Core.IO.Database
                     Log.Write(Log.Type.DATA, $"Creating missing database table {tableName}.");
                     UpdateQuery(createQuery, new Dictionary<string, object>());
                 }
+                _createdTables.Add(tableName);
             }
             catch (NpgsqlException e)
             {

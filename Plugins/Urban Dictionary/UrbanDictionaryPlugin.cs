@@ -22,7 +22,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
     {
         private ICommand cmd;
 
-        public static readonly string[] ReactionEmojis = new string[] { "1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣", "🔟" };
+        public static readonly string[] ReactionEmojis = new string[] { "1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣" };
         private List<NestedDefinitionButton> _nestedButtons = new List<NestedDefinitionButton>();
         public void AddNestedDefinitionButton(NestedDefinitionButton butt) => _nestedButtons.Add(butt);
 
