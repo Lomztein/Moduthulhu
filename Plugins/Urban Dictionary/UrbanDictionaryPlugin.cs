@@ -20,21 +20,57 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
     [Dependency("Moduthulhu-Command Root")]
     public class UrbanDictionaryPlugin : PluginBase
     {
-        private readonly ICommand cmd = new UrbanDefineCommand();
+        private ICommand cmd;
+
+        public static readonly string[] ReactionEmojis = new string[] { "1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣", "🔟" };
+        private List<NestedDefinitionButton> _nestedButtons = new List<NestedDefinitionButton>();
+        public void AddNestedDefinitionButton(NestedDefinitionButton butt) => _nestedButtons.Add(butt);
 
         public override void Initialize()
         {
+            cmd = new UrbanDefineCommand { ParentPlugin = this };
             SendMessage("Moduthulhu-Command Root", "AddCommand", cmd);
+            GuildHandler.ReactionAdded += GuildHandler_ReactionAdded;
+        }
+
+        private async Task GuildHandler_ReactionAdded(Cacheable<IUserMessage, ulong> arg1, Discord.WebSocket.ISocketMessageChannel arg2, Discord.WebSocket.SocketReaction arg3)
+        {
+            NestedDefinitionButton button = _nestedButtons.FirstOrDefault(x => x.MessageId == arg1.Id);
+            if (button != null && !arg3.User.GetValueOrDefault ().IsBot)
+            {
+                int emoji = ReactionEmojis.ToList().IndexOf(arg3.Emote.Name);
+                if (button.Contains (emoji))
+                {
+                    string word = button.Consume(emoji);
+                    var def = await UrbanDefinition.Get(word);
+                    var msg = await arg2.SendMessageAsync(null, false, def.ToEmbed());
+                    await AddNestedDefReactions(def, msg);
+                }
+            }
         }
 
         public override void Shutdown()
         {
             SendMessage("Moduthulhu-Command Root", "RemoveCommand", cmd);
+            GuildHandler.ReactionAdded -= GuildHandler_ReactionAdded;
+        }
+
+        public async Task AddNestedDefReactions (UrbanDefinition definition, IUserMessage message)
+        {
+            int length = Math.Min(definition.NestedDefinitionWords.Length, ReactionEmojis.Length);
+            AddNestedDefinitionButton(new NestedDefinitionButton(message.Id, definition.NestedDefinitionWords));
+
+            for (int i = 0; i < length; i++)
+            {
+                await message.AddReactionAsync(new Emoji(ReactionEmojis[i]));
+            }
+
         }
     }
 
     public class UrbanDefinition
     {
+        private static readonly string[] SuperscriptNumbers = new string[] { "¹", "²", "³", "⁴", "⁵", "⁶", "⁷", "⁸", "⁹" };
         public const string ApiUrl = "http://api.urbandictionary.com/v0/define?term={word}";
         public const string SearchUrl = "https://www.urbandictionary.com/define.php?term={word}";
 
@@ -44,6 +80,9 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
         public readonly string Author;
         public readonly string Permalink;
         public readonly bool Success;
+
+        private readonly List<string> _nestedDefs = new List<string>();
+        public string[] NestedDefinitionWords => _nestedDefs.ToArray();
 
         public string[] Tags { get; }
         public string[] Sounds { get; }
@@ -129,8 +168,22 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
         private string EmbedNestedDefinitions(string input)
         {
             Regex squareBracketRegex = new Regex(@"\[(.*?)\]");
-            string result = squareBracketRegex.Replace(input, x => $"{x.Value}({GetSearchUrl(x.Value.Substring(1, x.Value.Length - 2))})");
+            string result = squareBracketRegex.Replace(input, x => $"{x.Value}({GetSearchUrl(x.Value.Substring(1, x.Value.Length - 2))}){AddNestedDef(x.Value)}");
             return result;
+        }
+
+        private string AddNestedDef (string url)
+        {
+            if (_nestedDefs.Count == UrbanDictionaryPlugin.ReactionEmojis.Length)
+            {
+                return string.Empty;
+            }
+
+            if (!_nestedDefs.Contains (url))
+            {
+                _nestedDefs.Add(url);
+            }
+            return SuperscriptNumbers[_nestedDefs.IndexOf(url)];
         }
 
         private string EscapeEmphasis (string input)
@@ -163,10 +216,30 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
                 throw new InvalidOperationException("Unable to fetch definition. The service may be temporarily unavailable.");
             }
         }
-
     }
 
-    public class UrbanDefineCommand : Command
+    public class NestedDefinitionButton
+    {
+        public ulong MessageId { get; private set; }
+        private List<string> _nestedDefs;
+
+        public NestedDefinitionButton(ulong messageId, IEnumerable<string> nestedDefs)
+        {
+            MessageId = messageId;
+            _nestedDefs = new List<string>(nestedDefs);
+        }
+
+        public bool Contains(int index) => _nestedDefs[index] != null;
+
+        public string Consume (int index)
+        {
+            string word = _nestedDefs[index];
+            _nestedDefs[index] = null;
+            return word;
+        }
+    }
+
+    public class UrbanDefineCommand : PluginCommand<UrbanDictionaryPlugin>
     {
         public UrbanDefineCommand()
         {
@@ -177,10 +250,15 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
         }
 
         [Overload (typeof (Embed), "Fetch the definition of a given word from Urban Dictionary.")]
-        public async Task<Result> Execute(CommandMetadata _, string word)
+        public async Task<Result> Execute(CommandMetadata data, string word)
         {
-            Embed embed = (await UrbanDefinition.Get(word)).ToEmbed ();
-            return new Result(embed, string.Empty);
+            var def = await UrbanDefinition.Get(word);
+            Embed embed = def.ToEmbed ();
+
+            var message = await data.Message.Channel.SendMessageAsync(null, false, embed);
+            await ParentPlugin.AddNestedDefReactions(def, message);
+
+            return new Result(null, string.Empty);
         }
     }
 }
