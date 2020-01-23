@@ -142,13 +142,30 @@ namespace Lomztein.Moduthulhu.Modules.Voice {
                         continue;
                     }
 
+                    int unknowns = 0;
                     if (!user.IsBot)
                     {
-                        if (!numPlayers.ContainsKey(user.Activity.Name))
+                        if (user.Activity.Type == ActivityType.Playing)
                         {
-                            numPlayers.Add(user.Activity.Name, 0);
+                            string activity = user.Activity.ToString();
+
+                            if (!numPlayers.ContainsKey(activity))
+                            {
+                                numPlayers.Add(activity, 0);
+                            }
+                            numPlayers[activity]++;
                         }
-                        numPlayers[user.Activity.Name]++;
+                        else
+                        {
+                            unknowns++;
+                        }
+                    }
+
+                    // Temporary solution to the bot not being able to see game being played, if the user has a custom status.
+                    // In this case, if the user is not a bot, it is assumed they are playing all games currently being played by others.
+                    foreach (var pair in numPlayers)
+                    {
+                        numPlayers[pair.Key] += unknowns;
                     }
                 }
 
