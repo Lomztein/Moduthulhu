@@ -81,7 +81,7 @@ namespace Lomztein.Moduthulhu.Modules.Voice {
         }
 
         private string FormatName(string format, string name, string game, int playerAmount)
-            => format.Replace(_formatNameStr, name).Replace(_formatGameStr, game).Replace(_formatAmountPlayersStr, playerAmount.ToString (CultureInfo.InvariantCulture));
+            => format.Replace(_formatNameStr, name).Replace(_formatGameStr, game).Replace(_formatAmountPlayersStr, playerAmount == 0 ? string.Empty : playerAmount.ToString (CultureInfo.InvariantCulture));
 
         void InitDefaultTags () {
             AddTag (new Tag ("🎵", x => x.Users.Any (y => y.Id == _musicBotId.GetValue ())));
@@ -142,14 +142,14 @@ namespace Lomztein.Moduthulhu.Modules.Voice {
                         continue;
                     }
 
-                    if (user.Activity.Type == ActivityType.Playing && user.IsBot == false) {
-                        if (numPlayers.ContainsKey (user.Activity.Name)) {
-                            numPlayers [ user.Activity.Name ]++;
-                        } else {
-                            numPlayers.Add (user.Activity.Name, 1);
+                    if (!user.IsBot)
+                    {
+                        if (!numPlayers.ContainsKey(user.Activity.Name))
+                        {
+                            numPlayers.Add(user.Activity.Name, 0);
                         }
+                        numPlayers[user.Activity.Name]++;
                     }
-
                 }
 
                 int highest = int.MinValue;
@@ -180,7 +180,7 @@ namespace Lomztein.Moduthulhu.Modules.Voice {
                 }
                 if (_customNames.ContainsKey (channel.Id))
                 {
-                    newName = possibleShorten + " - " + _customNames[channel.Id];
+                    newName = FormatName(_nameFormat.GetValue(), possibleShorten, _customNames[channel.Id], 0);
                 }
 
                 // Trying to optimize API calls here, just to spare those poor souls at the Discord API HQ stuff
