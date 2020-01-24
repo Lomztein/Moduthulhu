@@ -163,9 +163,9 @@ namespace Lomztein.Moduthulhu.Modules.Voice {
 
                     // Temporary solution to the bot not being able to see game being played, if the user has a custom status.
                     // In this case, if the user is not a bot, it is assumed they are playing all games currently being played by others.
-                    foreach (var pair in numPlayers)
+                    for (int i = 0; i < numPlayers.Count; i++)
                     {
-                        numPlayers[pair.Key] += unknowns;
+                        numPlayers[numPlayers.ElementAt(i).Key] += unknowns;
                     }
                 }
 
