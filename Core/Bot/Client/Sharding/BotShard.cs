@@ -66,7 +66,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding
             {
                 ShardId = ShardId,
                 TotalShards = TotalShards,
-                DefaultRetryMode = RetryMode.AlwaysRetry,
+                DefaultRetryMode = RetryMode.AlwaysFail,
             };
 
             var client = new DiscordSocketClient(config);
@@ -110,6 +110,13 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding
 
         internal async Task Connect ()
         {
+            if (Client != null)
+            {
+                await Logout();
+                await Stop();
+                Client.Dispose();
+            }
+
             ConnectDate = DateTime.Now;
             Client = CreateClient();
 
@@ -163,8 +170,16 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding
         }
 
         private async Task Login () {
-            await Client.LoginAsync (TokenType.Bot, _token);
-            Log.Write (Log.Type.BOT, $"Shard {ShardId} logged in.");
+            Log.Bot($"Attempting login of shard {ShardId}..");
+            try
+            {
+                await Client.LoginAsync(TokenType.Bot, _token);
+                Log.Write (Log.Type.BOT, $"Shard {ShardId} logged in.");
+            } catch (Exception exc)
+            {
+                Log.Bot($"Shard {ShardId} failed to login:");
+                Log.Exception(exc);
+            }
         }
 
         private async Task Logout () {
