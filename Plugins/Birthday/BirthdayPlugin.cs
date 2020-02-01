@@ -55,6 +55,17 @@ namespace Lomztein.Moduthulhu.Plugins.Birthday {
             AddGeneralFeaturesStateAttribute("BirthdayGreetings", "Automatic birthday wishing if desired.");
         }
 
+        public override void PostInitialize()
+        {
+            SendMessage("Lomztein-Auto Voice Names", "AddTag", "🍰", "Someone celebrating their birthsday is present!", new Func<SocketVoiceChannel, bool>(x => AnyToday(x.Users)));
+        }
+
+        private bool AnyToday (IEnumerable<SocketGuildUser> users)
+        {
+            var knownDays = _allBirthdays.GetValue().Where(x => users.Any(y => x.Key == y.Id));
+            return knownDays.Any(x => x.Value.IsToday());
+        }
+
         private async Task Clock_OnHourPassed(DateTime currentTick, DateTime lastTick)
         {
             await TestBirthdays();

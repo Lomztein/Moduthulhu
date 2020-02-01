@@ -37,10 +37,10 @@ namespace Lomztein.Moduthulhu.Plugins.Standard {
             _trigger = GetConfigCache("CommandTrigger", x => '!');
             _hiddenTrigger = GetConfigCache("CommandHiddenTrigger", x => '/');
 
-            RegisterMessageAction("AddCommand", (x) => AddCommands((ICommand)x));
-            RegisterMessageAction("AddCommands", (x) => AddCommands((ICommand[])x));
-            RegisterMessageAction("RemoveCommand", (x) => RemoveCommands((ICommand)x));
-            RegisterMessageAction("RemoveCommands", (x) => RemoveCommands((ICommand[])x));
+            RegisterMessageAction("AddCommand", (x) => AddCommands(x[0] as ICommand));
+            RegisterMessageAction("AddCommands", (x) => AddCommands(x.Cast<ICommand>().ToArray ()));
+            RegisterMessageAction("RemoveCommand", (x) => RemoveCommands(x[0] as ICommand));
+            RegisterMessageAction("RemoveCommands", (x) => RemoveCommands(x.Cast<ICommand>().ToArray()));
 
             _commandRoot = new CommandRoot (new List<ICommand> (),
                 x => _trigger.GetValue (),

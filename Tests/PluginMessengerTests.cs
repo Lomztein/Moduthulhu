@@ -22,7 +22,7 @@ namespace Tests
         {
             var messenger = new PluginMessenger(); 
             bool value = false;
-            messenger.Register(target, name, (x) => value = (bool)x);
+            messenger.Register(target, name, (x) => value = (bool)x[0]);
             messenger.SendMessage(target, name, expectedValue);
             Assert.True(value == expectedValue);
         }

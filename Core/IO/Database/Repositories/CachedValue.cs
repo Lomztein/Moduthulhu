@@ -34,6 +34,8 @@ namespace Lomztein.Moduthulhu.Core.IO.Database.Repositories
         private State _state = State.Unset;
         private bool ShouldCache => _dirty || _state == State.Unset;
 
+        public event Action<T, T> OnModified;
+
         public CachedValue(DoubleKeyJsonRepository repo, ulong identity, string key, Func<T> defaultValue)
         {
             _repo = repo;
@@ -52,18 +54,22 @@ namespace Lomztein.Moduthulhu.Core.IO.Database.Repositories
 
         public void SetValue(T value)
         {
+            var old = _value;
             _value = value;
+            OnModified?.Invoke(old, value);
             Store();
         }
 
         public void MutateValue(Action<T> action)
         {
+            var old = _value;
             if (ShouldCache)
             {
                 Cache();
             }
 
             action(_value);
+            OnModified?.Invoke(old, _value);
             Store();
         }
 
