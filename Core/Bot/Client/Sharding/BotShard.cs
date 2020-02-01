@@ -53,9 +53,6 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding
 
             BootDate = DateTime.Now;
             await Connect();
-
-            InitInitialHandlers();
-            RouteEvents();
         }
 
         private DiscordSocketClient CreateClient ()
@@ -126,15 +123,21 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding
             await Start();
 
             await AwaitConnected();
+
+            InitHandlers();
+            RouteEvents();
         }
 
         internal GuildHandler[] GetGuildHandlers () => _guildHandlers.ToArray();
 
-        private void InitInitialHandlers ()
+        private void InitHandlers ()
         {
             foreach (SocketGuild guild in Client.Guilds)
             {
-                InitGuildHandler(guild);
+                if (!_guildHandlers.Any (x => x.GuildId == guild.Id))
+                {
+                    InitGuildHandler(guild);
+                }
             }
         }
 
