@@ -63,7 +63,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding
             {
                 ShardId = ShardId,
                 TotalShards = TotalShards,
-                DefaultRetryMode = RetryMode.AlwaysFail,
+                DefaultRetryMode = RetryMode.AlwaysRetry,
             };
 
             var client = new DiscordSocketClient(config);
@@ -72,10 +72,18 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding
             client.JoinedGuild += Client_JoinedGuild;
             client.LeftGuild += Client_LeftGuild;
             client.Disconnected += Client_Disconnected;
+            client.Connected += Client_Connected;
 
             client.GuildMembersDownloaded += Client_GuildMembersDownloaded;
 
             return client;
+        }
+
+        private Task Client_Connected()
+        {
+            Log.Write(Log.Type.BOT, $"Shard {ShardId} connected.");
+            IsConnected = true;
+            return Task.CompletedTask;
         }
 
         private Task Client_GuildMembersDownloaded(SocketGuild arg)
@@ -157,7 +165,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding
         }
 
         private Task Client_Ready() {
-            Log.Write (Log.Type.BOT, $"Shard {ShardId} is ready and connected.");
+            Log.Write (Log.Type.BOT, $"Shard {ShardId} is ready!");
             IsConnected = true;
             return Task.CompletedTask;
         }
