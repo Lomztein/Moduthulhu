@@ -53,9 +53,6 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding
 
             BootDate = DateTime.Now;
             await Connect();
-
-            InitInitialHandlers();
-            RouteEvents();
         }
 
         private DiscordSocketClient CreateClient ()
@@ -75,10 +72,18 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding
             client.JoinedGuild += Client_JoinedGuild;
             client.LeftGuild += Client_LeftGuild;
             client.Disconnected += Client_Disconnected;
+            client.Connected += Client_Connected;
 
             client.GuildMembersDownloaded += Client_GuildMembersDownloaded;
 
             return client;
+        }
+
+        private Task Client_Connected()
+        {
+            Log.Write(Log.Type.BOT, $"Shard {ShardId} connected.");
+            IsConnected = true;
+            return Task.CompletedTask;
         }
 
         private Task Client_GuildMembersDownloaded(SocketGuild arg)
@@ -110,6 +115,13 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding
 
         internal async Task Connect ()
         {
+            if (Client != null)
+            {
+                await Logout();
+                await Stop();
+                Client.Dispose();
+            }
+
             ConnectDate = DateTime.Now;
             Client = CreateClient();
 
@@ -119,15 +131,21 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding
             await Start();
 
             await AwaitConnected();
+
+            InitHandlers();
+            RouteEvents();
         }
 
         internal GuildHandler[] GetGuildHandlers () => _guildHandlers.ToArray();
 
-        private void InitInitialHandlers ()
+        private void InitHandlers ()
         {
             foreach (SocketGuild guild in Client.Guilds)
             {
-                InitGuildHandler(guild);
+                if (!_guildHandlers.Any (x => x.GuildId == guild.Id))
+                {
+                    InitGuildHandler(guild);
+                }
             }
         }
 
@@ -147,7 +165,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding
         }
 
         private Task Client_Ready() {
-            Log.Write (Log.Type.BOT, $"Shard {ShardId} is ready and connected.");
+            Log.Write (Log.Type.BOT, $"Shard {ShardId} is ready!");
             IsConnected = true;
             return Task.CompletedTask;
         }
@@ -163,8 +181,16 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding
         }
 
         private async Task Login () {
-            await Client.LoginAsync (TokenType.Bot, _token);
-            Log.Write (Log.Type.BOT, $"Shard {ShardId} logged in.");
+            Log.Bot($"Attempting login of shard {ShardId}..");
+            try
+            {
+                await Client.LoginAsync(TokenType.Bot, _token);
+                Log.Write (Log.Type.BOT, $"Shard {ShardId} logged in.");
+            } catch (Exception exc)
+            {
+                Log.Bot($"Shard {ShardId} failed to login:");
+                Log.Exception(exc);
+            }
         }
 
         private async Task Logout () {

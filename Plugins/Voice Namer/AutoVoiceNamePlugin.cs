@@ -32,6 +32,7 @@ namespace Lomztein.Moduthulhu.Modules.Voice {
 
         private readonly Dictionary<ulong, string> _customNames = new Dictionary<ulong, string> ();
         private readonly Dictionary<string, Tag> _tags = new Dictionary<string, Tag> (); // This is a dictionary purely for easier identification of tags.
+        private readonly Dictionary<ulong, string> _pendingNameChanges = new Dictionary<ulong, string>();
 
         private VoiceNameSet _commandSet;
 
@@ -43,6 +44,7 @@ namespace Lomztein.Moduthulhu.Modules.Voice {
             GuildHandler.ChannelDestroyed += OnChannelDestroyed;
             GuildHandler.UserVoiceStateUpdated += OnVoiceStateUpdated;
             GuildHandler.GuildMemberUpdated += OnGuildMemberUpdated;
+            GuildHandler.ChannelUpdated += OnChannelUpdated;
             InitDefaultTags();
 
             _channelNames = GetConfigCache("ChannelNames", x => x.GetGuild().VoiceChannels.ToDictionary(y => y.Id, z => z.Name));
@@ -78,16 +80,44 @@ namespace Lomztein.Moduthulhu.Modules.Voice {
             SendMessage("Moduthulhu-Command Root", "AddCommand", _commandSet);
 
             AddGeneralFeaturesStateAttribute("AutomatedVoiceNames", "Automatically changing voice channel names to reflect games played within.");
+
+            RegisterMessageAction("AddTag", x => AddTag(new Tag((string)x[0], (string)x[1], (Func<SocketVoiceChannel, bool>)x[2])));
+            RegisterMessageAction("RemoveTag", x => RemoveTag((string)x[0]));
+
+            SetStateChangeHeaders("Tags", "The following voice channel tags has been added", "The following voice channel tags has been removed", "The following  voice channel tags has been modified");
+        }
+
+        private async Task OnChannelUpdated(SocketChannel arg1, SocketChannel arg2)
+        {
+            if (arg2 is SocketVoiceChannel vc)
+            {
+                if (_pendingNameChanges.ContainsKey(vc.Id))
+                {
+                    _pendingNameChanges.Remove(vc.Id);
+                }
+                else if ((arg1 as SocketVoiceChannel).Name != vc.Name)
+                {
+                    if (_channelNames.GetValue().ContainsKey(vc.Id))
+                    {
+                        _channelNames.MutateValue(x => x[vc.Id] = vc.Name);
+                    }
+                    else
+                    {
+                        _channelNames.MutateValue(x => x.Add(vc.Id, vc.Name));
+                    }
+                    await UpdateChannel(vc);
+                }
+            }
         }
 
         private string FormatName(string format, string name, string game, int playerAmount)
             => format.Replace(_formatNameStr, name).Replace(_formatGameStr, game).Replace(_formatAmountPlayersStr, playerAmount == 0 ? string.Empty : playerAmount.ToString (CultureInfo.InvariantCulture));
 
         void InitDefaultTags () {
-            AddTag (new Tag ("🎵", x => x.Users.Any (y => y.Id == _musicBotId.GetValue ())));
-            AddTag (new Tag ("🔥", x => x.Users.Count (y => y.GuildPermissions.Administrator) >= 3));
-            AddTag (new Tag ("📹", x => x.Users.Any (y => y.Activity?.Type == ActivityType.Streaming)));
-            AddTag (new Tag ("🌎", x => x.Users.Any (y => y.Roles.Any (z => z.Id == _internationalRoleId.GetValue ()))));
+            AddTag (new Tag ("🎵", "Music Bot is present in channel.", x => x.Users.Any (y => y.Id == _musicBotId.GetValue ())));
+            AddTag (new Tag ("🔥", "A trio or more elitist scum is present.", x => x.Users.Count (y => y.GuildPermissions.Administrator) >= 3));
+            AddTag (new Tag ("📹", "Someone is streaming in this channel.", x => x.Users.Any (y => y.Activity?.Type == ActivityType.Streaming)));
+            AddTag (new Tag ("🌎", "Someone marked 'International' is in this channel.", x => x.Users.Any (y => y.Roles.Any (z => z.Id == _internationalRoleId.GetValue ()))));
         }
 
         private async Task OnGuildMemberUpdated(SocketGuildUser user, SocketGuildUser cur) {
@@ -203,6 +233,7 @@ namespace Lomztein.Moduthulhu.Modules.Voice {
                 // Trying to optimize API calls here, just to spare those poor souls at the Discord API HQ stuff
                 if (channel.Name != newName) {
                     try {
+                        _pendingNameChanges.Add(channel.Id, newName);
                         await channel.ModifyAsync (x => x.Name = newName);
                     }catch (Exception e) {
                         Core.Log.Exception (e);
@@ -235,6 +266,7 @@ namespace Lomztein.Moduthulhu.Modules.Voice {
 
         public void AddTag (Tag newTag) {
             _tags.Add (newTag.Emoji, newTag);
+            AddStateAttribute("Tags", newTag.Emoji, newTag.Emoji + " - " + newTag.Description);
         }
 
         public void RemoveTag (Tag tag) {
@@ -280,10 +312,12 @@ namespace Lomztein.Moduthulhu.Modules.Voice {
         public class Tag {
 
             public string Emoji { get; private set; } = string.Empty; // The "graphical" representation of the tag.
+            public string Description { get; private set; } = string.Empty;
             public Func<SocketVoiceChannel, bool> IsActive { get; private set; } // Should return true if the tag is active.
 
-            public Tag (string emoji, Func<SocketVoiceChannel, bool> isActive) {
+            public Tag (string emoji, string desc, Func<SocketVoiceChannel, bool> isActive) {
                 Emoji = emoji;
+                Description = desc;
                 IsActive = isActive;
             }
 

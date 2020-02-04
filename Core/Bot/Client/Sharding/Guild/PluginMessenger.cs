@@ -9,13 +9,13 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
     {
         private readonly List<MessageInfo> _messageRegister = new List<MessageInfo>();
 
-        public object SendMessage (string target, string name, object value)
+        public object SendMessage (string target, string name, object[] values)
         {
             List<MessageInfo> infos = _messageRegister.Where(x => x.Matches(target, name)).ToList ();
             MessageInfo single = infos.SingleOrDefault();
             if (single != null)
             {
-                return single.Execute(value);
+                return single.Execute(values);
             }
             else
             {
@@ -24,13 +24,13 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
             return null;
         }
 
-        public object SendMessage(string target, string name) => SendMessage(target, name, null);
+        public object SendMessage(string target, string name) => SendMessage(target, name, Array.Empty<object>());
 
-        public T SendMessage<T>(string target, string name, object value) => (T)SendMessage(target, name, value);
-        public T SendMessage<T>(string target, string name) => (T)SendMessage(target, name, null);
+        public T SendMessage<T>(string target, string name, object[] values) => (T)SendMessage(target, name, values);
+        public T SendMessage<T>(string target, string name) => (T)SendMessage(target, name, Array.Empty<object>());
 
-        public void Register(string target, string name, Func<object, object> function) => Register(target, name, new MessageInfo (target, name, function));
-        public void Register(string target, string name, Action<object> action) => Register (target, name, new MessageInfo (target, name, action));
+        public void Register(string target, string name, Func<object[], object> function) => Register(target, name, new MessageInfo (target, name, function));
+        public void Register(string target, string name, Action<object[]> action) => Register (target, name, new MessageInfo (target, name, action));
         private void Register (string target, string name, MessageInfo info)
         {
             if (_messageRegister.Any(x => x.Matches(target, name)))
@@ -65,16 +65,16 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
             private readonly string _target;
             private readonly string _name;
 
-            private readonly Func<object, object> _function;
+            private readonly Func<object[], object> _function;
 
-            public MessageInfo (string target, string name, Func<object, object> function)
+            public MessageInfo (string target, string name, Func<object[], object> function)
             {
                 _target = target;
                 _name = name;
                 _function = function;
             }
 
-            public MessageInfo (string target, string name, Action<object> action)
+            public MessageInfo (string target, string name, Action<object[]> action)
             {
                 _target = target;
                 _name = name;
@@ -84,7 +84,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
             public bool Matches(string target) => _target == target;
             public bool Matches (string target, string name) => Matches(target) && _name == name;
 
-            public object Execute(object value) => _function(value);
+            public object Execute(params object[] value) => _function(value);
         }
     }
 }

@@ -118,14 +118,14 @@ namespace Lomztein.Moduthulhu.Core.Plugins.Framework
         /// </summary>
         /// <param name="identifier">Message identifier</param>
         /// <param name="function">Message function delegate</param>
-        protected void RegisterMessageFunction(string identifier, Func<object, object> function) => GuildHandler.Messenger.Register(Plugin.GetFullName(GetType()), identifier, function);
+        protected void RegisterMessageFunction(string identifier, Func<object[], object> function) => GuildHandler.Messenger.Register(Plugin.GetFullName(GetType()), identifier, function);
      
         /// <summary>
         /// Register a message action that other plugins may call with <see cref="SendMessage(string, string, object)"/>. <seealso cref="SendMessage(string, string)"/>
         /// </summary>
         /// <param name="identifier"></param>
         /// <param name="action"></param>
-        protected void RegisterMessageAction(string identifier, Action<object> action) => GuildHandler.Messenger.Register(Plugin.GetFullName(GetType()), identifier, action);
+        protected void RegisterMessageAction(string identifier, Action<object[]> action) => GuildHandler.Messenger.Register(Plugin.GetFullName(GetType()), identifier, action);
 
         /// <summary>
         /// Unregister a message action or function previously registered using <see cref="RegisterMessageAction(string, Action{object})"/> or <see cref="RegisterMessageFunction(string, Func{object, object})"/>.
@@ -193,8 +193,8 @@ namespace Lomztein.Moduthulhu.Core.Plugins.Framework
         /// </summary>
         /// <param name="target">Target plugin</param>
         /// <param name="identifier">Target function/action</param>
-        /// <param name="value">Value to pass to action/function</param>
-        protected void SendMessage(string target, string identifier, object value) => GuildHandler.Messenger.SendMessage(target, identifier, value);
+        /// <param name="values">Values to pass to action/function</param>
+        protected void SendMessage(string target, string identifier, params object[] values) => GuildHandler.Messenger.SendMessage(target, identifier, values);
 
         /// <summary>
         /// Send a message to a registered function on another plugin using <see cref="RegisterMessageFunction(string, Func{object, object})"/>.
@@ -211,9 +211,9 @@ namespace Lomztein.Moduthulhu.Core.Plugins.Framework
         /// <typeparam name="T">The type of value expected to be returned.</typeparam>
         /// <param name="target">Target plugin</param>
         /// <param name="identifier">Target function</param>
-        /// <param name="value">Value to pass to function</param>
+        /// <param name="values">Values to pass to function</param>
         /// <returns>An value returned by the target funcion.</returns>
-        protected T SendMessage<T>(string target, string identifier, object value) => GuildHandler.Messenger.SendMessage<T>(target, identifier, value);
+        protected T SendMessage<T>(string target, string identifier, params object[] values) => GuildHandler.Messenger.SendMessage<T>(target, identifier, values);
 
         /// <summary>
         /// Throws a <see cref="MissingPermissionException"/> if the bot is missing permission <paramref name="perm"/>.

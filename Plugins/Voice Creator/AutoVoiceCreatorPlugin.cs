@@ -37,6 +37,8 @@ namespace Lomztein.Moduthulhu.Modules.Voice
             _ignoreChannels = GetConfigCache("IgnoreChannels", x => new List<ulong> { x.GetGuild().AFKChannel.ZeroIfNull () });
             _newChannelCategory = GetConfigCache("NewChannelCategory", x => (ulong)x.GetGuild().VoiceChannels.FirstOrDefault()?.CategoryId.GetValueOrDefault ());
 
+            _newVoiceNames.OnModified += NewVoiceName_OnModified;
+
             AddConfigInfo<SocketVoiceChannel>("Add Default Channel", "Add default channel", x => _defaultChannels.MutateValue(y => y.Add(x.Id)), x => $"Added channel '{x.Name}' to list of default.", "Channel");
             AddConfigInfo<ulong>("Add Default Channel", "Add default channel", x => _defaultChannels.MutateValue(y => y.Add(GuildHandler.GetVoiceChannel(x).Id)), x => $"Added channel '{GuildHandler.GetVoiceChannel(x).Name}' to list of default.", "Channel");
             AddConfigInfo<string>("Add Default Channel", "Add default channel", x => _defaultChannels.MutateValue(y => y.Add(GuildHandler.GetVoiceChannel(x).Id)), x =>  $"Added channel '{GuildHandler.GetVoiceChannel(x).Name}' to list of default.", "Channel");
@@ -47,7 +49,7 @@ namespace Lomztein.Moduthulhu.Modules.Voice
             AddConfigInfo<string>("Remove Default Channel", "Remove default channel", x => _defaultChannels.MutateValue(y => y.Remove(GuildHandler.GetVoiceChannel(x).Id)), x => $"Removed channel '{GuildHandler.GetVoiceChannel(x).Name}' from list of default.", "Channel");
 
             AddConfigInfo<string>("Add Voice Name", "Add voice name", x => _newVoiceNames.MutateValue (y => y.Add (x)), x => $"Added '{x}' name to list of possible options.", "Name");
-            AddConfigInfo("Add Voice Name", "List voice names", () => "Current possible extra voice names: " + string.Join('\n', _newVoiceNames.GetValue()));
+            AddConfigInfo("Add Voice Name", "List voice names", () => "Current possible extra voice names:\n " + string.Join('\n', _newVoiceNames.GetValue()));
             AddConfigInfo<string>("Remove Voice Name", "Remove voice name", x => _newVoiceNames.MutateValue(y => y.Remove(x)), x => $"Removed '{x}' name from list of possible options.", "Name");
 
             AddConfigInfo<int>("Set Desired Free Channels", "Set desired amount", x => _desiredFreeChannels.SetValue(x), x => $"Set desired amount to {x}", "Amount");
@@ -67,21 +69,31 @@ namespace Lomztein.Moduthulhu.Modules.Voice
             AddConfigInfo("Set New Channel Category", "Get category", () => $"New channels will currently be created in category {GuildHandler.GetCategoryChannel(_newChannelCategory.GetValue()).Name}");
         }
 
+        private void NewVoiceName_OnModified(List<string> arg1, List<string> arg2)
+        {
+            ResetNameQueue();
+        }
+
         public override void PostInitialize()
         {
-            _nameQueue = new List<string>();
             _temporaryChannels = new List<ulong>();
-
-            foreach (var value in _newVoiceNames.GetValue ())
-            {
-                _nameQueue.Add(value);
-            }
+            ResetNameQueue();
 
             var guild = GuildHandler.GetGuild();
             var nonCachedChannels = guild.VoiceChannels.Where(x => !_defaultChannels.GetValue ().Contains(x.Id));
             _temporaryChannels = nonCachedChannels.Select(x => x.Id).ToList();
 
             AddGeneralFeaturesStateAttribute("AutomatedVoiceCreation", "Automatic creation of new voice channels when needed.");
+        }
+
+        private void ResetNameQueue ()
+        {
+            _nameQueue = new List<string>();
+
+            foreach (var value in _newVoiceNames.GetValue())
+            {
+                _nameQueue.Add(value);
+            }
         }
 
         private Task OnChannelCreated(SocketChannel channel) {
