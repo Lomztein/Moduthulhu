@@ -3,6 +3,7 @@ using Lomztein.AdvDiscordCommands.Framework;
 using Lomztein.AdvDiscordCommands.Framework.Categories;
 using Lomztein.AdvDiscordCommands.Framework.Interfaces;
 using Lomztein.Moduthulhu.Core;
+using Lomztein.Moduthulhu.Core.IO.Database.Repositories;
 using Lomztein.Moduthulhu.Core.Plugins.Framework;
 using Newtonsoft.Json.Linq;
 using System;
@@ -22,6 +23,8 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
     {
         private ICommand cmd;
 
+        private CachedValue<bool> _enableHyperlinkReactions;
+        public bool EnableHyperlinkReactions => _enableHyperlinkReactions.GetValue();
         public static readonly string[] ReactionEmojis = new string[] { "1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣" };
         private List<NestedDefinitionButton> _nestedButtons = new List<NestedDefinitionButton>();
         public void AddNestedDefinitionButton(NestedDefinitionButton butt) => _nestedButtons.Add(butt);
@@ -30,21 +33,26 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
         {
             cmd = new UrbanDefineCommand { ParentPlugin = this };
             SendMessage("Moduthulhu-Command Root", "AddCommand", cmd);
+            _enableHyperlinkReactions = GetConfigCache("EnableHyperlinkReactions", x => false);
+            AddConfigInfo("Toggle Hyperlink Reactions", "Toggle reactions", () => _enableHyperlinkReactions.SetValue(!_enableHyperlinkReactions.GetValue()), () => _enableHyperlinkReactions.GetValue() ? "Hyperlink reactions has been enabled." : "Hyperlink reactions has been disabled.");
             GuildHandler.ReactionAdded += GuildHandler_ReactionAdded;
         }
 
         private async Task GuildHandler_ReactionAdded(Cacheable<IUserMessage, ulong> arg1, Discord.WebSocket.ISocketMessageChannel arg2, Discord.WebSocket.SocketReaction arg3)
         {
-            NestedDefinitionButton button = _nestedButtons.FirstOrDefault(x => x.MessageId == arg1.Id);
-            if (button != null && !arg3.User.GetValueOrDefault ().IsBot)
+            if (EnableHyperlinkReactions)
             {
-                int emoji = ReactionEmojis.ToList().IndexOf(arg3.Emote.Name);
-                if (button.Contains (emoji))
+                NestedDefinitionButton button = _nestedButtons.FirstOrDefault(x => x.MessageId == arg1.Id);
+                if (button != null && !arg3.User.GetValueOrDefault().IsBot)
                 {
-                    string word = button.Consume(emoji);
-                    var def = await UrbanDefinition.Get(word);
-                    var msg = await arg2.SendMessageAsync(null, false, def.ToEmbed());
-                    await AddNestedDefReactions(def, msg);
+                    int emoji = ReactionEmojis.ToList().IndexOf(arg3.Emote.Name);
+                    if (button.Contains(emoji))
+                    {
+                        string word = button.Consume(emoji);
+                        var def = await UrbanDefinition.Get(word, EnableHyperlinkReactions);
+                        var msg = await arg2.SendMessageAsync(null, false, def.ToEmbed());
+                        await AddNestedDefReactions(def, msg);
+                    }
                 }
             }
         }
@@ -57,14 +65,16 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
 
         public async Task AddNestedDefReactions (UrbanDefinition definition, IUserMessage message)
         {
-            int length = Math.Min(definition.NestedDefinitionWords.Length, ReactionEmojis.Length);
-            AddNestedDefinitionButton(new NestedDefinitionButton(message.Id, definition.NestedDefinitionWords));
-
-            for (int i = 0; i < length; i++)
+            if (EnableHyperlinkReactions)
             {
-                await message.AddReactionAsync(new Emoji(ReactionEmojis[i]));
-            }
+                int length = Math.Min(definition.NestedDefinitionWords.Length, ReactionEmojis.Length);
+                AddNestedDefinitionButton(new NestedDefinitionButton(message.Id, definition.NestedDefinitionWords));
 
+                for (int i = 0; i < length; i++)
+                {
+                    await message.AddReactionAsync(new Emoji(ReactionEmojis[i]));
+                }
+            }
         }
     }
 
@@ -80,6 +90,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
         public readonly string Author;
         public readonly string Permalink;
         public readonly bool Success;
+        private readonly bool _enableHyperlinkReactions;
 
         private readonly List<string> _nestedDefs = new List<string>();
         public string[] NestedDefinitionWords => _nestedDefs.ToArray();
@@ -90,7 +101,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
         readonly int ThumbsUp;
         readonly int ThumbsDown;
 
-        public UrbanDefinition(JObject jObject, string word)
+        public UrbanDefinition(JObject jObject, string word, bool enableHyperlinkReactions)
         {
             Success = (jObject["list"] as JArray).Count > 0;
 
@@ -104,9 +115,11 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
                 Example = first["example"].ToObject<string>();
                 Author = first["author"].ToObject<string>();
                 Permalink = first["permalink"].ToObject<string>();
-
+                
                 ThumbsUp = first["thumbs_up"].ToObject<int>();
                 ThumbsDown = first["thumbs_down"].ToObject<int>();
+
+                _enableHyperlinkReactions = enableHyperlinkReactions;
             }
             else
             {
@@ -174,7 +187,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
 
         private string AddNestedDef (string url)
         {
-            if (_nestedDefs.Count == UrbanDictionaryPlugin.ReactionEmojis.Length)
+            if (_nestedDefs.Count == UrbanDictionaryPlugin.ReactionEmojis.Length || !_enableHyperlinkReactions)
             {
                 return string.Empty;
             }
@@ -205,12 +218,12 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
 
         private string GetSearchUrl(string word) => SearchUrl.Replace("{word}", word).Replace (" ", "%20");
 
-        public static async Task<UrbanDefinition> Get(string word)
+        public static async Task<UrbanDefinition> Get(string word, bool enableHyperlinkReactions)
         {
             try
             {
                 JObject json = await HTTP.GetJSON(new Uri(ApiUrl.Replace("{word}", word))).ConfigureAwait(false);
-                return new UrbanDefinition(json, word);
+                return new UrbanDefinition(json, word, enableHyperlinkReactions);
             } catch (InvalidOperationException)
             {
                 throw new InvalidOperationException("Unable to fetch definition. The service may be temporarily unavailable.");
@@ -252,7 +265,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
         [Overload (typeof (Embed), "Fetch the definition of a given word from Urban Dictionary.")]
         public async Task<Result> Execute(CommandMetadata data, string word)
         {
-            var def = await UrbanDefinition.Get(word);
+            var def = await UrbanDefinition.Get(word, ParentPlugin.EnableHyperlinkReactions);
             Embed embed = def.ToEmbed ();
 
             var message = await data.Message.Channel.SendMessageAsync(null, false, embed);
