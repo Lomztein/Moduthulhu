@@ -85,6 +85,8 @@ namespace Lomztein.Moduthulhu.Modules.Voice {
             RegisterMessageAction("RemoveTag", x => RemoveTag((string)x[0]));
 
             SetStateChangeHeaders("Tags", "The following voice channel tags has been added", "The following voice channel tags has been removed", "The following  voice channel tags has been modified");
+
+            RegisterMessageAction("UpdateChannel", x => UpdateChannel(GuildHandler.GetVoiceChannel((ulong)x[0])).ConfigureAwait(false));
         }
 
         private async Task OnChannelUpdated(SocketChannel arg1, SocketChannel arg2)

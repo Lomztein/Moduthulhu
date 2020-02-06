@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Lomztein.Moduthulhu.Core.Plugins.Framework
 {
-    [AttributeUsage (AttributeTargets.Class)]
+    [AttributeUsage (AttributeTargets.Class, AllowMultiple = true)]
     public class DependencyAttribute : Attribute
     {
         public string DependencyName { get; private set; }

@@ -20,8 +20,6 @@ namespace Lomztein.Moduthulhu.Modules.Voice.Commands
             _commandsInSet = new List<ICommand> {
                 new CustomName (),
             };
-
-            _defaultCommand = new CustomName();
         }
 
         public class CustomName : PluginCommand<AutoVoiceNamePlugin> {

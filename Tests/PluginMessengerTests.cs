@@ -23,7 +23,7 @@ namespace Tests
             var messenger = new PluginMessenger(); 
             bool value = false;
             messenger.Register(target, name, (x) => value = (bool)x[0]);
-            messenger.SendMessage(target, name, expectedValue);
+            messenger.SendMessage(target, name, new object[] { expectedValue });
             Assert.True(value == expectedValue);
         }
 
@@ -34,7 +34,7 @@ namespace Tests
         {
             var messenger = new PluginMessenger();
             messenger.Register("Target", "Name", x => input.ToString());
-            Assert.True(messenger.SendMessage<string>("Target", "Name", input) == toString);
+            Assert.True(messenger.SendMessage<string>("Target", "Name", new object[] { input }) == toString);
         }
 
         [Theory]
