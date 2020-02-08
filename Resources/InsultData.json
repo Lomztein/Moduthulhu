@@ -1,12 +1,13 @@
 {
   "Formats": [
-    "{$Target} is a/an {Adjective.?100} {Verbing} {Noun/Bodypart}",
+    "{$Target} is a/an {Adjective.?100} {Verbing} {Noun/Bodypart/Slur}",
     "{$Target} {Verbs} {Nouns} on a/an {Frequency} basis",
     "{$Target} likes to {Verb} {Person/$RandomAdmin}s {Bodypart/Bodyparts}",
     "I've seen {$Target} {aggressively/tenderly} {Verb} {Person}s {Bodyparts}",
     "{$Target}s {Bodypart} smells like {Food}",
     "{$Target} secretly {dreams/daydreams/fantasizes} about {Person/$RandomAdmin}",
-    "{$Target} {fanatically?30} ships {Person} with {Person}"
+    "{$Target} {fanatically?30} ships {Person} with {Person}",
+    "{$Target} is a/an {Slur}-ass {Slur} who {Verbs} {Food} all day"
   ],
   
   "Adjective": [
@@ -51,5 +52,9 @@
 
   "Food": [
     "cheese", "fish", "goats milk", "yoghurt", "jizz", "freshly harvested apples"
+  ],
+  
+  "Slurs": [
+    "cunt", "retard", "bitch", "fascist", "nazi", "communist", "swede", "fat", "whore", "slut", "doofus", "weeb", "NPC", "noob"
   ]
 }
