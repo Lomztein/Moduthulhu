@@ -1,0 +1,55 @@
+{
+  "Formats": [
+    "{$Target} is a/an {Adjective.?100} {Verbing} {Noun/Bodypart}",
+    "{$Target} {Verbs} {Nouns} on a/an {Frequency} basis",
+    "{$Target} likes to {Verb} {Person/$RandomAdmin}s {Bodypart/Bodyparts}",
+    "I've seen {$Target} {aggressively/tenderly} {Verb} {Person}s {Bodyparts}",
+    "{$Target}s {Bodypart} smells like {Food}",
+    "{$Target} secretly {dreams/daydreams/fantasizes} about {Person/$RandomAdmin}",
+    "{$Target} {fanatically?30} ships {Person} with {Person}"
+  ],
+  
+  "Adjective": [
+    "ugly", "fat", "handsome", "disgusting", "Trump-supporting", "assfucking", "fucking"
+  ],
+  
+  "Verb": [
+    "fuck", "lick", "smell", "touch", "caress"
+  ],
+  
+  "Verbs": [
+    "fucks", "licks", "smells", "touches"
+  ],
+  
+  "Verbing": [
+    "fucking", "masturbating", "loving", "munching", "tittilating", "currently pooping", "sniffing", "t-posing"
+  ],
+  
+  "Noun": [
+    "Agesome1", "fuck", "ass", "donkey", "mouth", "penis", "tit", "birdfucker", "furry", "weeb", crybaby",
+  ],
+  
+  "Nouns": [
+    "asses", "donkeys", "mouths", "penii", "tits", "birdfuckers"
+  ],
+  
+  "Frequency": [
+    "weekly", "daily", "yearly", "hourly"
+  ],
+  
+  "Person": [
+    "Trump", "Angela Merkel", "Johnny Depp", "Ryan Reynold", "Pikachu", "Nyx", "Henry Cavill"
+  ],
+  
+  "Bodypart": [
+    "penis", "vagina", "head", "foot", "ass", "asscheek", "tounge", "eyeball"  
+  ],
+
+  "Bodyparts": [
+    "feet", "asscheeks", "eyes"  
+  ],
+
+  "Food": [
+    "cheese", "fish", "goats milk", "yoghurt", "jizz", "freshly harvested apples"
+  ],
+}

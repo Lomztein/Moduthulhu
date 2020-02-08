@@ -17,10 +17,7 @@ namespace Lomztein.Moduthulhu.Plugins
     [Descriptor ("Lomztein", "Insult Generator", "Ever wanted to rudely insult someone, but you are completely lacking any sense of creativity what so ever? Well I've got the solution for you!")]
     public class InsultGeneratorPlugin : PluginBase
     {
-        private IInsultGenerator[] _generators = new IInsultGenerator[]
-        {
-            new AdjectiveVerbNounInsultGenerator (),
-        };
+        private IInsultGenerator[] _generators;
 
         private ICommand _cmd;
 
@@ -28,6 +25,16 @@ namespace Lomztein.Moduthulhu.Plugins
         {
             _cmd = new InsultCommand { ParentPlugin = this };
             SendMessage("Moduthulhu-Command Root", "AddCommand", _cmd);
+            InitHandlers();
+        }
+
+        private void InitHandlers()
+        {
+            _generators = new IInsultGenerator[]
+            {
+                new LomzInsultGenerator (GuildHandler),
+                // Add new insult generators here.
+            };
         }
 
         public override void Shutdown()
