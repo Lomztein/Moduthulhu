@@ -33,7 +33,7 @@ namespace Lomztein.Moduthulhu.Modules.Voice {
 
         private readonly Dictionary<ulong, string> _customNames = new Dictionary<ulong, string> ();
         private readonly Dictionary<string, Tag> _tags = new Dictionary<string, Tag> (); // This is a dictionary purely for easier identification of tags.
-        private readonly Dictionary<ulong, string> _pendingNameChanges = new Dictionary<ulong, string>();
+        private readonly Dictionary<ulong, int> _pendingNameChanges = new Dictionary<ulong, int>();
 
         private VoiceNameSet _commandSet;
 
@@ -80,7 +80,7 @@ namespace Lomztein.Moduthulhu.Modules.Voice {
             AddConfigInfo("Set Name Format", "Set format", () => $"Current format is '{_nameFormat.GetValue()}' which might look like this in practice: '{FormatName(_nameFormat.GetValue(), "General 1", "Cool Game 3: The Coolest", 5)}'.");
             AddConfigInfo<string>("Set Name Format", "Set format", x => _nameFormat.SetValue (x), x => $"Set format to '{x}' which might look like this in practice: '{FormatName(x, "General 1", "Cool Game 3: The Coolest", 5)}'.", "Format");
 
-            AddConfigInfo<string, string>("Shorten Game Name", "Shorten a games name", (x, y) => SetShortenedGameName (x, y), (x, y) => $"'{x}' will now be shortened to '{y}'.");
+            AddConfigInfo<string, string>("Shorten Game Name", "Shorten a games name", (x, y) => SetShortenedGameName (x, y), (x, y) => $"'{x}' will now be shortened to '{y}'.", "Game", "Name");
             SendMessage("Moduthulhu-Command Root", "AddCommand", _commandSet);
 
             AddGeneralFeaturesStateAttribute("AutomatedVoiceNames", "Automatically changing voice channel names to reflect games played within.");
@@ -113,16 +113,22 @@ namespace Lomztein.Moduthulhu.Modules.Voice {
                 {
                     if (_pendingNameChanges.ContainsKey(vc.Id))
                     {
-                        _pendingNameChanges.Remove(vc.Id);
-                    }else if (_channelNames.GetValue().ContainsKey(vc.Id))
+                        _pendingNameChanges[vc.Id]--;
+                        if (_pendingNameChanges[vc.Id] <= 0)
+                        {
+                            _pendingNameChanges.Remove(vc.Id);
+                        }
+                    }
+                    else if (_channelNames.GetValue().ContainsKey(vc.Id))
                     {
                         _channelNames.MutateValue(x => x[vc.Id] = vc.Name);
+                        await UpdateChannel(vc);
                     }
                     else
                     {
                         _channelNames.MutateValue(x => x.Add(vc.Id, vc.Name));
+                        await UpdateChannel(vc);
                     }
-                    await UpdateChannel(vc);
                 }
             }
         }
@@ -241,7 +247,10 @@ namespace Lomztein.Moduthulhu.Modules.Voice {
                 {
                     newName = FormatName(_nameFormat.GetValue(), possibleShorten, highestGame, highest);
                 }
-                newName = tags + " " + newName;
+                if (!string.IsNullOrEmpty (tags))
+                {
+                    newName = tags + " " + newName;
+                }
 
                 if (channel.Users.Count == 0)
                 {
@@ -255,7 +264,12 @@ namespace Lomztein.Moduthulhu.Modules.Voice {
                 // Trying to optimize API calls here, just to spare those poor souls at the Discord API HQ stuff
                 if (channel.Name != newName) {
                     try {
-                        _pendingNameChanges.Add(channel.Id, newName);
+                        if (!_pendingNameChanges.ContainsKey (channel.Id))
+                        {
+                            _pendingNameChanges.Add(channel.Id, 0);
+                        }
+                        _pendingNameChanges[channel.Id]++;
+
                         await channel.ModifyAsync (x => x.Name = newName);
                     }catch (Exception e)
                     {
