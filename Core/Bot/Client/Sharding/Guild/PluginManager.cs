@@ -149,6 +149,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
                 }
                 else
                 {
+                    Log.Plugin($"Instantiating plugin '{Plugin.GetVersionedFullName(pluginType)}'.");
                     IPlugin plugin = AssemblyLoader.Instantiate<IPlugin>(pluginType);
                     _activePlugins.Add(plugin);
                 }

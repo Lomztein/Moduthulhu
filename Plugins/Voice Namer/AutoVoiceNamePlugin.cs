@@ -29,6 +29,7 @@ namespace Lomztein.Moduthulhu.Modules.Voice {
 
         private CachedValue<ulong> _musicBotId;
         private CachedValue<ulong> _internationalRoleId;
+        private CachedValue<Dictionary<string, string>> _shortenedGameNames;
 
         private readonly Dictionary<ulong, string> _customNames = new Dictionary<ulong, string> ();
         private readonly Dictionary<string, Tag> _tags = new Dictionary<string, Tag> (); // This is a dictionary purely for easier identification of tags.
@@ -54,6 +55,7 @@ namespace Lomztein.Moduthulhu.Modules.Voice {
             _musicBotId = GetConfigCache("MusicBotId", x => (ulong)0);
             _internationalRoleId = GetConfigCache("MusicBotId", x => (ulong)0);
             _nameFormat = GetConfigCache("NameFormat", x => $"{_formatNameStr} - {_formatGameStr} ({_formatAmountPlayersStr})");
+            _shortenedGameNames = GetConfigCache("ShortenedGameNames", x => new Dictionary<string, string>());
 
             AddConfigInfo("Set Channel Name", "Display channel names", () => "Current channel names:\n" + string.Join('\n', _channelNames.GetValue().Select(x => x.Value).ToArray()));
             AddConfigInfo<SocketVoiceChannel, string>("Set Channel Name", "Set channel name", (x, y) => _channelNames.MutateValue(z => z[x.Id] = y), (x, y) => $"Succesfully set channel '{x.Name}' to '{y}'", "Channel", "New name");
@@ -77,6 +79,8 @@ namespace Lomztein.Moduthulhu.Modules.Voice {
 
             AddConfigInfo("Set Name Format", "Set format", () => $"Current format is '{_nameFormat.GetValue()}' which might look like this in practice: '{FormatName(_nameFormat.GetValue(), "General 1", "Cool Game 3: The Coolest", 5)}'.");
             AddConfigInfo<string>("Set Name Format", "Set format", x => _nameFormat.SetValue (x), x => $"Set format to '{x}' which might look like this in practice: '{FormatName(x, "General 1", "Cool Game 3: The Coolest", 5)}'.", "Format");
+
+            AddConfigInfo<string, string>("Shorten Game Name", "Shorten a games name", (x, y) => SetShortenedGameName (x, y), (x, y) => $"'{x}' will now be shortened to '{y}'.");
             SendMessage("Moduthulhu-Command Root", "AddCommand", _commandSet);
 
             AddGeneralFeaturesStateAttribute("AutomatedVoiceNames", "Automatically changing voice channel names to reflect games played within.");
@@ -89,17 +93,28 @@ namespace Lomztein.Moduthulhu.Modules.Voice {
             RegisterMessageAction("UpdateChannel", x => UpdateChannel(GuildHandler.GetVoiceChannel((ulong)x[0])).ConfigureAwait(false));
         }
 
+        private void SetShortenedGameName (string game, string shortened)
+        {
+            if (!_shortenedGameNames.GetValue ().ContainsKey (game))
+            {
+                _shortenedGameNames.MutateValue (x => x.Add (game, shortened));
+            }
+            else
+            {
+                _shortenedGameNames.MutateValue(x => x[game] = shortened);
+            }
+        }
+
         private async Task OnChannelUpdated(SocketChannel arg1, SocketChannel arg2)
         {
             if (arg2 is SocketVoiceChannel vc)
             {
-                if (_pendingNameChanges.ContainsKey(vc.Id))
+                if ((arg1 as SocketVoiceChannel).Name != vc.Name)
                 {
-                    _pendingNameChanges.Remove(vc.Id);
-                }
-                else if ((arg1 as SocketVoiceChannel).Name != vc.Name)
-                {
-                    if (_channelNames.GetValue().ContainsKey(vc.Id))
+                    if (_pendingNameChanges.ContainsKey(vc.Id))
+                    {
+                        _pendingNameChanges.Remove(vc.Id);
+                    }else if (_channelNames.GetValue().ContainsKey(vc.Id))
                     {
                         _channelNames.MutateValue(x => x[vc.Id] = vc.Name);
                     }
@@ -212,6 +227,11 @@ namespace Lomztein.Moduthulhu.Modules.Voice {
                     }
                 }
 
+                if (_shortenedGameNames.GetValue ().ContainsKey (highestGame))
+                {
+                    highestGame = _shortenedGameNames.GetValue()[highestGame];
+                }
+
                 string [ ] splitVoice = name.Split (':');
                 string possibleShorten = splitVoice.Length > 1 ? splitVoice [ 1 ] : splitVoice [ 0 ];
 
@@ -237,7 +257,9 @@ namespace Lomztein.Moduthulhu.Modules.Voice {
                     try {
                         _pendingNameChanges.Add(channel.Id, newName);
                         await channel.ModifyAsync (x => x.Name = newName);
-                    }catch (Exception e) {
+                    }catch (Exception e)
+                    {
+                        _pendingNameChanges.Remove(channel.Id);
                         Core.Log.Exception (e);
                     }
                 }
