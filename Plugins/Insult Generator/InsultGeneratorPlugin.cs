@@ -3,11 +3,13 @@ using Lomztein.AdvDiscordCommands.Extensions;
 using Lomztein.AdvDiscordCommands.Framework;
 using Lomztein.AdvDiscordCommands.Framework.Categories;
 using Lomztein.AdvDiscordCommands.Framework.Interfaces;
+using Lomztein.Moduthulhu.Core.Bot;
 using Lomztein.Moduthulhu.Core.Plugins.Framework;
 using Lomztein.Moduthulhu.Plugins.InsultGenerators;
 using Lomztein.Moduthulhu.Plugins.Standard;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,6 +17,7 @@ using System.Threading.Tasks;
 namespace Lomztein.Moduthulhu.Plugins
 {
     [Descriptor ("Lomztein", "Insult Generator", "Ever wanted to rudely insult someone, but you are completely lacking any sense of creativity what so ever? Well I've got the solution for you!")]
+    [Source ("https://github.com/Lomztein", "https://github.com/Lomztein/Moduthulhu/tree/master/Plugins/Insult%20Generator")]
     public class InsultGeneratorPlugin : PluginBase
     {
         private IInsultGenerator[] _generators;
@@ -32,7 +35,7 @@ namespace Lomztein.Moduthulhu.Plugins
         {
             _generators = new IInsultGenerator[]
             {
-                new LomzInsultGenerator (GuildHandler),
+                new InsultGenerator (GuildHandler, Path.Combine (BotCore.ResourcesDirectory, "InsultData")),
                 // Add new insult generators here.
             };
         }

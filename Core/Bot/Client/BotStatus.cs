@@ -15,7 +15,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client
         private Action<IActivity> _onChange;
         private StatusMessage[] _messages;
 
-        public BotStatus (Action<IActivity> onChange, int treshold, params StatusMessage[] messages)
+        public BotStatus(Action<IActivity> onChange, int treshold, params StatusMessage[] messages)
         {
             _onChange = onChange;
             _timeTreshold = treshold;

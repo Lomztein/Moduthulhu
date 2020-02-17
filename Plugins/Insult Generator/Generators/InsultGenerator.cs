@@ -13,11 +13,11 @@ using System.Text.RegularExpressions;
 
 namespace Lomztein.Moduthulhu.Plugins.InsultGenerators
 {
-    public class LomzInsultGenerator : IInsultGenerator
+    public class InsultGenerator : IInsultGenerator
     {
         private static char[] _vowels = new char[] { 'a', 'e', 'i', 'o', 'u', 'y' };
 
-        private const string SOURCE_FILE_NAME = "InsultData.json";
+        private readonly string _sourcePath;
         private InsultDataSource _source;
 
         private Random random = new Random();
@@ -36,9 +36,10 @@ namespace Lomztein.Moduthulhu.Plugins.InsultGenerators
             }
         }
 
-        public LomzInsultGenerator (GuildHandler parentHandler)
+        public InsultGenerator (GuildHandler parentHandler, string sourcePath)
         {
             InitVariables(parentHandler);
+            _sourcePath = sourcePath;
         }
 
         private void InitVariables (GuildHandler dataSource)
@@ -46,7 +47,9 @@ namespace Lomztein.Moduthulhu.Plugins.InsultGenerators
             _variables = new Dictionary<string, Func<string, string>>
             {
                 { "Target", new Func<string, string> (target => target) },
-                { "RandomAdmin", new Func<string, string> (target => SelectRandom (dataSource.GetGuild().Users.Where (x => x.GuildPermissions.Administrator)).GetShownName ()) }
+                { "RandomAdmin", new Func<string, string> (target => SelectRandom (dataSource.GetGuild().Users.Where (x => x.GuildPermissions.Administrator)).GetShownName ()) },
+                { "ServerName", new Func<string, string> (x => dataSource.GetGuild ().Name) },
+                { "OwnerName", new Func<string, string> (x => dataSource.GetGuild ().Owner.GetShownName ()) }
             };
         }
 
@@ -191,13 +194,18 @@ namespace Lomztein.Moduthulhu.Plugins.InsultGenerators
         {
             if (_source == null)
             {
-                _source = LoadSource(Path.Combine (BotCore.ResourcesDirectory, SOURCE_FILE_NAME));
+                _source = LoadSource(_sourcePath);
             }
         }
 
         private InsultDataSource LoadSource (string path)
         {
             JObject obj = JSONSerialization.LoadAsJObject(path);
+            if (obj == null)
+            {
+                return null;
+            }
+
             string[] formats = null;
             Dictionary<string, string[]> categories = new Dictionary<string, string[]>();
 

@@ -114,19 +114,24 @@ namespace Lomztein.Moduthulhu.Modules.Voice {
                     if (_pendingNameChanges.ContainsKey(vc.Id))
                     {
                         _pendingNameChanges[vc.Id]--;
+                        Core.Log.Debug($"Channel '{vc.Name}' has had a pending name change subtracted.");
                         if (_pendingNameChanges[vc.Id] <= 0)
                         {
                             _pendingNameChanges.Remove(vc.Id);
+                            Core.Log.Debug($"Channel '{vc.Name}' has had a had their pending name change tracker removed.");
                         }
+                        Core.Log.Debug($"Channel '{vc.Name}' has {_pendingNameChanges[vc.Id]} pending name changes.");
                     }
                     else if (_channelNames.GetValue().ContainsKey(vc.Id))
                     {
                         _channelNames.MutateValue(x => x[vc.Id] = vc.Name);
+                        Core.Log.Debug($"Channel '{vc.Name}' changed by outside source and this has been stored.");
                         await UpdateChannel(vc);
                     }
                     else
                     {
                         _channelNames.MutateValue(x => x.Add(vc.Id, vc.Name));
+                        Core.Log.Debug($"Channel '{vc.Name}' changed by outside source, but not already in system? This has been stored.");
                         await UpdateChannel(vc);
                     }
                 }
@@ -247,7 +252,7 @@ namespace Lomztein.Moduthulhu.Modules.Voice {
                 {
                     newName = FormatName(_nameFormat.GetValue(), possibleShorten, highestGame, highest);
                 }
-                if (!string.IsNullOrEmpty (tags))
+                if (!string.IsNullOrWhiteSpace (tags))
                 {
                     newName = tags + " " + newName;
                 }
@@ -267,13 +272,16 @@ namespace Lomztein.Moduthulhu.Modules.Voice {
                         if (!_pendingNameChanges.ContainsKey (channel.Id))
                         {
                             _pendingNameChanges.Add(channel.Id, 0);
+                            Core.Log.Debug($"Channel '{channel.Name}' has had a pending name tracker added.");
                         }
                         _pendingNameChanges[channel.Id]++;
+                        Core.Log.Debug($"Channel '{channel.Name}' pending name changes: {_pendingNameChanges[channel.Id]}.");
 
                         await channel.ModifyAsync (x => x.Name = newName);
                     }catch (Exception e)
                     {
                         _pendingNameChanges.Remove(channel.Id);
+                        Core.Log.Debug($"Something went wrong '{channel.Name}' pending name changes has been removed. This may be the cause of issue.");
                         Core.Log.Exception (e);
                     }
                 }

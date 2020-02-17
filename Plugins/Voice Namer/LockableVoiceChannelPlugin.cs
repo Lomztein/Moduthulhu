@@ -19,7 +19,7 @@ namespace Lomztein.Moduthulhu.Plugins
 
         public override void Initialize()
         {
-            throw new NotImplementedException("This plugin is not yet ready to be activated.");
+            throw new NotImplementedException("This plugin is under development and not yet ready to be activated (if ever lets be honest).");
 
             AssertPermission(Discord.GuildPermission.ManageChannels);
             RegisterMessageFunction("IsLocked", x => _channelLocks.ContainsKey((ulong)x[0]));
