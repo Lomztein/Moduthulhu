@@ -8,7 +8,7 @@ namespace Lomztein.Moduthulhu.Core
     public static class Log
     {
         public static int LogLevel { get; set; } = int.TryParse (Environment.GetEnvironmentVariable ("MODUTHULHU_LOGLEVEL"), out int level) ? level : int.MaxValue;
-        public enum Type { CRITICAL, EXCEPTION, WARNING, SYSTEM, CONFIRM, BOT, PLUGIN, DATA, CHAT, CHANNEL, SERVER, USER }
+        public enum Type { CRITICAL, EXCEPTION, WARNING, SYSTEM, CONFIRM, BOT, PLUGIN, DATA, CHAT, CHANNEL, SERVER, USER, DEBUG }
         private static ConsoleColor[] _typeColor = new [] {
             ConsoleColor.Red, // CRITICAL
             ConsoleColor.DarkRed, // EXCEPTION
@@ -24,6 +24,8 @@ namespace Lomztein.Moduthulhu.Core
             ConsoleColor.White, // CHANNEL
             ConsoleColor.White, // SERVER
             ConsoleColor.White, // USER
+
+            ConsoleColor.Yellow, // DEBUG
         };
 
         private static void Write(ConsoleColor color, string prefix, string text) {
@@ -55,6 +57,7 @@ namespace Lomztein.Moduthulhu.Core
 
         public static void Warning(string text) => Write(Type.WARNING, text);
         public static void Critical(string text) => Write(Type.CRITICAL, text);
+        public static void Debug(string text) => Write(Type.DEBUG, text);
 
 
         public static ConsoleColor GetColor (Type type) {

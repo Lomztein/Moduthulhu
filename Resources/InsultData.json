@@ -1,60 +1,69 @@
 {
   "Formats": [
-    "{$Target} is a/an {Adjective.?100} {Verbing} {Noun/Bodypart/Slur}",
-    "{$Target} {Verbs} {Nouns} on a/an {Frequency} basis",
+    "{$Target} is a/an {Adjective.?50} {Verbing} {Noun/Bodypart/Slur}",
+    "{$Target} {Verbs} {Nouns/Demographics} on a/an {Frequency} basis",
     "{$Target} likes to {Verb} {Person/$RandomAdmin}s {Bodypart/Bodyparts}",
     "I've seen {$Target} {aggressively/tenderly} {Verb} {Person}s {Bodyparts}",
-    "{$Target}s {Bodypart} smells like {Food}",
+    "{$Target}s {Adjective.?40} {Bodypart} smells like {Food}",
     "{$Target} secretly {dreams/daydreams/fantasizes} about {Person/$RandomAdmin}",
-    "{$Target} {fanatically?30} ships {Person} with {Person}",
-    "{$Target} is a/an {Slur}-ass {Slur} who {Verbs} {Food} all day"
+    "{$Target}, like the absolute {Adjective} {Slur} they are, {fanatically/seriously/*actually*?30} ships {Person/$RandomAdmin} with {Person}",
+    "{$Target} is a/an {Slur}-ass {Slur} who {Verbs} {Food/Demographics} all day",
+    "{$Target} believes all {Demographics} are {Adjective} {Slurs}"
   ],
   
   "Adjective": [
-    "ugly", "fat", "handsome", "disgusting", "Trump-supporting", "assfucking", "fucking"
+    "ugly", "fat", "handsome", "disgusting", "Trump-supporting", "degenerate", "beautiful", "absolutely hideous", "sexy", "horrifying", "dead", "non-existant"
   ],
   
   "Verb": [
-    "fuck", "lick", "smell", "touch", "caress"
+    "fuck", "lick", "smell", "touch", "caress", "embrace", "molest", "shit on", "grab", "make tender, steamly love to"
   ],
   
   "Verbs": [
-    "fucks", "licks", "smells", "touches"
+    "fucks", "licks", "smells", "touches", "desires", "carresses", "poops on", "vigourously dicks"
   ],
   
   "Verbing": [
-    "fucking", "masturbating", "loving", "munching", "tittilating", "currently pooping", "sniffing", "t-posing"
+    "fucking", "masturbating", "loving", "currently pooping", "t-posing", "actively encouring ethnic genocide-ing", "farting", "ass-kicking", "hand-holding", "hating"
   ],
   
   "Noun": [
-    "fuck", "ass", "donkey", "mouth", "penis", "tit", "birdfucker", "goatfucker", "furry", "weeb", "crybaby"
+    "fuck", "ass", "donkey", "mouth", "penis", "tit", "birdfucker", "goatfucker", "furry", "weeb", "crybaby", "Trump", "dissapointing McDonalds burger", "king", "whale"
   ],
   
   "Nouns": [
-    "asses", "donkeys", "mouths", "penii", "tits", "birdfuckers"
+    "asses", "donkeys", "mouths", "penises", "tits", "birdfuckers", "buttholes", "goats", "furries", "weebs", "roadways", "cars", "a large amount of boxes of the second Cars movie", "children"
   ],
   
   "Frequency": [
-    "weekly", "daily", "yearly", "hourly"
+    "weekly", "daily", "yearly", "hourly", "monthly"
   ],
   
   "Person": [
-    "Trump", "Angela Merkel", "Johnny Depp", "Ryan Reynold", "Pikachu", "Henry Cavill", "Senpai"
+    "Trump", "Angela Merkel", "Johnny Depp", "Ryan Reynolds", "Pikachu", "Henry Cavill", "Senpai", "Stephen Hawking", "Danny DeVito", "Jack Black", "Chris Pratt", "Chris Hemsworth", "my ass", "Thor Odinson, Protector of Mankind", "Queen Elizabeth of England", "Margaret Thatcher", "The Sniper from Team Fortress 2", "themselves"
   ],
   
   "Bodypart": [
-    "penis", "vagina", "head", "foot", "ass", "asscheek", "tounge", "eyeball"  
+    "penis", "vagina", "ass", "asscheek", "butthole", "crotch", "taint", "thicc thigh", "hand", "hair", "lucious full beard", "brain tumor", "prostate"
   ],
 
   "Bodyparts": [
-    "feet", "asscheeks", "eyes"  
+    "feet", "asscheeks", "thicc thighs", "balls", "testicles", "growing malignant tumors", "buttocks"
   ],
 
   "Food": [
-    "cheese", "fish", "goats milk", "yoghurt", "jizz", "freshly harvested apples"
+    "cheese", "fish", "goats milk", "yoghurt", "jizz", "freshly harvested apples", "human feces", "fox urine", "jambalaya", "chocolate milk", "high quality vanilla ice cream", "burnt human flesh", "Margaret Thatchers desert-dry vagina"
   ],
   
   "Slur": [
-    "cunt", "retard", "bitch", "fascist", "nazi", "communist", "swede", "fat", "whore", "slut", "doofus", "weeb", "NPC", "noob"
+    "cunt", "retard", "bitch", "fascist", "nazi", "communist", "swede", "fat", "whore", "slut", "doofus", "weeb", "NPC", "noob", "degenerate", "child molester", "emo bitch", "dick", "pussy", "Trump", "american", "brony"
+  ],
+  
+  "Slurs": [
+    "cunts", "retards", "bitches", "fascists", "nazis", "communists", "swedes", "fat", "whores", "sluts", "doofuses", "weebs", "NPCs", "noobs", "degenerates", "child molesters", "emo bitches", "dicks", "pussies", "Trumps", "americans", "bronies"
+  ],
+  
+  "Demographics": [
+    "christians", "athiests", "muslims", "indians", "americans", "scandinavians", "canadians", "white people", "black people", "brown people", "slaves", "furries", "the PC Master Race", "bronies"
   ]
 }
