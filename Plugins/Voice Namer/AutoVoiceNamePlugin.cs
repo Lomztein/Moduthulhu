@@ -105,22 +105,22 @@ namespace Lomztein.Moduthulhu.Modules.Voice {
             }
         }
 
-        private async Task OnChannelUpdated(SocketChannel arg1, SocketChannel arg2)
+        private async Task OnChannelUpdated(SocketChannel before, SocketChannel after)
         {
-            if (arg2 is SocketVoiceChannel vc)
+            if (after is SocketVoiceChannel vc)
             {
-                if ((arg1 as SocketVoiceChannel).Name != vc.Name)
+                if ((before as SocketVoiceChannel).Name != vc.Name)
                 {
                     if (_pendingNameChanges.ContainsKey(vc.Id))
                     {
                         _pendingNameChanges[vc.Id]--;
                         Core.Log.Debug($"Channel '{vc.Name}' has had a pending name change subtracted.");
+                        Core.Log.Debug($"Channel '{vc.Name}' has {_pendingNameChanges[vc.Id]} pending name changes.");
                         if (_pendingNameChanges[vc.Id] <= 0)
                         {
                             _pendingNameChanges.Remove(vc.Id);
                             Core.Log.Debug($"Channel '{vc.Name}' has had a had their pending name change tracker removed.");
                         }
-                        Core.Log.Debug($"Channel '{vc.Name}' has {_pendingNameChanges[vc.Id]} pending name changes.");
                     }
                     else if (_channelNames.GetValue().ContainsKey(vc.Id))
                     {
@@ -307,6 +307,8 @@ namespace Lomztein.Moduthulhu.Modules.Voice {
             GuildHandler.ChannelDestroyed -= OnChannelDestroyed;
             GuildHandler.UserVoiceStateUpdated -= OnVoiceStateUpdated;
             GuildHandler.GuildMemberUpdated -= OnGuildMemberUpdated;
+            GuildHandler.ChannelUpdated -= OnChannelUpdated;
+
             SendMessage("Moduthulhu-Command Root", "RemoveCommand", _commandSet);
         }
 
