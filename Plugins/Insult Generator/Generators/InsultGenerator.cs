@@ -28,7 +28,7 @@ namespace Lomztein.Moduthulhu.Plugins.InsultGenerators
             CacheSource();
             if (_source == null)
             {
-                return $"{target} uses a bot whose host forgot to create the Core/Resources/InsultData.json file from where it reads insult data.";
+                return $"{target} uses a bot whose host forgot to create the Core/Resources/InsultData.json file from where it reads insult data. What a dummy.";
             }
             else
             {

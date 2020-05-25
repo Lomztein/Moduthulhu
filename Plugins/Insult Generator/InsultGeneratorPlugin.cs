@@ -62,6 +62,7 @@ namespace Lomztein.Moduthulhu.Plugins
             Name = "insult";
             Description = "So rude >:(";
             Category = StandardCategories.Fun;
+            Aliases = new[] { "fuck" };
         }
 
         [Overload (typeof (void), "Insult yourself, dummy.")]
