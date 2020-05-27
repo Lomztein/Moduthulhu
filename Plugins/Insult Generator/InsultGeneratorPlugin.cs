@@ -65,36 +65,42 @@ namespace Lomztein.Moduthulhu.Plugins
             Aliases = new[] { "fuck" };
         }
 
-        [Overload (typeof (void), "Insult yourself, dummy.")]
+        [Overload (typeof (string), "Insult yourself, dummy.")]
         public Task<Result> Execute (CommandMetadata data)
         {
-            return TaskResult(null, ParentPlugin.SelectGenerator().Insult(data.Author.GetShownName()));
+            return Insult(data.Author.GetShownName());
         }
 
-        [Overload(typeof(void), "Insult someone specific, you ass.")]
+        [Overload(typeof(string), "Insult someone specific, you ass.")]
         public Task<Result> Execute(CommandMetadata _, SocketGuildUser user)
         {
-            return TaskResult(null, ParentPlugin.SelectGenerator().Insult(user.GetShownName()));
+            return Insult (user.GetShownName());
         }
 
-        [Overload(typeof(void), "Insult someone specific, you butt.")]
+        [Overload(typeof(string), "Insult someone specific, you butt.")]
         public Task<Result> Execute(CommandMetadata data, string user)
         {
             SocketGuildUser userObj = ParentPlugin.GuildHandler.FindUser(user);
             if (userObj != null)
             {
-                return Execute(data, ParentPlugin.GuildHandler.GetUser(user));
+                return Insult (ParentPlugin.GuildHandler.GetUser(user).GetShownName());
             }
             else
             {
-                return TaskResult(null, ParentPlugin.SelectGenerator().Insult(user));
+                return Insult (user);
             }
         }
 
-        [Overload(typeof(void), "Insult someone specific, you donkey.")]
+        [Overload(typeof(string), "Insult someone specific, you donkey.")]
         public Task<Result> Execute(CommandMetadata data, ulong user)
         {
-            return Execute(data, ParentPlugin.GuildHandler.GetUser(user));
+            return Insult (ParentPlugin.GuildHandler.GetUser(user).GetShownName());
+        }
+
+        private Task<Result> Insult (string user)
+        {
+            string insult = ParentPlugin.SelectGenerator().Insult(user);
+            return TaskResult(insult, insult);
         }
     }
 }
