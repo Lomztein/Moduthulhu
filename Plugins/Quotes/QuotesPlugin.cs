@@ -113,12 +113,11 @@ namespace Lomztein.Moduthulhu.Plugins.Quotes
 
     public class QuoteCommand : PluginCommand<QuotesPlugin>
     {
-        public QuoteCommand ()
+        public QuoteCommand()
         {
             Name = "quote";
             Description = "Words of wisdom.";
             Category = StandardCategories.Fun;
-            RequiredPermissions.Add(GuildPermission.ManageMessages);
         }
 
         [Overload(typeof(Embed), "Get a random tidbit of endless wisdom.")]
