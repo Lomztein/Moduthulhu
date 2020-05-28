@@ -21,6 +21,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard.Utilities
                 new Embolden(),
                 new Fizzfyr13(),
                 new Ping { ParentPlugin = this },
+                new OwO (),
             };
             SendMessage("Moduthulhu-Command Root", "AddCommands", _commands);
         }

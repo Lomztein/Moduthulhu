@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Lomztein.Moduthulhu.Plugins.Standard.Utilities
@@ -175,6 +176,50 @@ namespace Lomztein.Moduthulhu.Plugins.Standard.Utilities
         public Task<Result> Execute (CommandMetadata _)
         {
             return TaskResult(ParentPlugin.GuildHandler.Shard.Client.Latency, "Pong!");
+        }
+    }
+
+    public class OwO : PluginCommand<UtilitiesPlugin>
+    {
+        public OwO()
+        {
+            Name = "owo";
+            Description = "Pwomote hatwad";
+            Category = StandardCategories.Fun;
+            Aliases = new[] { "uwu" };
+        }
+
+        private readonly Regex _tow = new Regex("(?:r|l)");
+        private readonly Regex _toW = new Regex("(?:R|L)");
+        private readonly Regex _ove = new Regex("ove");
+        private readonly Regex _OVE = new Regex("OVE");
+        private readonly Regex _ck = new Regex("ck");
+        private readonly Regex _CK = new Regex("CK");
+
+        private readonly Regex exclamation = new Regex("(?:!)");
+
+        private readonly string[] faces = new[] { "(・`ω´・)", ";;w;;", "owo", "UwU", ">w<", "^w^" };
+        private readonly Regex insertw = new Regex("(?: [bdfgkmpqrstvxz][aeiou])");
+        private readonly Regex insertW = new Regex("(?: [BDFGLMPQRSTVXZ][AEIOU])");
+
+        [Overload(typeof(string), "Implementation based heavily on the [OWOifier by @Black_is_Black](https://repl.it/@Black_is_Back/OWOifier#index.js).")]
+        public Task<Result> Execute(CommandMetadata metadata, string input)
+        {
+            input = _tow.Replace(input, "w");
+            input = _toW.Replace(input, "W");
+            input = _ove.Replace(input, "uv");
+            input = _OVE.Replace(input, "UV");
+            input = _ck.Replace(input, "k");
+            input = _CK.Replace(input, "K");
+
+            int fraction = 3;
+            Random random = new Random();
+            input = insertw.Replace(input, x => random.Next(fraction) == 0 ? x.Value.Insert(2, "w") : x.Value);
+            input = insertW.Replace(input, x => random.Next(fraction) == 0 ? x.Value.Insert(2, "W") : x.Value);
+
+            input = exclamation.Replace(input, x => $"! {faces[random.Next(faces.Length)]}");
+
+            return TaskResult(input, input);
         }
     }
 }
