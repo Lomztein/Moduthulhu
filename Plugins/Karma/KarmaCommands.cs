@@ -14,6 +14,7 @@ using Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild;
 using Lomztein.AdvDiscordCommands.Framework.Interfaces;
 using System.Globalization;
 using Lomztein.Moduthulhu.Core.Bot.Messaging.Advanced;
+using Lomztein.Moduthulhu.Core.Extensions;
 
 namespace Lomztein.Moduthulhu.Plugins.Karma.Commands
 {
@@ -274,26 +275,8 @@ namespace Lomztein.Moduthulhu.Plugins.Karma.Commands
             [Overload(typeof (Embed), "Show all who downvoted / upvoted a specific message given by URL.")]
             public Task<Result> Execute (CommandMetadata data, string messageUrl)
             {
-                string[] split = messageUrl.Split('/');
-                if (split.Length != 7)
-                {
-                    throw GetInvalidUrlMessage();
-                }
-
-                string channel = split[5];
-                string message = split[6];
-
-                try
-                {
-                    ulong channelId = ulong.Parse(channel);
-                    ulong messageId = ulong.Parse(message);
-                    return Execute(data, channelId, messageId);
-                } catch (FormatException)
-                {
-                    throw GetInvalidUrlMessage();
-                }
-
-                ArgumentException GetInvalidUrlMessage () => new ArgumentException("Message URL is not valid. You can get message URLs by clicking the three vertical dots to the right side of a message, and selecting 'Copy Link', or right click an embedded message link such as those found when viewing your own karma, and clicking 'Copy Link'.");
+                (ulong channelId, ulong messageId) = messageUrl.ParseMessageUrl();
+                return Execute(data, channelId, messageId);
             }
         }
 
@@ -320,7 +303,7 @@ namespace Lomztein.Moduthulhu.Plugins.Karma.Commands
 
                 foreach (var user in inRange)
                 {
-                    string cur = ++index + " - " + StringExtensions.UniformStrings(getUser(user).GetShownName(), toString(user));
+                    string cur = ++index + " - " + AdvDiscordCommands.Extensions.StringExtensions.UniformStrings(getUser(user).GetShownName(), toString(user));
                     curLength += cur.Length;
 
                     if (curLength > 1450) // 50 characters padding, just to be on the super safe side

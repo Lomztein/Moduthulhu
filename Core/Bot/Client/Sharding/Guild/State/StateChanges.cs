@@ -10,9 +10,9 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild.StateManagement
         public string RemovedHeader { get; }
         public string MutatedHeader { get; }
 
-        private string[] _additions;
-        private string[] _removals;
-        private string[] _mutations;
+        private readonly string[] _additions;
+        private readonly string[] _removals;
+        private readonly string[] _mutations;
 
         public StateChanges (string addedHeader, string[] additions, string removedHeader, string[] removals, string mutatedHeader, string[] mutations)
         {

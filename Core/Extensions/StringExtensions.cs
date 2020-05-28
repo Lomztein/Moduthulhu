@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 
@@ -51,6 +52,30 @@ namespace Lomztein.Moduthulhu.Core.Extensions
             }
 
             return splitted.ToArray ();
+        }
+        public static (ulong channelId, ulong messageId) ParseMessageUrl (this string messageUrl)
+        {
+            string[] split = messageUrl.Split('/');
+            if (split.Length != 7)
+            {
+                throw GetInvalidUrlMessage();
+            }
+
+            string channel = split[5];
+            string message = split[6];
+
+            try
+            {
+                ulong channelId = ulong.Parse(channel, CultureInfo.InvariantCulture);
+                ulong messageId = ulong.Parse(message, CultureInfo.InvariantCulture);
+                return (channelId, messageId);
+            }
+            catch (FormatException)
+            {
+                throw GetInvalidUrlMessage();
+            }
+
+            ArgumentException GetInvalidUrlMessage() => new ArgumentException("Message URL is not valid. You can get message URLs by clicking the three vertical dots to the right side of a message, and selecting 'Copy Link'.");
         }
     }
 }
