@@ -212,10 +212,9 @@ namespace Lomztein.Moduthulhu.Plugins.Standard.Utilities
             input = _ck.Replace(input, "k");
             input = _CK.Replace(input, "K");
 
-            int fraction = 3;
             Random random = new Random();
-            input = insertw.Replace(input, x => random.Next(fraction) == 0 ? x.Value.Insert(2, "w") : x.Value);
-            input = insertW.Replace(input, x => random.Next(fraction) == 0 ? x.Value.Insert(2, "W") : x.Value);
+            input = insertw.Replace(input, x => x.Value.Insert(2, "w"));
+            input = insertW.Replace(input, x => x.Value.Insert(2, "W"));
 
             input = exclamation.Replace(input, x => $"! {faces[random.Next(faces.Length)]}");
 
