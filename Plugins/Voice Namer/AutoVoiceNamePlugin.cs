@@ -274,13 +274,20 @@ namespace Lomztein.Moduthulhu.Modules.Voice {
                             _pendingNameChanges.Add(channel.Id, 0);
                             Core.Log.Debug($"Channel '{channel.Name}' has had a pending name tracker added.");
                         }
+                        
                         _pendingNameChanges[channel.Id]++;
                         Core.Log.Debug($"Channel '{channel.Name}' pending name changes: {_pendingNameChanges[channel.Id]}.");
 
-                        await channel.ModifyAsync (x => x.Name = newName);
-                    }catch (Exception e)
+                        await channel.ModifyAsync(x => x.Name = newName);
+                    }
+                    catch (Exception e)
                     {
-                        _pendingNameChanges.Remove(channel.Id);
+                        _pendingNameChanges[channel.Id]--;
+                        if (_pendingNameChanges[channel.Id] == 0)
+                        {
+                            _pendingNameChanges.Remove(channel.Id);
+                        }
+
                         Core.Log.Debug($"Something went wrong '{channel.Name}' pending name changes has been removed. This may be the cause of issue.");
                         Core.Log.Exception (e);
                     }
