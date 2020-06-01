@@ -115,7 +115,7 @@ namespace Lomztein.Moduthulhu.Plugins.Karma.Commands
                 StringBuilder top = new StringBuilder("```");
                 foreach (var upvote in voterList)
                 {
-                    IUser user = guildHandler.GetUser(upvote.Key);
+                    IUser user = guildHandler.FindUser(upvote.Key);
                     string name = user == null ? "*User not found." : user.GetShownName();
                     top.AppendLine($"{name} - {upvote.Value} {type}.");
                 }
