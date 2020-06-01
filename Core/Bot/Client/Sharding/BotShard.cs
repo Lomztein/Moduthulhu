@@ -30,14 +30,18 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding
         private readonly string _token;
         public readonly int ShardId;
         public readonly int TotalShards;
+        public readonly ulong UniqueId;
 
         public event Func<Exception, Task> ExceptionCaught;
+
+        private static ulong _uniqueShardIdCounter;
 
         internal BotShard(BotClient parentManager, string token, int shardId, int totalShards) {
             BotClient = parentManager;
             _token = token;
             ShardId = shardId;
             TotalShards = totalShards;
+            UniqueId = _uniqueShardIdCounter++;
         }
 
         internal void Run () {
@@ -73,10 +77,24 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding
             client.LeftGuild += Client_LeftGuild;
             client.Disconnected += Client_Disconnected;
             client.Connected += Client_Connected;
+            client.Log += Client_Log;
 
             client.GuildMembersDownloaded += Client_GuildMembersDownloaded;
 
             return client;
+        }
+
+        private Task Client_Log(LogMessage arg)
+        {
+            if (arg.Exception == null)
+            {
+                Log.Client($"[{arg.Severity}] {arg.Message} from {arg.Source}");
+            }
+            else
+            {
+                Log.Exception(arg.Exception);
+            }
+            return Task.CompletedTask;
         }
 
         private Task Client_Connected()
@@ -111,6 +129,8 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding
             Log.Warning($"Shard {ShardId} disconnected.");
             Log.Exception(arg);
             OnExceptionCaught(arg);
+
+            await Task.CompletedTask;
         }
 
         internal async Task Connect ()

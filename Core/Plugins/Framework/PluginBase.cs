@@ -327,5 +327,18 @@ namespace Lomztein.Moduthulhu.Core.Plugins.Framework
                 DisablePlugin($"Disabled plugin due to revoked permission '{permission}'.");
             }
         }
+
+        /// <summary>
+        /// Invokes <paramref name="action"/> after <paramref name="timeInSeconds"/> seconds has passed. Only accurate down to seconds, don't use for exact measurements.
+        /// </summary>
+        /// <param name="action">The action to perform.</param>
+        /// <param name="timeInSeconds">The amount of seconds to wait.</param>
+        protected TimedAction InvokeTimedAction (Action action, int timeInSeconds)
+        {
+            TimedAction ta = new TimedAction(action, timeInSeconds, GuildHandler.Clock);
+            ta.OnExceptionOccured += (e) => Core.Log.Exception(e);
+            ta.Start();
+            return ta;
+        }
     }
 }

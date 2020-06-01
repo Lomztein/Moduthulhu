@@ -8,7 +8,7 @@ namespace Lomztein.Moduthulhu.Core
     public static class Log
     {
         public static int LogLevel { get; set; } = int.TryParse (Environment.GetEnvironmentVariable ("MODUTHULHU_LOGLEVEL"), out int level) ? level : int.MaxValue;
-        public enum Type { CRITICAL, EXCEPTION, WARNING, SYSTEM, CONFIRM, BOT, PLUGIN, DATA, CHAT, CHANNEL, SERVER, USER, DEBUG }
+        public enum Type { CRITICAL, EXCEPTION, WARNING, SYSTEM, CONFIRM, CLIENT, BOT, PLUGIN, DATA, CHAT, CHANNEL, SERVER, USER, DEBUG }
         private static ConsoleColor[] _typeColor = new [] {
             ConsoleColor.Red, // CRITICAL
             ConsoleColor.DarkRed, // EXCEPTION
@@ -16,6 +16,7 @@ namespace Lomztein.Moduthulhu.Core
 
             ConsoleColor.Blue, // SYSTEM
             ConsoleColor.Green, // CONFIRM
+            ConsoleColor.Green, // CLIENT
             ConsoleColor.Cyan, // BOT
             ConsoleColor.Green, // PLUGIN
             ConsoleColor.Magenta, // DATA
@@ -41,7 +42,7 @@ namespace Lomztein.Moduthulhu.Core
         }
 
         public static void Exception (Exception exc) {
-            Write (Type.EXCEPTION, exc.Message + " - " + exc.StackTrace);
+            Write (Type.EXCEPTION, $"[{exc.GetType().Name}] {exc.Message} - {exc.StackTrace}");
         }
 
         public static void System(string text) => Write(Type.SYSTEM, text);
@@ -51,6 +52,7 @@ namespace Lomztein.Moduthulhu.Core
         public static void Confirm(string text) => Write(Type.CONFIRM, text);
 
         public static void Chat(string text) => Write(Type.CHAT, text);
+        public static void Client(string text) => Write(Type.CLIENT, text);
         public static void Channel(string text) => Write(Type.CHANNEL, text);
         public static void Server(string text) => Write(Type.SERVER, text);
         public static void User(string text) => Write(Type.USER, text);

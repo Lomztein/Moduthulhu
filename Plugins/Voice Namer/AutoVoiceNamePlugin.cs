@@ -1,6 +1,8 @@
 ﻿using Discord;
+using Discord.Net;
 using Discord.WebSocket;
 using Lomztein.AdvDiscordCommands.Extensions;
+using Lomztein.Moduthulhu.Core.Bot;
 using Lomztein.Moduthulhu.Core.IO.Database.Repositories;
 using Lomztein.Moduthulhu.Core.Plugins.Framework;
 using Lomztein.Moduthulhu.Modules.Voice.Commands;
@@ -9,6 +11,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Lomztein.Moduthulhu.Modules.Voice {
@@ -23,13 +26,19 @@ namespace Lomztein.Moduthulhu.Modules.Voice {
         private CachedValue<List<ulong>> _toIgnore;
 
         private CachedValue<string> _nameFormat;
-        private const string _formatNameStr = "{NAME}";
-        private const string _formatGameStr = "{GAME}";
-        private const string _formatAmountPlayersStr = "{PLAYERCOUNT}";
+        private const string _formatNameStr = "NAME";
+        private const string _formatGameStr = "GAME";
+        private const string _formatAmountPlayersStr = "PLAYERCOUNT";
+
+        private const string _formatStart = "{";
+        private const string _formatEnd = "}";
 
         private CachedValue<ulong> _musicBotId;
         private CachedValue<ulong> _internationalRoleId;
         private CachedValue<Dictionary<string, string>> _shortenedGameNames;
+
+        private Dictionary<ulong, TimedAction> _resetters = new Dictionary<ulong, TimedAction>();
+        private const int _resetterTime = 15 * 60;
 
         private readonly Dictionary<ulong, string> _customNames = new Dictionary<ulong, string> ();
         private readonly Dictionary<string, Tag> _tags = new Dictionary<string, Tag> (); // This is a dictionary purely for easier identification of tags.
@@ -54,7 +63,7 @@ namespace Lomztein.Moduthulhu.Modules.Voice {
             _toIgnore = GetConfigCache("ToIgnore", x => new List<ulong> { (x.GetGuild().AFKChannel?.Id).GetValueOrDefault() });
             _musicBotId = GetConfigCache("MusicBotId", x => (ulong)0);
             _internationalRoleId = GetConfigCache("MusicBotId", x => (ulong)0);
-            _nameFormat = GetConfigCache("NameFormat", x => $"{_formatNameStr} - {_formatGameStr} ({_formatAmountPlayersStr})");
+            _nameFormat = GetConfigCache("NameFormat", x => $"{_formatStart}{_formatNameStr}{_formatEnd} - {_formatStart}{_formatGameStr}{_formatEnd} {_formatStart}({_formatAmountPlayersStr}){_formatEnd}"); // lol
             _shortenedGameNames = GetConfigCache("ShortenedGameNames", x => new Dictionary<string, string>());
 
             AddConfigInfo("Set Channel Name", "Display channel names", () => "Current channel names:\n" + string.Join('\n', _channelNames.GetValue().Select(x => x.Value).ToArray()));
@@ -77,8 +86,8 @@ namespace Lomztein.Moduthulhu.Modules.Voice {
             AddConfigInfo<string>("Set International Role", "Set role.", x => _internationalRoleId.SetValue(GuildHandler.GetRole(x).Id), x => $"Set international role to be {GuildHandler.GetRole(x).Name}.", "Role Name");
             AddConfigInfo("Set International Role", "Show role.", () => GuildHandler.FindRole(_internationalRoleId.GetValue()) == null ? "Current international role doesn't exist :(" : "Current international role is " + GuildHandler.GetRole(_internationalRoleId.GetValue()).Name);
 
-            AddConfigInfo("Set Name Format", "Set format", () => $"Current format is '{_nameFormat.GetValue()}' which might look like this in practice: '{FormatName(_nameFormat.GetValue(), "General 1", "Cool Game 3: The Coolest", 5)}'.");
-            AddConfigInfo<string>("Set Name Format", "Set format", x => _nameFormat.SetValue (x), x => $"Set format to '{x}' which might look like this in practice: '{FormatName(x, "General 1", "Cool Game 3: The Coolest", 5)}'.", "Format");
+            AddConfigInfo("Set Name Format", "Set format", () => $"Current format is '{_nameFormat.GetValue()}' which might look like this in practice: '{FormatName(_nameFormat.GetValue(), _formatStart, _formatEnd, "General 1", "Cool Game 3: The Coolest", 5)}'.");
+            AddConfigInfo<string>("Set Name Format", "Set format", x => _nameFormat.SetValue (x), x => $"Set format to '{x}' which might look like this in practice: '{FormatName(x, _formatStart, _formatEnd, "General 1", "Cool Game 3: The Coolest", 5)}'.", "Format");
 
             AddConfigInfo<string, string>("Shorten Game Name", "Shorten a games name", (x, y) => SetShortenedGameName (x, y), (x, y) => $"'{x}' will now be shortened to '{y}'.", "Game", "Name");
             SendMessage("Moduthulhu-Command Root", "AddCommand", _commandSet);
@@ -91,6 +100,21 @@ namespace Lomztein.Moduthulhu.Modules.Voice {
             SetStateChangeHeaders("Tags", "The following voice channel tags has been added", "The following voice channel tags has been removed", "The following  voice channel tags has been modified");
 
             RegisterMessageAction("UpdateChannel", x => UpdateChannel(GuildHandler.GetVoiceChannel((ulong)x[0])).ConfigureAwait(false));
+        }
+
+        private void AddResetter (ulong id)
+        {
+            TimedAction action = InvokeTimedAction(() => UpdateChannel(GuildHandler.GetVoiceChannel(id)).ConfigureAwait(false), _resetterTime);
+            _resetters.Add(id, action);
+        }
+
+        private void RemoveResetter (ulong id)
+        {
+            if (_resetters.ContainsKey(id))
+            {
+                _resetters[id].Cancel();
+                _resetters.Remove(id);
+            }
         }
 
         private void SetShortenedGameName (string game, string shortened)
@@ -113,14 +137,7 @@ namespace Lomztein.Moduthulhu.Modules.Voice {
                 {
                     if (_pendingNameChanges.ContainsKey(vc.Id))
                     {
-                        _pendingNameChanges[vc.Id]--;
-                        Core.Log.Debug($"Channel '{vc.Name}' has had a pending name change subtracted.");
-                        Core.Log.Debug($"Channel '{vc.Name}' has {_pendingNameChanges[vc.Id]} pending name changes.");
-                        if (_pendingNameChanges[vc.Id] <= 0)
-                        {
-                            _pendingNameChanges.Remove(vc.Id);
-                            Core.Log.Debug($"Channel '{vc.Name}' has had a had their pending name change tracker removed.");
-                        }
+                        RemovePendingChange(vc.Id);
                     }
                     else if (_channelNames.GetValue().ContainsKey(vc.Id))
                     {
@@ -135,11 +152,40 @@ namespace Lomztein.Moduthulhu.Modules.Voice {
                         await UpdateChannel(vc);
                     }
                 }
+
+                if (vc.Users.Count == 0)
+                {
+                    AddResetter(vc.Id);
+                }
+                else
+                {
+                    RemoveResetter(vc.Id);
+                }
             }
         }
 
-        private string FormatName(string format, string name, string game, int playerAmount)
-            => format.Replace(_formatNameStr, name).Replace(_formatGameStr, game).Replace(_formatAmountPlayersStr, playerAmount == 0 ? string.Empty : playerAmount.ToString (CultureInfo.InvariantCulture));
+        private string FormatName(string format, string starter, string ender, string name, string game, int playerAmount)
+        {
+            string result = format;
+            string playerAmt = playerAmount == 0 ? "" : playerAmount.ToString(CultureInfo.InvariantCulture);
+
+            result = ReplacePart(result, _formatNameStr, starter, ender, name);
+            result = ReplacePart(result, _formatGameStr, starter, ender, game);
+            result = ReplacePart(result, _formatAmountPlayersStr, starter, ender, playerAmt);
+
+            return result;
+        }
+
+        private string ReplacePart (string input, string part, string starter, string ender, string replacement)
+        {
+            Regex regex = new Regex($"{starter}.*?{part}.*?{ender}");
+            return regex.Replace(input, x => TrimOuter (x.Value.Replace(part, replacement)));
+        }
+
+        private string TrimOuter (string input)
+        {
+            return input.Substring(1, input.Length - 2);
+        }
 
         void InitDefaultTags () {
             AddTag (new Tag ("🎵", "Music Bot is present in channel.", x => x.Users.Any (y => y.Id == _musicBotId.GetValue ())));
@@ -167,6 +213,7 @@ namespace Lomztein.Moduthulhu.Modules.Voice {
         }
 
         public async Task UpdateChannel(SocketVoiceChannel channel) {
+
             string highestGame = "";
 
             DisablePluginIfPermissionMissing(GuildPermission.ManageChannels, true);
@@ -205,13 +252,14 @@ namespace Lomztein.Moduthulhu.Modules.Voice {
                     {
                         if (user.Activity.Type == ActivityType.Playing)
                         {
-                            string activity = user.Activity.ToString();
+                            var activity = user.Activity;
+                            string activityName = activity.Name;
 
-                            if (!numPlayers.ContainsKey(activity))
+                            if (!numPlayers.ContainsKey(activityName))
                             {
-                                numPlayers.Add(activity, 0);
+                                numPlayers.Add(activityName, 0);
                             }
-                            numPlayers[activity]++;
+                            numPlayers[activityName]++;
                         }
                         else
                         {
@@ -250,7 +298,7 @@ namespace Lomztein.Moduthulhu.Modules.Voice {
                 string newName = splitVoice[0];
                 if (!string.IsNullOrWhiteSpace (highestGame))
                 {
-                    newName = FormatName(_nameFormat.GetValue(), possibleShorten, highestGame, highest);
+                    newName = FormatName(_nameFormat.GetValue(), _formatStart, _formatEnd, possibleShorten, highestGame, highest);
                 }
                 if (!string.IsNullOrWhiteSpace (tags))
                 {
@@ -263,34 +311,54 @@ namespace Lomztein.Moduthulhu.Modules.Voice {
                 }
                 if (_customNames.ContainsKey (channel.Id))
                 {
-                    newName = FormatName(_nameFormat.GetValue(), possibleShorten, _customNames[channel.Id], 0);
+                    newName = FormatName(_nameFormat.GetValue(), _formatStart, _formatEnd, possibleShorten, _customNames[channel.Id], 0);
                 }
 
                 // Trying to optimize API calls here, just to spare those poor souls at the Discord API HQ stuff
                 if (channel.Name != newName) {
                     try {
-                        if (!_pendingNameChanges.ContainsKey (channel.Id))
+                        AddPendingChange(channel.Id);
+                        try
                         {
-                            _pendingNameChanges.Add(channel.Id, 0);
-                            Core.Log.Debug($"Channel '{channel.Name}' has had a pending name tracker added.");
+                            await channel.ModifyAsync(x => x.Name = newName, new RequestOptions() { RetryMode = RetryMode.AlwaysFail, Timeout = 10000 });
+                        } catch (RateLimitedException)
+                        {
+                            Core.Log.Warning(channel.Name + " modification has been ratelimited.");
+                            RemovePendingChange(channel.Id);
                         }
-                        
-                        _pendingNameChanges[channel.Id]++;
-                        Core.Log.Debug($"Channel '{channel.Name}' pending name changes: {_pendingNameChanges[channel.Id]}.");
-
-                        await channel.ModifyAsync(x => x.Name = newName);
                     }
                     catch (Exception e)
                     {
-                        _pendingNameChanges[channel.Id]--;
-                        if (_pendingNameChanges[channel.Id] == 0)
-                        {
-                            _pendingNameChanges.Remove(channel.Id);
-                        }
-
-                        Core.Log.Debug($"Something went wrong '{channel.Name}' pending name changes has been removed. This may be the cause of issue.");
+                        RemovePendingChange(channel.Id);
                         Core.Log.Exception (e);
                     }
+                }
+            }
+        }
+
+        private void AddPendingChange (ulong id)
+        {
+            if (!_pendingNameChanges.ContainsKey(id))
+            {
+                _pendingNameChanges.Add(id, 0);
+                Core.Log.Debug($"Channel with ID '{id}' has had a pending name tracker added.");
+            }
+
+            _pendingNameChanges[id]++;
+            Core.Log.Debug($"Channel with ID '{id}' pending name changes: {_pendingNameChanges[id]}.");
+        }
+
+        private void RemovePendingChange (ulong id)
+        {
+            if (_pendingNameChanges.ContainsKey(id))
+            {
+                _pendingNameChanges[id]--;
+                Core.Log.Debug($"Channel with ID '{id}' has had a pending name change subtracted.");
+                Core.Log.Debug($"Channel with ID '{id}' has {_pendingNameChanges[id]} pending name changes.");
+                if (_pendingNameChanges[id] <= 0)
+                {
+                    _pendingNameChanges.Remove(id);
+                    Core.Log.Debug($"Channel with ID '{id}' has had a had their pending name change tracker removed.");
                 }
             }
         }

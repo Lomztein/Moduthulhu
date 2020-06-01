@@ -11,7 +11,8 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client
         public ActivityType Type { get; }
         private readonly Func<string> _message;
         public string Name => _message();
-
+        public ActivityProperties Flags => ActivityProperties.None;
+        public string Details => string.Empty;
         public StatusMessage (ActivityType type, Func<string> message)
         {
             Type = type;
