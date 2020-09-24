@@ -12,9 +12,9 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client
         public struct IntRange : IEquatable<IntRange>
         {
             [JsonProperty]
-            public int Min { get; private set; }
+            public int Min { get; set; }
             [JsonProperty]
-            public int Max { get; private set; }
+            public int Max { get; set; }
 
             public bool IsValid() => Min < Max;
 
@@ -49,11 +49,11 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client
         }
 
             [JsonProperty]
-        public IntRange ShardRange { get; private set; }
+        public IntRange ShardRange { get; set; }
             [JsonProperty]
-        public int TotalShards { get; private set; }
+        public int TotalShards { get; set; }
             [JsonProperty]
-        internal string Token { get; private set; }
+        internal string Token { get; set; }
 
         public void CheckValidity ()
         {

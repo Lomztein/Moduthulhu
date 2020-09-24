@@ -23,7 +23,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding
         public DiscordSocketClient Client { get; private set; }
         private readonly List<GuildHandler> _guildHandlers = new List<GuildHandler>();
         public IReadOnlyCollection<SocketGuild> Guilds { get => Client.Guilds; }
-        public bool IsConnected { get; private set; }
+        public bool IsConnected => Client != null && (Client.ConnectionState == ConnectionState.Connected || Client.ConnectionState == ConnectionState.Connecting);
 
         private Thread _thread;
 
@@ -52,11 +52,10 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding
             _thread.Start ();
         }
 
-        internal async Task Initialize () {
+        internal Task Initialize () {
             Log.Bot($"Initializing shard {ShardId}.");
-
             BootDate = DateTime.Now;
-            await Connect();
+            return Task.CompletedTask;
         }
 
         private DiscordSocketClient CreateClient ()
@@ -100,7 +99,6 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding
         private Task Client_Connected()
         {
             Log.Write(Log.Type.BOT, $"Shard {ShardId} connected.");
-            IsConnected = true;
             return Task.CompletedTask;
         }
 
@@ -124,8 +122,6 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding
 
         private async Task Client_Disconnected(Exception arg)
         {
-            IsConnected = false;
-
             Log.Warning($"Shard {ShardId} disconnected.");
             Log.Exception(arg);
             OnExceptionCaught(arg);
@@ -133,27 +129,26 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding
             await Task.CompletedTask;
         }
 
-        internal async Task Connect ()
+        internal async Task<bool> Connect ()
         {
-            if (Client != null)
-            {
-                await Logout();
-                await Stop();
-                Client.Dispose();
-            }
-
             ConnectDate = DateTime.Now;
             Client = CreateClient();
+            
+            Log.Bot($"Connecting shard {ShardId}..");
+            if (await TryLogin(6, 10000)) // Try logging in six times every ten seconds
+            {
+                await Start();
+                await AwaitConnected();
 
-            Log.Bot("Connecting..");
-
-            await Login();
-            await Start();
-
-            await AwaitConnected();
-
-            InitHandlers();
-            RouteEvents();
+                InitHandlers();
+                RouteEvents();
+                return true;
+            }
+            else
+            {
+                Log.Critical($"Shard {ShardId} has failed to login after several attempts. Something is wrong, perhaps Discord cannot be reached.");
+                return false;
+            }
         }
 
         internal GuildHandler[] GetGuildHandlers () => _guildHandlers.ToArray();
@@ -186,7 +181,6 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding
 
         private Task Client_Ready() {
             Log.Write (Log.Type.BOT, $"Shard {ShardId} is ready!");
-            IsConnected = true;
             return Task.CompletedTask;
         }
 
@@ -200,6 +194,24 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding
             Log.Write (Log.Type.BOT, $"Shard {ShardId} stopped.");
         }
 
+        private async Task<bool> TryLogin (int attempts, int delayMillis)
+        {
+            while (attempts > 0)
+            {
+                try
+                {
+                    await Login();
+                    return true;
+                } catch (Exception)
+                {
+                    Log.Bot($"Reattempting login of Shard {ShardId} in 10 seconds.");
+                    await Task.Delay(delayMillis);
+                    attempts--;
+                }
+            }
+            return false;
+        }
+
         private async Task Login () {
             Log.Bot($"Attempting login of shard {ShardId}..");
             try
@@ -210,6 +222,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding
             {
                 Log.Bot($"Shard {ShardId} failed to login:");
                 Log.Exception(exc);
+                throw;
             }
         }
 
@@ -297,7 +310,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding
         // Status related stuff
         public async Task AwaitConnected () {
             while (!IsConnected) {
-                await Task.Delay (100);
+                await Task.Delay (1000);
             }
         }
 

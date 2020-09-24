@@ -51,12 +51,35 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client
             _botAdministrators = new UserList(DataDirectory + "/Administrators");
 
             InitializeShards();
+            ConnectShards();
+
             await AwaitAllConnected().ConfigureAwait (false);
 
             InitStatus();
             _statusClock.OnMinutePassed += StatusClock_OnMinutePassed;
             _statusClock.OnMinutePassed += _status.Cycle;
             _statusClock.Start();
+        }
+
+        internal void InitializeShards()
+        {
+            _shards = new BotShard[Configuration.TotalShards];
+            for (int i = Configuration.ShardRange.Min; i < Configuration.ShardRange.Max; i++)
+            {
+                Log.Bot($"Creating shard {i + 1}/{Configuration.ShardRange.Max}, Id = 0.");
+                _shards[i] = CreateShard(i, Configuration.TotalShards);
+                _shards[i].Run();
+            }
+        }
+        private async Task ConnectShards()
+        {
+            foreach (BotShard shard in _shards)
+            {
+                if (!(await shard.Connect()))
+                {
+                    Log.Bot($"Shard {shard.ShardId} has completely failed to connect.");
+                }
+            }
         }
 
         internal void InitStatus()
@@ -82,7 +105,12 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client
             if (Configuration == null)
             {
                 // If no file exists, create a new one.
-                Configuration = new ClientConfiguration();
+                Configuration = new ClientConfiguration()
+                {
+                    ShardRange = new ClientConfiguration.IntRange() { Min = 0, Max = 1 },
+                    TotalShards = 1,
+                    Token = "REPLACE_WITH_TOKEN"
+                };
                 Configuration.Save(path);
             }
 
@@ -93,17 +121,11 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client
 
 
 
-        private async Task StatusClock_OnMinutePassed(DateTime currentTick, DateTime lastTick)
+        private Task StatusClock_OnMinutePassed(DateTime currentTick, DateTime lastTick)
         {
             if (_shards.Any (x => x.IsConnected == false)) {
                 _consecutiveOfflineMinutes++;
                 Log.Write(Log.Type.WARNING, $"Disconnected shard detected, commencing auto-shutdown in {_consecutiveOfflineMinutes}/{_automaticOfflineMinutesTreshold} minutes..");
-
-                foreach (var shard in _shards.Where (x => !x.IsConnected))
-                {
-                    Log.Bot($"Attempting reconnect of shard {shard.ShardId}.");
-                    await shard.Connect();
-                }
             }
             else
             {
@@ -120,6 +142,8 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client
                 Log.Write(Log.Type.CRITICAL, $"Commencing automatic shutdown due to disconnected shard. :(");
                 Shutdown();
             }
+
+            return Task.CompletedTask;
         }
 
         private void Shutdown()
@@ -127,14 +151,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client
             Core.Shutdown();
         }
 
-        internal void InitializeShards () {
-            _shards = new BotShard[Configuration.TotalShards];
-            for (int i = Configuration.ShardRange.Min; i < Configuration.ShardRange.Max; i++) {
-                Log.Bot($"Creating shard {i + 1}/{Configuration.ShardRange.Max}, Id = 0.");
-                _shards[i] = CreateShard (i, Configuration.TotalShards);
-                _shards[i].Run();
-            }
-        }
+
 
         public bool IsBotAdministrator(ulong userId)
         {

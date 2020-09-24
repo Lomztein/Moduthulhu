@@ -16,15 +16,11 @@
     <RepositoryUrl>https://github.com/Lomztein/Moduthulhu.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <NeutralLanguage>en</NeutralLanguage>
-    <Copyright>Copyright (c) 2018 - 2019 Marcus L. Jensen</Copyright>
+    <Copyright>Copyright (c) 2018 - 2020 Marcus L. Jensen</Copyright>
     <PackageIconUrl>https://i.imgur.com/vO9aWZR.png</PackageIconUrl>
     <icon>https://i.imgur.com/STOT7SZ.png</icon>
     <SignAssembly>false</SignAssembly>
     <RootNamespace>Lomztein.Moduthulhu.Core</RootNamespace>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>C:\Users\Lomztein\Documents\GitHub\Moduthulhu\Core\Core.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
