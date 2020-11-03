@@ -19,7 +19,7 @@ namespace Lomztein.Moduthulhu.Core.Bot {
 
         private readonly CancellationTokenSource _shutdownToken = new CancellationTokenSource();
 
-        // TODOD: Create a CoreInitializer or CoreFactory or something, in order to conceal InitializeCore and avoid accidental calls from plugins on an already initialized core.
+        // TODO: Create a CoreInitializer or CoreFactory or something, in order to conceal InitializeCore and avoid accidental calls from plugins on an already initialized core.
         public async Task InitializeCore(string[] args)
         {
             // Set up core
