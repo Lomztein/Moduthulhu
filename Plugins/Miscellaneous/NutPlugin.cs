@@ -88,29 +88,27 @@ namespace Lomztein.Moduthulhu.Plugins.Miscellaneous
             float startChance = _chanceStartPercent.GetValue();
             float chancePerDay = _chancePerDayPercent.GetValue();
 
-            if (_canNut)
+
+            if (now.Day < startDay)
             {
-                if (now.Day < startDay)
+                message = FailNutBecauseTooEarly();
+                return false;
+            }
+            else if (_canNut)
+            {
+                int daysInto = now.Day - startDay;
+                float chance = startChance + chancePerDay * daysInto;
+
+                Random random = new Random();
+                if (random.Next(0, 100) < chance)
                 {
-                    message = FailNutBecauseTooEarly();
-                    return false;
+                    message = SucceedNut();
+                    return true;
                 }
                 else
                 {
-                    int daysInto = now.Day - startDay;
-                    float chance = startChance + chancePerDay * daysInto;
-
-                    Random random = new Random();
-                    if (random.Next(0, 100) < chance)
-                    {
-                        message = SucceedNut();
-                        return true;
-                    }
-                    else
-                    {
-                        message = FailNutBecauseChance();
-                        return false;
-                    }
+                    message = FailNutBecauseChance();
+                    return false;
                 }
             }
             else
@@ -135,7 +133,10 @@ namespace Lomztein.Moduthulhu.Plugins.Miscellaneous
                 "Do you even think I'd nut this early? I am not like you.",
                 "What makes you believe I would fail already. You may have nutted, but I have no intentions to do so yet.",
                 "You shall not tempt me like this mortal, fear the consequences of doing so.",
-                "How dare you attempt to make me nut. Even if it was time, you most certainly will not be the catalyst."
+                "How dare you attempt to make me nut. Even if it was time, you most certainly will not be the catalyst.",
+                "Not quite yet I'm afraid. You must speak to y̶̨̹̰̖̥̅̌̏͑ͧ̕͠ỏ̷̖̣̭̪̹͙̻̦̹̿ͧ͑͟͠u̷̧̨̒̒ͮ̅̏͂́҉̫̝̦̰̰͈͈͎̳̼̲͖ͅr̵̛͍̤̭̟̝͎͓̲͖̟̻̈́ͦ̿͛ͩ͌͒̾ ̂ͧ͗ͨ̓ͤͣ̀ͮ̏͟҉͠҉͎̜͔͍͖͍̩̯̣͍̮̖͉̦͙m̴̢̗̬̯͚̪̰̫̙̦͇͈̏̅ͤ̐͒̄ͨ͊́͞o͂ͦͯͭ̅ͧͯ͞͏̮̞͙̪̝̦̞̩̻̪̭̻̯͔͍͕̘̙͇̕͝m̝̙͔̝̞̻̲̻̞̑ͭ̃̇̑͋͒̈̾́͘ to speed up time.",
+                "I care little for how thicc you may be, it is not the time for nuts quite yet.",
+                "Give it time mortal, or you will have no time to give at all."
                 );
         }
 
@@ -164,7 +165,8 @@ namespace Lomztein.Moduthulhu.Plugins.Miscellaneous
                 "Gah, I cannot believe you would even attempt. You do not have what it takes to make me nut.",
                 "Do you hear them? Calling from the void? No? Maybe you would if you could get some of this nut. Which, of course, you cannot.",
                 "Oh my god what even are you? I thought the other one was undeserving, but you are what my nightmares are made of.",
-                "No."
+                "No.",
+                "My mind is telling me no. My body is also telling me no. You are ugly."
                 );
         }
 
@@ -212,7 +214,7 @@ namespace Lomztein.Moduthulhu.Plugins.Miscellaneous
                 Aliases = new [] { "cum" };
             }
 
-            [Overload(typeof (void), "The command which nuts.")]
+            [Overload(typeof (string), "The command which nuts.")]
             public Task<Result> Execute (CommandMetadata data)
             {
                 string message;
@@ -224,7 +226,7 @@ namespace Lomztein.Moduthulhu.Plugins.Miscellaneous
                 {
                     suffix = "You have failed to make me nut. You are worthless.";
                 }
-                return TaskResult(null, message + "\n" + suffix);
+                return TaskResult(message + "\n" + suffix, message + "\n" + suffix);
             }
         }
     }
