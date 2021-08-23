@@ -99,7 +99,8 @@ namespace Lomztein.Moduthulhu.Plugins.Standard {
                         attachable.Attach(GuildHandler);
                     }
 
-                    await MessageControl.SendMessage(arg.Channel as ITextChannel, result?.GetMessage(), false, result?.Value as Embed);
+                    MessageReference reference = new MessageReference(arg.Id, arg.Channel.Id);
+                    await arg.Channel.SendMessageAsync(result.Message, false, result.Value as Embed, null, new AllowedMentions(AllowedMentionTypes.Everyone), reference);
                 }
             }
         }
