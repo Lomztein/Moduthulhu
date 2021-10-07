@@ -24,6 +24,15 @@ namespace Lomztein.Moduthulhu.Plugins.WikiMediaFetcher
         public override void Initialize()
         {
             AddCommand (CreateCommand("https://en.wikipedia.org/w/", "wiki", "Good ol' Wikipedia"));
+            AddCommand (CreateCommand("https://spademanns.fandom.com/", "spademanns", "penis"));
+            AddCommand (CreateCommand("https://dc.fandom.com/", "dc", "Learn about Superman"));
+            AddCommand (CreateCommand("https://starwars.fandom.com/", "starwars", "Look at wookies"));
+            AddCommand (CreateCommand("https://marvelcinematicuniverse.fandom.com/", "marvel", "Simp for Wanda"));
+            AddCommand (CreateCommand("https://minecraft.fandom.com/", "minecraf", "become dank"));
+            AddCommand (CreateCommand("https://leagueoflegends.fandom.com/", "lol", "Embrace toxicity"));
+            AddCommand (CreateCommand("https://herosiege.fandom.com/", "herosiege", "Hero Siege?"));
+            AddCommand (CreateCommand("https://half-life.fandom.com/", "halflife", "Fight the opression"));
+            AddCommand (CreateCommand("https://terraria.fandom.com/", "terraria", "best game"));
         }
 
         public override void Shutdown()
@@ -68,17 +77,24 @@ namespace Lomztein.Moduthulhu.Plugins.WikiMediaFetcher
             var query = queryResult["query"];
             var page = query["pages"].First.First as JObject; // idk
 
-            try
+            if (page["title"] != null)
             {
-                builder.WithTitle(page["title"].ToString())
-                .WithDescription(page["extract"].ToString())
-                .WithUrl(page["fullurl"].ToString())
-                    .WithImageUrl(page["thumbnail"]["source"].ToString());
-
-                return builder.Build();
+                builder.WithTitle(page["title"].ToString());
             }
-            catch (Exception) { }
-            return null;
+            if (page["extract"] != null)
+            {
+                builder.WithDescription(page["extract"].ToString());
+            }
+            if (page["fullurl"] != null)
+            {
+                builder.WithUrl(page["fullurl"].ToString());
+            }
+            if (page["thumbnail"]?["source"] != null)
+            {
+                builder.WithImageUrl(page["thumbnail"]["source"].ToString());
+            }
+
+            return builder.Build();
         }
 
         private UniversalFetchCommand CreateCommand (string sourceUrl, string name, string description)
@@ -102,7 +118,7 @@ namespace Lomztein.Moduthulhu.Plugins.WikiMediaFetcher
                 Name = name;
                 Description = description;
                 _sourceUrl = sourceUrl;
-                Category = StandardCategories.Utility;
+                Category = new Category("Wiki", "Commands for querying a varity of wikies. Support for adding custom wikies planned.");
             }
 
             [Overload(typeof(Embed), "Query this wiki for a particular page.")]
