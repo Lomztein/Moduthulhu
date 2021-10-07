@@ -24,15 +24,15 @@ namespace Lomztein.Moduthulhu.Plugins.WikiMediaFetcher
         public override void Initialize()
         {
             AddCommand (CreateCommand("https://en.wikipedia.org/w/", "wiki", "Good ol' Wikipedia"));
-            AddCommand (CreateCommand("https://spademanns.fandom.com/", "spademanns", "penis"));
-            AddCommand (CreateCommand("https://dc.fandom.com/", "dc", "Learn about Superman"));
-            AddCommand (CreateCommand("https://starwars.fandom.com/", "starwars", "Look at wookies"));
-            AddCommand (CreateCommand("https://marvelcinematicuniverse.fandom.com/", "marvel", "Simp for Wanda"));
-            AddCommand (CreateCommand("https://minecraft.fandom.com/", "minecraf", "become dank"));
-            AddCommand (CreateCommand("https://leagueoflegends.fandom.com/", "lol", "Embrace toxicity"));
-            AddCommand (CreateCommand("https://herosiege.fandom.com/", "herosiege", "Hero Siege?"));
-            AddCommand (CreateCommand("https://half-life.fandom.com/", "halflife", "Fight the opression"));
-            AddCommand (CreateCommand("https://terraria.fandom.com/", "terraria", "best game"));
+            AddCommand (CreateCommand("https://dc.fandom.com/", "dc", "DC Univese wiki"));
+            AddCommand (CreateCommand("https://starwars.fandom.com/", "starwars", "Wookiepedia"));
+            AddCommand (CreateCommand("https://marvelcinematicuniverse.fandom.com/", "marvel", "Marvel universe wiki"));
+            AddCommand (CreateCommand("https://minecraft.fandom.com/", "minecraft", "Minecraft wiki"));
+            AddCommand (CreateCommand("https://leagueoflegends.fandom.com/", "lol", "League of Legends wiki"));
+            AddCommand (CreateCommand("https://herosiege.fandom.com/", "herosiege", "Hero Siege wiki"));
+            AddCommand (CreateCommand("https://half-life.fandom.com/", "halflife", "Half-Life wiki"));
+            AddCommand (CreateCommand("https://terraria.fandom.com/", "terraria", "Terraria wiki"));
+            AddCommand (CreateCommand("https://spademanns.fandom.com/", "spademanns", "forhud"));
         }
 
         public override void Shutdown()
