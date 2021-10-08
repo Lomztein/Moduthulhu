@@ -53,7 +53,10 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
                         var args = new List<object>(x);
                         args.RemoveAt(0); // Remove command metadata.
 
-                        source.Action.DynamicInvoke (args.ToArray ());
+                        object result = source.Action.DynamicInvoke(args.ToArray());
+                        bool success = result is bool ? (bool)result : true;
+                        if (result != null) args.Insert(0, success); // Effectively replace metadata with a success if a success boolean was returned.
+
                         return TaskResult(null, source.Message.DynamicInvoke (args.ToArray ()) as string);
                     });
             }

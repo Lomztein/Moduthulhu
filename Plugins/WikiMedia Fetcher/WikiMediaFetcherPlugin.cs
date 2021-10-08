@@ -1,39 +1,68 @@
 ﻿using Discord;
 using Lomztein.AdvDiscordCommands.Framework;
 using Lomztein.AdvDiscordCommands.Framework.Categories;
+using Lomztein.Moduthulhu.Core.IO.Database.Repositories;
 using Lomztein.Moduthulhu.Core.Plugins.Framework;
 using Lomztein.Moduthulhu.Plugins.Standard;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Lomztein.Moduthulhu.Plugins.WikiMediaFetcher
 {
-    [Descriptor("Lomztein", "Universal Wiki Fetcher", "Eternally WIP simple fetcher for any WikiMedia based source wiki. Except for the part where other wikis don't work for whatever reason.")]
+    [Dependency("Moduthulhu-Command Root")]
+    [Descriptor("Lomztein", "Universal Wiki Fetcher", "Simple universal wiki fetcher for any WikiMedia based source wiki. Uses the WikiMedia API.")]
+    [Source("https://github.com/Lomztein", "https://github.com/Lomztein/Moduthulhu/blob/master/Plugins/WikiMedia%20Fetcher/WikiMediaFetcherPlugin.cs")]
     public class WikiMediaFetcherPlugin : PluginBase
     {
         private const string QUERY_BASE = "api.php?action=query&format=json&prop=extracts%7Cinfo%7Cpageimages&list=&titles=[QUERY]&exchars=1200&exintro=1&explaintext=1&inprop=url&piprop=thumbnail%7Cname&pithumbsize=512&pilimit=1";
         private const string QUERY_REPLACE = "[QUERY]";
 
         private List<UniversalFetchCommand> _commands = new List<UniversalFetchCommand>();
+        private CachedValue<List<Tuple<string, string, string>>> _sourceUrls;
 
         public override void Initialize()
         {
-            AddCommand (CreateCommand("https://en.wikipedia.org/w/", "wiki", "Good ol' Wikipedia"));
-            AddCommand (CreateCommand("https://dc.fandom.com/", "dc", "DC Univese wiki"));
-            AddCommand (CreateCommand("https://starwars.fandom.com/", "starwars", "Wookiepedia"));
-            AddCommand (CreateCommand("https://marvelcinematicuniverse.fandom.com/", "marvel", "Marvel universe wiki"));
-            AddCommand (CreateCommand("https://minecraft.fandom.com/", "minecraft", "Minecraft wiki"));
-            AddCommand (CreateCommand("https://leagueoflegends.fandom.com/", "lol", "League of Legends wiki"));
-            AddCommand (CreateCommand("https://herosiege.fandom.com/", "herosiege", "Hero Siege wiki"));
-            AddCommand (CreateCommand("https://half-life.fandom.com/", "halflife", "Half-Life wiki"));
-            AddCommand (CreateCommand("https://terraria.fandom.com/", "terraria", "Terraria wiki"));
-            AddCommand (CreateCommand("https://spademanns.fandom.com/", "spademanns", "forhud"));
+            _sourceUrls = GetConfigCache("SourceUrls", (x) => new List<Tuple<string, string, string>>() { new Tuple<string, string, string>("https://en.wikipedia.org/w/", "wiki", "Good ol' Wikipedia" )});
+
+            AddConfigInfo<string, string, string>("addwiki", "Add a new wiki", ValidateAndAddSource, (success, source, name, description) => success ? "Succesfully added wiki at " + source : "Failed to add wiki at " + source, "Source URL", "Command Name", "Command Description");
+            AddConfigInfo<string>("removewiki", "Remove an existing wiki", RemoveSouce, (success, source) => success ? "Succesfully removed " + source : "Failed to remove " + source + ", please ensure that your request matches the URL perfectly.", "Source URL");
+            AddConfigInfo("listwikies", "List current wikies", ListSources);
+
+            foreach (var cmd in _sourceUrls.GetValue())
+            {
+                AddCommand(CreateCommand(cmd.Item1, cmd.Item2, cmd.Item3));
+            }
         }
+
+        private bool ValidateAndAddSource (string source, string cmdName, string cmdDescription)
+        {
+            if (ValidateSource(source).GetAwaiter().GetResult())
+            {
+                _sourceUrls.MutateValue(x => x.Add(new Tuple<string, string, string>(source, cmdName, cmdDescription)));
+                AddCommand(CreateCommand(source, cmdName, cmdDescription));
+                return true;
+            }
+            return false;
+        }
+
+        private bool RemoveSouce(string source)
+        {
+            bool removed = false;
+            _sourceUrls.MutateValue(x => removed = x.RemoveAll(y => y.Item1 == source) > 0);
+            if (removed)
+            {
+                RemoveCommand(GetCommandBySource(source));
+            }
+            return removed;
+        }
+
+        private string ListSources() => string.Join("\n", _sourceUrls.GetValue());
 
         public override void Shutdown()
         {
@@ -46,9 +75,21 @@ namespace Lomztein.Moduthulhu.Plugins.WikiMediaFetcher
             SendMessage("Moduthulhu-Command Root", "AddCommand", command);
         }
 
+        private void RemoveCommand(UniversalFetchCommand command)
+        {
+            _commands.Remove(command);
+            SendMessage("Moduthulhu-Command Root", "RemoveCommand", command);
+        }
+
+        private UniversalFetchCommand GetCommandBySource(string source) => _commands.FirstOrDefault(x => x.SourceUrl == source);
+
         private void RemoveAllCommands ()
         {
-            SendMessage("Moduthulhu-Command Root", "RemoveCommands", _commands.ToArray());
+            var copy = _commands.ToArray();
+            foreach (var cmd in copy)
+            {
+                RemoveCommand(cmd);
+            }
         }
 
         private async Task<JObject> QueryAsync (string wiki, string query)
@@ -102,29 +143,29 @@ namespace Lomztein.Moduthulhu.Plugins.WikiMediaFetcher
             return new UniversalFetchCommand(sourceUrl, name, description) { ParentPlugin = this };
         }
 
-        private async Task AssertSourceValidity (string sourceUrl)
+        private async Task<bool> ValidateSource (string sourceUrl)
         {
             HttpWebRequest request = WebRequest.CreateHttp(sourceUrl);
             WebResponse response = await request.GetResponseAsync();
-            throw new ArgumentException("Source URL is invalid. Try and go to a page of your desired wiki, and copy the URL that prefixes the page. Example: https://en.wikipedia.org/wiki/Death -> https://en.wikipedia.org/wiki/");
+            return true; // TODO: Implement lol
         }
 
         public class UniversalFetchCommand : PluginCommand<WikiMediaFetcherPlugin>
         {
-            private string _sourceUrl;
+            public string SourceUrl { get; private set; } 
 
             public UniversalFetchCommand (string sourceUrl, string name, string description)
             {
                 Name = name;
                 Description = description;
-                _sourceUrl = sourceUrl;
+                SourceUrl = sourceUrl;
                 Category = new Category("Wiki", "Commands for querying a varity of wikies. Support for adding custom wikies planned.");
             }
 
             [Overload(typeof(Embed), "Query this wiki for a particular page.")]
             public async Task<Result> Execute (CommandMetadata metadata, string query)
             {
-                JObject result = await ParentPlugin.QueryAsync(_sourceUrl, query);
+                JObject result = await ParentPlugin.QueryAsync(SourceUrl, query);
                 Embed embed = ParentPlugin.BuildPageEmbed(result);
                 if (embed == null)
                 {

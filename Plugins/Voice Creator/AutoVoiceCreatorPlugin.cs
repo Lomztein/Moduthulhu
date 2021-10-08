@@ -39,33 +39,33 @@ namespace Lomztein.Moduthulhu.Modules.Voice
 
             _newVoiceNames.OnModified += NewVoiceName_OnModified;
 
-            AddConfigInfo<SocketVoiceChannel>("Add Default Channel", "Add default channel", x => _defaultChannels.MutateValue(y => y.Add(x.Id)), x => $"Added channel '{x.Name}' to list of default.", "Channel");
-            AddConfigInfo<ulong>("Add Default Channel", "Add default channel", x => _defaultChannels.MutateValue(y => y.Add(GuildHandler.GetVoiceChannel(x).Id)), x => $"Added channel '{GuildHandler.GetVoiceChannel(x).Name}' to list of default.", "Channel");
-            AddConfigInfo<string>("Add Default Channel", "Add default channel", x => _defaultChannels.MutateValue(y => y.Add(GuildHandler.GetVoiceChannel(x).Id)), x =>  $"Added channel '{GuildHandler.GetVoiceChannel(x).Name}' to list of default.", "Channel");
+            AddConfigInfo<SocketVoiceChannel>("Add Default Channel", "Add default channel", x => _defaultChannels.MutateValue(y => y.Add(x.Id)), (success, x) => $"Added channel '{x.Name}' to list of default.", "Channel");
+            AddConfigInfo<ulong>("Add Default Channel", "Add default channel", x => _defaultChannels.MutateValue(y => y.Add(GuildHandler.GetVoiceChannel(x).Id)), (success, x) => $"Added channel '{GuildHandler.GetVoiceChannel(x).Name}' to list of default.", "Channel");
+            AddConfigInfo<string>("Add Default Channel", "Add default channel", x => _defaultChannels.MutateValue(y => y.Add(GuildHandler.GetVoiceChannel(x).Id)), (success, x) =>  $"Added channel '{GuildHandler.GetVoiceChannel(x).Name}' to list of default.", "Channel");
             AddConfigInfo("Add Default Channel", "List default channels", () => "Current default channels are:\n" + string.Join('\n', _defaultChannels.GetValue().Select(x => GuildHandler.GetVoiceChannel(x).Name)));
 
-            AddConfigInfo<SocketVoiceChannel>("Remove Default Channel", "Remove default channel", x => _defaultChannels.MutateValue(y => y.Remove(x.Id)), x => $"Removed channel '{x.Name}' from list of default.", "Channel");
-            AddConfigInfo<ulong>("Remove Default Channel", "Remove default channel", x => _defaultChannels.MutateValue(y => y.Remove(GuildHandler.GetVoiceChannel (x).Id)), x => $"Removed channel '{GuildHandler.GetVoiceChannel(x).Name}' from list of default.", "Channel");
-            AddConfigInfo<string>("Remove Default Channel", "Remove default channel", x => _defaultChannels.MutateValue(y => y.Remove(GuildHandler.GetVoiceChannel(x).Id)), x => $"Removed channel '{GuildHandler.GetVoiceChannel(x).Name}' from list of default.", "Channel");
+            AddConfigInfo<SocketVoiceChannel>("Remove Default Channel", "Remove default channel", x => _defaultChannels.MutateValue(y => y.Remove(x.Id)), (success, x) => $"Removed channel '{x.Name}' from list of default.", "Channel");
+            AddConfigInfo<ulong>("Remove Default Channel", "Remove default channel", x => _defaultChannels.MutateValue(y => y.Remove(GuildHandler.GetVoiceChannel (x).Id)), (success, x) => $"Removed channel '{GuildHandler.GetVoiceChannel(x).Name}' from list of default.", "Channel");
+            AddConfigInfo<string>("Remove Default Channel", "Remove default channel", x => _defaultChannels.MutateValue(y => y.Remove(GuildHandler.GetVoiceChannel(x).Id)), (success, x) => $"Removed channel '{GuildHandler.GetVoiceChannel(x).Name}' from list of default.", "Channel");
 
-            AddConfigInfo<string>("Add Voice Name", "Add voice name", x => _newVoiceNames.MutateValue (y => y.Add (x)), x => $"Added '{x}' name to list of possible options.", "Name");
+            AddConfigInfo<string>("Add Voice Name", "Add voice name", x => _newVoiceNames.MutateValue (y => y.Add (x)), (success, x) => $"Added '{x}' name to list of possible options.", "Name");
             AddConfigInfo("Add Voice Name", "List voice names", () => "Current possible extra voice names:\n " + string.Join('\n', _newVoiceNames.GetValue()));
-            AddConfigInfo<string>("Remove Voice Name", "Remove voice name", x => _newVoiceNames.MutateValue(y => y.Remove(x)), x => $"Removed '{x}' name from list of possible options.", "Name");
+            AddConfigInfo<string>("Remove Voice Name", "Remove voice name", x => _newVoiceNames.MutateValue(y => y.Remove(x)), (success, x) => $"Removed '{x}' name from list of possible options.", "Name");
 
-            AddConfigInfo<int>("Set Desired Free Channels", "Set desired amount", x => _desiredFreeChannels.SetValue(x), x => $"Set desired amount to {x}", "Amount");
+            AddConfigInfo<int>("Set Desired Free Channels", "Set desired amount", x => _desiredFreeChannels.SetValue(x), (success, x) => $"Set desired amount to {x}", "Amount");
             AddConfigInfo("Set Desired Free Channels", "Show desired amount", () => $"Current desired amount is {_desiredFreeChannels.GetValue ()}");
 
-            AddConfigInfo<SocketVoiceChannel>("Ignore Channel", "Ignore channel", x => _ignoreChannels.MutateValue(y => y.Add(x.Id)), x => $"Added channel '{x.Name}' to list of ignored.", "Channel");
-            AddConfigInfo<ulong>("Ignore Channel", "Ignore channel", x => _ignoreChannels.MutateValue(y => y.Add(GuildHandler.GetVoiceChannel (x).Id)), x => $"Added channel '{GuildHandler.GetVoiceChannel(x).Name}' to list of default.", "ignored");
-            AddConfigInfo<string>("Ignore Channel", "Ignore channel", x => _ignoreChannels.MutateValue(y => y.Add(GuildHandler.GetVoiceChannel(x).Id)), x => $"Added channel '{GuildHandler.GetVoiceChannel(x).Name}' to list of ignored.", "Channel");
+            AddConfigInfo<SocketVoiceChannel>("Ignore Channel", "Ignore channel", x => _ignoreChannels.MutateValue(y => y.Add(x.Id)), (success, x) => $"Added channel '{x.Name}' to list of ignored.", "Channel");
+            AddConfigInfo<ulong>("Ignore Channel", "Ignore channel", x => _ignoreChannels.MutateValue(y => y.Add(GuildHandler.GetVoiceChannel (x).Id)), (success, x) => $"Added channel '{GuildHandler.GetVoiceChannel(x).Name}' to list of default.", "ignored");
+            AddConfigInfo<string>("Ignore Channel", "Ignore channel", x => _ignoreChannels.MutateValue(y => y.Add(GuildHandler.GetVoiceChannel(x).Id)), (success, x) => $"Added channel '{GuildHandler.GetVoiceChannel(x).Name}' to list of ignored.", "Channel");
 
-            AddConfigInfo<SocketVoiceChannel>("Unignore Channel", "Unignore channel", x => _ignoreChannels.MutateValue(y => y.Remove(x.Id)), x => $"Removed channel '{x.Name}' from list of ignored.", "Channel");
-            AddConfigInfo<ulong>("Unignore Channel", "Unignore channel", x => _ignoreChannels.MutateValue(y => y.Remove(GuildHandler.GetVoiceChannel (x).Id)), x => $"Removed channel '{GuildHandler.GetVoiceChannel(x).Name}' from list of ignored.", "Channel");
-            AddConfigInfo<string>("Unignore Channel", "Unignore channel", x => _ignoreChannels.MutateValue(y => y.Remove(GuildHandler.GetVoiceChannel(x).Id)), x => $"Removed channel '{GuildHandler.GetVoiceChannel(x).Name}' from list of ignored.", "Channel");
+            AddConfigInfo<SocketVoiceChannel>("Unignore Channel", "Unignore channel", x => _ignoreChannels.MutateValue(y => y.Remove(x.Id)), (success, x) => $"Removed channel '{x.Name}' from list of ignored.", "Channel");
+            AddConfigInfo<ulong>("Unignore Channel", "Unignore channel", x => _ignoreChannels.MutateValue(y => y.Remove(GuildHandler.GetVoiceChannel (x).Id)), (success, x) => $"Removed channel '{GuildHandler.GetVoiceChannel(x).Name}' from list of ignored.", "Channel");
+            AddConfigInfo<string>("Unignore Channel", "Unignore channel", x => _ignoreChannels.MutateValue(y => y.Remove(GuildHandler.GetVoiceChannel(x).Id)), (success, x) => $"Removed channel '{GuildHandler.GetVoiceChannel(x).Name}' from list of ignored.", "Channel");
 
-            AddConfigInfo<SocketCategoryChannel>("Set New Channel Category", "Set category", x => _newChannelCategory.SetValue (x.Id), x => $"Set category where new channels will be created to {x.Name}", "Channel");
-            AddConfigInfo<ulong>("Set New Channel Category", "Set category", x => _newChannelCategory.SetValue (GuildHandler.GetCategoryChannel (x).Id), x => $"Set category where new channels will be created to {GuildHandler.GetCategoryChannel(x).Name}", "Channel");
-            AddConfigInfo<string>("Set New Channel Category", "Set category", x => _newChannelCategory.SetValue (GuildHandler.GetCategoryChannel (x).Id), x => $"Set category where new channels will be created to {GuildHandler.GetCategoryChannel(x).Name}", "Channel");
+            AddConfigInfo<SocketCategoryChannel>("Set New Channel Category", "Set category", x => _newChannelCategory.SetValue (x.Id), (success, x) => $"Set category where new channels will be created to {x.Name}", "Channel");
+            AddConfigInfo<ulong>("Set New Channel Category", "Set category", x => _newChannelCategory.SetValue (GuildHandler.GetCategoryChannel (x).Id), (success, x) => $"Set category where new channels will be created to {GuildHandler.GetCategoryChannel(x).Name}", "Channel");
+            AddConfigInfo<string>("Set New Channel Category", "Set category", x => _newChannelCategory.SetValue (GuildHandler.GetCategoryChannel (x).Id), (success, x) => $"Set category where new channels will be created to {GuildHandler.GetCategoryChannel(x).Name}", "Channel");
             AddConfigInfo("Set New Channel Category", "Get category", () => $"New channels will currently be created in category {GuildHandler.GetCategoryChannel(_newChannelCategory.GetValue()).Name}");
         }
 

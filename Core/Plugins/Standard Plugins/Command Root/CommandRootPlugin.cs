@@ -49,12 +49,12 @@ namespace Lomztein.Moduthulhu.Plugins.Standard {
 
             _commandRoot.AddCommands(new HelpCommand());
 
-            AddConfigInfo<char>("Set Trigger", "Set trigger character.", x => _trigger.SetValue(x), x => $"Set trigger to '{_trigger.GetValue ()}'", "character");
+            AddConfigInfo<char>("Set Trigger", "Set trigger character.", x => _trigger.SetValue(x), (success, x) => $"Set trigger to '{_trigger.GetValue ()}'", "character");
             AddConfigInfo("Set Trigger", "Display current trigger.", () => $"Current trigger character is '{_trigger.GetValue ()}'");
-            AddConfigInfo("Reset Trigger", "Reset trigger.", () => _trigger.SetValue('!'), () => "Reset trigger character to '!'");
-            AddConfigInfo<char>("Set Hidden", "Set hidden character.", x => _trigger.SetValue(x), x => $"Set hidden trigger to '{_hiddenTrigger.GetValue()}'", "character");
+            AddConfigInfo("Reset Trigger", "Reset trigger.", () => _trigger.SetValue('!'), (success) => "Reset trigger character to '!'");
+            AddConfigInfo<char>("Set Hidden", "Set hidden character.", x => _trigger.SetValue(x), (success, x) => $"Set hidden trigger to '{_hiddenTrigger.GetValue()}'", "character");
             AddConfigInfo("Set Hidden", "Display hidden character.", () => $"Current hidden trigger character is '{_hiddenTrigger.GetValue ()}'");
-            AddConfigInfo("Reset Hidden", "Reset hidden.", () => _trigger.SetValue('/'), () => "Reset hidden trigger character to '/'");
+            AddConfigInfo("Reset Hidden", "Reset hidden.", () => _trigger.SetValue('/'), (success) => "Reset hidden trigger character to '/'");
         }
 
         public override void Initialize() {
@@ -125,6 +125,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard {
             }
 
             ((ICommandSet)_commandRoot).AddCommands (newCommands);
+            _commandRoot.InitializeCommands();
         }
 
         public void RemoveCommands(params ICommand [ ] commands) {

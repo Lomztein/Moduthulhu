@@ -52,23 +52,23 @@ namespace Lomztein.Moduthulhu.Plugins.WelcomeMessage
             _command = new DemoWelcomeMessageCommand { ParentPlugin = this };
             SendMessage("Moduthulhu-Command Root", "AddCommand", _command);
 
-            AddConfigInfo<string>("Set Welcome Title", "Set title", x => _title.SetValue(x), x => $"Welcome message title has been set to '{x}'.", "Title");
-            AddConfigInfo<string>("Set Welcome Description", "Set description", x => _description.SetValue(x), x => $"Welcome message description has been set to '{x}'.", "Description");
-            AddConfigInfo<string>("Set Welcome Url", "Set url", x => _url.SetValue(x), x => $"Welcome message url has been set to '{x}'.", "Url");
-            AddConfigInfo<string>("Set Welcome Colour", "Set color (hex)", x => _colourHex.SetValue(x), x => $"Welcome message colour has been set to '#{x}'.", "Colour (hex)");
-            AddConfigInfo<string>("Set Welcome Icon Url", "Set icon url", x => _iconUrl.SetValue(x), x => $"Welcome message icon url has been set to '{x}'.", "Icon Url");
-            AddConfigInfo<string>("Set Welcome Footer", "Set footer", x => _footerText.SetValue(x), x => $"Welcome message footer has been set to '{x}'.", "Footer");
+            AddConfigInfo<string>("Set Welcome Title", "Set title", x => _title.SetValue(x), (success, x) => $"Welcome message title has been set to '{x}'.", "Title");
+            AddConfigInfo<string>("Set Welcome Description", "Set description", x => _description.SetValue(x), (success, x) => $"Welcome message description has been set to '{x}'.", "Description");
+            AddConfigInfo<string>("Set Welcome Url", "Set url", x => _url.SetValue(x), (success, x) => $"Welcome message url has been set to '{x}'.", "Url");
+            AddConfigInfo<string>("Set Welcome Colour", "Set color (hex)", x => _colourHex.SetValue(x), (success, x) => $"Welcome message colour has been set to '#{x}'.", "Colour (hex)");
+            AddConfigInfo<string>("Set Welcome Icon Url", "Set icon url", x => _iconUrl.SetValue(x), (success, x) => $"Welcome message icon url has been set to '{x}'.", "Icon Url");
+            AddConfigInfo<string>("Set Welcome Footer", "Set footer", x => _footerText.SetValue(x), (success, x) => $"Welcome message footer has been set to '{x}'.", "Footer");
 
-            AddConfigInfo<string, string>("Add Welcome Field", "Add field", (x, y) => _fields.MutateValue(z => z.Add(new FieldData(x, y, false))), (x, y) => $"Added field with title '{x}' and value '{y}'", "Title", "Value");
-            AddConfigInfo<string, string, bool>("Add Welcome Field", "Add field", (x, y, z) => _fields.MutateValue(w => w.Add(new FieldData(x, y, z))), (x, y, z) => $"Added field with title '{x}' and value '{y}' that is inline: {z}", "Title", "Value", "Inline");
+            AddConfigInfo<string, string>("Add Welcome Field", "Add field", (x, y) => _fields.MutateValue(z => z.Add(new FieldData(x, y, false))), (success, x, y) => $"Added field with title '{x}' and value '{y}'", "Title", "Value");
+            AddConfigInfo<string, string, bool>("Add Welcome Field", "Add field", (x, y, z) => _fields.MutateValue(w => w.Add(new FieldData(x, y, z))), (success, x, y, z) => $"Added field with title '{x}' and value '{y}' that is inline: {z}", "Title", "Value", "Inline");
             AddConfigInfo("Add Welcome Field", "Add field", () => $"Current fields in the welcome message embed:{string.Join ("\n", _fields.GetValue ().Select (x => $"**{x.Name}**\n{x.Value}"))}");
 
-            AddConfigInfo<string>("Remove Welcome Field", "Remove field", x => _fields.MutateValue(y => y.RemoveAll(z => z.Name == x)), x => $"Removed any fields with the title '{x}'.", "Title");
+            AddConfigInfo<string>("Remove Welcome Field", "Remove field", x => _fields.MutateValue(y => y.RemoveAll(z => z.Name == x)), (success, x) => $"Removed any fields with the title '{x}'.", "Title");
 
-            AddConfigInfo<IUser>("Set Welcome Author", "Set Author", x => _author.SetValue(new EmbedAuthor(x.GetShownName (), null, x.GetAvatarUrl ())), x => $"Set welcome message author to {x.GetShownName ()}.", "User");
-            AddConfigInfo<string>("Set Welcome Author", "Set Author", x => _author.SetValue(new EmbedAuthor(x, null, null)), x => $"Set welcome message author to '{x}'.", "Author Name");
-            AddConfigInfo<string, string>("Set Welcome Author", "Set Author", (x, y) => _author.SetValue(new EmbedAuthor(x, null, y)), (x, y) => $"Set welcome message author to '{x}' with icon url '{y}'.", "Author Name", "Author Icon Url");
-            AddConfigInfo<string, string, string>("Set Welcome Author", "Set Author", (x, y, z) => _author.SetValue(new EmbedAuthor(x, z, y)), (x, y, z) => $"Set welcome message author to '{x}' with icon url '{y}' and url to {z}.", "Author Name", "Author Icon Url", "Author Url");
+            AddConfigInfo<IUser>("Set Welcome Author", "Set Author", x => _author.SetValue(new EmbedAuthor(x.GetShownName (), null, x.GetAvatarUrl ())), (success, x) => $"Set welcome message author to {x.GetShownName ()}.", "User");
+            AddConfigInfo<string>("Set Welcome Author", "Set Author", x => _author.SetValue(new EmbedAuthor(x, null, null)), (success, x) => $"Set welcome message author to '{x}'.", "Author Name");
+            AddConfigInfo<string, string>("Set Welcome Author", "Set Author", (x, y) => _author.SetValue(new EmbedAuthor(x, null, y)), (success, x, y) => $"Set welcome message author to '{x}' with icon url '{y}'.", "Author Name", "Author Icon Url");
+            AddConfigInfo<string, string, string>("Set Welcome Author", "Set Author", (x, y, z) => _author.SetValue(new EmbedAuthor(x, z, y)), (success, x, y, z) => $"Set welcome message author to '{x}' with icon url '{y}' and url to {z}.", "Author Name", "Author Icon Url", "Author Url");
         }
 
         public override void Shutdown()

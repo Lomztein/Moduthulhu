@@ -50,9 +50,9 @@ namespace Lomztein.Moduthulhu.Modules.ServerMessages {
             AddConfigInfoForMessage(_onUserJoinedGuildByInvite, "On New Member Invited");
 
             // TODO: Split names and descriptions into seperate methods, and link using an identifier.
-            AddConfigInfo<SocketTextChannel>("Set Message Channel", "Set channel", y => _channelId.SetValue (y.Id), y => $"Message channel set to {y.Mention}", "Channel");
-            AddConfigInfo<ulong>("Set Message Channel", "Set channel", y => _channelId.SetValue (GuildHandler.GetTextChannel (y).Id), y => $"Message channel set to {GuildHandler.GetTextChannel(y).Mention}", "Channel");
-            AddConfigInfo<string>("Set Message Channel", "Set channel", y => _channelId.SetValue (GuildHandler.GetTextChannel (y).Id), y => $"Message channel set to {GuildHandler.GetTextChannel(y).Mention}", "Channel");
+            AddConfigInfo<SocketTextChannel>("Set Message Channel", "Set channel", y => _channelId.SetValue (y.Id), (success, y) => $"Message channel set to {y.Mention}", "Channel");
+            AddConfigInfo<ulong>("Set Message Channel", "Set channel", y => _channelId.SetValue (GuildHandler.GetTextChannel (y).Id), (success, y) => $"Message channel set to {GuildHandler.GetTextChannel(y).Mention}", "Channel");
+            AddConfigInfo<string>("Set Message Channel", "Set channel", y => _channelId.SetValue (GuildHandler.GetTextChannel (y).Id), (success, y) => $"Message channel set to {GuildHandler.GetTextChannel(y).Mention}", "Channel");
 
             if (HasPermission (GuildPermission.ManageGuild))
             {
@@ -66,8 +66,8 @@ namespace Lomztein.Moduthulhu.Modules.ServerMessages {
         private void AddConfigInfoForMessage (CachedValue<List<string>> message, string name)
         {
             string msg = string.Empty;
-            AddConfigInfo<string>(name, "Add a message", x => message.MutateValue(y => y.Add (x)), x => $"Added new {name} message: '{x}'.", "Message");
-            AddConfigInfo<int>(name, "Remove a message", x => message.MutateValue(y => { msg = y[x]; y.RemoveAt(x); }), x => $"Removed {name} message: '{msg}'.", "Index");
+            AddConfigInfo<string>(name, "Add a message", x => message.MutateValue(y => y.Add (x)), (success, x) => $"Added new {name} message: '{x}'.", "Message");
+            AddConfigInfo<int>(name, "Remove a message", x => message.MutateValue(y => { msg = y[x]; y.RemoveAt(x); }), (success, x) => $"Removed {name} message: '{msg}'.", "Index");
             AddConfigInfo(name, "Display messages", () => $"Current '{name}' messages:\n{string.Join('\n', message.GetValue().ToArray ())}");
         }
 

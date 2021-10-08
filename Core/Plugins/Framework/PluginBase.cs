@@ -145,7 +145,7 @@ namespace Lomztein.Moduthulhu.Core.Plugins.Framework
         /// <param name="description"></param>
         /// <param name="action"></param>
         /// <param name="message"></param>
-        protected void AddConfigInfo(string name, string description, Action action, Func<string> message) => GuildHandler.Config.Add(name, description, Plugin.GetFullName(GetType()), action, message);
+        protected void AddConfigInfo(string name, string description, Action action, Func<bool, string> message) => GuildHandler.Config.Add(name, description, Plugin.GetFullName(GetType()), action, message);
 
         /// <summary>
         /// Add a new configuration info that may be used for end-users to configure the bot.
@@ -166,14 +166,23 @@ namespace Lomztein.Moduthulhu.Core.Plugins.Framework
 
         // Generic AddConfigInfo methods.
         #region
-        protected void AddConfigInfo<T1>(string name, string description, Action<T1> action, Func<T1, string> message, params string[] paramNames) => GuildHandler.Config.Add(name, description, Plugin.GetFullName(GetType()), action, message, paramNames);
-        protected void AddConfigInfo<T1, T2>(string name, string description, Action<T1, T2> action, Func<T1, T2, string> message, params string[] paramNames) => GuildHandler.Config.Add(name, description, Plugin.GetFullName(GetType()), action, message, paramNames);
-        protected void AddConfigInfo<T1, T2, T3>(string name, string description, Action<T1, T2, T3> action, Func<T1, T2, T3, string> message, params string[] paramNames) => GuildHandler.Config.Add(name, description, Plugin.GetFullName(GetType()), action, message, paramNames);
-        protected void AddConfigInfo<T1, T2, T3, T4>(string name, string description, Action<T1, T2, T3, T4> action, Func<T1, T2, T3, T4, string> message, params string[] paramNames) => GuildHandler.Config.Add(name, description, Plugin.GetFullName(GetType()), action, message, paramNames);
-        protected void AddConfigInfo<T1, T2, T3, T4, T5>(string name, string description, Action<T1, T2, T3, T4, T5> action, Func<T1, T2, T3, T4, T5, string> message, params string[] paramNames) => GuildHandler.Config.Add(name, description, Plugin.GetFullName(GetType()), action, message, paramNames);
-        protected void AddConfigInfo<T1, T2, T3, T4, T5, T6>(string name, string description, Action<T1, T2, T3, T4, T5, T6> action, Func<T1, T2, T3, T4, T5, T6, string> message, params string[] paramNames) => GuildHandler.Config.Add(name, description, Plugin.GetFullName(GetType()), action, message, paramNames);
-        protected void AddConfigInfo<T1, T2, T3, T4, T5, T6, T7>(string name, string description, Action<T1, T2, T3, T4, T5, T6, T7> action, Func<T1, T2, T3, T4, T5, T6, T7, string> message, params string[] paramNames) => GuildHandler.Config.Add(name, description, Plugin.GetFullName(GetType()), action, message, paramNames);
-        protected void AddConfigInfo<T1, T2, T3, T4, T5, T6, T7, T8>(string name, string description, Action<T1, T2, T3, T4, T5, T6, T7, T8> action, Func<T1, T2, T3, T4, T5, T6, T7, T8, string> message, params string[] paramNames) => GuildHandler.Config.Add(name, description, Plugin.GetFullName(GetType()), action, message, paramNames);
+        protected void AddConfigInfo<T1>(string name, string description, Action<T1> action, Func<bool, T1, string> message, params string[] paramNames) => GuildHandler.Config.Add(name, description, Plugin.GetFullName(GetType()), action, message, paramNames);
+        protected void AddConfigInfo<T1, T2>(string name, string description, Action<T1, T2> action, Func<bool, T1, T2, string> message, params string[] paramNames) => GuildHandler.Config.Add(name, description, Plugin.GetFullName(GetType()), action, message, paramNames);
+        protected void AddConfigInfo<T1, T2, T3>(string name, string description, Action<T1, T2, T3> action, Func<bool, T1, T2, T3, string> message, params string[] paramNames) => GuildHandler.Config.Add(name, description, Plugin.GetFullName(GetType()), action, message, paramNames);
+        protected void AddConfigInfo<T1, T2, T3, T4>(string name, string description, Action<T1, T2, T3, T4> action, Func<bool, T1, T2, T3, T4, string> message, params string[] paramNames) => GuildHandler.Config.Add(name, description, Plugin.GetFullName(GetType()), action, message, paramNames);
+        protected void AddConfigInfo<T1, T2, T3, T4, T5>(string name, string description, Action<T1, T2, T3, T4, T5> action, Func<bool, T1, T2, T3, T4, T5, string> message, params string[] paramNames) => GuildHandler.Config.Add(name, description, Plugin.GetFullName(GetType()), action, message, paramNames);
+        protected void AddConfigInfo<T1, T2, T3, T4, T5, T6>(string name, string description, Action<T1, T2, T3, T4, T5, T6> action, Func<bool, T1, T2, T3, T4, T5, T6, string> message, params string[] paramNames) => GuildHandler.Config.Add(name, description, Plugin.GetFullName(GetType()), action, message, paramNames);
+        protected void AddConfigInfo<T1, T2, T3, T4, T5, T6, T7>(string name, string description, Action<T1, T2, T3, T4, T5, T6, T7> action, Func<bool, T1, T2, T3, T4, T5, T6, T7, string> message, params string[] paramNames) => GuildHandler.Config.Add(name, description, Plugin.GetFullName(GetType()), action, message, paramNames);
+        protected void AddConfigInfo<T1, T2, T3, T4, T5, T6, T7, T8>(string name, string description, Action<T1, T2, T3, T4, T5, T6, T7, T8> action, Func<bool, T1, T2, T3, T4, T5, T6, T7, T8, string> message, params string[] paramNames) => GuildHandler.Config.Add(name, description, Plugin.GetFullName(GetType()), action, message, paramNames);
+
+        protected void AddConfigInfo<T1>(string name, string description, Func<T1, bool> action, Func<bool, T1, string> message, params string[] paramNames) => GuildHandler.Config.Add(name, description, Plugin.GetFullName(GetType()), action, message, paramNames);
+        protected void AddConfigInfo<T1, T2>(string name, string description, Func<T1, T2, bool> action, Func<bool, T1, T2, string> message, params string[] paramNames) => GuildHandler.Config.Add(name, description, Plugin.GetFullName(GetType()), action, message, paramNames);
+        protected void AddConfigInfo<T1, T2, T3>(string name, string description, Func<T1, T2, T3, bool> action, Func<bool, T1, T2, T3, string> message, params string[] paramNames) => GuildHandler.Config.Add(name, description, Plugin.GetFullName(GetType()), action, message, paramNames);
+        protected void AddConfigInfo<T1, T2, T3, T4>(string name, string description, Func<T1, T2, T3, T4, bool> action, Func<bool, T1, T2, T3, T4, string> message, params string[] paramNames) => GuildHandler.Config.Add(name, description, Plugin.GetFullName(GetType()), action, message, paramNames);
+        protected void AddConfigInfo<T1, T2, T3, T4, T5>(string name, string description, Func<T1, T2, T3, T4, T5, bool> action, Func<bool, T1, T2, T3, T4, T5, string> message, params string[] paramNames) => GuildHandler.Config.Add(name, description, Plugin.GetFullName(GetType()), action, message, paramNames);
+        protected void AddConfigInfo<T1, T2, T3, T4, T5, T6>(string name, string description, Func<T1, T2, T3, T4, T5, T6, bool> action, Func<bool, T1, T2, T3, T4, T5, T6, string> message, params string[] paramNames) => GuildHandler.Config.Add(name, description, Plugin.GetFullName(GetType()), action, message, paramNames);
+        protected void AddConfigInfo<T1, T2, T3, T4, T5, T6, T7>(string name, string description, Func<T1, T2, T3, T4, T5, T6, T7, bool> action, Func<bool, T1, T2, T3, T4, T5, T6, T7, string> message, params string[] paramNames) => GuildHandler.Config.Add(name, description, Plugin.GetFullName(GetType()), action, message, paramNames);
+        protected void AddConfigInfo<T1, T2, T3, T4, T5, T6, T7, T8>(string name, string description, Func<T1, T2, T3, T4, T5, T6, T7, T8, bool> action, Func<bool, T1, T2, T3, T4, T5, T6, T7, T8, string> message, params string[] paramNames) => GuildHandler.Config.Add(name, description, Plugin.GetFullName(GetType()), action, message, paramNames);
         #endregion
 
         /// <summary>

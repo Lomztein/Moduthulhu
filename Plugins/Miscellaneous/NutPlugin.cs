@@ -38,10 +38,10 @@ namespace Lomztein.Moduthulhu.Plugins.Miscellaneous
             _refractoryPeriod = GetConfigCache("RefractoryPeriod", x => 60 * 60 * 2); // two hours.
             _nutters = GetDataCache("Nutters", x => new List<ulong>());
 
-            AddConfigInfo<int>("setchancestartday", "", (x) => _chanceStartDay.SetValue(x), x => $"Start day set to day {x}.", "day");
-            AddConfigInfo<float>("setchancestartpercent", "", (x) => _chanceStartPercent.SetValue(x), x => $"Starting chance after starting day set to {x}%", "chance");
-            AddConfigInfo<float>("setchanceperday", "", (x) => _chancePerDayPercent.SetValue(x), x => $"Chance per day after starting day set to {x}%", "chance per day");
-            AddConfigInfo<int>("setrefractoryperiod", "", (x) => _refractoryPeriod.SetValue(x), x => $"Refractory period set to {x} seconds.", "seconds");
+            AddConfigInfo<int>("setchancestartday", "", (x) => _chanceStartDay.SetValue(x), (success, x) => $"Start day set to day {x}.", "day");
+            AddConfigInfo<float>("setchancestartpercent", "", (x) => _chanceStartPercent.SetValue(x), (success, x) => $"Starting chance after starting day set to {x}%", "chance");
+            AddConfigInfo<float>("setchanceperday", "", (x) => _chancePerDayPercent.SetValue(x), (success, x) => $"Chance per day after starting day set to {x}%", "chance per day");
+            AddConfigInfo<int>("setrefractoryperiod", "", (x) => _refractoryPeriod.SetValue(x), (success, x) => $"Refractory period set to {x} seconds.", "seconds");
 
             GuildHandler.Clock.OnDayPassed += CheckDate;
 

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Reflection;
+using System.Linq;
 
 namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild.Config
 {
@@ -21,17 +22,16 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild.Config
             Action = action;
             Message = message;
 
-            if (Action.Method.ReturnType != typeof(void))
-            { // I couldn't find any non-generic Action object to use, best I got is a Delegate type.
-                throw new ArgumentException("Action delegate must be without a return type.");
-            }
-
             if (Message.Method.ReturnType != typeof (string))
             {
                 throw new ArgumentException("Message delegate must have a string return type.");
             }
 
             Type[] generics = Action.GetType().GetGenericArguments();
+            if (Action.Method.ReturnType != typeof(void))
+            {
+                generics = generics.ToList().GetRange(0, generics.Length - 1).ToArray(); // shut up;
+            }
             if (generics.Length != paramNames.Length)
             {
                 throw new ArgumentException("A differing amount of parameter names was given in comparison to the actions generic arguments. Lengths need to be identical.");

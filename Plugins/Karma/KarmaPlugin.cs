@@ -37,10 +37,10 @@ namespace Lomztein.Moduthulhu.Plugins.Karma
 
             AddConfigInfo("Set Upvote Emote", "Get emote", () => $"Current upvote emote is '{GuildHandler.GetGuild().GetEmoteAsync(_upvoteEmoteId.GetValue()).Result.Name}'.");
             AddConfigInfo<string>("Set Upvote Emote", "Set emote", x => _upvoteEmoteId.SetValue((GuildHandler.GetGuild().GetEmoteAsync(_upvoteEmoteId.GetValue()).Result?.Id).GetValueOrDefault()),
-                 x => $"Set upvote emote to '{x}'.", "Emote");
+                 (success, x) => $"Set upvote emote to '{x}'.", "Emote");
             AddConfigInfo("Set Downvote Emote", "Get emote", () => $"Current downvote emote is '{GuildHandler.GetGuild().GetEmoteAsync(_downvoteEmoteId.GetValue()).Result.Name}'.");
             AddConfigInfo<string>("Set Downvote Emote", "Set emote", x => _downvoteEmoteId.SetValue((GuildHandler.GetGuild().GetEmoteAsync(_downvoteEmoteId.GetValue()).Result?.Id).GetValueOrDefault()),
-                x => $"Set downote emote to '{x}'.", "Emote");
+                (success, x) => $"Set downote emote to '{x}'.", "Emote");
 
             AddGeneralFeaturesStateAttribute("Karma", "Tracking of total upvotes / downvotes per user.");
         }

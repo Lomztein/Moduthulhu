@@ -34,7 +34,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
             cmd = new UrbanDefineCommand { ParentPlugin = this };
             SendMessage("Moduthulhu-Command Root", "AddCommand", cmd);
             _enableHyperlinkReactions = GetConfigCache("EnableHyperlinkReactions", x => false);
-            AddConfigInfo("Toggle Hyperlink Reactions", "Toggle reactions", () => _enableHyperlinkReactions.SetValue(!_enableHyperlinkReactions.GetValue()), () => _enableHyperlinkReactions.GetValue() ? "Hyperlink reactions has been enabled." : "Hyperlink reactions has been disabled.");
+            AddConfigInfo("Toggle Hyperlink Reactions", "Toggle reactions", () => _enableHyperlinkReactions.SetValue(!_enableHyperlinkReactions.GetValue()), (success) => _enableHyperlinkReactions.GetValue() ? "Hyperlink reactions has been enabled." : "Hyperlink reactions has been disabled.");
             GuildHandler.ReactionAdded += GuildHandler_ReactionAdded;
         }
 
