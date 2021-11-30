@@ -1,4 +1,4 @@
-﻿using Discord;
+using Discord;
 using Discord.WebSocket;
 using Lomztein.AdvDiscordCommands.Extensions;
 using Lomztein.Moduthulhu.Core.IO;
@@ -106,7 +106,7 @@ namespace Lomztein.Moduthulhu.Plugins.Birthday {
                     SocketGuildUser guildUser = GuildHandler.GetUser(user.Key);
                     if (guildUser == null)
                     {
-                        return; // User doesn't exist anymore, may have left the server.
+                        continue; // User doesn't exist anymore, may have left the server.
                     }
 
                     SocketTextChannel guildChannel = GuildHandler.GetTextChannel(_announcementChannel.GetValue());
