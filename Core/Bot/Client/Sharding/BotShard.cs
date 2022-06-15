@@ -244,12 +244,12 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding
             Client.ChannelCreated           += async (x) =>         { try { await ForGuild ((x as SocketGuildChannel)?.Guild, g => g.OnChannelCreated(x));              } catch (Exception exc) { OnExceptionCaught (exc); } };
             Client.ChannelDestroyed         += async (x) =>         { try { await ForGuild ((x as SocketGuildChannel)?.Guild, g => g.OnChannelDestroyed(x));            } catch (Exception exc) { OnExceptionCaught (exc); } };
             Client.ChannelUpdated           += async (x, y) =>      { try { await ForGuild ((x as SocketGuildChannel)?.Guild, g => g.OnChannelUpdated(x, y));           } catch (Exception exc) { OnExceptionCaught (exc); } };
-            Client.MessageDeleted           += async (x, y) =>      { try { await ForGuild ((y as SocketTextChannel)?.Guild, g => g.OnMessageDeleted (x, y));           } catch (Exception exc) { OnExceptionCaught (exc); } };
+            Client.MessageDeleted           += async (x, y) =>      { try { await ForGuild ((await y.GetOrDownloadAsync() as SocketTextChannel)?.Guild, async g => await g.OnMessageDeleted(x, y));              } catch (Exception exc) { OnExceptionCaught (exc); } };
             Client.MessageUpdated           += async (x, y, z) =>   { try { await ForGuild ((z as SocketTextChannel)?.Guild, g => g.OnMessageUpdated (x, y, z));        } catch (Exception exc) { OnExceptionCaught (exc); } };
-            Client.ReactionAdded            += async (x, y, z) =>   { try { await ForGuild ((y as SocketTextChannel)?.Guild, g => g.OnReactionAdded (x, y, z));         } catch (Exception exc) { OnExceptionCaught (exc); } };
-            Client.ReactionRemoved          += async (x, y, z) =>   { try { await ForGuild ((y as SocketTextChannel)?.Guild, g => g.OnReactionRemoved (x, y, z));       } catch (Exception exc) { OnExceptionCaught (exc); } };
-            Client.ReactionsCleared         += async (x, y) =>      { try { await ForGuild ((y as SocketTextChannel)?.Guild, g => g.OnReactionsCleared (x, y));         } catch (Exception exc) { OnExceptionCaught (exc); } };
-            Client.UserIsTyping             += async (x, y) =>      { try { await ForGuild ((y as SocketTextChannel)?.Guild, g => g.OnUserIsTyping (x, y));             } catch (Exception exc) { OnExceptionCaught (exc); } };
+            Client.ReactionAdded            += async (x, y, z) =>   { try { await ForGuild ((await y.GetOrDownloadAsync() as SocketTextChannel)?.Guild, async g => await g.OnReactionAdded (x, y, z));          } catch (Exception exc) { OnExceptionCaught (exc); } };
+            Client.ReactionRemoved          += async (x, y, z) =>   { try { await ForGuild ((await y.GetOrDownloadAsync() as SocketTextChannel)?.Guild, async g => await g.OnReactionRemoved (x, y, z));        } catch (Exception exc) { OnExceptionCaught (exc); } };
+            Client.ReactionsCleared         += async (x, y) =>      { try { await ForGuild ((await y.GetOrDownloadAsync() as SocketTextChannel)?.Guild, async g => await g.OnReactionsCleared (x,y));            } catch (Exception exc) { OnExceptionCaught (exc); } };
+            Client.UserIsTyping             += async (x, y) =>      { try { await ForGuild ((await y.GetOrDownloadAsync() as SocketTextChannel)?.Guild, async g => await g.OnUserIsTyping (x, y));               } catch (Exception exc) { OnExceptionCaught (exc); } };
             Client.UserVoiceStateUpdated    += async (x, y, z) =>   { try { await ForGuild ((x as SocketGuildUser)?.Guild, g => g.OnUserVoiceStateUpdated (x, y, z));   } catch (Exception exc) { OnExceptionCaught (exc); } };
             Client.Connected                += async () =>          { try { await ForEachGuild (g => g.OnConnected ());                                                 } catch (Exception exc) { OnExceptionCaught (exc); } };
             Client.CurrentUserUpdated       += async (x, y) =>      { try { await ForEachGuild (g => g.OnCurrentUserUpdated(x, y));                                     } catch (Exception exc) { OnExceptionCaught (exc); } };
@@ -259,18 +259,21 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding
             Client.LoggedIn                 += async () =>          { try { await ForEachGuild (g => g.OnLoggedIn ());                                                  } catch (Exception exc) { OnExceptionCaught (exc); } };
             Client.LoggedOut                += async () =>          { try { await ForEachGuild (g => g.OnLoggedOut ());                                                 } catch (Exception exc) { OnExceptionCaught (exc); } };
             Client.Ready                    += async () =>          { try { await ForEachGuild (g => g.OnReady ());                                                     } catch (Exception exc) { OnExceptionCaught (exc); } };
-            Client.GuildMemberUpdated       += async (x, y) =>      { try { await ForGuild (x.Guild, g => g.OnGuildMemberUpdated (x, y));                               } catch (Exception exc) { OnExceptionCaught (exc); } };
+            Client.GuildMemberUpdated       += async (x, y) =>      { try { await ForGuild ((await x.GetOrDownloadAsync()).Guild, async g => await g.OnGuildMemberUpdated (x, y));   } catch (Exception exc) { OnExceptionCaught (exc); } };
             Client.RoleCreated              += async (x) =>         { try { await ForGuild (x.Guild, g => g.OnRoleCreated (x));                                         } catch (Exception exc) { OnExceptionCaught (exc); } };
             Client.RoleDeleted              += async (x) =>         { try { await ForGuild (x.Guild, g => g.OnRoleDeleted (x));                                         } catch (Exception exc) { OnExceptionCaught (exc); } };
             Client.RoleUpdated              += async (x, y) =>      { try { await ForGuild (x.Guild, g => g.OnRoleUpdated (x, y));                                      } catch (Exception exc) { OnExceptionCaught (exc); } };
             Client.UserJoined               += async (x) =>         { try { await ForGuild (x.Guild, g => g.OnUserJoined (x));                                          } catch (Exception exc) { OnExceptionCaught (exc); } };
-            Client.UserLeft                 += async (x) =>         { try { await ForGuild (x.Guild, g => g.OnUserLeft (x));                                            } catch (Exception exc) { OnExceptionCaught (exc); } };
+            Client.UserLeft                 += async (x, y) =>      { try { await ForGuild (x, g => g.OnUserLeft (y));                                                  } catch (Exception exc) { OnExceptionCaught (exc); } };
             Client.GuildAvailable           += async (x) =>         { try { await ForGuild (x, g => g.OnGuildAvailable());                                              } catch (Exception exc) { OnExceptionCaught (exc); } };
             Client.GuildMembersDownloaded   += async (x) =>         { try { await ForGuild (x, g => g.OnGuildMembersDownloaded ());                                     } catch (Exception exc) { OnExceptionCaught (exc); } };
             Client.GuildUnavailable         += async (x) =>         { try { await ForGuild (x, g => g.OnGuildUnavailable ());                                           } catch (Exception exc) { OnExceptionCaught (exc); } };
             Client.GuildUpdated             += async (x, y) =>      { try { await ForGuild (x, g => g.OnGuildUpdated (x, y));                                           } catch (Exception exc) { OnExceptionCaught (exc); } };
             Client.UserBanned               += async (x, y) =>      { try { await ForGuild (y, g => g.OnUserBanned (x));                                                } catch (Exception exc) { OnExceptionCaught (exc); } };
             Client.UserUnbanned             += async (x, y) =>      { try { await ForGuild (y, g => g.OnUserUnbanned (x));                                              } catch (Exception exc) { OnExceptionCaught (exc); } };
+            Client.ApplicationCommandCreated += async (x) =>        { try { await (x.Guild == null ? ForEachGuild(y => y.OnApplicationCommandCreated(x)) : ForGuild(x.Guild, y => y.OnApplicationCommandCreated(x))); } catch (Exception exc) { OnExceptionCaught(exc); } };
+            Client.ApplicationCommandDeleted += async (x) =>        { try { await (x.Guild == null ? ForEachGuild(y => y.OnApplicationCommandDeleted(x)) : ForGuild(x.Guild, y => y.OnApplicationCommandDeleted(x))); } catch (Exception exc) { OnExceptionCaught(exc); } };
+            Client.ApplicationCommandUpdated += async (x) =>        { try { await (x.Guild == null ? ForEachGuild(y => y.OnApplicationCommandUpdated(x)) : ForGuild(x.Guild, y => y.OnApplicationCommandUpdated(x))); } catch (Exception exc) { OnExceptionCaught(exc); } };
         }
 
         private Task ForGuild (ulong? guildId, Func<GuildHandler, Task> func)
@@ -286,7 +289,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding
                 InitGuildHandler(GetGuild(guildId.Value));
             }
 
-            _ = func(handler);
+            func(handler);
             return Task.CompletedTask;
         }
 
@@ -299,7 +302,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding
             {
                 tasks[i] = func(_guildHandlers[i]);
             }
-            _ = Task.WhenAll(tasks);
+            Task.WhenAll(tasks);
             return Task.CompletedTask;
         }
 

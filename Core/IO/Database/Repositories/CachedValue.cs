@@ -67,7 +67,6 @@ namespace Lomztein.Moduthulhu.Core.IO.Database.Repositories
             {
                 Cache();
             }
-
             action(_value);
             OnModified?.Invoke(old, _value);
             Store();

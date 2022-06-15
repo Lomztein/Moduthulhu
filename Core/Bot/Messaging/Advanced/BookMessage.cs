@@ -34,7 +34,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Messaging.Advanced {
             guildHandler.ReactionAdded += GuildHandler_ReactionAdded;
         }
 
-        private async Task GuildHandler_ReactionAdded(Cacheable<IUserMessage, ulong> arg1, Discord.WebSocket.ISocketMessageChannel arg2, Discord.WebSocket.SocketReaction arg3)
+        private async Task GuildHandler_ReactionAdded(Cacheable<IUserMessage, ulong> arg1, Cacheable<IMessageChannel, ulong> arg2, Discord.WebSocket.SocketReaction arg3)
         {
             if (arg1.Id == _book.Message.Id)
             {

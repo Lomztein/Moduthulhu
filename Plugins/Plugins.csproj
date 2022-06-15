@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="Current">
   <PropertyGroup>
     <OutputType>Library</OutputType>
-    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
     <ApplicationIcon />
     <StartupObject />
     <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
@@ -17,6 +17,6 @@
     <ProjectReference Include="..\Core\Core.csproj" />
   </ItemGroup>
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="copy &quot;$(TargetPath)&quot; &quot;$(SolutionDir)Core\bin\Debug\netcoreapp2.1\IncludedPlugins.dll&quot; /y" Condition=" '$(OS)' == 'Windows_NT' " />
+    <Exec Command="copy &quot;$(TargetPath)&quot; &quot;$(SolutionDir)Core\bin\Debug\netcoreapp3.1\IncludedPlugins.dll&quot; /y" Condition=" '$(OS)' == 'Windows_NT' " />
   </Target>
 </Project>

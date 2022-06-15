@@ -45,11 +45,11 @@ namespace Lomztein.Moduthulhu.Plugins.Karma
             AddGeneralFeaturesStateAttribute("Karma", "Tracking of total upvotes / downvotes per user.");
         }
 
-        private async Task OnReactionRemoved(Cacheable<IUserMessage, ulong> arg1, ISocketMessageChannel arg2, SocketReaction arg3) {
+        private async Task OnReactionRemoved(Cacheable<IUserMessage, ulong> arg1, Cacheable<IMessageChannel, ulong> arg2, SocketReaction arg3) {
             await OnReactionChanged (arg1, arg3, -1);
         }
 
-        private async Task OnReactionAdded(Cacheable<IUserMessage, ulong> arg1, ISocketMessageChannel arg2, SocketReaction arg3) {
+        private async Task OnReactionAdded(Cacheable<IUserMessage, ulong> arg1, Cacheable<IMessageChannel, ulong> arg2, SocketReaction arg3) {
             await OnReactionChanged (arg1, arg3, 1);
         }
 

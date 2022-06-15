@@ -71,8 +71,8 @@ namespace Lomztein.Moduthulhu.Modules.ServerMessages {
             AddConfigInfo(name, "Display messages", () => $"Current '{name}' messages:\n{string.Join('\n', message.GetValue().ToArray ())}");
         }
 
-        private async Task OnGuildMemberUpdated(SocketGuildUser arg1, SocketGuildUser arg2) {
-            await CheckAndAnnounceNameChange (arg1, arg2);
+        private async Task OnGuildMemberUpdated(Cacheable<SocketGuildUser, ulong> arg1, SocketGuildUser arg2) {
+            await CheckAndAnnounceNameChange (await arg1.GetOrDownloadAsync(), arg2);
         }
 
         private async Task CheckAndAnnounceNameChange(SocketGuildUser before, SocketGuildUser after) {
@@ -91,7 +91,7 @@ namespace Lomztein.Moduthulhu.Modules.ServerMessages {
             await SendMessage (_onUserUnbannedFromGuild, "[USERNAME]", user.GetShownName ());
         }
 
-        private async Task OnUserLeftGuild(SocketGuildUser user) {
+        private async Task OnUserLeftGuild(SocketUser user) {
             await SendMessage (_onUserLeftGuild, "[USERNAME]", user.GetShownName ());
         }
 

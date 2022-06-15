@@ -38,7 +38,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
             GuildHandler.ReactionAdded += GuildHandler_ReactionAdded;
         }
 
-        private async Task GuildHandler_ReactionAdded(Cacheable<IUserMessage, ulong> arg1, Discord.WebSocket.ISocketMessageChannel arg2, Discord.WebSocket.SocketReaction arg3)
+        private async Task GuildHandler_ReactionAdded(Cacheable<IUserMessage, ulong> arg1, Cacheable<IMessageChannel, ulong> arg2, Discord.WebSocket.SocketReaction arg3)
         {
             if (EnableHyperlinkReactions)
             {
@@ -50,7 +50,8 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
                     {
                         string word = button.Consume(emoji);
                         var def = await UrbanDefinition.Get(word, EnableHyperlinkReactions);
-                        var msg = await arg2.SendMessageAsync(null, false, def.ToEmbed());
+                        await arg2.GetOrDownloadAsync();
+                        var msg = await arg2.Value.SendMessageAsync(null, false, def.ToEmbed());
                         await AddNestedDefReactions(def, msg);
                     }
                 }

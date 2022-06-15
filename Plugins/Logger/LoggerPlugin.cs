@@ -104,8 +104,8 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
             return Task.CompletedTask;
         }
 
-        private static Task OnUserLeft(SocketGuildUser arg) {
-            Core.Log.Write (Core.Log.Type.USER, arg.GetShownName () + " has left " + arg.Guild.Name);
+        private Task OnUserLeft(SocketUser arg) {
+            Core.Log.Write (Core.Log.Type.USER, arg.GetShownName () + " has left " + GuildHandler.GetGuild());
             return Task.CompletedTask;
         }
 
@@ -149,19 +149,19 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
             return Task.CompletedTask;
         }
 
-        private static Task OnReactionsCleared(Cacheable<IUserMessage, ulong> arg1, ISocketMessageChannel arg2) {
-            Core.Log.Write (Core.Log.Type.CHAT, "Message " + arg1.Id + " in " + arg2.GetPath () + " had reactions cleared.");
-            return Task.CompletedTask;
+        private static async Task OnReactionsCleared(Cacheable<IUserMessage, ulong> arg1, Cacheable<IMessageChannel, ulong> arg2) {
+            await arg2.GetOrDownloadAsync();
+            Core.Log.Write (Core.Log.Type.CHAT, "Message " + arg1.Id + " in " + arg2.Value.GetPath () + " had reactions cleared.");
         }
 
-        private static Task OnReactionRemoved(Cacheable<IUserMessage, ulong> arg1, ISocketMessageChannel arg2, SocketReaction arg3) {
-            Core.Log.Write (Core.Log.Type.CHAT, "Message " + arg1.Id + " in " + arg2.GetPath () + " had a reaction " + arg3.Emote.Name + " removed by " + arg3.User.Value?.ToStringOrNull () + ".");
-            return Task.CompletedTask;
+        private static async Task OnReactionRemoved(Cacheable<IUserMessage, ulong> arg1, Cacheable<IMessageChannel, ulong> arg2, SocketReaction arg3) {
+            await arg2.GetOrDownloadAsync();
+            Core.Log.Write (Core.Log.Type.CHAT, "Message " + arg1.Id + " in " + arg2.Value.GetPath () + " had a reaction " + arg3.Emote.Name + " removed by " + arg3.User.Value?.ToStringOrNull () + ".");
         }
 
-        private static Task OnReactionAdded(Cacheable<IUserMessage, ulong> arg1, ISocketMessageChannel arg2, SocketReaction arg3) {
-            Core.Log.Write (Core.Log.Type.CHAT, "Message " + arg1.Id + " in " + arg2.GetPath () + " had a reaction " + arg3.Emote.Name + " added by " + arg3.User.Value?.ToStringOrNull () + ".");
-            return Task.CompletedTask;
+        private static async Task OnReactionAdded(Cacheable<IUserMessage, ulong> arg1, Cacheable<IMessageChannel, ulong> arg2, SocketReaction arg3) {
+            await arg2.GetOrDownloadAsync();
+            Core.Log.Write (Core.Log.Type.CHAT, "Message " + arg1.Id + " in " + arg2.Value.GetPath () + " had a reaction " + arg3.Emote.Name + " added by " + arg3.User.Value?.ToStringOrNull () + ".");
         }
 
         private static Task OnMessageUpdated(Cacheable<IMessage, ulong> arg1, SocketMessage arg2, ISocketMessageChannel arg3) {
@@ -174,9 +174,9 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
             return Task.CompletedTask;
         }
 
-        private static Task OnMessageDeleted(Cacheable<IMessage, ulong> arg1, ISocketMessageChannel arg2) {
-            Core.Log.Write (Core.Log.Type.CHAT, "Message " + arg1.Id + " in " + arg2.GetPath () + " has been deleted.");
-            return Task.CompletedTask;
+        private static async Task OnMessageDeleted(Cacheable<IMessage, ulong> arg1, Cacheable<IMessageChannel, ulong> arg2) {
+            await arg2.GetOrDownloadAsync();
+            Core.Log.Write (Core.Log.Type.CHAT, "Message " + arg1.Id + " in " + arg2.Value.GetPath () + " has been deleted.");
         }
 
         private static Task OnLeftGuild(SocketGuild arg) {
@@ -210,31 +210,30 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
             return Task.CompletedTask;
         }
 
-        private static Task OnGuildMemberUpdated(SocketGuildUser arg1, SocketGuildUser arg2) {
-            if (arg1.Nickname != arg2.Nickname)
+        private static async Task OnGuildMemberUpdated(Cacheable<SocketGuildUser, ulong> arg1, SocketGuildUser arg2) {
+            var before = await arg1.GetOrDownloadAsync();
+            if (before.Nickname != arg2.Nickname)
             {
-                Core.Log.Write(Core.Log.Type.USER, arg1.GetPath() + " changed nickname to " + arg2.GetShownName());
+                Core.Log.Write(Core.Log.Type.USER, before.GetPath() + " changed nickname to " + arg2.GetShownName());
             }
-            if (arg1.GuildPermissions.RawValue != arg2.GuildPermissions.RawValue)
+            if (before.GuildPermissions.RawValue != arg2.GuildPermissions.RawValue)
             {
-                Core.Log.Write(Core.Log.Type.USER, arg1.GetPath() + " had guild permissions changed.");
+                Core.Log.Write(Core.Log.Type.USER, before.GetPath() + " had guild permissions changed.");
             }
 
-            SocketRole added = GetAddedRole (arg1, arg2);
+            SocketRole added = GetAddedRole (before, arg2);
 
             if (added != null)
             {
-                Core.Log.Write(Core.Log.Type.USER, arg1.GetPath() + " had role " + added.GetPath() + " added.");
+                Core.Log.Write(Core.Log.Type.USER, before.GetPath() + " had role " + added.GetPath() + " added.");
             }
             else {
-                SocketRole removed = GetRemovedRole (arg1, arg2);
+                SocketRole removed = GetRemovedRole (before, arg2);
                 if (removed != null)
                 {
-                    Core.Log.Write(Core.Log.Type.USER, arg1.GetPath() + " had role " + removed.GetPath() + " removed.");
+                    Core.Log.Write(Core.Log.Type.USER, before.GetPath() + " had role " + removed.GetPath() + " removed.");
                 }
             }
-
-            return Task.CompletedTask;
         }
 
         private static Task OnGuildMembersDownloaded(SocketGuild arg) {

@@ -146,8 +146,8 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
         internal async Task OnGuildMembersDownloaded() => await (GuildMembersDownloaded?.Invoke(GetGuild()) ?? Task.CompletedTask);
         public event Func<SocketGuild, Task> GuildMembersDownloaded;
 
-        internal async Task OnGuildMemberUpdated(SocketGuildUser before, SocketGuildUser after) => await (GuildMemberUpdated?.Invoke(before, after) ?? Task.CompletedTask);
-        public event Func<SocketGuildUser, SocketGuildUser, Task> GuildMemberUpdated;
+        internal async Task OnGuildMemberUpdated(Cacheable<SocketGuildUser, ulong> before, SocketGuildUser after) => await (GuildMemberUpdated?.Invoke(before, after) ?? Task.CompletedTask);
+        public event Func<Cacheable<SocketGuildUser, ulong>, SocketGuildUser, Task> GuildMemberUpdated;
 
         internal async Task OnGuildUpdated(SocketGuild before, SocketGuild after) => await (GuildUpdated?.Invoke(before, after) ?? Task.CompletedTask);
         public event Func<SocketGuild, SocketGuild, Task> GuildUpdated;
@@ -167,8 +167,8 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
         internal async Task OnReady() => await (Ready?.Invoke() ?? Task.CompletedTask);
         public event Func<Task> Ready; // New
 
-        internal async Task OnMessageDeleted(Cacheable<IMessage, ulong> message, ISocketMessageChannel channel) => await (MessageDeleted?.Invoke(message, channel) ?? Task.CompletedTask);
-        public event Func<Cacheable<IMessage, ulong>, ISocketMessageChannel, Task> MessageDeleted;
+        internal async Task OnMessageDeleted(Cacheable<IMessage, ulong> message, Cacheable<IMessageChannel, ulong> channel) => await (MessageDeleted?.Invoke(message, channel) ?? Task.CompletedTask);
+        public event Func<Cacheable<IMessage, ulong>, Cacheable<IMessageChannel, ulong>, Task> MessageDeleted;
 
         internal async Task OnMessageRecieved(SocketMessage message) => await (MessageReceived?.Invoke(message) ?? Task.CompletedTask);
         public event Func<SocketMessage, Task> MessageReceived;
@@ -176,14 +176,14 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
         internal async Task OnMessageUpdated(Cacheable<IMessage, ulong> before, SocketMessage after, ISocketMessageChannel channel) => await (MessageUpdated?.Invoke(before, after, channel) ?? Task.CompletedTask);
         public event Func<Cacheable<IMessage, ulong>, SocketMessage, ISocketMessageChannel, Task> MessageUpdated;
 
-        internal async Task OnReactionAdded(Cacheable<IUserMessage, ulong> message, ISocketMessageChannel channel, SocketReaction reaction) => await (ReactionAdded?.Invoke(message, channel, reaction) ?? Task.CompletedTask);
-        public event Func<Cacheable<IUserMessage, ulong>, ISocketMessageChannel, SocketReaction, Task> ReactionAdded;
+        internal async Task OnReactionAdded(Cacheable<IUserMessage, ulong> message, Cacheable<IMessageChannel, ulong> channel, SocketReaction reaction) => await (ReactionAdded?.Invoke(message, channel, reaction) ?? Task.CompletedTask);
+        public event Func<Cacheable<IUserMessage, ulong>, Cacheable<IMessageChannel, ulong>, SocketReaction, Task> ReactionAdded;
 
-        internal async Task OnReactionRemoved(Cacheable<IUserMessage, ulong> message, ISocketMessageChannel channel, SocketReaction reaction) => await (ReactionRemoved?.Invoke(message, channel, reaction) ?? Task.CompletedTask);
-        public event Func<Cacheable<IUserMessage, ulong>, ISocketMessageChannel, SocketReaction, Task> ReactionRemoved;
+        internal async Task OnReactionRemoved(Cacheable<IUserMessage, ulong> message, Cacheable<IMessageChannel, ulong> channel, SocketReaction reaction) => await (ReactionRemoved?.Invoke(message, channel, reaction) ?? Task.CompletedTask);
+        public event Func<Cacheable<IUserMessage, ulong>, Cacheable<IMessageChannel, ulong>, SocketReaction, Task> ReactionRemoved;
         
-        internal async Task OnReactionsCleared(Cacheable<IUserMessage, ulong> message, ISocketMessageChannel channel) => await (ReactionsCleared?.Invoke(message, channel) ?? Task.CompletedTask);
-        public event Func<Cacheable<IUserMessage, ulong>, ISocketMessageChannel, Task> ReactionsCleared;
+        internal async Task OnReactionsCleared(Cacheable<IUserMessage, ulong> message, Cacheable<IMessageChannel, ulong> channel) => await (ReactionsCleared?.Invoke(message, channel) ?? Task.CompletedTask);
+        public event Func<Cacheable<IUserMessage, ulong>, Cacheable<IMessageChannel, ulong>, Task> ReactionsCleared;
 
         internal async Task OnRoleCreated(SocketRole role) => await (RoleCreated?.Invoke(role) ?? Task.CompletedTask);
         public event Func<SocketRole, Task> RoleCreated;
@@ -197,20 +197,31 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
         internal async Task OnUserBanned(SocketUser user) => await (UserBanned?.Invoke(user, GetGuild()) ?? Task.CompletedTask);
         public event Func<SocketUser, SocketGuild, Task> UserBanned;
 
-        internal async Task OnUserIsTyping(SocketUser user, ISocketMessageChannel channel) => await (UserIsTyping?.Invoke(user, channel) ?? Task.CompletedTask);
-        public event Func<SocketUser, ISocketMessageChannel, Task> UserIsTyping;
+        internal async Task OnUserIsTyping(Cacheable<IUser, ulong> user, Cacheable<IMessageChannel, ulong> channel) => await (UserIsTyping?.Invoke(user, channel) ?? Task.CompletedTask);
+        public event Func<Cacheable<IUser, ulong>, Cacheable<IMessageChannel, ulong>, Task> UserIsTyping;
 
         internal async Task OnUserJoined(SocketGuildUser user) => await (UserJoined?.Invoke(user) ?? Task.CompletedTask);
         public event Func<SocketGuildUser, Task> UserJoined;
-
-        internal async Task OnUserLeft(SocketGuildUser user) => await (UserLeft?.Invoke(user) ?? Task.CompletedTask);
-        public event Func<SocketGuildUser, Task> UserLeft;
+        
+        internal async Task OnUserLeft(SocketUser user) => await (UserLeft?.Invoke(user) ?? Task.CompletedTask);
+        public event Func<SocketUser, Task> UserLeft;
 
         internal async Task OnUserUnbanned(SocketUser user) => await (UserUnbanned?.Invoke(user, GetGuild()) ?? Task.CompletedTask);
         public event Func<SocketUser, SocketGuild, Task> UserUnbanned;
 
+        internal async Task OnApplicationCommandCreated(SocketApplicationCommand command) => await (ApplicationCommandCreated?.Invoke(command) ?? Task.CompletedTask);
+        public event Func<SocketApplicationCommand, Task> ApplicationCommandCreated;
+
+        internal async Task OnApplicationCommandDeleted(SocketApplicationCommand command) => await (ApplicationCommandDeleted?.Invoke(command) ?? Task.CompletedTask);
+        public event Func<SocketApplicationCommand, Task> ApplicationCommandDeleted;
+
+        internal async Task OnApplicationCommandUpdated(SocketApplicationCommand command) => await (ApplicationCommandUpdated?.Invoke(command) ?? Task.CompletedTask);
+        public event Func<SocketApplicationCommand, Task> ApplicationCommandUpdated;
+
         internal async Task OnUserVoiceStateUpdated(SocketUser user, SocketVoiceState before, SocketVoiceState after) => await (UserVoiceStateUpdated?.Invoke(user, before, after) ?? Task.CompletedTask);
         public event Func<SocketUser, SocketVoiceState, SocketVoiceState, Task> UserVoiceStateUpdated;
+
+
         // ROUTED DISCORD EVENTS //
         #endregion
 

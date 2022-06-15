@@ -190,11 +190,11 @@ namespace Lomztein.Moduthulhu.Modules.Voice {
         void InitDefaultTags () {
             AddTag (new Tag ("🎵", "Music Bot is present in channel.", x => x.Users.Any (y => y.Id == _musicBotId.GetValue ())));
             AddTag (new Tag ("🔥", "A trio or more elitist scum is present.", x => x.Users.Count (y => y.GuildPermissions.Administrator) >= 3));
-            AddTag (new Tag ("📹", "Someone is streaming in this channel.", x => x.Users.Any (y => y.Activity?.Type == ActivityType.Streaming)));
+            AddTag (new Tag ("📹", "Someone is streaming in this channel.", x => x.Users.Any (y => y.Activities.Any(z => z.Type == ActivityType.Streaming))));
             AddTag (new Tag ("🌎", "Someone marked 'International' is in this channel.", x => x.Users.Any (y => y.Roles.Any (z => z.Id == _internationalRoleId.GetValue ()))));
         }
 
-        private async Task OnGuildMemberUpdated(SocketGuildUser user, SocketGuildUser cur) {
+        private async Task OnGuildMemberUpdated(Cacheable<SocketGuildUser, ulong> user, SocketGuildUser cur) {
             if (cur.VoiceChannel != null)
             {
                 await UpdateChannel(cur.VoiceChannel);
@@ -242,7 +242,7 @@ namespace Lomztein.Moduthulhu.Modules.Voice {
                 Dictionary<string, int> numPlayers = new Dictionary<string, int> ();
                 foreach (SocketGuildUser user in users) {
 
-                    if (user.Activity == null)
+                    if (user.Activities.Count() == 0)
                     {
                         continue;
                     }
@@ -250,20 +250,22 @@ namespace Lomztein.Moduthulhu.Modules.Voice {
                     int unknowns = 0;
                     if (!user.IsBot)
                     {
-                        if (user.Activity.Type == ActivityType.Playing)
+                        foreach (var activity in user.Activities)
                         {
-                            var activity = user.Activity;
-                            string activityName = activity.Name;
-
-                            if (!numPlayers.ContainsKey(activityName))
+                            if (activity.Type == ActivityType.Playing)
                             {
-                                numPlayers.Add(activityName, 0);
+                                string activityName = activity.Name;
+
+                                if (!numPlayers.ContainsKey(activityName))
+                                {
+                                    numPlayers.Add(activityName, 0);
+                                }
+                                numPlayers[activityName]++;
                             }
-                            numPlayers[activityName]++;
-                        }
-                        else
-                        {
-                            unknowns++;
+                            else
+                            {
+                                unknowns++;
+                            }
                         }
                     }
 

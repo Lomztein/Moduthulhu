@@ -111,7 +111,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
 
                 try
                 {
-                    var dm = await metadata.Author.GetOrCreateDMChannelAsync();
+                    var dm = await metadata.Author.CreateDMChannelAsync();
                     await dm.SendFileAsync(stream, metadata.AuthorID.ToString(CultureInfo.InvariantCulture) + ".json", "Your personal data, as requested. You may delete all of this using the `!deletedata` command in the same server as you requested the data. If we share multiple servers, you must do this for each server. The file may be opened as a text file in something like Notepad. Additionally, a website like http://jsonviewer.stack.hu/ may make reading it easier.");
                 }
                 catch (HttpException)

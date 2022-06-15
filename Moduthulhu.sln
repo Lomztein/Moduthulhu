@@ -1,11 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.29418.71
+# Visual Studio Version 17
+VisualStudioVersion = 17.2.32519.379
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Core", "Core\Core.csproj", "{86C0F367-13F1-42AF-9D88-024E8B19FEA9}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Webserver", "Webserver\Webserver.csproj", "{DA60A2C2-1ABD-4AD7-9E54-C98619DDFC14}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tests", "Tests\Tests.csproj", "{77504FB5-DE0F-438A-A12D-6263259212AB}"
 EndProject
@@ -21,10 +19,6 @@ Global
 		{86C0F367-13F1-42AF-9D88-024E8B19FEA9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{86C0F367-13F1-42AF-9D88-024E8B19FEA9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{86C0F367-13F1-42AF-9D88-024E8B19FEA9}.Release|Any CPU.Build.0 = Release|Any CPU
-		{DA60A2C2-1ABD-4AD7-9E54-C98619DDFC14}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DA60A2C2-1ABD-4AD7-9E54-C98619DDFC14}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DA60A2C2-1ABD-4AD7-9E54-C98619DDFC14}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DA60A2C2-1ABD-4AD7-9E54-C98619DDFC14}.Release|Any CPU.Build.0 = Release|Any CPU
 		{77504FB5-DE0F-438A-A12D-6263259212AB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{77504FB5-DE0F-438A-A12D-6263259212AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{77504FB5-DE0F-438A-A12D-6263259212AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
