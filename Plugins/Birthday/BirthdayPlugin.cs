@@ -34,6 +34,8 @@ namespace Lomztein.Moduthulhu.Plugins.Birthday {
 
         public override void Initialize()
         {
+            throw new Exception("This plugin is broken. Please don't enable it.");
+
             _announcementChannel = GetConfigCache("AnnouncementChannel", x => x.GetGuild().TextChannels.FirstOrDefault(y => y.Name == "general" || y.Name == "main" || y.Name == "chat").ZeroIfNull());
             _announcementMessage = GetConfigCache("AnnouncementMessage", x => "Congratulations to **[USERNAME]** as today they celebrate their [AGE] birthday!");
 
