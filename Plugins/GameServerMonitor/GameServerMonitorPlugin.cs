@@ -105,16 +105,22 @@ namespace Lomztein.Moduthulhu.Plugins.GameServerMonitor
         {
             var monitor = GetMonitor(info.GameName);
             SocketTextChannel channel = GuildHandler.GetTextChannel(info.MessageChannelId);
-            IUserMessage message = await channel.GetMessageAsync(info.MessageId) as IUserMessage;
-            if (info.UseEmbed)
+            if (channel != null)
             {
-                Embed embed = await monitor.PollEmbed(info.ServerName, info.HostName);
-                await message.ModifyAsync(x => { x.Content = string.Empty; x.Embed = embed; }) ;
-            }
-            else
-            {
-                string content = await monitor.PollString(info.ServerName, info.HostName);
-                await message.ModifyAsync(x => { x.Content = content; x.Embed = null; });
+                IUserMessage message = await channel.GetMessageAsync(info.MessageId) as IUserMessage;
+                if (message != null)
+                {
+                    if (info.UseEmbed)
+                    {
+                        Embed embed = await monitor.PollEmbed(info.ServerName, info.HostName);
+                        await message.ModifyAsync(x => { x.Content = string.Empty; x.Embed = embed; });
+                    }
+                    else
+                    {
+                        string content = await monitor.PollString(info.ServerName, info.HostName);
+                        await message.ModifyAsync(x => { x.Content = content; x.Embed = null; });
+                    }
+                }
             }
         }
 
