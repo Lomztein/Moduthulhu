@@ -49,12 +49,25 @@ namespace Lomztein.Moduthulhu.Plugins.GameServerMonitor
                 {
                     EmbedBuilder builder = new EmbedBuilder()
                         .WithTitle("Current server monitors")
-                        .WithDescription($"```\n{string.Join("\n", current.Select(x => x.ServerName + " at '" + x.HostName + "'"))}```");
+                        .WithDescription($"```\n{string.Join("\n", current.Select(x => x.ServerName + " at '" + x.HostName + "'" + WantToRemoveString(x)))}```");
                     return TaskResult(builder.Build(), string.Empty);
                 }
                 else
                 {
                     return TaskResult(null, "There are currently no servers being monitored.");
+                }
+            }
+
+            private string WantToRemoveString(GameServerMonitorInfo info)
+            {
+                var message = ParentPlugin.GetServerMonitoringMessage(info).Result;
+                if (message == null)
+                {
+                    return " (Monitoring message not found, you might want to delete this monitor using the gsm remove command)";
+                }
+                else
+                {
+                    return String.Empty;
                 }
             }
         }
@@ -118,11 +131,11 @@ namespace Lomztein.Moduthulhu.Plugins.GameServerMonitor
                 if (ParentPlugin.RemoveServerToMonitor(serverName))
                 {
                     await ParentPlugin.DeleteServerMonitoringMessage(info);
-                    return new Result(true, $"Succesfully removed server monitor '{serverName} for '{info.GameName}' at '{info.HostName}'.");
+                    return new Result(true, $"Succesfully removed server monitor '{serverName}' for '{info.GameName}' at '{info.HostName}'.");
                 }
                 else
                 {
-                    return new Result(true, $"Failed to remove server monitor '{serverName}: Monitor not found.");
+                    return new Result(true, $"Failed to remove server monitor '{serverName}': Monitor not found.");
                 }
             }
         }

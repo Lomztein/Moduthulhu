@@ -22,8 +22,8 @@ namespace Lomztein.Moduthulhu.Plugins.GameServerMonitor.ServerMonitors
             {
                 EmbedBuilder builder = new EmbedBuilder().
                     WithTitle(string.IsNullOrEmpty(info.serverName) ? serverName : info.serverName)
-                    .WithDescription($"Join at '{info.hostName}'!\n{info.playerCount} / {info.maxPlayers} players at a {info.ping} millisecond ping."
-                     + (string.IsNullOrEmpty(info.motd) ? "" : $"\n\n> {info.motd}"));
+                    .WithDescription($"Join at '{info.hostName}'!\n{info.playerCount} / {info.maxPlayers} players" + (info.ping > 0 ? $"at a {info.ping} millisecond ping." : ".")
+                     + (string.IsNullOrEmpty(info.motd) ? "" : $"\n\nMessage of the Day:\n> {info.motd}"));
 
                 var fields = new List<EmbedFieldBuilder>();
 
@@ -43,10 +43,10 @@ namespace Lomztein.Moduthulhu.Plugins.GameServerMonitor.ServerMonitors
                 {
                     fields.Add(new EmbedFieldBuilder().WithName("Server Tags").WithValue(string.Join(", ", info.tags)).WithIsInline(false));
                 }
-                if (!string.IsNullOrEmpty(info.hostAddress))
+                /*if (!string.IsNullOrEmpty(info.hostAddress))
                 {
                     fields.Add(new EmbedFieldBuilder().WithName("Server Address").WithValue(info.hostAddress).WithIsInline(false));
-                }
+                }*/
 
                 builder.WithFields(fields);
                 builder.WithCurrentTimestamp();

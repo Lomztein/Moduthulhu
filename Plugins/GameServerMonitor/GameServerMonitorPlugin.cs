@@ -36,6 +36,18 @@ namespace Lomztein.Moduthulhu.Plugins.GameServerMonitor
             ServersToMonitor = GetDataCache("ServersToMonitor", x => new List<GameServerMonitorInfo>());
             RegisterMessageAction(nameof(AddGameServerMonitor), x => AddGameServerMonitor(x[0] as IGameServerMonitor));
             SendMessage("Moduthulhu-Command Root", "AddCommand", _commands);
+
+            GuildHandler.MessageDeleted += GuildHandler_MessageDeleted;
+        }
+
+        private Task GuildHandler_MessageDeleted(Cacheable<IMessage, ulong> arg1, Cacheable<IMessageChannel, ulong> arg2)
+        {
+            var info = ServersToMonitor.GetValue().Find(x => x.MessageId == arg1.Id && x.MessageChannelId == arg2.Id);
+            if (info != null)
+            {
+                RemoveServerToMonitor(info.ServerName);
+            }
+            return Task.CompletedTask;
         }
 
         internal bool AddServerToMonitor (GameServerMonitorInfo info)
@@ -74,9 +86,25 @@ namespace Lomztein.Moduthulhu.Plugins.GameServerMonitor
 
         internal async Task DeleteServerMonitoringMessage(GameServerMonitorInfo info)
         {
+            var message = await GetServerMonitoringMessage(info);
+            if (message != null)
+            {
+                await message.DeleteAsync();
+            }
+        }
+
+        internal async Task<IUserMessage> GetServerMonitoringMessage(GameServerMonitorInfo info)
+        {
             SocketTextChannel channel = GuildHandler.GetTextChannel(info.MessageChannelId);
-            var message = await channel.GetMessageAsync(info.MessageId);
-            await message.DeleteAsync();
+            if (channel != null)
+            {
+                IUserMessage message = await channel.GetMessageAsync(info.MessageId) as IUserMessage;
+                if (message != null)
+                {
+                    return message;
+                }
+            }
+            return null;
         }
 
         internal async Task<RestUserMessage> CreateServerMonitoringMessage(SocketTextChannel channel)
@@ -101,25 +129,22 @@ namespace Lomztein.Moduthulhu.Plugins.GameServerMonitor
             }
         }
 
-        internal async Task PollServer (GameServerMonitorInfo info)
+        internal async Task PollServer(GameServerMonitorInfo info)
         {
             var monitor = GetMonitor(info.GameName);
-            SocketTextChannel channel = GuildHandler.GetTextChannel(info.MessageChannelId);
-            if (channel != null)
+            var message = await GetServerMonitoringMessage(info);
+
+            if (message != null)
             {
-                IUserMessage message = await channel.GetMessageAsync(info.MessageId) as IUserMessage;
-                if (message != null)
+                if (info.UseEmbed)
                 {
-                    if (info.UseEmbed)
-                    {
-                        Embed embed = await monitor.PollEmbed(info.ServerName, info.HostName);
-                        await message.ModifyAsync(x => { x.Content = string.Empty; x.Embed = embed; });
-                    }
-                    else
-                    {
-                        string content = await monitor.PollString(info.ServerName, info.HostName);
-                        await message.ModifyAsync(x => { x.Content = content; x.Embed = null; });
-                    }
+                    Embed embed = await monitor.PollEmbed(info.ServerName, info.HostName);
+                    await message.ModifyAsync(x => { x.Content = string.Empty; x.Embed = embed; });
+                }
+                else
+                {
+                    string content = await monitor.PollString(info.ServerName, info.HostName);
+                    await message.ModifyAsync(x => { x.Content = content; x.Embed = null; });
                 }
             }
         }
@@ -129,6 +154,7 @@ namespace Lomztein.Moduthulhu.Plugins.GameServerMonitor
             GuildHandler.Clock.OnHourPassed -= Clock_OnHourPassed;
             UnregisterMessageDelegate(nameof(AddGameServerMonitor));
             SendMessage("Moduthulhu-Command Root", "RemoveCommand", _commands);
+            GuildHandler.MessageDeleted -= GuildHandler_MessageDeleted;
         }
     }
 }
