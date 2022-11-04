@@ -226,6 +226,10 @@ namespace Lomztein.Moduthulhu.Plugins.Miscellaneous
                 else
                 {
                     suffix = "You have failed to make me nut. " + (ParentPlugin.IsPrecious(data.AuthorID) ? "But that's okay I still love you." : "You are worthless.");
+                    
+                    if (data.AuthorID == 249307541648048138){
+                        message = "No ";
+                    }
                 }
                 return TaskResult(message + "\n" + suffix, message + "\n" + suffix);
             }
