@@ -22,6 +22,7 @@ namespace Lomztein.Moduthulhu.Plugins.Miscellaneous
         private bool _canNut = true;
 
         private ulong[] _preciousIds = new ulong[] { 249307541648048138 };
+        private ulong[] _noHurtIds = new ulong[] { 249307541648048138 };
 
         private NutCommand _nutCommand;
 
@@ -226,6 +227,10 @@ namespace Lomztein.Moduthulhu.Plugins.Miscellaneous
                 else
                 {
                     suffix = "You have failed to make me nut. " + (ParentPlugin.IsPrecious(data.AuthorID) ? "But that's okay I still love you." : "You are worthless.");
+                    
+                    if (_noHurtIds.contains(data.AuthorID)){
+                        message = "No ";
+                    }
                 }
                 return TaskResult(message + "\n" + suffix, message + "\n" + suffix);
             }
