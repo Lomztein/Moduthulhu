@@ -160,15 +160,21 @@ namespace Lomztein.Moduthulhu.Plugins.Standard {
 
         private async void AddSlashCommand(ICommand cmd)
         {
-            while(true)
+            while (true)
             {
                 try
                 {
                     await GuildHandler.GetGuild().CreateApplicationCommandAsync(cmd.ToSlashCommand());
                     break;
-                }catch (Exception ex)
+                }
+                catch (TimeoutException ex)
                 {
                     Log(ex.Message);
+                }
+                catch(Exception ex)
+                {
+                    Log(ex.Message);
+                    break;
                 }
             }
             Log($"Slash command '{cmd.Name}' succesfully added.");
