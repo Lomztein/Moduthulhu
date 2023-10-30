@@ -15,6 +15,8 @@ using Lomztein.Moduthulhu.Core.Plugins.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Lomztein.Moduthulhu.Plugins.Standard {
@@ -61,7 +63,28 @@ namespace Lomztein.Moduthulhu.Plugins.Standard {
         public override void Initialize() {
             GuildHandler.MessageReceived += OnMessageRecieved;
             GuildHandler.SlashCommandExecuted += SlashCommandExecuted;
+            GuildHandler.ApplicationCommandCreated += GuildHandler_ApplicationCommandCreated;
+            GuildHandler.ApplicationCommandDeleted += GuildHandler_ApplicationCommandDeleted;
+            GuildHandler.ApplicationCommandUpdated += GuildHandler_ApplicationCommandUpdated;
             SetStateChangeHeaders("Commands", "The following commands has been added", "The following commands has been removed");
+        }
+
+        private Task GuildHandler_ApplicationCommandUpdated(SocketApplicationCommand arg)
+        {
+            Log($"Application command '{arg.Name}' succesfully updated.");
+            return Task.CompletedTask;
+        }
+
+        private Task GuildHandler_ApplicationCommandDeleted(SocketApplicationCommand arg)
+        {
+            Log($"Application command '{arg.Name}' succesfully deleted.");
+            return Task.CompletedTask;
+        }
+
+        private Task GuildHandler_ApplicationCommandCreated(SocketApplicationCommand arg)
+        {
+            Log($"Application command '{arg.Name}' succesfully added.");
+            return Task.CompletedTask;
         }
 
         private async Task SlashCommandExecuted(SocketSlashCommand arg)
@@ -135,6 +158,11 @@ namespace Lomztein.Moduthulhu.Plugins.Standard {
             GuildHandler.MessageReceived -= OnMessageRecieved;
             GuildHandler.SlashCommandExecuted -= SlashCommandExecuted;
 
+            GuildHandler.ApplicationCommandCreated -= GuildHandler_ApplicationCommandCreated;
+            GuildHandler.ApplicationCommandDeleted -= GuildHandler_ApplicationCommandDeleted;
+            GuildHandler.ApplicationCommandUpdated -= GuildHandler_ApplicationCommandUpdated;
+
+            // TODO: Detect which commands and subcommands are currently on the guild, and add / remove accordingly
             GuildHandler.GetGuild().DeleteApplicationCommandsAsync().Wait();
 
             ClearMessageDelegates();
@@ -160,24 +188,30 @@ namespace Lomztein.Moduthulhu.Plugins.Standard {
 
         private async void AddSlashCommand(ICommand cmd)
         {
-            while (true)
+            RequestOptions options = new RequestOptions()
             {
-                try
-                {
-                    await GuildHandler.GetGuild().CreateApplicationCommandAsync(cmd.ToSlashCommand());
-                    break;
-                }
-                catch (TimeoutException ex)
-                {
-                    Log(ex.Message);
-                }
-                catch(Exception ex)
-                {
-                    Log(ex.Message);
-                    break;
-                }
+                RatelimitCallback = new Func<IRateLimitInfo, Task>(x => SlashRateLimitCallback(x, cmd)),
+                RetryMode = RetryMode.AlwaysRetry
+            };
+            try
+            {
+                await GuildHandler.GetGuild().CreateApplicationCommandAsync(cmd.ToSlashCommand(), options);
+                Log($"Slash command '{cmd.Name}' succesfully added.");
+            }catch(TimeoutException exc)
+            {
+                Log($"Slash command '{cmd.Name}' timed out: {exc.Message}");
             }
-            Log($"Slash command '{cmd.Name}' succesfully added.");
+        }
+
+        private async Task SlashRateLimitCallback(IRateLimitInfo info, ICommand cmd)
+        {
+            if (info.RetryAfter.HasValue)
+            {
+                float retryTime = info.RetryAfter.Value;
+                Log($"Slash command {cmd.Name} rate limited, waiting {retryTime} seconds, then try adding again..");
+                await Task.Delay((int)(retryTime * 1000f));
+                AddSlashCommand(cmd);
+            }
         }
 
         public void RemoveCommands(params ICommand [ ] commands) {
