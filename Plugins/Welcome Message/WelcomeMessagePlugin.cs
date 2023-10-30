@@ -225,7 +225,7 @@ namespace Lomztein.Moduthulhu.Plugins.WelcomeMessage
         }
 
         [Overload (typeof (Embed), "Display what you'd see if you joined this server.")]
-        public Task<Result> Execute (CommandMetadata data)
+        public Task<Result> Execute (ICommandMetadata data)
             => TaskResult(ParentPlugin.GenerateWelcomeMessage(data.Author as SocketGuildUser), string.Empty);
     }
 }

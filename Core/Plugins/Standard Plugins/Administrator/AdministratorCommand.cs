@@ -12,9 +12,9 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
 
         protected bool IsAdmin(ulong userId) => ParentPlugin.GuildHandler.IsBotAdministrator(userId);
 
-        public override string AllowExecution(CommandMetadata metadata) {
+        public override string AllowExecution(ICommandMetadata metadata) {
             string baseAllowance = base.AllowExecution (metadata);
-            if (!IsAdmin (metadata.AuthorID)) {
+            if (!IsAdmin (metadata.AuthorId)) {
                 baseAllowance += "\t" + "User is not a bot administrator.";
             }
             return baseAllowance;

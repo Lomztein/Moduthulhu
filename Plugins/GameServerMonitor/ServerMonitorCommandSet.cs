@@ -42,7 +42,7 @@ namespace Lomztein.Moduthulhu.Plugins.GameServerMonitor
             }
 
             [Overload(typeof(void), "List all current server monitors.")]
-            public Task<Result> Execute(CommandMetadata metadata)
+            public Task<Result> Execute(ICommandMetadata metadata)
             {
                 var current = ParentPlugin.ServersToMonitor.GetValue();
                 if (current.Count > 0)
@@ -83,7 +83,7 @@ namespace Lomztein.Moduthulhu.Plugins.GameServerMonitor
             }
 
             [Overload(typeof (bool), "Add a new server monitor. Returns true if succesful, otherwise false.")]
-            public async Task<Result> Execute (CommandMetadata metadata, string gameName, string serverName, string hostName, string type)
+            public async Task<Result> Execute (ICommandMetadata metadata, string gameName, string serverName, string hostName, string type)
             {
                 type = type.ToLowerInvariant();
                 if (type != "embed" && type != "text")
@@ -100,7 +100,7 @@ namespace Lomztein.Moduthulhu.Plugins.GameServerMonitor
                 {
                     if (ParentPlugin.HasMonitor(gameName))
                     {
-                        var message = await ParentPlugin.CreateServerMonitoringMessage(metadata.Message.Channel as SocketTextChannel);
+                        var message = await ParentPlugin.CreateServerMonitoringMessage(metadata.Channel as SocketTextChannel);
                         var info = new GameServerMonitorInfo(gameName, serverName, hostName, message.Channel.Id, message.Id, useEmbed);
                         ParentPlugin.AddServerToMonitor(info);
                         await ParentPlugin.PollServers();
@@ -125,7 +125,7 @@ namespace Lomztein.Moduthulhu.Plugins.GameServerMonitor
             }
 
             [Overload(typeof(bool), "Remove a server monitor. Returns true if succesful, otherwise false.")]
-            public async Task<Result> Execute(CommandMetadata metadata, string serverName)
+            public async Task<Result> Execute(ICommandMetadata metadata, string serverName)
             {
                 var info = ParentPlugin.GetServerMonitor(serverName);
                 if (ParentPlugin.RemoveServerToMonitor(serverName))
@@ -151,14 +151,14 @@ namespace Lomztein.Moduthulhu.Plugins.GameServerMonitor
             }
 
             [Overload(typeof(bool), "Force a poll of all server monitors.")]
-            public async Task<Result> Execute(CommandMetadata metadata)
+            public async Task<Result> Execute(ICommandMetadata metadata)
             {
                 await ParentPlugin.PollServers();
                 return new Result(null, "Succesfully polled servers.");
             }
 
             [Overload(typeof(bool), "Force a poll of a particular server monitor.")]
-            public async Task<Result> Execute(CommandMetadata metadata, string serverName)
+            public async Task<Result> Execute(ICommandMetadata metadata, string serverName)
             {
                 var info = ParentPlugin.GetServerMonitor(serverName);
                 if (info == null)

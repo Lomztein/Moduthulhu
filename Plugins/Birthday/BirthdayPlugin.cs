@@ -234,10 +234,10 @@ namespace Lomztein.Moduthulhu.Plugins.Birthday {
             }
 
             [Overload (typeof (void), "Set your birthday to a specific date.")]
-            public Task<Result> Execute (CommandMetadata data, int day, int month, int year) {
-                Consent.AssertConsent((data.Author as SocketGuildUser).Guild.Id, data.AuthorID);
+            public Task<Result> Execute (ICommandMetadata data, int day, int month, int year) {
+                Consent.AssertConsent((data.Author as SocketGuildUser).Guild.Id, data.AuthorId);
                 DateTime date = new DateTime (year, month, day, 12, 0, 0);
-                ParentPlugin.SetBirthday (data.Message.Author.Id, date);
+                ParentPlugin.SetBirthday (data.AuthorId, date);
                 return TaskResult (null, $"Succesfully set birthday date to **{date.ToString ("MMMM dd, yyyy", CultureInfo.InvariantCulture)}**.");
             }
         }

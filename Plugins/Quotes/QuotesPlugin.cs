@@ -121,13 +121,13 @@ namespace Lomztein.Moduthulhu.Plugins.Quotes
         }
 
         [Overload(typeof(Embed), "Get a random tidbit of endless wisdom.")]
-        public Task<Result> Execute (CommandMetadata metadata)
+        public Task<Result> Execute (ICommandMetadata metadata)
         {
             return TaskResult(ParentPlugin.GetQuoteEmbed(ParentPlugin.GetRandomQuote()), string.Empty);
         }
 
         [Overload(typeof(Embed), "Quote a specific message using the message link.")]
-        public async Task<Result> Execute(CommandMetadata metadata, string url) // Perhaps add URLs to the command framework?
+        public async Task<Result> Execute(ICommandMetadata metadata, string url) // Perhaps add URLs to the command framework?
         {
             (ulong channelId, ulong messageId) = url.ParseMessageUrl();
             SocketTextChannel channel = ParentPlugin.GuildHandler.FindTextChannel(channelId);
@@ -162,7 +162,7 @@ namespace Lomztein.Moduthulhu.Plugins.Quotes
         }
 
         [Overload(typeof(Embed), "Quote someone in current year.")]
-        public Task<Result> Execute(CommandMetadata metadata, string content, string author)
+        public Task<Result> Execute(ICommandMetadata metadata, string content, string author)
         {
             Quote quote = new Quote(content, author, DateTime.Now.Year);
             ParentPlugin.AddQuote(quote);
@@ -170,7 +170,7 @@ namespace Lomztein.Moduthulhu.Plugins.Quotes
         }
 
         [Overload(typeof(Embed), "Quote someone in a specific year.")]
-        public Task<Result> Execute(CommandMetadata metadata, string content, string author, int year)
+        public Task<Result> Execute(ICommandMetadata metadata, string content, string author, int year)
         {
             Quote quote = new Quote(content, author, year);
             ParentPlugin.AddQuote(quote);
@@ -189,14 +189,14 @@ namespace Lomztein.Moduthulhu.Plugins.Quotes
         }
 
         [Overload(typeof (void), "Remove a command by a given index.")]
-        public Task<Result> Execute (CommandMetadata metadata, int id)
+        public Task<Result> Execute (ICommandMetadata metadata, int id)
         {
             Quote quote = ParentPlugin.RemoveQuote(id);
             return TaskResult(null, $"Succesfully removed quote with id {id} and content '{quote.Content} - {quote.Author}, {quote.Year}'.");
         }
 
         [Overload(typeof(void), "Remove a command by its content.")]
-        public Task<Result> Execute(CommandMetadata metadata, string content)
+        public Task<Result> Execute(ICommandMetadata metadata, string content)
         {
             Quote quote = ParentPlugin.RemoveQuote(content);
             return TaskResult(null, $"Succesfully removed quote with content '{quote.Content} - {quote.Author}, {quote.Year}'.");

@@ -117,7 +117,7 @@ namespace Lomztein.Moduthulhu.Plugins.Miscellaneous
             }
 
             [Overload(typeof(double), "Convert from one specified unit to another specified unit")]
-            public Task<Result> Execute (CommandMetadata metadata, double value, string from, string to)
+            public Task<Result> Execute (ICommandMetadata metadata, double value, string from, string to)
             {
                 Converter fromConverter = ParentPlugin.FindConverter(from);
                 Converter toConverter = ParentPlugin.FindConverter(to);
@@ -141,7 +141,7 @@ namespace Lomztein.Moduthulhu.Plugins.Miscellaneous
             }
 
             [Overload(typeof(double), "Convert from a specified unit to a random unit")]
-            public Task<Result> Execute (CommandMetadata metadata, double value, string from)
+            public Task<Result> Execute (ICommandMetadata metadata, double value, string from)
             {
                 Converter fromConverter = ParentPlugin.FindConverter(from);
                 if (fromConverter != null)

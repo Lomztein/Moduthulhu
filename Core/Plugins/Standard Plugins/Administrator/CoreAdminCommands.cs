@@ -46,7 +46,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
             }
 
             [Overload (typeof (void), "Shutdown the entire process and all of its clients. Requires manual rebooting.")]
-            public Task<Result> Execute (CommandMetadata metadata) {
+            public Task<Result> Execute (ICommandMetadata metadata) {
                 Environment.Exit (0);
                 return TaskResult (null, "Shutting down...");
             }
@@ -63,7 +63,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
             }
 
             [Overload (typeof (LargeEmbed), "Check the status for the core and its clients.")]
-            public Task<Result> Execute (CommandMetadata _) {
+            public Task<Result> Execute (ICommandMetadata _) {
 
                 int shardIndex = 0;
                 EmbedBuilder builder = new EmbedBuilder()
@@ -77,7 +77,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
             }
 
             [Overload (typeof (LargeEmbed), "Check status for a specific shard.")]
-            public Task<Result> Execute (CommandMetadata _, int shardId)
+            public Task<Result> Execute (ICommandMetadata _, int shardId)
             {
                 BotShard shard = ParentPlugin.GuildHandler.Shard.BotClient.GetShards().FirstOrDefault(x => x.ShardId == shardId);
                 GuildHandler[] handlers = shard?.GetGuildHandlers();
@@ -94,7 +94,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
             }
 
             [Overload (typeof (Embed), "Check status of a specific GuildHandler")]
-            public Task<Result> Execute (CommandMetadata _, string guildHandler)
+            public Task<Result> Execute (ICommandMetadata _, string guildHandler)
             {
                 GuildHandler handler = ParentPlugin.GuildHandler.Shard.GetGuildHandlers().FirstOrDefault(x => x.Name.ToUpperInvariant() == guildHandler.ToUpperInvariant());
                 if (handler != null)
@@ -127,7 +127,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
             }
 
             [Overload(typeof(void), "Set the clients username to something new.")]
-            public async Task<Result> Execute(CommandMetadata metadata, string newUsername)
+            public async Task<Result> Execute(ICommandMetadata metadata, string newUsername)
             {
                 try
                 {
@@ -155,7 +155,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
             }
 
             [Overload(typeof(void), "Set the clients avatar to something from a website.")]
-            public async Task<Result> Execute(CommandMetadata metadata, string uri)
+            public async Task<Result> Execute(ICommandMetadata metadata, string uri)
             {
                 Uri address = new Uri(uri);
                 using (WebClient client = new WebClient())
@@ -191,7 +191,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
             }
 
             [Overload (typeof (string), "Return the current version of the bot core framework.")]
-            public Task<Result> Execute (CommandMetadata metadata)
+            public Task<Result> Execute (ICommandMetadata metadata)
             {
                 string version = Assembly.GetEntryAssembly().GetName().Version.ToString ();
                 return TaskResult(version, $"Current Moduthulhu core version is '{version}'");
@@ -209,7 +209,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
             }
 
             [Overload (typeof (string), "Credits those amazing beautiful handsome sexy people that created this bot core.")]
-            public Task<Result> Execute (CommandMetadata _)
+            public Task<Result> Execute (ICommandMetadata _)
             {
                 StringBuilder credits = new StringBuilder();
                 credits.AppendLine("Bot core is created by Marcus \"Lomztein\" Jensen *(https://github.com/Lomztein)*, as a hobby passion project and passingly sentient slave.\n");

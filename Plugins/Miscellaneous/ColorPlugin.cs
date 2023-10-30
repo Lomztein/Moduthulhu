@@ -66,9 +66,9 @@ namespace Lomztein.Moduthulhu.Modules.Colour
             }
 
             [Overload(typeof(void), "Set your colour to something cool!")]
-            public async Task<Result> Execute(CommandMetadata data, string colorName) {
+            public async Task<Result> Execute(ICommandMetadata data, string colorName) {
 
-                SocketGuildUser guildUser = data.Message.Author as SocketGuildUser;
+                SocketGuildUser guildUser = data.Author as SocketGuildUser;
                 IEnumerable<SocketRole> currentRoles = guildUser.Roles.Where(x => ParentPlugin.GetRoles().Any(y => x.Id == y.Id));
 
                 SocketRole role = null;
@@ -92,7 +92,7 @@ namespace Lomztein.Moduthulhu.Modules.Colour
             }
 
             [Overload (typeof (SocketRole[]), "Return a list of all available colours.")]
-            public Task<Result> Execute (CommandMetadata _)
+            public Task<Result> Execute (ICommandMetadata _)
             {
                 string colours = string.Join(", ", ParentPlugin.GetRoles().Select(x => x.Name.Substring (ParentPlugin._colourRolePrefix.GetValue ().Length)));
                 return TaskResult(ParentPlugin.GetRoles(), "These colours are available: " + colours);

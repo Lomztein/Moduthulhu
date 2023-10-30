@@ -21,8 +21,8 @@ namespace Lomztein.Moduthulhu.Plugins.Miscellaneous
         private CachedValue<List<ulong>> _nutters;
         private bool _canNut = true;
 
-        private ulong[] _preciousIds = new ulong[] { 249307541648048138 };
-        private ulong[] _noHurtIds = new ulong[] { 249307541648048138 };
+        private static ulong[] _preciousIds = new ulong[] { 249307541648048138 };
+        private static ulong[] _noHurtIds = new ulong[] { 249307541648048138 };
 
         private NutCommand _nutCommand;
 
@@ -217,18 +217,18 @@ namespace Lomztein.Moduthulhu.Plugins.Miscellaneous
             }
 
             [Overload(typeof (string), "The command which nuts.")]
-            public Task<Result> Execute (CommandMetadata data)
+            public Task<Result> Execute (ICommandMetadata data)
             {
                 string message;
                 string suffix;
                 if (ParentPlugin.TryNut(out message)) {
-                    suffix = $"You have made me nut {ParentPlugin.AddNutter(data.AuthorID)} time(s) now, be proud mortal.";
+                    suffix = $"You have made me nut {ParentPlugin.AddNutter(data.AuthorId)} time(s) now, be proud mortal.";
                 }
                 else
                 {
-                    suffix = "You have failed to make me nut. " + (ParentPlugin.IsPrecious(data.AuthorID) ? "But that's okay I still love you." : "You are worthless.");
+                    suffix = "You have failed to make me nut. " + (ParentPlugin.IsPrecious(data.AuthorId) ? "But that's okay I still love you." : "You are worthless.");
                     
-                    if (_noHurtIds.contains(data.AuthorID)){
+                    if (_noHurtIds.Contains(data.AuthorId)){
                         message = "No ";
                     }
                 }

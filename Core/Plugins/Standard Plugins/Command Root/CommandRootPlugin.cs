@@ -5,6 +5,7 @@ using Lomztein.AdvDiscordCommands.ExampleCommands;
 using Lomztein.AdvDiscordCommands.Extensions;
 using Lomztein.AdvDiscordCommands.Framework;
 using Lomztein.AdvDiscordCommands.Framework.Interfaces;
+using Lomztein.Moduthulhu.Core;
 using Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild;
 using Lomztein.Moduthulhu.Core.Bot.Messaging;
 using Lomztein.Moduthulhu.Core.Bot.Messaging.Advanced;
@@ -59,7 +60,18 @@ namespace Lomztein.Moduthulhu.Plugins.Standard {
 
         public override void Initialize() {
             GuildHandler.MessageReceived += OnMessageRecieved;
+            GuildHandler.SlashCommandExecuted += SlashCommandExecuted;
             SetStateChangeHeaders("Commands", "The following commands has been added", "The following commands has been removed");
+        }
+
+        private async Task SlashCommandExecuted(SocketSlashCommand arg)
+        {
+            var result = await _commandRoot.ExecuteSlashCommand(arg);
+            if (result != null)
+            {
+                await HandleSpecials(result, arg.Channel);
+                await arg.RespondAsync(result.Message, HandleEmbed(result.Value));
+            }
         }
 
         public override void PostInitialize() {
@@ -76,6 +88,15 @@ namespace Lomztein.Moduthulhu.Plugins.Standard {
             await AwaitAndSend (arg);
         }
 
+        private static Embed[] HandleEmbed(object result)
+        {
+            if (result is Embed embed)
+                return new Embed[] { embed };
+            if (result is Embed[])
+                return result as Embed[];
+            return null;
+        }
+
         // This is neccesary since awaiting the result in the event would halt the rest of the bot, and we don't really want that.
         private async Task AwaitAndSend(SocketMessage arg) {
 
@@ -84,20 +105,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard {
                 var result = await _commandRoot.EnterCommand (userMessage);
                 if (result != null)
                 {
-                    if (result.Exception != null)
-                    {
-                        Core.Log.Exception(result.Exception);
-                    }
-
-                    if (result.Value is ISendable sendable)
-                    {
-                        await sendable.SendAsync(arg.Channel);
-                    }
-
-                    if (result.Value is IAttachable attachable)
-                    {
-                        attachable.Attach(GuildHandler);
-                    }
+                    await HandleSpecials(result, arg.Channel);
 
                     MessageReference reference = new MessageReference(arg.Id, arg.Channel.Id);
                     await arg.Channel.SendMessageAsync(result.Message, false, result.Value as Embed, null, new AllowedMentions(AllowedMentionTypes.Everyone), reference);
@@ -105,8 +113,29 @@ namespace Lomztein.Moduthulhu.Plugins.Standard {
             }
         }
 
+        private async Task HandleSpecials (Result result, ISocketMessageChannel channel)
+        {
+            if (result.Exception != null)
+            {
+                Core.Log.Exception(result.Exception);
+            }
+
+            if (result.Value is ISendable sendable)
+            {
+                await sendable.SendAsync(channel);
+            }
+
+            if (result.Value is IAttachable attachable)
+            {
+                attachable.Attach(GuildHandler);
+            }
+        }
+
         public override void Shutdown() {
             GuildHandler.MessageReceived -= OnMessageRecieved;
+            GuildHandler.SlashCommandExecuted -= SlashCommandExecuted;
+
+            GuildHandler.GetGuild().DeleteApplicationCommandsAsync().Wait();
 
             ClearMessageDelegates();
             ClearConfigInfos();
@@ -122,10 +151,27 @@ namespace Lomztein.Moduthulhu.Plugins.Standard {
             foreach (ICommand cmd in newCommands)
             {
                 AddStateAttribute("Commands", cmd.Name, _commandRoot.GetChildPrefix (GuildHandler.GuildId) + cmd.Name);
+                AddSlashCommand(cmd);
             }
 
             ((ICommandSet)_commandRoot).AddCommands (newCommands);
             _commandRoot.InitializeCommands();
+        }
+
+        private async void AddSlashCommand(ICommand cmd)
+        {
+            while(true)
+            {
+                try
+                {
+                    await GuildHandler.GetGuild().CreateApplicationCommandAsync(cmd.ToSlashCommand());
+                    break;
+                }catch (Exception ex)
+                {
+                    Log(ex.Message);
+                }
+            }
+            Log($"Slash command '{cmd.Name}' succesfully added.");
         }
 
         public void RemoveCommands(params ICommand [ ] commands) {

@@ -69,10 +69,10 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
         }
 
         [Overload(typeof(void), "Toggle consent for the bot to store personal data.")]
-        public Task<Result> Execute(CommandMetadata metadata)
+        public Task<Result> Execute(ICommandMetadata metadata)
         {
             ulong guildId = (metadata.Author as SocketGuildUser).Guild.Id;
-            ulong userId = metadata.AuthorID;
+            ulong userId = metadata.AuthorId;
             if (Consent.TryAssertConsent(guildId, userId))
             {
                 Consent.SetConsent(guildId, userId, false);
@@ -96,9 +96,9 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
         }
 
         [Overload(typeof(void), "Request a JSON file containing any data linked to your Discord ID in this server.")]
-        public async Task<Result> Execute(CommandMetadata metadata)
+        public async Task<Result> Execute(ICommandMetadata metadata)
         {
-            JObject data = ParentPlugin.GuildHandler.Plugins.RequestUserData(metadata.AuthorID);
+            JObject data = ParentPlugin.GuildHandler.Plugins.RequestUserData(metadata.AuthorId);
             MemoryStream stream = new MemoryStream();
 
             using (TextWriter writer = new StreamWriter(stream))
@@ -112,7 +112,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
                 try
                 {
                     var dm = await metadata.Author.CreateDMChannelAsync();
-                    await dm.SendFileAsync(stream, metadata.AuthorID.ToString(CultureInfo.InvariantCulture) + ".json", "Your personal data, as requested. You may delete all of this using the `!deletedata` command in the same server as you requested the data. If we share multiple servers, you must do this for each server. The file may be opened as a text file in something like Notepad. Additionally, a website like http://jsonviewer.stack.hu/ may make reading it easier.");
+                    await dm.SendFileAsync(stream, metadata.AuthorId.ToString(CultureInfo.InvariantCulture) + ".json", "Your personal data, as requested. You may delete all of this using the `!deletedata` command in the same server as you requested the data. If we share multiple servers, you must do this for each server. The file may be opened as a text file in something like Notepad. Additionally, a website like http://jsonviewer.stack.hu/ may make reading it easier.");
                 }
                 catch (HttpException)
                 {
@@ -134,12 +134,12 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
         }
 
         [Overload (typeof (void), "Delete any permanently stored plugin data that is linked to your Discord ID in this server.")]
-        public Task<Result> Execute (CommandMetadata metadata)
+        public Task<Result> Execute (ICommandMetadata metadata)
         {
             QuestionMessage message = new QuestionMessage("Are you sure you wish to delete personal data? This is a permanent action and cannot be undone.", async () => { 
-                ParentPlugin.GuildHandler.Plugins.DeleteUserData(metadata.AuthorID);
-                await metadata.Message.Channel.SendMessageAsync ("Stored data linked to your ID has succesfully been deleted. Keep in mind some plugins may require to keep track of your ID to function, so they may immidiately store your ID again.");
-                }, async () => await metadata.Message.Channel.SendMessageAsync ("Data deletion cancelled."));
+                ParentPlugin.GuildHandler.Plugins.DeleteUserData(metadata.AuthorId);
+                await metadata.Channel.SendMessageAsync ("Stored data linked to your ID has succesfully been deleted. Keep in mind some plugins may require to keep track of your ID to function, so they may immidiately store your ID again.");
+                }, async () => await metadata.Channel.SendMessageAsync ("Data deletion cancelled."));
             return TaskResult(message, string.Empty);
         }
     }

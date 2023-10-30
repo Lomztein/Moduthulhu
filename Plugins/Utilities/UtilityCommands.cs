@@ -20,13 +20,13 @@ namespace Lomztein.Moduthulhu.Plugins.Standard.Utilities
         }
 
         [Overload (typeof (int), "Roll a six sided die and get the result.")]
-        public Task<Result> Execute (CommandMetadata metadata)
+        public Task<Result> Execute (ICommandMetadata metadata)
         {
             return Execute(metadata, 6);
         }
 
         [Overload (typeof (int), "Roll an n-sided die and get the result.")]
-        public Task<Result> Execute (CommandMetadata _, int sides)
+        public Task<Result> Execute (ICommandMetadata _, int sides)
         {
             Random random = new Random();
             int value = random.Next(1, sides + 1);
@@ -45,7 +45,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard.Utilities
         }
 
         [Overload (typeof (int), "Flip a coin and recieve either Heads or Tails!")]
-        public Task<Result> Execute (CommandMetadata _)
+        public Task<Result> Execute (ICommandMetadata _)
         {
             string result = new Random().Next(0, 2) == 0 ? "Heads" : "Tails";
             return TaskResult(result, $"The coin landed on {result}!");
@@ -70,7 +70,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard.Utilities
         }
 
         [Overload (typeof (string), "Embolden the given piece of text.")]
-        public Task<Result> Execute(CommandMetadata _, string input)
+        public Task<Result> Execute(ICommandMetadata _, string input)
         {
             StringBuilder outText = new StringBuilder ();
 
@@ -156,9 +156,9 @@ namespace Lomztein.Moduthulhu.Plugins.Standard.Utilities
         }
 
         [Overload (typeof (string), "Witness the true power of the moist side.")]
-        public Task<Result> Execute (CommandMetadata metadata)
+        public Task<Result> Execute (ICommandMetadata metadata)
         {
-            metadata.Message.Channel.SendFileAsync(BotCore.ResourcesDirectory + "/fizzfyr.jpg", "Looking for this sexy stud?");
+            metadata.Channel.SendFileAsync(BotCore.ResourcesDirectory + "/fizzfyr.jpg", "Looking for this sexy stud?");
             return TaskResult("I'm so sorry you had to witness this.", null);
         }
     }
@@ -173,7 +173,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard.Utilities
         }
 
         [Overload (typeof (int), "Ping the bot. Returns ping time in milliseconds.")]
-        public Task<Result> Execute (CommandMetadata _)
+        public Task<Result> Execute (ICommandMetadata _)
         {
             return TaskResult(ParentPlugin.GuildHandler.Shard.Client.Latency, "Pong!");
         }
@@ -203,7 +203,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard.Utilities
         private readonly Regex insertW = new Regex("(?: [BDFGLMPQRSTVXZ][AEIOU])");
 
         [Overload(typeof(string), "Implementation based heavily on the [OWOifier by @Black_is_Black](https://repl.it/@Black_is_Back/OWOifier#index.js).")]
-        public Task<Result> Execute(CommandMetadata metadata, string input)
+        public Task<Result> Execute(ICommandMetadata metadata, string input)
         {
             input = _tow.Replace(input, "w");
             input = _toW.Replace(input, "W");

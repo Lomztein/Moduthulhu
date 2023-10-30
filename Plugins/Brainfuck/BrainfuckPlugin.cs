@@ -59,8 +59,8 @@ namespace Lomztein.ModularDiscordBot.Modules.Misc.Brainfuck
             }
 
             [Overload (typeof (string), "Brainfuck.")]
-            public async Task<Result> Execute (CommandMetadata metadata, string program) {
-                string result = await ParentPlugin.Run (program, metadata.Message.Channel.Id);
+            public async Task<Result> Execute (ICommandMetadata metadata, string program) {
+                string result = await ParentPlugin.Run (program, metadata.Channel.Id);
                 return new Result (result, result);
             }
 

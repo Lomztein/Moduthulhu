@@ -163,7 +163,7 @@ namespace Lomztein.Moduthulhu.Plugins.WikiMediaFetcher
             }
 
             [Overload(typeof(Embed), "Query this wiki for a particular page.")]
-            public async Task<Result> Execute (CommandMetadata metadata, string query)
+            public async Task<Result> Execute (ICommandMetadata metadata, string query)
             {
                 JObject result = await ParentPlugin.QueryAsync(SourceUrl, query);
                 Embed embed = ParentPlugin.BuildPageEmbed(result);

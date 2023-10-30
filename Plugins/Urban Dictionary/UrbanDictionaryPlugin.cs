@@ -264,12 +264,12 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
         }
 
         [Overload (typeof (Embed), "Fetch the definition of a given word from Urban Dictionary.")]
-        public async Task<Result> Execute(CommandMetadata data, string word)
+        public async Task<Result> Execute(ICommandMetadata data, string word)
         {
             var def = await UrbanDefinition.Get(word, ParentPlugin.EnableHyperlinkReactions);
             Embed embed = def.ToEmbed ();
 
-            var message = await data.Message.Channel.SendMessageAsync(null, false, embed);
+            var message = await data.Channel.SendMessageAsync(null, false, embed);
             await ParentPlugin.AddNestedDefReactions(def, message);
 
             return new Result(null, string.Empty);

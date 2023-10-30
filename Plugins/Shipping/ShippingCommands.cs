@@ -37,8 +37,8 @@ namespace Lomztein.Moduthulhu.Modules.Shipping {
             }
 
             [Overload (typeof (bool), "Ship two people so that they'll be together forever, at least in your headcanon.")]
-            public Task<Result> Execute(CommandMetadata data, SocketGuildUser shippieOne, SocketGuildUser shippieTwo) {
-                var succesful = ParentPlugin.Ship (data.AuthorID, shippieOne.Id, shippieTwo.Id);
+            public Task<Result> Execute(ICommandMetadata data, SocketGuildUser shippieOne, SocketGuildUser shippieTwo) {
+                var succesful = ParentPlugin.Ship (data.AuthorId, shippieOne.Id, shippieTwo.Id);
                 if (succesful) {
                     return TaskResult (succesful, "Succesfully shipped " + shippieOne.GetShownName () + " and " + shippieTwo.GetShownName () + ", now known as " + ParentPlugin.GetShipName (ParentPlugin.GetShipByShippies (shippieOne.Id, shippieTwo.Id)) + ".");
                 }
@@ -46,19 +46,19 @@ namespace Lomztein.Moduthulhu.Modules.Shipping {
             }
 
             [Overload(typeof(bool), "Ship two people so that they'll be together forever, at least in your headcanon.")]
-            public Task<Result> Execute(CommandMetadata data, string shippieOne, string shippieTwo)
+            public Task<Result> Execute(ICommandMetadata data, string shippieOne, string shippieTwo)
             {
                 return Execute(data, ParentPlugin.GuildHandler.GetUser(shippieOne), ParentPlugin.GuildHandler.GetUser(shippieTwo));
             }
 
             [Overload (typeof (Ship), "Ship two people so that they'll be together forever, with a given custom name.")]
-            public Task<Result> Execute(CommandMetadata data, SocketGuildUser shippieOne, SocketGuildUser shippieTwo, string name) {
+            public Task<Result> Execute(ICommandMetadata data, SocketGuildUser shippieOne, SocketGuildUser shippieTwo, string name) {
                 ParentPlugin.NameShip (shippieOne.Id, shippieTwo.Id, name);
                 return Execute (data, shippieOne, shippieTwo);
             }
 
             [Overload(typeof(bool), "Ship two people so that they'll be together forever, with a given custom name.")]
-            public Task<Result> Execute(CommandMetadata data, string shippieOne, string shippieTwo, string name)
+            public Task<Result> Execute(ICommandMetadata data, string shippieOne, string shippieTwo, string name)
             {
                 return Execute(data, ParentPlugin.GuildHandler.GetUser(shippieOne), ParentPlugin.GuildHandler.GetUser(shippieTwo), name);
             }
@@ -74,8 +74,8 @@ namespace Lomztein.Moduthulhu.Modules.Shipping {
             }
 
             [Overload (typeof (bool), "Sink one of your ships, in case the imaginative spark is gone.")]
-            public Task<Result> Execute(CommandMetadata data, SocketGuildUser shippieOne, SocketGuildUser shippieTwo) {
-                var succesful = ParentPlugin.Sink (data.AuthorID, shippieOne.Id, shippieTwo.Id);
+            public Task<Result> Execute(ICommandMetadata data, SocketGuildUser shippieOne, SocketGuildUser shippieTwo) {
+                var succesful = ParentPlugin.Sink (data.AuthorId, shippieOne.Id, shippieTwo.Id);
                 if (succesful) {
                     return TaskResult (true, "Succesfully sunk " + ParentPlugin.GetShipName (ParentPlugin.GetShipByShippies (shippieOne.Id, shippieTwo.Id)) + ", at least for you.");
                 }
@@ -83,7 +83,7 @@ namespace Lomztein.Moduthulhu.Modules.Shipping {
             }
 
             [Overload(typeof(bool), "Sink one of your ships, in case the imaginative spark is gone.")]
-            public Task<Result> Execute(CommandMetadata data, string shippieOne, string shippieTwo)
+            public Task<Result> Execute(ICommandMetadata data, string shippieOne, string shippieTwo)
             {
                 return Execute(data, ParentPlugin.GuildHandler.GetUser(shippieOne), ParentPlugin.GuildHandler.GetUser(shippieTwo));
             }
@@ -98,26 +98,26 @@ namespace Lomztein.Moduthulhu.Modules.Shipping {
             }
 
             [Overload (typeof (void), "Name a ship something better than the shitty automatic name generator did.")]
-            public Task<Result> Execute(CommandMetadata data, SocketGuildUser shippieOne, SocketGuildUser shippieTwo, string name) {
+            public Task<Result> Execute(ICommandMetadata data, SocketGuildUser shippieOne, SocketGuildUser shippieTwo, string name) {
                 ParentPlugin.NameShip (shippieOne.Id, shippieTwo.Id, name);
                 return TaskResult (null, $"{shippieOne.GetShownName ()} x {shippieTwo.GetShownName ()} has now been named {name}");
             }
 
             [Overload(typeof(bool), "Name a ship something better than the shitty automatic name generator did.")]
-            public Task<Result> Execute(CommandMetadata data, string shippieOne, string shippieTwo, string name)
+            public Task<Result> Execute(ICommandMetadata data, string shippieOne, string shippieTwo, string name)
             {
                 return Execute(data, ParentPlugin.GuildHandler.GetUser(shippieOne), ParentPlugin.GuildHandler.GetUser(shippieTwo), name);
             }
 
             [Overload (typeof (void), "Reset a ship name back to the automatically generated one.")]
-            public Task<Result> Execute(CommandMetadata data, SocketGuildUser shippieOne, SocketGuildUser shippieTwo) {
+            public Task<Result> Execute(ICommandMetadata data, SocketGuildUser shippieOne, SocketGuildUser shippieTwo) {
                 ParentPlugin.DeleteShipName (shippieOne.Id, shippieTwo.Id);
                 Shipping.Ship ship = ParentPlugin.GetShipByShippies (shippieOne.Id, shippieTwo.Id);
                 return TaskResult (null, $"{shippieOne.GetShownName ()} x {shippieTwo.GetShownName ()} has been named back to {ParentPlugin.GetShipName (ship)}.");
             }
 
             [Overload(typeof(bool), "Reset a ship name back to the automatically generated one.")]
-            public Task<Result> Execute(CommandMetadata data, string shippieOne, string shippieTwo)
+            public Task<Result> Execute(ICommandMetadata data, string shippieOne, string shippieTwo)
             {
                 return Execute(data, ParentPlugin.GuildHandler.GetUser(shippieOne), ParentPlugin.GuildHandler.GetUser(shippieTwo));
             }
@@ -133,12 +133,12 @@ namespace Lomztein.Moduthulhu.Modules.Shipping {
             }
 
             [Overload (typeof (Embed), "List every single ship that you yourself is a part of.")]
-            public Task<Result> Execute(CommandMetadata data) {
-                return Execute (data, data.Message.Author as SocketGuildUser);
+            public Task<Result> Execute(ICommandMetadata data) {
+                return Execute (data, data.Author as SocketGuildUser);
             }
 
             [Overload (typeof (Embed), "List every single ship that the given person is a part of.")]
-            public Task<Result> Execute(CommandMetadata data, SocketGuildUser user) {
+            public Task<Result> Execute(ICommandMetadata data, SocketGuildUser user) {
                 var ships = ParentPlugin.GetShippieShips (user.Id);
                 var catagorized = ships.GroupBy (x => x.GetCompanionTo (user.Id));
 
@@ -169,10 +169,10 @@ namespace Lomztein.Moduthulhu.Modules.Shipping {
             }
 
             [Overload (typeof (string), "Show every single ship that you yourself has shipped.")]
-            public Task<Result> Execute(CommandMetadata data) => Execute (data, data.Message.Author as SocketGuildUser);
+            public Task<Result> Execute(ICommandMetadata data) => Execute (data, data.Author as SocketGuildUser);
 
             [Overload (typeof (string), "Show every single ship the given person has shipped.")]
-            public Task<Result> Execute(CommandMetadata data, SocketGuildUser user) {
+            public Task<Result> Execute(ICommandMetadata data, SocketGuildUser user) {
                 var allShips = ParentPlugin.GetAllShipperShips (user);
                 StringBuilder result = new StringBuilder ($"{user.GetShownName ()} has shipped the following ships:```\n");
                 foreach (Shipping.Ship ship in allShips) {
@@ -192,12 +192,12 @@ namespace Lomztein.Moduthulhu.Modules.Shipping {
             }
 
             [Overload (typeof (Embed), "Show a leaderboard of most shipped ships, sorted by most shipped.")]
-            public Task<Result> Execute(CommandMetadata data) {
-                var leaderboard = ParentPlugin.GetShipLeaderboard (data.Message.GetGuild ());
+            public Task<Result> Execute(ICommandMetadata data) {
+                var leaderboard = ParentPlugin.GetShipLeaderboard (data.Guild as SocketGuild);
 
                 EmbedBuilder builder = new EmbedBuilder ().
                     WithAuthor (ParentPlugin.GuildHandler.BotUser).
-                    WithTitle ("All ships on " + data.Message.GetGuild ().Name + ".");
+                    WithTitle ("All ships on " + data.Guild.Name + ".");
 
                 List<EmbedFieldBuilder> embedFields = new List<EmbedFieldBuilder>();
                 foreach (var pair in leaderboard)

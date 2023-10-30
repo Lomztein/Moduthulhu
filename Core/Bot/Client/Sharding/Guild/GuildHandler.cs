@@ -221,6 +221,9 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
         internal async Task OnUserVoiceStateUpdated(SocketUser user, SocketVoiceState before, SocketVoiceState after) => await (UserVoiceStateUpdated?.Invoke(user, before, after) ?? Task.CompletedTask);
         public event Func<SocketUser, SocketVoiceState, SocketVoiceState, Task> UserVoiceStateUpdated;
 
+        internal async Task OnSlashCommandExecuted(SocketSlashCommand command) => await (SlashCommandExecuted?.Invoke(command) ?? Task.CompletedTask);
+        public event Func<SocketSlashCommand, Task> SlashCommandExecuted;
+
 
         // ROUTED DISCORD EVENTS //
         #endregion
@@ -318,5 +321,6 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding.Guild
                 throw new MissingPermissionException($"Bot does not have channel {nameof (permission)} '{permission} in channel '{channel.Name}'");
             }
         }
+
     }
 }

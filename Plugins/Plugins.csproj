@@ -11,6 +11,7 @@
     <OldToolsVersion>2.0</OldToolsVersion>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="Lomztein.Advanced-Discord-Commands" Version="1.4.0" />
     <PackageReference Include="OpenCover" Version="4.7.1221" />
   </ItemGroup>
   <ItemGroup>

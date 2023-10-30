@@ -45,20 +45,20 @@ namespace Lomztein.Moduthulhu.Plugins.Karma.Commands
             }
 
             [Overload(typeof(int), "Returns your own karma.")]
-            public async Task<Result> Execute(CommandMetadata data)
+            public async Task<Result> Execute(ICommandMetadata data)
             {
-                return await Execute(data, data.Message.Author);
+                return await Execute(data, data.Author);
             }
 
             [Overload(typeof(int), "Returns karma of a given user.")]
-            public async Task<Result> Execute(CommandMetadata data, IUser user)
+            public async Task<Result> Execute(ICommandMetadata data, IUser user)
             {
                 var karma = ParentPlugin.GetKarma(user.Id);
                 return new Result(await GetKarmaEmbed(karma, user.GetShownName(), 3, ParentPlugin.GuildHandler), string.Empty);
             }
 
             [Overload(typeof(int), "Returns karma of a given user.")]
-            public async Task<Result> Execute(CommandMetadata data, string username)
+            public async Task<Result> Execute(ICommandMetadata data, string username)
             {
                 IUser user = ParentPlugin.GuildHandler.GetUser(username);
                 var karma = ParentPlugin.GetKarma(user.Id);
@@ -66,14 +66,14 @@ namespace Lomztein.Moduthulhu.Plugins.Karma.Commands
             }
 
             [Overload(typeof(int), "Returns karma of a given user.")]
-            public async Task<Result> Execute(CommandMetadata data, ulong userId)
+            public async Task<Result> Execute(ICommandMetadata data, ulong userId)
             {
                 var karma = ParentPlugin.GetKarma(userId);
                 return new Result(await GetKarmaEmbed(karma, ParentPlugin.GuildHandler.GetUser (userId).GetShownName(), 3, ParentPlugin.GuildHandler), string.Empty);
             }
 
             [Overload(typeof(SocketGuildUser[]), "Returns top <n> karma whores.")]
-            public Task<Result> Execute(CommandMetadata data, int amount)
+            public Task<Result> Execute(ICommandMetadata data, int amount)
             {
                 var allKarma = ParentPlugin.GetLeaderboard();
                 return TaskResult (GetLeaderboardEmbed(allKarma, (x, y) => y.Total - x.Total, x => ParentPlugin.GuildHandler.FindUser (x.UserId),
@@ -164,7 +164,7 @@ namespace Lomztein.Moduthulhu.Plugins.Karma.Commands
             }
 
             [Overload(typeof(SocketGuildUser[]), "Returns top karma leaderboard.")]
-            public Task<Result> Execute(CommandMetadata data)
+            public Task<Result> Execute(ICommandMetadata data)
             {
                 var allKarma = ParentPlugin.GetLeaderboard();
                 return TaskResult(GetLeaderboardEmbed(allKarma, (x, y) => y.Total - x.Total, x => ParentPlugin.GuildHandler.FindUser(x.UserId),
@@ -173,7 +173,7 @@ namespace Lomztein.Moduthulhu.Plugins.Karma.Commands
             }
 
             [Overload(typeof(SocketGuildUser[]), "Returns top <n> karma whores.")]
-            public Task<Result> Execute(CommandMetadata data, int amount)
+            public Task<Result> Execute(ICommandMetadata data, int amount)
             {
                 var allKarma = ParentPlugin.GetLeaderboard();
                 return TaskResult(GetLeaderboardEmbed(allKarma, (x, y) => y.Total - x.Total, x => ParentPlugin.GuildHandler.FindUser(x.UserId),
@@ -204,7 +204,7 @@ namespace Lomztein.Moduthulhu.Plugins.Karma.Commands
             private string _voteType;
 
             [Overload(typeof(LargeEmbed), "Display top voters.")]
-            public Task<Result> Execute(CommandMetadata data)
+            public Task<Result> Execute(ICommandMetadata data)
             {
                 var allKarma = ParentPlugin.GetLeaderboard();
                 var allVotes = allKarma.SelectMany(x => x.GetMessages()).SelectMany (x => _voteSelector (x));
@@ -228,13 +228,13 @@ namespace Lomztein.Moduthulhu.Plugins.Karma.Commands
             }
 
             [Overload (typeof (Embed), "Show all who downvoted / upvoted a specific message in the current channel.")]
-            public Task<Result> Execute (CommandMetadata data, ulong id)
+            public Task<Result> Execute (ICommandMetadata data, ulong id)
             {
-                return Execute(data, data.Message.Channel.Id, id);
+                return Execute(data, data.ChannelId.Value, id);
             }
 
             [Overload (typeof (Embed), "Show all who downvoted / upvoted a specific message given by channel and message ID.")]
-            public async Task<Result> Execute (CommandMetadata data, ulong channelId, ulong messageId)
+            public async Task<Result> Execute (ICommandMetadata data, ulong channelId, ulong messageId)
             {
                 ITextChannel channel = ParentPlugin.GuildHandler.FindTextChannel(channelId);
                 IMessage message = await channel?.GetMessageAsync(messageId);
@@ -273,7 +273,7 @@ namespace Lomztein.Moduthulhu.Plugins.Karma.Commands
 
             }
             [Overload(typeof (Embed), "Show all who downvoted / upvoted a specific message given by URL.")]
-            public Task<Result> Execute (CommandMetadata data, string messageUrl)
+            public Task<Result> Execute (ICommandMetadata data, string messageUrl)
             {
                 (ulong channelId, ulong messageId) = messageUrl.ParseMessageUrl();
                 return Execute(data, channelId, messageId);

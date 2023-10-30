@@ -49,7 +49,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
             }
 
             [Overload(typeof(Embed), "Add a new plugin from the list of available plugins.")]
-            public async Task<Result> Execute(CommandMetadata metadata, string pluginName)
+            public async Task<Result> Execute(ICommandMetadata metadata, string pluginName)
             {
                 Type plugin = PluginLoader.GetPlugin(pluginName);
                 if (plugin != null)
@@ -63,15 +63,15 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
                             if (ParentPlugin.GuildHandler.Plugins.IsPluginActive(pluginName))
                             {
                                 var state = ParentPlugin.GuildHandler.State;
-                                await metadata.Message.Channel.SendMessageAsync(string.Empty, false, state.ChangesToEmbed ($"Succesfully enabled plugin '{name}' on this server."));
+                                await metadata.Channel.SendMessageAsync(string.Empty, false, state.ChangesToEmbed ($"Succesfully enabled plugin '{name}' on this server."));
                             }
                             else
                             {
                                 IEnumerable<string> exceptions = ParentPlugin.GuildHandler.Plugins.GetInitializationExceptions().Select(x => x.InnerException.Message);
-                                await metadata.Message.Channel.SendMessageAsync($"Failed to add plugin '{name}'. Issues occured during initialization:\n\t{string.Join("\n\t", exceptions)}");
+                                await metadata.Channel.SendMessageAsync($"Failed to add plugin '{name}'. Issues occured during initialization:\n\t{string.Join("\n\t", exceptions)}");
                             }
-                        }, async () => await metadata.Message.Channel.SendMessageAsync($"Cancelled enabled plugin '{name}'.")).SetRecipient (metadata.AuthorID);
-                        await metadata.Message.Channel.SendMessageAsync(null, false, GetModuleEmbed(PluginLoader.GetPlugin(pluginName)));
+                        }, async () => await metadata.Channel.SendMessageAsync($"Cancelled enabled plugin '{name}'.")).SetRecipient (metadata.AuthorId);
+                        await metadata.Channel.SendMessageAsync(null, false, GetModuleEmbed(PluginLoader.GetPlugin(pluginName)));
                         return new Result (question, string.Empty);
                     }
                     else
@@ -101,7 +101,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
             }
 
             [Overload(typeof(Embed), "Remove a plugin from currently active plugins.")]
-            public Task<Result> Execute(CommandMetadata _, string pluginName)
+            public Task<Result> Execute(ICommandMetadata _, string pluginName)
             {
                 ParentPlugin.RemovePlugin(pluginName);
                 var state = ParentPlugin.GuildHandler.State;
@@ -120,7 +120,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
             }
 
             [Overload(typeof(Embed), "Display all currently active plugins on this server.")]
-            public Task<Result> Execute(CommandMetadata metadata)
+            public Task<Result> Execute(ICommandMetadata metadata)
             {
                 return TaskResult(GetModuleListEmbed(ParentPlugin.GetActivePlugins ().Select(x => x.GetType()), "All active plugins.", "A list of all currently active plugins on this server."), null);
             }
@@ -136,7 +136,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
             }
 
             [Overload(typeof(Embed), "Display all available plugins.")]
-            public Task<Result> Execute(CommandMetadata metadata)
+            public Task<Result> Execute(ICommandMetadata metadata)
             {
                 return TaskResult(GetModuleListEmbed(PluginManagerPlugin.GetAvailablePlugins().Where (x => !ParentPlugin.GetActivePlugins ().Any (y => y.GetType () == x)), "All available plugins.", "A list of all currently available, but not enabled plugins on this server."), null);
             }
@@ -152,7 +152,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
             }
 
             [Overload(typeof(Embed), "Display all plugins.")]
-            public Task<Result> Execute(CommandMetadata metadata)
+            public Task<Result> Execute(ICommandMetadata metadata)
             {
                 return TaskResult(GetModuleListEmbed(PluginManagerPlugin.GetAvailablePlugins(), "All available plugins.", "A list of all currently available."), null);
             }
@@ -168,7 +168,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard
             }
 
             [Overload(typeof(Embed), "Display information about a specific plugin.")]
-            public Task<Result> Execute(CommandMetadata metadata, string pluginName)
+            public Task<Result> Execute(ICommandMetadata metadata, string pluginName)
             {
                 Type pluginType = Plugin.Find(PluginLoader.GetPlugins (), pluginName);
                 if (pluginType != null)

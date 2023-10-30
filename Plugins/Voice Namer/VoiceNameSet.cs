@@ -31,8 +31,8 @@ namespace Lomztein.Moduthulhu.Modules.Voice.Commands
             }
 
             [Overload (typeof (void), "Reset a custom channel name.")]
-            public async Task<Result> Execute (CommandMetadata data) {
-                SocketGuildUser user = data.Message.Author as SocketGuildUser;
+            public async Task<Result> Execute (ICommandMetadata data) {
+                SocketGuildUser user = data.Author as SocketGuildUser;
                 if (user.VoiceChannel != null) {
                     await ParentPlugin.ResetCustomName (user.VoiceChannel);
                     return new Result (null, "Succesfully reset custom voice channel name.");
@@ -41,8 +41,8 @@ namespace Lomztein.Moduthulhu.Modules.Voice.Commands
             }
 
             [Overload (typeof (void), "Set a custom channel name.")]
-            public async Task<Result> Execute(CommandMetadata data, string name) {
-                SocketGuildUser user = data.Message.Author as SocketGuildUser;
+            public async Task<Result> Execute(ICommandMetadata data, string name) {
+                SocketGuildUser user = data.Author as SocketGuildUser;
                 if (user.VoiceChannel != null) {
                     await ParentPlugin.SetCustomName (user.VoiceChannel, name);
                     return new Result(null, $"Succesfully set custom voice channel name to {name}.");
