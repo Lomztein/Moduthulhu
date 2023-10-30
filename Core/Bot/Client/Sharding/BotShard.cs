@@ -35,6 +35,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding
         public event Func<Exception, Task> ExceptionCaught;
 
         private static ulong _uniqueShardIdCounter;
+        public bool Ready { get; private set; }
 
         internal BotShard(BotClient parentManager, string token, int shardId, int totalShards) {
             BotClient = parentManager;
@@ -122,6 +123,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding
 
         private async Task Client_Disconnected(Exception arg)
         {
+            Ready = false;
             Log.Warning($"Shard {ShardId} disconnected.");
             Log.Exception(arg);
             OnExceptionCaught(arg);
@@ -180,6 +182,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding
         }
 
         private Task Client_Ready() {
+            Ready = true;
             Log.Write (Log.Type.BOT, $"Shard {ShardId} is ready!");
             return Task.CompletedTask;
         }
@@ -313,7 +316,7 @@ namespace Lomztein.Moduthulhu.Core.Bot.Client.Sharding
 
         // Status related stuff
         public async Task AwaitConnected () {
-            while (!IsConnected) {
+            while (!IsConnected || !Ready) {
                 await Task.Delay (1000);
             }
         }

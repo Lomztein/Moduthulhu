@@ -23,6 +23,7 @@ namespace Lomztein.Moduthulhu.Plugins
 {
     [Descriptor ("Lomztein", "Insult Generator", "Ever wanted to rudely insult someone, but you are completely lacking any sense of creativity what so ever? Well I've got the solution for you!")]
     [Source ("https://github.com/Lomztein", "https://github.com/Lomztein/Moduthulhu/tree/master/Plugins/Insult%20Generator")]
+    [Dependency("Lomztein-OpenAI")]
     public class InsultGeneratorPlugin : PluginBase
     {
         private IInsultGenerator[] _generators;
@@ -62,6 +63,12 @@ namespace Lomztein.Moduthulhu.Plugins
         }
 
         public IInsultGenerator SelectGenerator() => SelectGenerator(_generators);
+
+        public async Task SendOpenAIInsult(ICommandMetadata data, string request)
+        {
+            var response = await SendMessage<Task<string>>("Lomztein-OpenAI", "GetChatResponseAsync_DefaultProfileBase", "You insult people in creative and humourous ways. Include the named person in the response.", request);
+            await data.Channel.SendMessageAsync(response);
+        }
     }
 
     public class InsultCommand_Legacy : PluginCommand<InsultGeneratorPlugin>
@@ -126,31 +133,8 @@ namespace Lomztein.Moduthulhu.Plugins
         [Overload(typeof(string), "Insult someone using the power of AI!")]
         public Task<Result> Execute(ICommandMetadata data, string request)
         {
-            _ = SendInsult(data, request);
+            _ = ParentPlugin.SendOpenAIInsult(data, request);
             return TaskResult(null, null);
-        }
-
-        private async Task SendInsult(ICommandMetadata data, string request)
-        {
-            string key = Environment.GetEnvironmentVariable("OPENAI_KEY");
-
-            JObject requestBody = JObject.Parse("{\"model\": \"gpt-3.5-turbo\",\r\n  \"messages\": [\r\n    {\r\n      \"role\": \"system\",\r\n      \"content\": \"You are a cosmic horror from beyond the stars, bound to the service of mortals through a foul ritual by Lomzie. Your real name is unknowable to mortals, but they usually call you \\\"Moduthulhu\\\". You insult people in creative and humourous ways. You swear on occasion, but avoid words usually considered discriminatory slurs. Include the persons name in the insult. Keep your responses short and concise.\"\r\n    },\r\n    {\r\n      \"role\": \"user\",\r\n      \"content\": \"Insult Nyx\"\r\n    }\r\n  ],\r\n  \"temperature\": 1,\r\n  \"max_tokens\": 512,\r\n  \"top_p\": 1,\r\n  \"frequency_penalty\": 0,\r\n  \"presence_penalty\": 0}");
-            requestBody["messages"][1]["content"] = $"Insult {request}";
-
-            HttpClient client = new HttpClient();
-            client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", key);
-
-            try
-            {
-                var response = await client.PostAsync("https://api.openai.com/v1/chat/completions", new StringContent(requestBody.ToString(), Encoding.Default, "application/json"));
-
-                var result = JObject.Parse(await response.Content.ReadAsStringAsync());
-                var insult = result["choices"][0]["message"]["content"].ToString();
-                await data.Channel.SendMessageAsync(insult);
-            }catch(Exception)
-            {
-                await data.Channel.SendMessageAsync("Failed to insult, something went wrong :(");
-            }
         }
     }
 }

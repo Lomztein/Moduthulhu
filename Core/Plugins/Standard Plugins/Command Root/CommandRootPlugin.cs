@@ -105,6 +105,8 @@ namespace Lomztein.Moduthulhu.Plugins.Standard {
             TypeDescriptions.Add(typeof(BookMessage), "Book", "Specialized [Discord.IMessage] that allows for flipping between 'pages', like in a book.");
             TypeDescriptions.Add(typeof(LargeTextMessage), "Large Message", "Specialized [Discord.IMessage] that automatically splits into multiple [Discord.IMessage]s if a required to fit.");
             TypeDescriptions.Add(typeof(uint), "Positive Integer", "An integer number that may only be positive.");
+
+            UpdateSlashCommands().Wait();
         }
 
         private async Task OnMessageRecieved(SocketMessage arg) {
@@ -173,13 +175,41 @@ namespace Lomztein.Moduthulhu.Plugins.Standard {
             return ((ICommandSet)_commandRoot).GetCommands ();
         }
 
+        private async Task UpdateSlashCommands()
+        {
+            var currentSlash = await GuildHandler.GetGuild().GetApplicationCommandsAsync();
+            var currentCommands = GetCommands();
+
+            var toRemove = new List<SocketApplicationCommand>();
+            var toAdd = new List<ICommand>();
+
+            foreach (var slash in currentSlash)
+            {
+                if (!currentCommands.Any(x => x.Name == slash.Name))
+                    toRemove.Add(slash);
+            }
+
+            foreach (var cmd in currentCommands)
+            {
+                if (!currentSlash.Any(x => x.Name == cmd.Name))
+                    toAdd.Add(cmd);
+            }
+
+            if (toAdd.Count > 0) Log($"Detected {toAdd.Count} new slash commands to add to guild.");
+            if (toRemove.Count > 0) Log($"Detected {toAdd.Count} slash commands to remove from guild.");
+
+            foreach (var slash in toRemove)
+                RemoveSlashCommand(slash);
+            foreach (var cmd in toAdd)
+                AddSlashCommand(cmd);
+        }
+
         public void AddCommands(params ICommand [ ] newCommands) {
             Log ($"Adding commands: {string.Join (", ", newCommands.Select (x => x.Name).ToArray ())}");
             
             foreach (ICommand cmd in newCommands)
             {
                 AddStateAttribute("Commands", cmd.Name, _commandRoot.GetChildPrefix (GuildHandler.GuildId) + cmd.Name);
-                AddSlashCommand(cmd);
             }
 
             ((ICommandSet)_commandRoot).AddCommands (newCommands);
@@ -188,33 +218,30 @@ namespace Lomztein.Moduthulhu.Plugins.Standard {
 
         private async void AddSlashCommand(ICommand cmd)
         {
-            RequestOptions options = new RequestOptions()
-            {
-                RatelimitCallback = new Func<IRateLimitInfo, Task>(x => SlashRateLimitCallback(x, cmd)),
-                RetryMode = RetryMode.AlwaysRetry
-            };
             try
             {
-                await GuildHandler.GetGuild().CreateApplicationCommandAsync(cmd.ToSlashCommand(), options);
+                await GuildHandler.GetGuild().CreateApplicationCommandAsync(cmd.ToSlashCommand(), new RequestOptions() { RetryMode = RetryMode.AlwaysFail });
                 Log($"Slash command '{cmd.Name}' succesfully added.");
             }catch(TimeoutException exc)
             {
-                Core.Log.Warning($"Slash command '{cmd.Name}' timed out: {exc.Message}");
+                _ = OnSlashAddFail(30f, cmd);
+                Core.Log.Warning($"Slash command '{cmd.Name}' failed out: {exc.Message}");
             }catch(Exception exc)
             {
                 Core.Log.Critical($"Something went wrong while adding slash command '{cmd.Name}': {exc.Message} - {exc.StackTrace}");
             }
         }
 
-        private async Task SlashRateLimitCallback(IRateLimitInfo info, ICommand cmd)
+        private async void RemoveSlashCommand(SocketApplicationCommand cmd)
         {
-            if (info.RetryAfter.HasValue)
-            {
-                float retryTime = info.RetryAfter.Value;
-                Core.Log.Warning($"Slash command {cmd.Name} rate limited, waiting {retryTime} seconds, then try adding again..");
-                await Task.Delay((int)(retryTime * 1000f));
-                AddSlashCommand(cmd);
-            }
+            await GuildHandler.GetGuild().DeleteIntegrationAsync(cmd.Id);
+        }
+
+        private async Task OnSlashAddFail(float retryDelay, ICommand cmd)
+        {
+            Core.Log.Warning($"Slash command {cmd.Name} rate limited, waiting {retryDelay} seconds, then try adding again..");
+            await Task.Delay((int)(retryDelay * 1000f));
+            AddSlashCommand(cmd);
         }
 
         public void RemoveCommands(params ICommand [ ] commands) {
