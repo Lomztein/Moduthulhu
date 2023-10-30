@@ -199,7 +199,10 @@ namespace Lomztein.Moduthulhu.Plugins.Standard {
                 Log($"Slash command '{cmd.Name}' succesfully added.");
             }catch(TimeoutException exc)
             {
-                Log($"Slash command '{cmd.Name}' timed out: {exc.Message}");
+                Core.Log.Warning($"Slash command '{cmd.Name}' timed out: {exc.Message}");
+            }catch(Exception exc)
+            {
+                Core.Log.Critical($"Something went wrong while adding slash command '{cmd.Name}': {exc.Message} - {exc.StackTrace}");
             }
         }
 
@@ -208,7 +211,7 @@ namespace Lomztein.Moduthulhu.Plugins.Standard {
             if (info.RetryAfter.HasValue)
             {
                 float retryTime = info.RetryAfter.Value;
-                Log($"Slash command {cmd.Name} rate limited, waiting {retryTime} seconds, then try adding again..");
+                Core.Log.Warning($"Slash command {cmd.Name} rate limited, waiting {retryTime} seconds, then try adding again..");
                 await Task.Delay((int)(retryTime * 1000f));
                 AddSlashCommand(cmd);
             }
