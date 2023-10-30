@@ -234,7 +234,16 @@ namespace Lomztein.Moduthulhu.Plugins.Standard {
 
         private async void RemoveSlashCommand(SocketApplicationCommand cmd)
         {
-            await GuildHandler.GetGuild().DeleteIntegrationAsync(cmd.Id);
+            try
+            {
+                Log($"Attempting to remove slash command '{cmd.Name}'..");
+                await cmd.DeleteAsync();
+                //await GuildHandler.GetGuild().DeleteIntegrationAsync(cmd.Id);
+                Log($"Slash command '{cmd.Name}' succesfully removed");
+            }catch (Exception exc)
+            {
+                Core.Log.Critical($"Failed to remove slash command '{cmd.Name}': {exc.Message} - {exc.StackTrace}");
+            }
         }
 
         private async Task OnSlashAddFail(float retryDelay, ICommand cmd)

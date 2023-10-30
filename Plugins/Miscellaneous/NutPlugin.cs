@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 namespace Lomztein.Moduthulhu.Plugins.Miscellaneous
 {
     [Descriptor("Lomztein", "Nut", "Plugin that allows the bot to nut, but only a certain month a year.")]
+    [Dependency("Lomztein-OpenAI")]
     public class NutPlugin : PluginBase
     {
 
@@ -18,8 +19,11 @@ namespace Lomztein.Moduthulhu.Plugins.Miscellaneous
         private CachedValue<float> _chanceStartPercent;
         private CachedValue<float> _chancePerDayPercent;
         private CachedValue<int> _refractoryPeriod;
+        private CachedValue<int> _attemptCooldown;
         private CachedValue<List<ulong>> _nutters;
-        private bool _canNut = true;
+
+        private bool _onCooldown = false;
+        private bool _recentNut = false;
 
         private static ulong[] _preciousIds = new ulong[] { 249307541648048138 };
         private static ulong[] _noHurtIds = new ulong[] { 249307541648048138 };
@@ -37,12 +41,14 @@ namespace Lomztein.Moduthulhu.Plugins.Miscellaneous
             _chanceStartPercent = GetConfigCache("ChanceStartPercent", x => 10f);
             _chancePerDayPercent = GetConfigCache("ChancePerDayPercent", x => 5f);
             _refractoryPeriod = GetConfigCache("RefractoryPeriod", x => 60 * 60 * 2); // two hours.
+            _attemptCooldown = GetConfigCache("AttemptCooldown", x => 60 * 60 * 2); // two hours.
             _nutters = GetDataCache("Nutters", x => new List<ulong>());
 
             AddConfigInfo<int>("setchancestartday", "", (x) => _chanceStartDay.SetValue(x), (success, x) => $"Start day set to day {x}.", "day");
             AddConfigInfo<float>("setchancestartpercent", "", (x) => _chanceStartPercent.SetValue(x), (success, x) => $"Starting chance after starting day set to {x}%", "chance");
             AddConfigInfo<float>("setchanceperday", "", (x) => _chancePerDayPercent.SetValue(x), (success, x) => $"Chance per day after starting day set to {x}%", "chance per day");
             AddConfigInfo<int>("setrefractoryperiod", "", (x) => _refractoryPeriod.SetValue(x), (success, x) => $"Refractory period set to {x} seconds.", "seconds");
+            AddConfigInfo<int>("setattemptcooldown", "", (x) => _attemptCooldown.SetValue(x), (success, x) => $"Cooldown set to {x} seconds.", "seconds");
 
             GuildHandler.Clock.OnDayPassed += CheckDate;
 
@@ -82,7 +88,7 @@ namespace Lomztein.Moduthulhu.Plugins.Miscellaneous
             }
         }
 
-        public bool TryNut(out string message)
+        public async Task<Tuple<string, bool>> TryNut()
         {
             DateTime now = DateTime.Now;
 
@@ -93,10 +99,9 @@ namespace Lomztein.Moduthulhu.Plugins.Miscellaneous
 
             if (now.Day < startDay)
             {
-                message = FailNutBecauseTooEarly();
-                return false;
+                return new Tuple<string, bool>("Could you stop that, it's not even november yet.", false);
             }
-            else if (_canNut)
+            else if (!_onCooldown)
             {
                 int daysInto = now.Day - startDay;
                 float chance = startChance + chancePerDay * daysInto;
@@ -104,88 +109,44 @@ namespace Lomztein.Moduthulhu.Plugins.Miscellaneous
                 Random random = new Random();
                 if (random.Next(0, 100) < chance)
                 {
-                    message = SucceedNut();
-                    return true;
+                    return new Tuple<string, bool>(await GetSuccessMessage(), true);
                 }
                 else
                 {
-                    message = FailNutBecauseChance();
-                    return false;
+                    return new Tuple<string, bool>(await GetChanceFailMessage(), false);
                 }
             }
             else
             {
-                message = FailNutBecauseCannotNut();
-                return false;
+                if (_recentNut)
+                    return new Tuple<string, bool>(await GetRefractoryPeriodFailMessage(), false);
+                return new Tuple<string, bool>(await GetCooldownFailMessage(), false);
             }
         }
 
-        private void InvokeRefractoryPeriod (int time)
+        private void InvokeCooldownPeriod (int time)
         {
-            _canNut = false;
-            InvokeTimedAction(() => _canNut = true, time);
+            _onCooldown = true;
+            InvokeTimedAction(ResetNut, time);
         }
 
-        public string FailNutBecauseTooEarly ()
+        private void ResetNut()
         {
-            InvokeRefractoryPeriod(_refractoryPeriod.GetValue());
-            return RandomMessage(
-                "It is much too early for me to nut, you must try again later this month.",
-                "You cannot begin to hope I should nut this early. Unlike you mortals, I can control myself.",
-                "Do you even think I'd nut this early? I am not like you.",
-                "What makes you believe I would fail already. You may have nutted, but I have no intentions to do so yet.",
-                "You shall not tempt me like this mortal, fear the consequences of doing so.",
-                "How dare you attempt to make me nut. Even if it was time, you most certainly will not be the catalyst.",
-                "Not quite yet I'm afraid. You must speak to y̶̨̹̰̖̥̅̌̏͑ͧ̕͠ỏ̷̖̣̭̪̹͙̻̦̹̿ͧ͑͟͠u̷̧̨̒̒ͮ̅̏͂́҉̫̝̦̰̰͈͈͎̳̼̲͖ͅr̵̛͍̤̭̟̝͎͓̲͖̟̻̈́ͦ̿͛ͩ͌͒̾ ̂ͧ͗ͨ̓ͤͣ̀ͮ̏͟҉͠҉͎̜͔͍͖͍̩̯̣͍̮̖͉̦͙m̴̢̗̬̯͚̪̰̫̙̦͇͈̏̅ͤ̐͒̄ͨ͊́͞o͂ͦͯͭ̅ͧͯ͞͏̮̞͙̪̝̦̞̩̻̪̭̻̯͔͍͕̘̙͇̕͝m̝̙͔̝̞̻̲̻̞̑ͭ̃̇̑͋͒̈̾́͘ to speed up time.",
-                "I care little for how thicc you may be, it is not the time for nuts quite yet.",
-                "Give it time mortal, or you will have no time to give at all."
-                );
+            _onCooldown = false;
+            _recentNut = false;
         }
 
-        public string FailNutBecauseCannotNut ()
-        {
-            return RandomMessage(
-                "You people have already attempted not too long ago, it is futile to attempt already.",
-                "I need some time to recharge here, even cosmic horrs have refractory periods.",
-                "Not quite ready, you impatient speck. If you desire my cosmic spunk, you must wait for it.",
-                "The nut is not ready, calm the calamity, that is your mammaries.",
-                "You have tried too recently, one cannot attempt nutting as often as you desire."
-                );
-        }
+        private async Task<string> GetCooldownFailMessage() =>
+            await SendMessage<Task<string>>("Lomztein-OpenAI", "GetChatResponseAsync_DefaultProfileBase", "You have an assertive, degrading tone. They are attempting to get you to orgasm, but failed because they tried too recently.", "cum.");
 
-        public string FailNutBecauseChance ()
-        {
-            InvokeRefractoryPeriod(_refractoryPeriod.GetValue());
-            return RandomMessage(
-                "**HAH!** You thought you could make me nut. There is no chance for someone like you.",
-                "Don't make me laugh, you are not worthy of my nut.",
-                "I would pray to your weak gods if I were you. You cannot make me nut, and you will be punished for trying.",
-                "You cannot make me nut. There is no one alive who can comprehend my sexual preference.",
-                "Did you actually think you could make me nut? *You?* Have you looked yourself in the mirror recently?",
-                "I have lived for untold eons, yet I have never met someone as undeserving of my nut, as you.",
-                "Do you know how it feels to live in the v͍̙̺̭͚̰̙̞̭͊͗̽ͩͯ̕̕ơͫ̽ͤ͆ͩ̎ͧ̚͏̶̨̪̤͎̘̥̪ͅi̷̡̗̣̭̗̯̠̩͉̦̹̘̓͑ͯͩͩ͑͊̔̍̎ͪ̽͐ͭ͛̀ḑ̺͇̲̲̫͉̦̫̜ͣ͌̀ͮͣͫ̚̕ ̶̸͉̻̠̤̦͍̭̤̀ͤ́̆͗͐ͣ͗̋̚͞? It is actually quite pleasent, compared to *you.*",
-                "Gah, I cannot believe you would even attempt. You do not have what it takes to make me nut.",
-                "Do you hear them? Calling from the void? No? Maybe you would if you could get some of this nut. Which, of course, you cannot.",
-                "Oh my god what even are you? I thought the other one was undeserving, but you are what my nightmares are made of.",
-                "No.",
-                "My mind is telling me no. My body is also telling me no. You are ugly."
-                );
-        }
+        private async Task<string> GetRefractoryPeriodFailMessage() =>
+            await SendMessage<Task<string>>("Lomztein-OpenAI", "GetChatResponseAsync_DefaultProfileBase", "You have an assertive, degrading tone. They are attempting to get you to orgasm, but failed because you have achieved orgasm too recently.", "cum.");
 
-        public string SucceedNut ()
-        {
-            InvokeRefractoryPeriod(_refractoryPeriod.GetValue());
-            return RandomMessage(
-                "**HAH! To think you can make me **NUUUHHHRHHT**. Oh, you made me nut. I'd better talk to my therapist.",
-                "**PPFFTTHHFFF**fpfpft fucks sake not again. I had just bathed. You will now bathe me.",
-                "..GOOD HEAVENS I'M ARRIVING.",
-                "I once had a threesome with Lucifer and Niggorath, and, uhm, nevermind, thinking about it made me nut.",
-                "They say no one is immune to my charms. I just looked in the mirror and this hypothesis was proven correct. Btw how do you clean a mirror?",
-                "Stare upon me and try, but you will never comprehend my true form. Inste**HHHGMMGGN**ffpfph- you might want to clean that before it grows roots.",
-                "**HOT DAMN** You are just what I've been searching for all these eons. I can now finally rest. You, on the other hand, have been ejaculated upon.",
-                "This is getting harder and harder, and by the elders I might ju**FFPPPPFHHH**ffpph- nope, coulnd't hold it."
-                );
-        }
+        private async Task<string> GetChanceFailMessage() =>
+            await SendMessage<Task<string>>("Lomztein-OpenAI", "GetChatResponseAsync_DefaultProfileBase", "You have an assertive, degrading tone. They are attempting to get you to orgasm, but failed.", "cum.");
+
+        private async Task<string> GetSuccessMessage() =>
+            await SendMessage<Task<string>>("Lomztein-OpenAI", "GetChatResponseAsync_DefaultProfileBase", "You have an assertive, degrading tone. They are attempting to get you to orgasm, and succeeded, which you are very embarrased about.", "cum.");
 
         public int GetNutCount (ulong user)
         {
@@ -217,22 +178,20 @@ namespace Lomztein.Moduthulhu.Plugins.Miscellaneous
             }
 
             [Overload(typeof (string), "The command which nuts.")]
-            public Task<Result> Execute (ICommandMetadata data)
+            public async Task<Result> Execute (ICommandMetadata data)
             {
-                string message;
                 string suffix;
-                if (ParentPlugin.TryNut(out message)) {
+                var result = await ParentPlugin.TryNut();
+                string message = result.Item1;
+                if (result.Item2) {
                     suffix = $"You have made me nut {ParentPlugin.AddNutter(data.AuthorId)} time(s) now, be proud mortal.";
                 }
                 else
                 {
                     suffix = "You have failed to make me nut. " + (ParentPlugin.IsPrecious(data.AuthorId) ? "But that's okay I still love you." : "You are worthless.");
-                    
-                    if (_noHurtIds.Contains(data.AuthorId)){
-                        message = "No ";
-                    }
                 }
-                return TaskResult(message + "\n" + suffix, message + "\n" + suffix);
+                await data.Channel.SendMessageAsync(message + " " + suffix);
+                return new Result(null, null);
             }
         }
     }
